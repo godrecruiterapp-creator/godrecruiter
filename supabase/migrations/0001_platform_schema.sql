@@ -16,8 +16,8 @@ create table public.subscription_plans (
   id                  text primary key,           -- e.g. 'starter', 'growth', 'enterprise'
   name                text not null,
   description         text,
-  price_monthly       integer not null default 0, -- cents
-  price_yearly        integer not null default 0, -- cents
+  price_monthly       integer,                    -- cents (null = custom/contact us pricing)
+  price_yearly        integer,                    -- cents (null = custom/contact us pricing)
   max_users           integer,                    -- null = unlimited
   max_jobs            integer,                    -- null = unlimited
   features            jsonb not null default '{}',
