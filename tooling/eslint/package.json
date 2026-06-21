@@ -1,0 +1,19 @@
+{
+  "name": "@god-recruiter/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./base": "./src/base.js",
+    "./next": "./src/next.js",
+    "./react-internal": "./src/react-internal.js"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.0.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-turbo": "^2.0.0"
+  }
+}

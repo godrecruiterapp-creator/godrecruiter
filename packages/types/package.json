@@ -1,0 +1,12 @@
+{
+  "name": "@god-recruiter/types",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@god-recruiter/tsconfig": "workspace:*",
+    "typescript": "^5.6.3"
+  }
+}

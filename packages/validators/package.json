@@ -1,0 +1,19 @@
+{
+  "name": "@god-recruiter/validators",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./tenant": "./src/tenant.ts",
+    "./user": "./src/user.ts",
+    "./candidate": "./src/candidate.ts",
+    "./job": "./src/job.ts"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@god-recruiter/tsconfig": "workspace:*",
+    "typescript": "^5.6.3"
+  }
+}
