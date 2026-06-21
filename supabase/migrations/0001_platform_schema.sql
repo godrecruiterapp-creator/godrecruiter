@@ -148,14 +148,15 @@ create index idx_pool_available on public.pool_schemas(is_available) where is_av
 -- USAGE EVENTS  (silent telemetry — ADR R9)
 -- =============================================================================
 create table public.usage_events (
-  id            text primary key,                 -- ULID
-  tenant_id     text not null references public.tenants(id) on delete cascade,
+  id            text not null,                    -- ULID
+  tenant_id     text not null,                    -- no FK on partitioned table
   event_type    text not null,
                 -- candidates_added | jobs_published | emails_sent | ai_credits_used
                 -- storage_bytes | api_calls | applications_processed | interviews_scheduled
   quantity      integer not null default 1,
   metadata      jsonb default '{}',
-  created_at    timestamptz not null default now()
+  created_at    timestamptz not null default now(),
+  primary key (id, created_at)
 ) partition by range (created_at);
 
 -- Partition by month for efficient querying + archiving
