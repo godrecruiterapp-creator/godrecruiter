@@ -21,3 +21,6 @@ supabase/functions/.deploy
 .DS_Store
 *.log
 .vercel
+
+# Claude Code
+.claude/settings.local.json
