@@ -3,8 +3,6 @@ import type { TenantContext } from '@god-recruiter/types'
 const TENANT_CACHE = new Map<string, { context: TenantContext; expiresAt: number }>()
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
-// Resolves a subdomain or custom domain to a TenantContext
-// In production this hits Upstash Redis first, then falls back to DB
 export async function resolveTenant(
   host: string,
   appDomain: string
@@ -30,18 +28,14 @@ export async function resolveTenant(
 }
 
 function extractTenantSlug(host: string, appDomain: string): string | null {
-  // Strip port for local dev
   const hostname = host.split(':')[0]!
 
-  // app.godrecruiter.com → no tenant (marketing/auth)
   if (hostname === appDomain || hostname === `app.${appDomain}`) return null
 
-  // {slug}.godrecruiter.com → slug
   if (hostname.endsWith(`.${appDomain}`)) {
     return hostname.replace(`.${appDomain}`, '')
   }
 
-  // Custom domain — look up by full hostname
   return `custom:${hostname}`
 }
 
@@ -49,26 +43,18 @@ async function fetchTenantContext(
   slugOrCustom: string,
   _host: string
 ): Promise<TenantContext | null> {
-  // This function is called server-side only.
-  // We import the admin client dynamically to avoid bundling it client-side.
   const { createAdminClient } = await import('@/lib/supabase/admin')
   const supabase = createAdminClient()
 
-  let query = supabase
+  const baseQuery = supabase
     .schema('public')
     .from('tenants')
     .select('id, slug, schema_name, region, plan_id, status')
-    .eq('deleted_at' as never, null)
-    .single()
+    .is('deleted_at', null)
 
-  if (slugOrCustom.startsWith('custom:')) {
-    const domain = slugOrCustom.replace('custom:', '')
-    query = query.eq('custom_domain', domain)
-  } else {
-    query = query.eq('slug', slugOrCustom)
-  }
-
-  const { data, error } = await query
+  const { data, error } = slugOrCustom.startsWith('custom:')
+    ? await baseQuery.eq('custom_domain', slugOrCustom.replace('custom:', '')).single()
+    : await baseQuery.eq('slug', slugOrCustom).single()
 
   if (error || !data) return null
   if (data.status === 'suspended' || data.status === 'cancelled') return null
