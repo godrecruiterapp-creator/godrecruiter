@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/app/sidebar'
@@ -24,9 +25,28 @@ export default async function DashboardLayout({
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header userName={fullName} userEmail={user.email ?? ''} />
         <main style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
-          {children}
+          <Suspense fallback={<PageSkeleton />}>
+            {children}
+          </Suspense>
         </main>
       </div>
+    </div>
+  )
+}
+
+function PageSkeleton() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {[1, 2, 3].map(i => (
+        <div key={i} style={{
+          height: '64px',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '10px',
+          animation: 'pulse 1.5s ease-in-out infinite',
+        }} />
+      ))}
+      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
     </div>
   )
 }
