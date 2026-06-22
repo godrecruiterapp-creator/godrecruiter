@@ -77,23 +77,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── 6. Resolve tenant from hostname ──────────────────────────────────────
+  // Skip DB lookup entirely for the main app domain (Vercel URL or app.*)
+  const hostname = host.split(':')[0] ?? ''
+  const isMainDomain = !hostname.endsWith(`.${APP_DOMAIN}`) || hostname === `app.${APP_DOMAIN}`
+
+  if (isMainDomain) {
+    // On main domain — no tenant context needed, allow all authenticated routes
+    return response
+  }
+
   const tenantContext = await resolveTenant(host, APP_DOMAIN)
 
   if (!tenantContext) {
-    // On the main app domain (Vercel URL or app.godrecruiter.com), allow
-    // /dashboard, /select-workspace, /onboarding without a tenant in the URL.
-    const isMainDomain =
-      !host.includes(`.${APP_DOMAIN}`) ||
-      host.startsWith('app.')
-    const isSharedRoute =
-      pathname.startsWith('/dashboard') ||
-      pathname.startsWith('/select-workspace') ||
-      pathname.startsWith('/onboarding')
-
-    if (isMainDomain && isSharedRoute) {
-      return response
-    }
-
     if (!pathname.startsWith('/select-workspace')) {
       return NextResponse.redirect(new URL('/select-workspace', request.url))
     }
