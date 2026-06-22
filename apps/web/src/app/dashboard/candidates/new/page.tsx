@@ -1,7 +1,20 @@
+'use client'
+
+import { useActionState } from 'react'
 import { createCandidateAction } from '../actions'
 import Link from 'next/link'
 
+const initialState = { error: '' }
+
 export default function NewCandidatePage() {
+  const [state, formAction, pending] = useActionState(
+    async (_prev: typeof initialState, formData: FormData) => {
+      const result = await createCandidateAction(formData)
+      return result ?? initialState
+    },
+    initialState
+  )
+
   return (
     <div style={{ maxWidth: '680px' }}>
 
@@ -27,7 +40,17 @@ export default function NewCandidatePage() {
         </div>
       </div>
 
-      <form action={createCandidateAction as (formData: FormData) => void} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {state.error && (
+        <div style={{
+          padding: '12px 16px', marginBottom: '16px',
+          background: '#FFF1F1', border: '1px solid #FECACA',
+          borderRadius: '6px', fontSize: '13px', color: '#DC2626',
+        }}>
+          {state.error}
+        </div>
+      )}
+
+      <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         <Section title="Personal information">
           <Row>
@@ -86,12 +109,12 @@ export default function NewCandidatePage() {
         </Section>
 
         <div style={{ display: 'flex', gap: '8px', paddingBottom: '40px' }}>
-          <button type="submit" style={{
-            padding: '9px 18px', background: '#0A0A0A', color: '#FFFFFF',
+          <button type="submit" disabled={pending} style={{
+            padding: '9px 18px', background: pending ? '#555555' : '#0A0A0A', color: '#FFFFFF',
             border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500',
-            cursor: 'pointer', fontFamily: 'inherit',
+            cursor: pending ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
           }}>
-            Save candidate
+            {pending ? 'Saving…' : 'Save candidate'}
           </button>
           <a href="/dashboard/candidates" style={{
             padding: '9px 14px', background: '#FFFFFF', color: '#555555',

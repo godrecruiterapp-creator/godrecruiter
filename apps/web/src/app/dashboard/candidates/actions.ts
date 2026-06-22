@@ -16,7 +16,7 @@ async function getTenantId(userId: string) {
   return data?.tenant_id ?? null
 }
 
-export async function createCandidateAction(formData: FormData) {
+export async function createCandidateAction(formData: FormData): Promise<{ error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated.' }
@@ -24,19 +24,19 @@ export async function createCandidateAction(formData: FormData) {
   const tenantId = await getTenantId(user.id)
   if (!tenantId) return { error: 'No workspace found.' }
 
-  const first_name      = formData.get('first_name') as string
-  const last_name       = formData.get('last_name') as string
-  const email           = formData.get('email') as string
-  const phone           = formData.get('phone') as string
-  const current_title   = formData.get('current_title') as string
-  const current_company = formData.get('current_company') as string
-  const location        = formData.get('location') as string
-  const linkedin_url    = formData.get('linkedin_url') as string
-  const candidate_type  = formData.get('candidate_type') as string
-  const notice_period   = formData.get('notice_period') as string
-  const source          = formData.get('source') as string
-  const notes           = formData.get('notes') as string
-  const current_ctc_raw = formData.get('current_ctc') as string
+  const first_name       = formData.get('first_name') as string
+  const last_name        = formData.get('last_name') as string
+  const email            = formData.get('email') as string
+  const phone            = formData.get('phone') as string
+  const current_title    = formData.get('current_title') as string
+  const current_company  = formData.get('current_company') as string
+  const location         = formData.get('location') as string
+  const linkedin_url     = formData.get('linkedin_url') as string
+  const candidate_type   = formData.get('candidate_type') as string
+  const notice_period    = formData.get('notice_period') as string
+  const source           = formData.get('source') as string
+  const notes            = formData.get('notes') as string
+  const current_ctc_raw  = formData.get('current_ctc') as string
   const expected_ctc_raw = formData.get('expected_ctc') as string
 
   if (!first_name || !last_name) return { error: 'First and last name are required.' }
@@ -61,7 +61,7 @@ export async function createCandidateAction(formData: FormData) {
     current_ctc: current_ctc_raw ? parseInt(current_ctc_raw) : null,
     expected_ctc: expected_ctc_raw ? parseInt(expected_ctc_raw) : null,
     created_by: user.id,
-  }).select().single()
+  }).select('id').single()
 
   if (error) {
     if (error.code === '23505') return { error: 'A candidate with this email already exists.' }
