@@ -3,33 +3,33 @@ import Link from 'next/link'
 
 export default function NewJobPage() {
   return (
-    <div style={{ maxWidth: '760px' }}>
-      {/* Page header */}
-      <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <div style={{ maxWidth: '680px' }}>
+
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <Link href="/dashboard/jobs" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: '34px', height: '34px', borderRadius: '8px',
-          border: '1px solid var(--border-subtle)', background: '#fff',
-          textDecoration: 'none', color: 'var(--text-secondary)',
-          boxShadow: 'var(--shadow-sm)',
+          width: '30px', height: '30px', borderRadius: '6px',
+          border: '1px solid #E0E0E0', background: '#FFFFFF',
+          textDecoration: 'none', color: '#777777',
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </Link>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#0A0A0A', margin: 0, letterSpacing: '-0.02em' }}>
             Post a job
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '3px 0 0' }}>
-            Fill in the details below. Save as draft or publish immediately.
+          <p style={{ fontSize: '13px', color: '#777777', margin: '2px 0 0' }}>
+            Save as draft or publish immediately.
           </p>
         </div>
       </div>
 
-      <form action={createJobAction as (formData: FormData) => void} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <form action={createJobAction as (formData: FormData) => void} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-        <Card title="Basic Information">
+        <Section title="Basic information">
           <Field label="Job title" name="title" placeholder="e.g. Senior Software Engineer" required />
           <Row>
             <Field label="Department" name="department" placeholder="e.g. Engineering" />
@@ -53,36 +53,32 @@ export default function NewJobPage() {
             <Field label="Max salary (₹/year)" name="salary_max" type="number" placeholder="e.g. 1200000" />
           </Row>
           <Field label="Number of openings" name="openings" type="number" placeholder="1" />
-        </Card>
+        </Section>
 
-        <Card title="Job Description">
-          <Textarea label="Description" name="description" placeholder="Describe the role, responsibilities, and what the candidate will be working on…" rows={6} />
+        <Section title="Description">
+          <Textarea label="Role description" name="description" placeholder="Describe the role, responsibilities, and what the candidate will be working on…" rows={6} />
           <Textarea label="Requirements" name="requirements" placeholder="List the skills, experience, and qualifications required…" rows={5} />
-        </Card>
+        </Section>
 
-        <Card title="Publishing">
+        <Section title="Publishing">
           <Select label="Status" name="status" options={[
             { value: 'draft',     label: 'Save as draft' },
             { value: 'published', label: 'Publish immediately' },
           ]} />
-        </Card>
+        </Section>
 
-        <div style={{ display: 'flex', gap: '12px', paddingBottom: '32px' }}>
+        <div style={{ display: 'flex', gap: '8px', paddingBottom: '40px' }}>
           <button type="submit" style={{
-            padding: '11px 24px',
-            background: 'var(--color-primary)', color: '#fff',
-            border: 'none', borderRadius: '8px',
-            fontSize: '14px', fontWeight: '600', cursor: 'pointer',
-            transition: 'background 0.15s',
+            padding: '9px 18px', background: '#0A0A0A', color: '#FFFFFF',
+            border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500',
+            cursor: 'pointer', fontFamily: 'inherit',
           }}>
             Save job
           </button>
           <a href="/dashboard/jobs" style={{
-            padding: '11px 20px',
-            background: '#fff', color: 'var(--text-secondary)',
-            border: '1px solid var(--border-default)',
-            borderRadius: '8px', fontSize: '14px', fontWeight: '500',
-            textDecoration: 'none',
+            padding: '9px 14px', background: '#FFFFFF', color: '#555555',
+            border: '1px solid #E0E0E0', borderRadius: '6px',
+            fontSize: '13px', fontWeight: '500', textDecoration: 'none', display: 'inline-block',
           }}>
             Cancel
           </a>
@@ -92,25 +88,19 @@ export default function NewJobPage() {
   )
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{
-      background: '#fff',
-      border: '1px solid var(--border-subtle)',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      boxShadow: 'var(--shadow-card)',
+      background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', overflow: 'hidden',
     }}>
       <div style={{
-        padding: '16px 22px',
-        borderBottom: '1px solid var(--border-subtle)',
-        fontSize: '14px', fontWeight: '600',
-        color: 'var(--text-primary)',
-        background: 'var(--bg-subtle)',
+        padding: '13px 18px', borderBottom: '1px solid #EBEBEB',
+        fontSize: '13px', fontWeight: '500', color: '#0A0A0A',
+        background: '#FAFAFA',
       }}>
         {title}
       </div>
-      <div style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {children}
       </div>
     </div>
@@ -119,32 +109,30 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 function Row({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
       {children}
     </div>
   )
 }
 
-const inputBase = {
-  height: '42px', padding: '0 14px',
-  fontSize: '14px', color: 'var(--text-primary)',
-  background: 'var(--bg-app)',
-  border: '1.5px solid var(--border-default)',
-  borderRadius: '8px', outline: 'none',
-  width: '100%', boxSizing: 'border-box' as const,
+const inputStyle: React.CSSProperties = {
+  height: '38px', padding: '0 12px',
+  fontSize: '14px', color: '#0A0A0A',
+  background: '#FFFFFF', border: '1px solid #E0E0E0',
+  borderRadius: '6px', outline: 'none',
+  width: '100%', boxSizing: 'border-box',
   fontFamily: 'inherit',
-  transition: 'border-color 0.15s',
 }
 
 function Field({ label, name, type = 'text', placeholder, required }: {
   label: string; name: string; type?: string; placeholder?: string; required?: boolean
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' }}>
-        {label}{required && <span style={{ color: 'var(--status-danger)', marginLeft: 2 }}>*</span>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>
+        {label}{required && <span style={{ color: '#DC2626', marginLeft: 2 }}>*</span>}
       </label>
-      <input name={name} type={type} placeholder={placeholder} required={required} style={inputBase} />
+      <input name={name} type={type} placeholder={placeholder} required={required} style={inputStyle} />
     </div>
   )
 }
@@ -153,9 +141,9 @@ function Select({ label, name, options }: {
   label: string; name: string; options: { value: string; label: string }[]
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' }}>{label}</label>
-      <select name={name} defaultValue={options[0]?.value} style={{ ...inputBase, cursor: 'pointer' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>{label}</label>
+      <select name={name} defaultValue={options[0]?.value} style={{ ...inputStyle, cursor: 'pointer' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
@@ -166,21 +154,15 @@ function Textarea({ label, name, placeholder, rows = 4 }: {
   label: string; name: string; placeholder?: string; rows?: number
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' }}>{label}</label>
-      <textarea
-        name={name} placeholder={placeholder} rows={rows}
-        style={{
-          padding: '12px 14px',
-          fontSize: '14px', color: 'var(--text-primary)',
-          background: 'var(--bg-app)',
-          border: '1.5px solid var(--border-default)',
-          borderRadius: '8px', outline: 'none',
-          resize: 'vertical', width: '100%',
-          boxSizing: 'border-box', lineHeight: '1.6',
-          fontFamily: 'inherit',
-        }}
-      />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>{label}</label>
+      <textarea name={name} placeholder={placeholder} rows={rows} style={{
+        padding: '10px 12px', fontSize: '14px', color: '#0A0A0A',
+        background: '#FFFFFF', border: '1px solid #E0E0E0',
+        borderRadius: '6px', outline: 'none', resize: 'vertical',
+        width: '100%', boxSizing: 'border-box', lineHeight: '1.6',
+        fontFamily: 'inherit',
+      }} />
     </div>
   )
 }

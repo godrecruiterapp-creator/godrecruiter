@@ -26,35 +26,33 @@ export default async function JobsPage() {
     .order('created_at', { ascending: false })
   ).data ?? [] : []
 
-  const statusMeta: Record<string, { label: string; color: string; bg: string }> = {
-    draft:     { label: 'Draft',     color: '#64748B', bg: '#F1F5F9' },
-    published: { label: 'Published', color: '#059669', bg: '#DCFCE7' },
-    paused:    { label: 'Paused',    color: '#D97706', bg: '#FEF9C3' },
-    closed:    { label: 'Closed',    color: '#DC2626', bg: '#FEE2E2' },
+  const statusBadge: Record<string, { label: string; color: string; bg: string }> = {
+    draft:     { label: 'Draft',     color: '#555555', bg: '#F5F5F5' },
+    published: { label: 'Published', color: '#16A34A', bg: '#F0FDF4' },
+    paused:    { label: 'Paused',    color: '#CA8A04', bg: '#FEFCE8' },
+    closed:    { label: 'Closed',    color: '#DC2626', bg: '#FFF1F1' },
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '880px' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#0A0A0A', margin: 0, letterSpacing: '-0.02em' }}>
             Jobs
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '4px 0 0' }}>
-            {jobs.length} job{jobs.length !== 1 ? 's' : ''} total
+          <p style={{ fontSize: '13px', color: '#777777', margin: '3px 0 0' }}>
+            {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'}
           </p>
         </div>
         <Link href="/dashboard/jobs/new" style={{
-          padding: '10px 18px',
-          background: 'var(--color-primary)',
-          color: '#fff', borderRadius: '8px',
-          fontSize: '14px', fontWeight: '600',
-          textDecoration: 'none',
-          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '8px 14px',
+          background: '#0A0A0A', color: '#FFFFFF',
+          borderRadius: '6px', fontSize: '13px', fontWeight: '500',
+          textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px',
         }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
           Post a job
@@ -64,89 +62,80 @@ export default async function JobsPage() {
       {/* Empty state */}
       {jobs.length === 0 && (
         <div style={{
-          background: '#fff',
-          border: '2px dashed var(--border-default)',
-          borderRadius: '12px',
-          padding: '72px 24px',
+          background: '#FFFFFF',
+          border: '1px solid #EBEBEB',
+          borderRadius: '8px',
+          padding: '60px 24px',
           textAlign: 'center',
-          boxShadow: 'var(--shadow-card)',
         }}>
-          <div style={{
-            width: '56px', height: '56px', borderRadius: '12px',
-            background: '#EFF6FF', color: '#0369A1',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px',
-          }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="7" width="20" height="14" rx="2"/>
-              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-              <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
-            </svg>
-          </div>
-          <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 8px' }}>
-            No jobs yet
-          </h2>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 24px', lineHeight: '1.6' }}>
-            Post your first job opening to start receiving applications from candidates.
+          <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 6px' }}>No jobs yet</p>
+          <p style={{ fontSize: '13px', color: '#999999', margin: '0 0 20px' }}>
+            Post your first job to start receiving applications.
           </p>
           <Link href="/dashboard/jobs/new" style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '10px 20px', background: 'var(--color-primary)',
-            color: '#fff', borderRadius: '8px',
-            fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+            display: 'inline-block', padding: '8px 16px',
+            background: '#0A0A0A', color: '#FFFFFF',
+            borderRadius: '6px', fontSize: '13px', fontWeight: '500', textDecoration: 'none',
           }}>
             Post a job
           </Link>
         </div>
       )}
 
-      {/* Jobs list */}
+      {/* Jobs table */}
       {jobs.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {jobs.map((job: Record<string, string | null>) => {
-            const meta = statusMeta[job.status ?? ''] ?? { label: 'Draft', color: '#64748B', bg: '#F1F5F9' }
+        <div style={{
+          background: '#FFFFFF',
+          border: '1px solid #EBEBEB',
+          borderRadius: '8px',
+          overflow: 'hidden',
+        }}>
+          {/* Table header */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto auto',
+            padding: '10px 20px',
+            borderBottom: '1px solid #EBEBEB',
+            background: '#F9F9F9',
+          }}>
+            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Job</span>
+            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em', width: '90px', textAlign: 'center' }}>Status</span>
+            <span style={{ width: '16px' }} />
+          </div>
+
+          {jobs.map((job: Record<string, string | null>, i) => {
+            const badge = statusBadge[job.status ?? ''] ?? { label: 'Draft', color: '#555555', bg: '#F5F5F5' }
+            const meta = [job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')
             return (
               <Link key={job.id} href={`/dashboard/jobs/${job.id}`} style={{
-                display: 'flex',
+                display: 'grid',
+                gridTemplateColumns: '1fr auto auto',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '18px 22px',
-                background: '#fff',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '10px',
+                padding: '14px 20px',
+                borderBottom: i < jobs.length - 1 ? '1px solid #F5F5F5' : 'none',
                 textDecoration: 'none',
-                boxShadow: 'var(--shadow-card)',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
+                transition: 'background 0.1s',
               }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent-primary)'
-                  ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(3,105,161,0.1)'
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-subtle)'
-                  ;(e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card)'
-                }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#FAFAFA'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                <div>
+                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 2px' }}>
                     {job.title}
-                  </span>
-                  <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
-                    {[job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')}
-                  </span>
+                  </p>
+                  {meta && <p style={{ fontSize: '12px', color: '#AAAAAA', margin: 0 }}>{meta}</p>}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{
-                    padding: '4px 12px', borderRadius: '20px',
-                    fontSize: '12px', fontWeight: '600',
-                    background: meta.bg, color: meta.color,
-                  }}>
-                    {meta.label}
-                  </span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"/>
-                  </svg>
-                </div>
+                <span style={{
+                  padding: '3px 10px', borderRadius: '4px',
+                  fontSize: '11px', fontWeight: '500',
+                  background: badge.bg, color: badge.color,
+                  width: '90px', textAlign: 'center', display: 'block',
+                }}>
+                  {badge.label}
+                </span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '8px' }}>
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
               </Link>
             )
           })}

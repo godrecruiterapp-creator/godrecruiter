@@ -5,28 +5,28 @@ interface AlertProps {
   message: string
 }
 
-const styles = {
-  error:   { bg: '#FEF2F2', border: '#FECACA', color: '#991B1B', icon: '✕' },
-  success: { bg: '#F0FDF4', border: '#BBF7D0', color: '#166534', icon: '✓' },
-  info:    { bg: '#EFF6FF', border: '#BFDBFE', color: '#1E40AF', icon: 'ℹ' },
+const config = {
+  error:   { bg: '#FFF1F1', border: '#FECACA', color: '#991B1B', dot: '#DC2626' },
+  success: { bg: '#F0FDF4', border: '#BBF7D0', color: '#166534', dot: '#16A34A' },
+  info:    { bg: '#F9F9F9', border: '#E0E0E0', color: '#333333', dot: '#0A0A0A' },
 }
 
 export function Alert({ type, message }: AlertProps) {
-  const s = styles[type]
+  const c = config[type]
   return (
     <div role="alert" style={{
-      padding: '12px 14px',
-      borderRadius: '8px',
-      background: s.bg,
-      border: `1px solid ${s.border}`,
-      fontSize: '13px',
-      color: s.color,
-      lineHeight: '1.5',
-      display: 'flex',
-      gap: '10px',
-      alignItems: 'flex-start',
+      padding: '11px 14px',
+      borderRadius: '6px',
+      background: c.bg,
+      border: `1px solid ${c.border}`,
+      fontSize: '13px', color: c.color,
+      lineHeight: 1.5,
+      display: 'flex', gap: '8px', alignItems: 'flex-start',
     }}>
-      <span style={{ fontWeight: '700', flexShrink: 0, fontSize: '12px', marginTop: '1px' }}>{s.icon}</span>
+      <span style={{
+        width: '6px', height: '6px', borderRadius: '50%',
+        background: c.dot, flexShrink: 0, marginTop: '5px',
+      }} />
       <span>{message}</span>
     </div>
   )

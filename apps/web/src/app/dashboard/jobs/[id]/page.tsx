@@ -24,103 +24,78 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   const workModeLabel: Record<string, string> = { remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site' }
   const jobTypeLabel: Record<string, string>  = { full_time: 'Full-time', part_time: 'Part-time', contract: 'Contract', internship: 'Internship' }
 
-  const statusMeta: Record<string, { label: string; color: string; bg: string }> = {
-    draft:     { label: 'Draft',     color: '#64748B', bg: '#F1F5F9' },
-    published: { label: 'Published', color: '#059669', bg: '#DCFCE7' },
-    paused:    { label: 'Paused',    color: '#D97706', bg: '#FEF9C3' },
-    closed:    { label: 'Closed',    color: '#DC2626', bg: '#FEE2E2' },
+  const statusBadge: Record<string, { label: string; color: string; bg: string }> = {
+    draft:     { label: 'Draft',     color: '#555555', bg: '#F5F5F5' },
+    published: { label: 'Published', color: '#16A34A', bg: '#F0FDF4' },
+    paused:    { label: 'Paused',    color: '#CA8A04', bg: '#FEFCE8' },
+    closed:    { label: 'Closed',    color: '#DC2626', bg: '#FFF1F1' },
   }
 
-  const st = statusMeta[job.status as string] ?? { label: 'Draft', color: '#64748B', bg: '#F1F5F9' }
-
-  const salary = job.salary_min || job.salary_max
-    ? `₹${job.salary_min ? (job.salary_min / 1000).toFixed(0) + 'K' : ''}${job.salary_min && job.salary_max ? ' – ' : ''}${job.salary_max ? '₹' + (job.salary_max / 1000).toFixed(0) + 'K' : ''} / year`
-    : null
+  const badge = statusBadge[job.status as string] ?? { label: 'Draft', color: '#555555', bg: '#F5F5F5' }
 
   const chips = [
     job.department,
     job.location,
     workModeLabel[job.work_mode],
     jobTypeLabel[job.job_type],
-    salary,
     `${job.openings ?? 1} opening${(job.openings ?? 1) > 1 ? 's' : ''}`,
   ].filter(Boolean)
 
   return (
-    <div style={{ maxWidth: '760px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ maxWidth: '680px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
       {/* Top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Link href="/dashboard/jobs" style={{
           display: 'flex', alignItems: 'center', gap: '6px',
-          fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none',
-          padding: '7px 12px', borderRadius: '8px', border: '1px solid var(--border-subtle)',
-          background: '#fff', boxShadow: 'var(--shadow-sm)', fontWeight: '500',
+          fontSize: '13px', color: '#777777', textDecoration: 'none',
+          padding: '6px 10px', borderRadius: '6px', border: '1px solid #E0E0E0',
+          background: '#FFFFFF',
         }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
-          Back to jobs
+          Back
         </Link>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '6px' }}>
           {job.status !== 'published' && (
             <form action={async () => { 'use server'; await updateJobStatusAction(id, 'published') }}>
-              <button type="submit" style={{
-                padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '600',
-                background: '#059669', color: '#fff', border: 'none', cursor: 'pointer',
-              }}>
-                Publish
-              </button>
+              <button type="submit" style={actionBtn('#0A0A0A', '#FFFFFF')}>Publish</button>
             </form>
           )}
           {job.status === 'published' && (
             <form action={async () => { 'use server'; await updateJobStatusAction(id, 'paused') }}>
-              <button type="submit" style={{
-                padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '600',
-                background: '#FEF9C3', color: '#92400E', border: '1px solid #FDE68A', cursor: 'pointer',
-              }}>
-                Pause
-              </button>
+              <button type="submit" style={actionBtn('#FFFFFF', '#555555', true)}>Pause</button>
             </form>
           )}
           <form action={async () => { 'use server'; await deleteJobAction(id) }}>
-            <button type="submit" style={{
-              padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '600',
-              background: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', cursor: 'pointer',
-            }}>
+            <button type="submit" style={{ ...actionBtn('#FFFFFF', '#DC2626', true), borderColor: '#FECACA' }}>
               Delete
             </button>
           </form>
         </div>
       </div>
 
-      {/* Header card */}
-      <div style={{
-        background: '#fff',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: '12px',
-        padding: '28px',
-        boxShadow: 'var(--shadow-card)',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', gap: '16px' }}>
-          <h1 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em' }}>
+      {/* Job header */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', padding: '22px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '14px' }}>
+          <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#0A0A0A', margin: 0, letterSpacing: '-0.02em' }}>
             {job.title}
           </h1>
           <span style={{
-            padding: '5px 14px', borderRadius: '20px',
-            fontSize: '12px', fontWeight: '600', flexShrink: 0,
-            background: st.bg, color: st.color,
+            padding: '3px 10px', borderRadius: '4px',
+            fontSize: '11px', fontWeight: '500', flexShrink: 0,
+            background: badge.bg, color: badge.color,
           }}>
-            {st.label}
+            {badge.label}
           </span>
         </div>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {chips.map((val) => (
             <span key={String(val)} style={{
-              fontSize: '13px', color: 'var(--text-secondary)',
-              background: 'var(--bg-subtle)', borderRadius: '6px',
-              padding: '4px 10px', fontWeight: '500',
+              fontSize: '12px', color: '#555555',
+              background: '#F5F5F5', borderRadius: '4px',
+              padding: '3px 10px',
             }}>
               {String(val)}
             </span>
@@ -130,45 +105,42 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
       {/* Description */}
       {job.description && (
-        <Section title="Description">
-          <p style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.7', margin: 0, whiteSpace: 'pre-wrap' }}>
-            {job.description}
-          </p>
-        </Section>
+        <TextSection title="Description" body={job.description} />
       )}
 
       {/* Requirements */}
       {job.requirements && (
-        <Section title="Requirements">
-          <p style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.7', margin: 0, whiteSpace: 'pre-wrap' }}>
-            {job.requirements}
-          </p>
-        </Section>
+        <TextSection title="Requirements" body={job.requirements} />
       )}
 
     </div>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function TextSection({ title, body }: { title: string; body: string }) {
   return (
-    <div style={{
-      background: '#fff',
-      border: '1px solid var(--border-subtle)',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      boxShadow: 'var(--shadow-card)',
-    }}>
+    <div style={{ background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', overflow: 'hidden' }}>
       <div style={{
-        padding: '16px 22px',
-        borderBottom: '1px solid var(--border-subtle)',
-        fontSize: '14px', fontWeight: '600',
-        color: 'var(--text-primary)',
-        background: 'var(--bg-subtle)',
+        padding: '12px 18px', borderBottom: '1px solid #EBEBEB',
+        fontSize: '13px', fontWeight: '500', color: '#0A0A0A',
+        background: '#FAFAFA',
       }}>
         {title}
       </div>
-      <div style={{ padding: '22px' }}>{children}</div>
+      <div style={{ padding: '18px' }}>
+        <p style={{ fontSize: '14px', color: '#333333', lineHeight: '1.7', margin: 0, whiteSpace: 'pre-wrap' }}>
+          {body}
+        </p>
+      </div>
     </div>
   )
+}
+
+function actionBtn(bg: string, color: string, bordered = false): React.CSSProperties {
+  return {
+    padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: '500',
+    background: bg, color, cursor: 'pointer',
+    border: bordered ? '1px solid #E0E0E0' : 'none',
+    fontFamily: 'inherit',
+  }
 }

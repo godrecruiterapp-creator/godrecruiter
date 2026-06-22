@@ -20,11 +20,11 @@ export default async function DashboardLayout({
     'User'
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg-app)' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
       <Sidebar />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header userName={fullName} userEmail={user.email ?? ''} />
-        <main style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
+        <main style={{ flex: 1, overflow: 'auto', padding: '28px 28px', background: '#FAFAFA' }}>
           <Suspense fallback={<PageSkeleton />}>
             {children}
           </Suspense>
@@ -39,10 +39,10 @@ function PageSkeleton() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {[1, 2, 3].map(i => (
         <div key={i} style={{
-          height: '64px',
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-default)',
-          borderRadius: '10px',
+          height: '56px',
+          background: '#FFFFFF',
+          border: '1px solid #EBEBEB',
+          borderRadius: '8px',
           animation: 'pulse 1.5s ease-in-out infinite',
         }} />
       ))}

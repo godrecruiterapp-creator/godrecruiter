@@ -18,35 +18,32 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label htmlFor={name} style={{
-        fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)',
-      }}>
+      <label htmlFor={name} style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>
         {label}
-        {required && <span style={{ color: 'var(--status-danger)', marginLeft: '2px' }}>*</span>}
+        {required && <span style={{ color: '#DC2626', marginLeft: '2px' }}>*</span>}
       </label>
       <input
         id={name} name={name} type={type}
         placeholder={placeholder} required={required}
         autoComplete={autoComplete} defaultValue={defaultValue}
         style={{
-          width: '100%', height: '42px', padding: '0 14px',
-          fontSize: '14px', color: 'var(--text-primary)',
-          background: 'var(--bg-app)',
-          border: `1.5px solid ${error ? 'var(--status-danger)' : 'var(--border-default)'}`,
-          borderRadius: '8px', outline: 'none',
-          transition: 'border-color 0.15s, box-shadow 0.15s',
+          width: '100%', height: '40px', padding: '0 12px',
+          fontSize: '14px', color: '#0A0A0A',
+          background: '#FFFFFF',
+          border: `1px solid ${error ? '#DC2626' : '#E0E0E0'}`,
+          borderRadius: '6px', outline: 'none',
+          transition: 'border-color 0.12s',
+          fontFamily: 'inherit',
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = error ? 'var(--status-danger)' : 'var(--accent-primary)'
-          e.currentTarget.style.boxShadow = `0 0 0 3px ${error ? 'rgba(220,38,38,0.1)' : 'rgba(3,105,161,0.12)'}`
+          e.currentTarget.style.borderColor = error ? '#DC2626' : '#0A0A0A'
         }}
         onBlur={(e) => {
-          e.currentTarget.style.borderColor = error ? 'var(--status-danger)' : 'var(--border-default)'
-          e.currentTarget.style.boxShadow = 'none'
+          e.currentTarget.style.borderColor = error ? '#DC2626' : '#E0E0E0'
         }}
       />
-      {error && <p style={{ fontSize: '12px', color: 'var(--status-danger)' }}>{error}</p>}
-      {hint && !error && <p style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{hint}</p>}
+      {error && <p style={{ fontSize: '12px', color: '#DC2626', margin: 0 }}>{error}</p>}
+      {hint && !error && <p style={{ fontSize: '12px', color: '#999999', margin: 0 }}>{hint}</p>}
     </div>
   )
 }
