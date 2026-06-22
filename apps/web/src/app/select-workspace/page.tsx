@@ -31,10 +31,10 @@ export default async function SelectWorkspacePage() {
 
   const workspaces = (memberships ?? [])
     .filter((m) => m.tenants)
-    .map((m) => ({
-      ...(m.tenants as Record<string, unknown>),
-      role: m.role,
-    }))
+    .map((m) => {
+      const t = m.tenants as { id: string; name: string; slug: string; logo_url: string | null; status: string; plan_id: string }
+      return { ...t, role: m.role }
+    })
 
   // If user has exactly one workspace, skip the picker and go straight in
   if (workspaces.length === 1 && workspaces[0]) {
