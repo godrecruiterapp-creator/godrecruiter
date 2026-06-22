@@ -11,8 +11,6 @@ export default async function JobsPage() {
   if (!user) redirect('/auth/login')
 
   const admin = createAdminClient()
-
-  // Get user's tenant
   const { data: membership } = await admin
     .from('platform_user_tenants')
     .select('tenant_id')
@@ -28,75 +26,75 @@ export default async function JobsPage() {
     .order('created_at', { ascending: false })
   ).data ?? [] : []
 
-  const statusColor: Record<string, string> = {
-    draft:     'var(--text-tertiary)',
-    published: 'var(--status-success)',
-    paused:    'var(--status-warning)',
-    closed:    'var(--status-danger)',
-  }
-
-  const statusBg: Record<string, string> = {
-    draft:     'var(--bg-subtle)',
-    published: '#dcfce7',
-    paused:    '#fef9c3',
-    closed:    '#fee2e2',
+  const statusMeta: Record<string, { label: string; color: string; bg: string }> = {
+    draft:     { label: 'Draft',     color: '#64748B', bg: '#F1F5F9' },
+    published: { label: 'Published', color: '#059669', bg: '#DCFCE7' },
+    paused:    { label: 'Paused',    color: '#D97706', bg: '#FEF9C3' },
+    closed:    { label: 'Closed',    color: '#DC2626', bg: '#FEE2E2' },
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Jobs</h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '4px 0 0' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em' }}>
+            Jobs
+          </h1>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '4px 0 0' }}>
             {jobs.length} job{jobs.length !== 1 ? 's' : ''} total
           </p>
         </div>
-        <Link
-          href="/dashboard/jobs/new"
-          style={{
-            padding: '8px 16px',
-            background: 'var(--accent-primary)',
-            color: '#fff',
-            borderRadius: '6px',
-            fontSize: '13px',
-            fontWeight: '600',
-            textDecoration: 'none',
-          }}
-        >
-          + Post a job
+        <Link href="/dashboard/jobs/new" style={{
+          padding: '10px 18px',
+          background: 'var(--color-primary)',
+          color: '#fff', borderRadius: '8px',
+          fontSize: '14px', fontWeight: '600',
+          textDecoration: 'none',
+          display: 'flex', alignItems: 'center', gap: '6px',
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Post a job
         </Link>
       </div>
 
       {/* Empty state */}
       {jobs.length === 0 && (
         <div style={{
-          background: 'var(--bg-card)',
-          border: '1px dashed var(--border-default)',
-          borderRadius: '10px',
-          padding: '60px 24px',
+          background: '#fff',
+          border: '2px dashed var(--border-default)',
+          borderRadius: '12px',
+          padding: '72px 24px',
           textAlign: 'center',
+          boxShadow: 'var(--shadow-card)',
         }}>
-          <div style={{ fontSize: '32px', marginBottom: '12px' }}>💼</div>
-          <h2 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', margin: '0 0 6px' }}>
+          <div style={{
+            width: '56px', height: '56px', borderRadius: '12px',
+            background: '#EFF6FF', color: '#0369A1',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
+          </div>
+          <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 8px' }}>
             No jobs yet
           </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 20px' }}>
-            Post your first job to start receiving applications.
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 24px', lineHeight: '1.6' }}>
+            Post your first job opening to start receiving applications from candidates.
           </p>
-          <Link
-            href="/dashboard/jobs/new"
-            style={{
-              padding: '8px 18px',
-              background: 'var(--accent-primary)',
-              color: '#fff',
-              borderRadius: '6px',
-              fontSize: '13px',
-              fontWeight: '600',
-              textDecoration: 'none',
-            }}
-          >
+          <Link href="/dashboard/jobs/new" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '10px 20px', background: 'var(--color-primary)',
+            color: '#fff', borderRadius: '8px',
+            fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+          }}>
             Post a job
           </Link>
         </div>
@@ -104,47 +102,54 @@ export default async function JobsPage() {
 
       {/* Jobs list */}
       {jobs.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {jobs.map((job: Record<string, string | null>) => (
-            <Link
-              key={job.id}
-              href={`/dashboard/jobs/${job.id}`}
-              style={{
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {jobs.map((job: Record<string, string | null>) => {
+            const meta = statusMeta[job.status ?? ''] ?? statusMeta.draft
+            return (
+              <Link key={job.id} href={`/dashboard/jobs/${job.id}`} style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '16px 20px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
+                padding: '18px 22px',
+                background: '#fff',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '10px',
                 textDecoration: 'none',
-                transition: 'border-color 0.15s',
+                boxShadow: 'var(--shadow-card)',
+                transition: 'border-color 0.15s, box-shadow 0.15s',
               }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                  {job.title}
-                </span>
-                <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
-                  {[job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')}
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{
-                  padding: '3px 10px',
-                  borderRadius: '20px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  background: statusBg[job.status ?? ''] ?? 'var(--bg-subtle)',
-                  color: statusColor[job.status ?? ''] ?? 'var(--text-tertiary)',
-                  textTransform: 'capitalize',
-                }}>
-                  {job.status}
-                </span>
-                <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>→</span>
-              </div>
-            </Link>
-          ))}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent-primary)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(3,105,161,0.1)'
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-subtle)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card)'
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                    {job.title}
+                  </span>
+                  <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
+                    {[job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{
+                    padding: '4px 12px', borderRadius: '20px',
+                    fontSize: '12px', fontWeight: '600',
+                    background: meta.bg, color: meta.color,
+                  }}>
+                    {meta.label}
+                  </span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>

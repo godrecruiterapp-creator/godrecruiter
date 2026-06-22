@@ -58,17 +58,17 @@ export function LoginForm({ redirectTo, reset }: Props) {
             required
           />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <label
                 htmlFor="password"
-                style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-secondary)' }}
+                style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' }}
               >
                 Password
               </label>
               <Link
                 href="/auth/forgot-password"
-                style={{ fontSize: '11px', color: 'var(--accent-primary)', textDecoration: 'none' }}
+                style={{ fontSize: '12px', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: '500' }}
               >
                 Forgot password?
               </Link>
@@ -81,16 +81,16 @@ export function LoginForm({ redirectTo, reset }: Props) {
               autoComplete="current-password"
               required
               style={{
-                width: '100%',
-                height: '36px',
-                padding: '0 12px',
-                fontSize: '13px',
-                color: 'var(--text-primary)',
+                width: '100%', height: '42px', padding: '0 14px',
+                fontSize: '14px', color: 'var(--text-primary)',
                 background: 'var(--bg-app)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '6px',
-                outline: 'none',
+                border: '1.5px solid var(--border-default)',
+                borderRadius: '8px', outline: 'none',
+                transition: 'border-color 0.15s',
+                fontFamily: 'inherit',
               }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(3,105,161,0.12)' }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.boxShadow = 'none' }}
             />
           </div>
 
