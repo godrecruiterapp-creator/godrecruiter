@@ -48,6 +48,6 @@ export async function createWorkspaceAction(
     }
 
     console.error('Workspace creation error:', message)
-    return { error: 'Could not create workspace. Please try again.' }
+    return { error: `Could not create workspace: ${message}` }
   }
 }
