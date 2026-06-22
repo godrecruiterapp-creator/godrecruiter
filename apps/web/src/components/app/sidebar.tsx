@@ -5,19 +5,101 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 const NAV = [
-  { label: 'Dashboard',   href: '/dashboard',            icon: '⊞' },
-  { label: 'Jobs',        href: '/dashboard/jobs',       icon: '💼' },
-  { label: 'Candidates',  href: '/dashboard/candidates', icon: '👤' },
-  { label: 'Pipeline',    href: '/dashboard/pipeline',   icon: '⬡' },
-  { label: 'Interviews',  href: '/dashboard/interviews', icon: '📅' },
-  { label: 'Reports',     href: '/dashboard/reports',    icon: '📊' },
-  { label: 'Settings',    href: '/dashboard/settings',   icon: '⚙' },
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Jobs',
+    href: '/dashboard/jobs',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Candidates',
+    href: '/dashboard/candidates',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Pipeline',
+    href: '/dashboard/pipeline',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12H3"/><path d="M22 6H8"/><path d="M22 18H8"/>
+        <circle cx="4" cy="6" r="2"/><circle cx="4" cy="18" r="2"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Interviews',
+    href: '/dashboard/interviews',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Reports',
+    href: '/dashboard/reports',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Settings',
+    href: '/dashboard/settings',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    ),
+  },
 ]
+
+const IconSignOut = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+)
+
+const IconCollapse = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="15 18 9 12 15 6"/>
+  </svg>
+)
+
+const IconExpand = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 18 15 12 9 6"/>
+  </svg>
+)
 
 export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
-
   const width = collapsed ? '56px' : '220px'
 
   return (
@@ -35,24 +117,23 @@ export function Sidebar() {
 
       {/* Logo + collapse toggle */}
       <div style={{
-        padding: collapsed ? '16px 0' : '20px 20px 16px',
+        padding: collapsed ? '13px 0' : '14px 16px',
         borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
-        gap: '10px',
         minHeight: '57px',
       }}>
         {!collapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              width: '30px', height: '30px',
+              width: '28px', height: '28px',
               background: 'var(--accent-primary)',
-              borderRadius: '8px',
+              borderRadius: '7px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '15px', fontWeight: '800', color: '#fff', flexShrink: 0,
+              fontSize: '14px', fontWeight: '800', color: '#fff', flexShrink: 0,
             }}>G</div>
-            <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
               God Recruiter
             </span>
           </div>
@@ -60,11 +141,11 @@ export function Sidebar() {
 
         {collapsed && (
           <div style={{
-            width: '30px', height: '30px',
+            width: '28px', height: '28px',
             background: 'var(--accent-primary)',
-            borderRadius: '8px',
+            borderRadius: '7px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '15px', fontWeight: '800', color: '#fff',
+            fontSize: '14px', fontWeight: '800', color: '#fff',
           }}>G</div>
         )}
 
@@ -72,17 +153,21 @@ export function Sidebar() {
           <button
             onClick={() => setCollapsed(true)}
             title="Collapse sidebar"
+            aria-label="Collapse sidebar"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--text-tertiary)', fontSize: '16px', padding: '2px 4px',
-              borderRadius: '4px', lineHeight: 1, flexShrink: 0,
+              color: 'var(--text-tertiary)', padding: '4px',
+              borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, transition: 'color 0.15s',
             }}
-          >‹‹</button>
+          >
+            <IconCollapse />
+          </button>
         )}
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+      <nav style={{ flex: 1, padding: collapsed ? '10px 8px' : '10px 8px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
         {NAV.map(({ label, href, icon }) => {
           const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
           return (
@@ -90,24 +175,26 @@ export function Sidebar() {
               key={href}
               href={href}
               title={collapsed ? label : undefined}
+              aria-label={collapsed ? label : undefined}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                gap: '10px',
-                padding: collapsed ? '8px' : '7px 10px',
+                gap: '9px',
+                padding: collapsed ? '9px' : '8px 10px',
                 borderRadius: '6px',
                 fontSize: '13px',
                 fontWeight: active ? '600' : '400',
                 color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 background: active ? 'var(--accent-subtle)' : 'transparent',
                 textDecoration: 'none',
-                transition: 'background 0.1s, color 0.1s',
+                transition: 'background 0.15s, color 0.15s',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
+                cursor: 'pointer',
               }}
             >
-              <span style={{ fontSize: '16px', flexShrink: 0 }}>{icon}</span>
+              <span style={{ flexShrink: 0, display: 'flex' }}>{icon}</span>
               {!collapsed && label}
             </Link>
           )
@@ -116,23 +203,27 @@ export function Sidebar() {
 
       {/* Bottom */}
       <div style={{
-        padding: collapsed ? '12px 8px' : '12px 10px',
+        padding: collapsed ? '10px 8px' : '10px 8px',
         borderTop: '1px solid var(--border-subtle)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '4px',
+        gap: '1px',
       }}>
         {collapsed && (
           <button
             onClick={() => setCollapsed(false)}
             title="Expand sidebar"
+            aria-label="Expand sidebar"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--text-tertiary)', fontSize: '16px', padding: '8px',
+              color: 'var(--text-tertiary)', padding: '9px',
               borderRadius: '6px', width: '100%', display: 'flex',
               alignItems: 'center', justifyContent: 'center',
+              transition: 'color 0.15s, background 0.15s',
             }}
-          >››</button>
+          >
+            <IconExpand />
+          </button>
         )}
         <a
           href="/auth/logout"
@@ -141,15 +232,17 @@ export function Sidebar() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: '10px',
-            padding: collapsed ? '8px' : '7px 10px',
+            gap: '9px',
+            padding: collapsed ? '9px' : '8px 10px',
             borderRadius: '6px',
             fontSize: '13px',
             color: 'var(--text-tertiary)',
             textDecoration: 'none',
+            transition: 'background 0.15s, color 0.15s',
+            cursor: 'pointer',
           }}
         >
-          <span style={{ fontSize: '16px', flexShrink: 0 }}>↩</span>
+          <span style={{ flexShrink: 0, display: 'flex' }}><IconSignOut /></span>
           {!collapsed && 'Sign out'}
         </a>
       </div>
