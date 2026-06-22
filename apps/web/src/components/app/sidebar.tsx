@@ -85,7 +85,7 @@ export function Sidebar() {
         padding: '12px 10px',
         borderTop: '1px solid var(--border-subtle)',
       }}>
-        <Link
+        <a
           href="/auth/logout"
           style={{
             display: 'flex',
@@ -100,7 +100,7 @@ export function Sidebar() {
         >
           <span style={{ fontSize: '14px', width: '18px', textAlign: 'center' }}>↩</span>
           Sign out
-        </Link>
+        </a>
       </div>
     </aside>
   )
