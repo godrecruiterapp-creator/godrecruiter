@@ -80,7 +80,20 @@ export async function middleware(request: NextRequest) {
   const tenantContext = await resolveTenant(host, APP_DOMAIN)
 
   if (!tenantContext) {
-    // Authenticated but no tenant found → send to tenant selection or error
+    // On the main app domain (Vercel URL or app.godrecruiter.com), allow
+    // /dashboard, /select-workspace, /onboarding without a tenant in the URL.
+    const isMainDomain =
+      !host.includes(`.${APP_DOMAIN}`) ||
+      host.startsWith('app.')
+    const isSharedRoute =
+      pathname.startsWith('/dashboard') ||
+      pathname.startsWith('/select-workspace') ||
+      pathname.startsWith('/onboarding')
+
+    if (isMainDomain && isSharedRoute) {
+      return response
+    }
+
     if (!pathname.startsWith('/select-workspace')) {
       return NextResponse.redirect(new URL('/select-workspace', request.url))
     }
