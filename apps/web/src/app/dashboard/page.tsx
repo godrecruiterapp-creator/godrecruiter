@@ -1,49 +1,66 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-
-export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/auth/login')
-
+export default function DashboardPage() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg-app)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      gap: '16px',
-      fontFamily: 'var(--font-sans)',
-    }}>
-      <div style={{
-        width: '48px', height: '48px',
-        background: 'var(--accent-primary)',
-        borderRadius: '12px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '24px', fontWeight: '800', color: '#fff',
-      }}>
-        G
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+      {/* Stats row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        {[
+          { label: 'Active Jobs',       value: '0', sub: 'No jobs yet'       },
+          { label: 'Total Candidates',  value: '0', sub: 'No candidates yet' },
+          { label: 'Interviews Today',  value: '0', sub: 'Nothing scheduled' },
+          { label: 'Offers Pending',    value: '0', sub: 'All clear'         },
+        ].map(({ label, value, sub }) => (
+          <div key={label} style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            borderRadius: '10px',
+            padding: '20px',
+          }}>
+            <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', margin: '0 0 6px', fontWeight: '500' }}>{label}</p>
+            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 4px', letterSpacing: '-0.02em' }}>{value}</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', margin: 0 }}>{sub}</p>
+          </div>
+        ))}
       </div>
-      <h1 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
-        Welcome to God Recruiter
-      </h1>
-      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
-        Your workspace is ready. The full dashboard is coming soon.
-      </p>
+
+      {/* Getting started */}
       <div style={{
-        marginTop: '8px',
-        padding: '12px 20px',
         background: 'var(--bg-card)',
         border: '1px solid var(--border-default)',
-        borderRadius: '8px',
-        fontSize: '13px',
-        color: 'var(--text-secondary)',
+        borderRadius: '10px',
+        padding: '28px',
       }}>
-        Signed in as <strong style={{ color: 'var(--text-primary)' }}>{user.email}</strong>
+        <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 6px' }}>
+          Welcome to God Recruiter
+        </h2>
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 20px' }}>
+          Your workspace is set up. Start by creating your first job.
+        </p>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          {[
+            { label: 'Post a job',        href: '/dashboard/jobs/new',   primary: true  },
+            { label: 'Add a candidate',   href: '/dashboard/candidates/new', primary: false },
+          ].map(({ label, href, primary }) => (
+            <a
+              key={label}
+              href={href}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: '600',
+                textDecoration: 'none',
+                background: primary ? 'var(--accent-primary)' : 'var(--bg-subtle)',
+                color: primary ? '#fff' : 'var(--text-primary)',
+                border: primary ? 'none' : '1px solid var(--border-default)',
+              }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
       </div>
+
     </div>
   )
 }
