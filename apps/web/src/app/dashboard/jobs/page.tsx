@@ -69,11 +69,8 @@ export default async function JobsPage() {
       {/* Empty state */}
       {jobs.length === 0 && (
         <div style={{
-          background: '#FFFFFF',
-          border: '1px solid #EBEBEB',
-          borderRadius: '8px',
-          padding: '60px 24px',
-          textAlign: 'center',
+          background: '#FFFFFF', border: '1px solid #EBEBEB',
+          borderRadius: '8px', padding: '60px 24px', textAlign: 'center',
         }}>
           <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 6px' }}>No jobs yet</p>
           <p style={{ fontSize: '13px', color: '#999999', margin: '0 0 20px' }}>
@@ -89,42 +86,34 @@ export default async function JobsPage() {
         </div>
       )}
 
-      {/* Jobs table */}
+      {/* Jobs list */}
       {jobs.length > 0 && (
-        <div style={{
-          background: '#FFFFFF',
-          border: '1px solid #EBEBEB',
-          borderRadius: '8px',
-          overflow: 'hidden',
-        }}>
-          {/* Table header */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', overflow: 'hidden' }}>
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto auto',
-            padding: '10px 20px',
-            borderBottom: '1px solid #EBEBEB',
-            background: '#F9F9F9',
+            display: 'grid', gridTemplateColumns: '1fr 100px 20px',
+            padding: '10px 20px', borderBottom: '1px solid #EBEBEB', background: '#F9F9F9',
           }}>
             <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Job</span>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em', width: '90px', textAlign: 'center' }}>Status</span>
-            <span style={{ width: '16px' }} />
+            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>Status</span>
+            <span />
           </div>
 
           {jobs.map((job: Record<string, string | null>, i) => {
             const badge = statusBadge[job.status ?? ''] ?? { label: 'Draft', color: '#555555', bg: '#F5F5F5' }
             const meta = [job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')
             return (
-              <Link key={job.id} href={`/dashboard/jobs/${job.id}`} style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto auto',
-                alignItems: 'center',
-                padding: '14px 20px',
-                borderBottom: i < jobs.length - 1 ? '1px solid #F5F5F5' : 'none',
-                textDecoration: 'none',
-                transition: 'background 0.1s',
-              }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#FAFAFA'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+              <Link
+                key={job.id}
+                href={`/dashboard/jobs/${job.id}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 100px 20px',
+                  alignItems: 'center',
+                  padding: '14px 20px',
+                  borderBottom: i < jobs.length - 1 ? '1px solid #F5F5F5' : 'none',
+                  textDecoration: 'none',
+                  background: 'transparent',
+                }}
               >
                 <div>
                   <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 2px' }}>
@@ -136,11 +125,11 @@ export default async function JobsPage() {
                   padding: '3px 10px', borderRadius: '4px',
                   fontSize: '11px', fontWeight: '500',
                   background: badge.bg, color: badge.color,
-                  width: '90px', textAlign: 'center', display: 'block',
+                  textAlign: 'center', display: 'block',
                 }}>
                   {badge.label}
                 </span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '8px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6"/>
                 </svg>
               </Link>
