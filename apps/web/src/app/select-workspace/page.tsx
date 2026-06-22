@@ -40,7 +40,8 @@ export default async function SelectWorkspacePage() {
   // If user has exactly one workspace, skip the picker and go straight in
   if (workspaces.length === 1 && workspaces[0]) {
     const ws = workspaces[0] as { slug: string }
-    redirect(`https://${ws.slug}.godrecruiter.com/dashboard`)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://godrecruiter-4bmm.vercel.app'
+    redirect(`${appUrl}/dashboard`)
   }
 
   // No workspaces → send to onboarding
