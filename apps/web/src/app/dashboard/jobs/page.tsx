@@ -10,21 +10,28 @@ export default async function JobsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const admin = createAdminClient()
-  const { data: membership } = await admin
-    .from('platform_user_tenants')
-    .select('tenant_id')
-    .eq('platform_user_id', user.id)
-    .eq('is_active', true)
-    .single()
+  let jobs: Record<string, string | null>[] = []
+  try {
+    const admin = createAdminClient()
+    const { data: membership } = await admin
+      .from('platform_user_tenants')
+      .select('tenant_id')
+      .eq('platform_user_id', user!.id)
+      .eq('is_active', true)
+      .single()
 
-  const jobs = membership ? (await admin
-    .from('jobs')
-    .select('*')
-    .eq('tenant_id', membership.tenant_id)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false })
-  ).data ?? [] : []
+    if (membership) {
+      const { data } = await admin
+        .from('jobs')
+        .select('*')
+        .eq('tenant_id', membership.tenant_id)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+      jobs = data ?? []
+    }
+  } catch (err) {
+    console.error('Jobs fetch error:', err)
+  }
 
   const statusBadge: Record<string, { label: string; color: string; bg: string }> = {
     draft:     { label: 'Draft',     color: '#555555', bg: '#F5F5F5' },
