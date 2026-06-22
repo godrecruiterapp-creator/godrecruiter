@@ -6,7 +6,7 @@ import { AuthCard }            from '@/components/auth/auth-card'
 import { FormField }           from '@/components/auth/form-field'
 import { SubmitButton }        from '@/components/auth/submit-button'
 import { Alert }               from '@/components/auth/alert'
-import { forgotPasswordAction } from '../actions'
+import { forgotPasswordAction } from '../../actions'
 
 export default function ForgotPasswordPage() {
   const [state, action] = useActionState(forgotPasswordAction, null)

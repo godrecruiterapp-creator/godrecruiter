@@ -5,7 +5,7 @@ import { AuthCard }           from '@/components/auth/auth-card'
 import { FormField }          from '@/components/auth/form-field'
 import { SubmitButton }       from '@/components/auth/submit-button'
 import { Alert }              from '@/components/auth/alert'
-import { resetPasswordAction } from '../actions'
+import { resetPasswordAction } from '../../actions'
 
 export default function ResetPasswordPage() {
   const [state, action] = useActionState(resetPasswordAction, null)
