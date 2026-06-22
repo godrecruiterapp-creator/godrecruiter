@@ -49,10 +49,10 @@ export async function signupAction(prevState: ActionState, formData: FormData): 
   })
 
   if (error) {
-    if (error.message.includes('already registered')) {
+    if (error.message.includes('already registered') || error.message.includes('already been registered')) {
       return { error: 'An account with this email already exists. Try signing in.' }
     }
-    return { error: 'Could not create account. Please try again.' }
+    return { error: `Could not create account: ${error.message}` }
   }
 
   if (data.user && !data.session) {
