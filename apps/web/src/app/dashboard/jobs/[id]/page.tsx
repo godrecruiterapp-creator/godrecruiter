@@ -31,7 +31,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     closed:    { label: 'Closed',    color: '#DC2626', bg: '#FEE2E2' },
   }
 
-  const st = statusMeta[job.status] ?? statusMeta.draft
+  const st = statusMeta[job.status as string] ?? { label: 'Draft', color: '#64748B', bg: '#F1F5F9' }
 
   const salary = job.salary_min || job.salary_max
     ? `₹${job.salary_min ? (job.salary_min / 1000).toFixed(0) + 'K' : ''}${job.salary_min && job.salary_max ? ' – ' : ''}${job.salary_max ? '₹' + (job.salary_max / 1000).toFixed(0) + 'K' : ''} / year`

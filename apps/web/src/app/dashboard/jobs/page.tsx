@@ -104,7 +104,7 @@ export default async function JobsPage() {
       {jobs.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {jobs.map((job: Record<string, string | null>) => {
-            const meta = statusMeta[job.status ?? ''] ?? statusMeta.draft
+            const meta = statusMeta[job.status ?? ''] ?? { label: 'Draft', color: '#64748B', bg: '#F1F5F9' }
             return (
               <Link key={job.id} href={`/dashboard/jobs/${job.id}`} style={{
                 display: 'flex',
