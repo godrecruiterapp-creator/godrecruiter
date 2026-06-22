@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useActionState } from 'react'
+import { useActionState } from 'react'
 import Link from 'next/link'
 import { AuthCard }     from '@/components/auth/auth-card'
 import { FormField }    from '@/components/auth/form-field'
@@ -11,11 +11,11 @@ import { Alert }        from '@/components/auth/alert'
 import { loginAction }  from '../../actions'
 
 interface Props {
-  searchParams: Promise<{ redirectTo?: string; reset?: string }>
+  redirectTo?: string | undefined
+  reset?: string | undefined
 }
 
-export function LoginForm({ searchParams }: Props) {
-  const params = use(searchParams)
+export function LoginForm({ redirectTo, reset }: Props) {
   const [state, action] = useActionState(loginAction, null)
 
   return (
@@ -36,7 +36,7 @@ export function LoginForm({ searchParams }: Props) {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-        {params.reset === 'success' && (
+        {reset === 'success' && (
           <Alert type="success" message="Password updated. Sign in with your new password." />
         )}
 
@@ -47,7 +47,7 @@ export function LoginForm({ searchParams }: Props) {
         <Divider />
 
         <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <input type="hidden" name="redirectTo" value={params.redirectTo ?? ''} />
+          <input type="hidden" name="redirectTo" value={redirectTo ?? ''} />
 
           <FormField
             label="Work email"
