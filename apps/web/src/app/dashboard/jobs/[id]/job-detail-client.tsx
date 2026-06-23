@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,18 +11,20 @@ import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import {
-  ArrowLeft, MapPin, Briefcase, Users, Clock, ChevronDown,
-  Plus, Send, Share2, Pencil, Copy, XCircle, MoreHorizontal,
-  User, FileText, MessageSquare, CheckSquare, BarChart2,
-  Search, Filter, LayoutGrid, List, Phone, Mail, MoveRight,
-  Star, Building2, DollarSign, TrendingUp, Activity, Eye,
-  StickyNote, Paperclip, Zap, AlertCircle, ChevronRight
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  MapPin, Briefcase, Users, Clock, ChevronDown, Plus, Send,
+  Share2, Pencil, Copy, XCircle, FileText, MessageSquare,
+  CheckSquare, BarChart2, Search, Filter, LayoutGrid, List,
+  Mail, Star, Building2, TrendingUp, Activity, Eye,
+  StickyNote, Paperclip, Zap, ChevronRight,
 } from 'lucide-react'
 import { deleteJobAction, updateJobStatusAction } from '../actions'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────────
 
 export interface JobDetailData {
   id: string
@@ -49,7 +49,7 @@ export interface JobDetailData {
   updated_at: string
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Label maps ────────────────────────────────────────────────────────────────
 
 const EMP_LABELS: Record<string, string> = {
   contract: 'Contract', full_time: 'Full-Time', cth: 'CTH',
@@ -58,103 +58,106 @@ const EMP_LABELS: Record<string, string> = {
 const WORK_MODE_LABELS: Record<string, string> = {
   onsite: 'On-site', hybrid: 'Hybrid', remote: 'Remote',
 }
+const STATUS_MAP: Record<string, { label: string; cls: string }> = {
+  open:    { label: 'Open',    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  on_hold: { label: 'On Hold', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+  closed:  { label: 'Closed',  cls: 'bg-muted text-muted-foreground border-border' },
+  filled:  { label: 'Filled',  cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+}
+const PRIORITY_MAP: Record<string, { label: string; cls: string }> = {
+  high:   { label: 'High Priority',   cls: 'bg-red-50 text-red-700 border-red-200' },
+  medium: { label: 'Med Priority', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+  low:    { label: 'Low Priority',    cls: 'bg-muted text-muted-foreground border-border' },
+}
 
-// ─── Mock pipeline data ───────────────────────────────────────────────────────
+// ─── Mock data ──────────────────────────────────────────────────────────────────
 
 const STAGES = [
-  { id: 'sourced',    label: 'Sourced',    count: 42 },
-  { id: 'qualified',  label: 'Qualified',  count: 20 },
-  { id: 'submitted',  label: 'Submitted',  count: 12 },
-  { id: 'interview',  label: 'Interview',  count: 5  },
-  { id: 'offer',      label: 'Offer',      count: 2  },
-  { id: 'start',      label: 'Start',      count: 1  },
+  { id: 'sourced',   label: 'Sourced',   count: 42 },
+  { id: 'qualified', label: 'Qualified', count: 20 },
+  { id: 'submitted', label: 'Submitted', count: 12 },
+  { id: 'interview', label: 'Interview', count: 5  },
+  { id: 'offer',     label: 'Offer',     count: 2  },
+  { id: 'start',     label: 'Start',     count: 1  },
 ]
 
 const MOCK_CANDIDATES = [
-  { id: '1', name: 'Priya Sharma',   exp: '7 yrs', location: 'Dallas, TX', visa: 'H1B',    score: 95, stage: 'sourced',   recruiter: 'AR' },
-  { id: '2', name: 'Rajan Mehta',    exp: '9 yrs', location: 'Austin, TX', visa: 'USC',    score: 91, stage: 'sourced',   recruiter: 'AR' },
-  { id: '3', name: 'Neha Verma',     exp: '5 yrs', location: 'Remote',     visa: 'GC',     score: 88, stage: 'qualified', recruiter: 'SK' },
-  { id: '4', name: 'Aditya Kumar',   exp: '11 yrs', location: 'Houston, TX', visa: 'USC',  score: 86, stage: 'submitted', recruiter: 'AR' },
-  { id: '5', name: 'Sonal Joshi',    exp: '6 yrs', location: 'Dallas, TX', visa: 'H1B',    score: 83, stage: 'interview', recruiter: 'SK' },
-  { id: '6', name: 'Vikram Singh',   exp: '8 yrs', location: 'Remote',     visa: 'GC',     score: 79, stage: 'offer',    recruiter: 'AR' },
+  { id: '1', name: 'Priya Sharma',  exp: '7 yrs', location: 'Dallas, TX',   visa: 'H1B', score: 95, stage: 'sourced',   recruiter: 'AR' },
+  { id: '2', name: 'Rajan Mehta',   exp: '9 yrs', location: 'Austin, TX',   visa: 'USC', score: 91, stage: 'sourced',   recruiter: 'AR' },
+  { id: '3', name: 'Neha Verma',    exp: '5 yrs', location: 'Remote',       visa: 'GC',  score: 88, stage: 'qualified', recruiter: 'SK' },
+  { id: '4', name: 'Aditya Kumar',  exp: '11 yrs', location: 'Houston, TX', visa: 'USC', score: 86, stage: 'submitted', recruiter: 'AR' },
+  { id: '5', name: 'Sonal Joshi',   exp: '6 yrs', location: 'Dallas, TX',   visa: 'H1B', score: 83, stage: 'interview', recruiter: 'SK' },
+  { id: '6', name: 'Vikram Singh',  exp: '8 yrs', location: 'Remote',       visa: 'GC',  score: 79, stage: 'offer',     recruiter: 'AR' },
 ]
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Small reusable pieces ─────────────────────────────────────────────────────
 
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, string> = {
-    open:    'bg-emerald-50 text-emerald-700 border-emerald-200',
-    on_hold: 'bg-amber-50 text-amber-700 border-amber-200',
-    closed:  'bg-slate-100 text-slate-600 border-slate-200',
-    filled:  'bg-blue-50 text-blue-700 border-blue-200',
-  }
-  const labels: Record<string, string> = {
-    open: 'Open', on_hold: 'On Hold', closed: 'Closed', filled: 'Filled',
-  }
+function Chip({ label, cls }: { label: string; cls: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${map[status] ?? map['open']}`}>
-      {labels[status] ?? status}
+    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${cls}`}>
+      {label}
     </span>
   )
 }
 
-function PriorityBadge({ priority }: { priority: string | null }) {
-  if (!priority) return null
-  const map: Record<string, string> = {
-    high:   'bg-red-50 text-red-700 border-red-200',
-    medium: 'bg-amber-50 text-amber-700 border-amber-200',
-    low:    'bg-slate-100 text-slate-500 border-slate-200',
-  }
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${map[priority] ?? map['medium']}`}>
-      {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
-    </span>
+    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+      {children}
+    </p>
   )
 }
 
-function ScoreBadge({ score }: { score: number }) {
-  const color = score >= 90 ? 'text-emerald-600' : score >= 80 ? 'text-amber-600' : 'text-slate-500'
-  return <span className={`text-xs font-semibold ${color}`}>{score}%</span>
+function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
+  if (!value) return null
+  return (
+    <div className="flex items-start justify-between gap-3 py-1.5 border-b border-border/50 last:border-0">
+      <span className="text-xs text-muted-foreground shrink-0 w-24">{label}</span>
+      <span className="text-xs text-foreground font-medium text-right">{value}</span>
+    </div>
+  )
 }
 
-function CandidateCard({ candidate, onClick }: { candidate: typeof MOCK_CANDIDATES[0]; onClick: () => void }) {
+function ScoreDot({ score }: { score: number }) {
+  const cls = score >= 90 ? 'text-emerald-600' : score >= 80 ? 'text-amber-600' : 'text-muted-foreground'
+  return <span className={`text-xs font-semibold tabular-nums ${cls}`}>{score}%</span>
+}
+
+// ─── Candidate card ─────────────────────────────────────────────────────────────
+
+function CandidateCard({ c, onClick }: { c: typeof MOCK_CANDIDATES[0]; onClick: () => void }) {
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-border rounded-lg p-3 cursor-pointer hover:border-primary/40 hover:shadow-sm transition-all group"
+      className="bg-card border border-border rounded-lg p-3 cursor-pointer hover:border-foreground/20 hover:shadow-sm transition-all group"
     >
       <div className="flex items-start gap-2.5">
-        <Avatar className="size-8 shrink-0 mt-0.5">
-          <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
-            {candidate.name.split(' ').map(n => n[0]).join('')}
+        <Avatar className="size-8 shrink-0">
+          <AvatarFallback className="text-xs bg-muted text-foreground font-semibold">
+            {c.name.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-1">
-            <p className="text-sm font-medium truncate">{candidate.name}</p>
-            <ScoreBadge score={candidate.score} />
+            <p className="text-sm font-medium truncate">{c.name}</p>
+            <ScoreDot score={c.score} />
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">{candidate.exp} · {candidate.location}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{c.exp} · {c.location}</p>
           <div className="flex items-center gap-1.5 mt-1.5">
-            <span className="text-[10px] bg-slate-100 text-slate-600 rounded px-1.5 py-0.5 font-medium">{candidate.visa}</span>
-            <span className="text-[10px] text-muted-foreground">• Rec: {candidate.recruiter}</span>
+            <span className="text-[10px] bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-medium">{c.visa}</span>
+            <span className="text-[10px] text-muted-foreground">Rec: {c.recruiter}</span>
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-1 mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        {[
-          { icon: Eye, label: 'View' },
-          { icon: Send, label: 'Submit' },
-          { icon: Mail, label: 'Email' },
-          { icon: MessageSquare, label: 'Note' },
-        ].map(({ icon: Icon, label }) => (
+      {/* Hover actions */}
+      <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {([['View', Eye], ['Submit', Send], ['Email', Mail], ['Note', MessageSquare]] as const).map(([label, Icon]) => (
           <button
             key={label}
             onClick={e => e.stopPropagation()}
-            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 rounded px-1.5 py-0.5 transition-colors"
+            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground bg-muted hover:bg-accent rounded px-1.5 py-0.5 transition-colors"
           >
-            <Icon className="size-2.5" />
-            {label}
+            <Icon className="size-2.5" />{label}
           </button>
         ))}
       </div>
@@ -162,28 +165,34 @@ function CandidateCard({ candidate, onClick }: { candidate: typeof MOCK_CANDIDAT
   )
 }
 
+// ─── Kanban ─────────────────────────────────────────────────────────────────────
+
 function KanbanBoard({ onCandidateClick }: { onCandidateClick: (c: typeof MOCK_CANDIDATES[0]) => void }) {
   return (
-    <div className="flex gap-3 overflow-x-auto pb-4 min-h-[calc(100vh-320px)]">
+    <div className="flex gap-3 pb-4 h-full">
       {STAGES.map(stage => {
         const cards = MOCK_CANDIDATES.filter(c => c.stage === stage.id)
         return (
-          <div key={stage.id} className="flex-shrink-0 w-56">
+          <div key={stage.id} className="flex-shrink-0 w-56 flex flex-col">
+            {/* Column header */}
             <div className="flex items-center justify-between mb-2 px-0.5">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-semibold text-foreground">{stage.label}</span>
-                <span className="text-[10px] bg-muted text-muted-foreground rounded-full px-1.5 py-0.5 font-medium">{stage.count}</span>
+                <span className="text-[10px] bg-muted text-muted-foreground rounded-full px-1.5 py-0.5 font-medium tabular-nums">
+                  {stage.count}
+                </span>
               </div>
               <button className="size-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                 <Plus className="size-3" />
               </button>
             </div>
-            <div className="space-y-2">
+            {/* Cards */}
+            <div className="flex-1 space-y-2 overflow-y-auto">
               {cards.map(c => (
-                <CandidateCard key={c.id} candidate={c} onClick={() => onCandidateClick(c)} />
+                <CandidateCard key={c.id} c={c} onClick={() => onCandidateClick(c)} />
               ))}
               {cards.length === 0 && (
-                <div className="border-2 border-dashed border-border rounded-lg h-20 flex items-center justify-center">
+                <div className="border-2 border-dashed border-border rounded-lg h-16 flex items-center justify-center">
                   <span className="text-xs text-muted-foreground">Drop here</span>
                 </div>
               )}
@@ -195,161 +204,194 @@ function KanbanBoard({ onCandidateClick }: { onCandidateClick: (c: typeof MOCK_C
   )
 }
 
+// ─── Candidate drawer ───────────────────────────────────────────────────────────
+
 function CandidateDrawer({ candidate, open, onClose }: {
   candidate: typeof MOCK_CANDIDATES[0] | null
   open: boolean
   onClose: () => void
 }) {
-  const [drawerTab, setDrawerTab] = useState('profile')
+  const [tab, setTab] = useState('profile')
   if (!candidate) return null
+
+  const drawerTabs = [
+    { id: 'profile', label: 'Profile' },
+    { id: 'resume', label: 'Resume' },
+    { id: 'notes', label: 'Notes' },
+    { id: 'checks', label: 'Checks' },
+    { id: 'activity', label: 'Activity' },
+  ]
+
   return (
     <Sheet open={open} onOpenChange={v => !v && onClose()}>
-      <SheetContent className="w-[480px] sm:max-w-[480px] p-0 flex flex-col">
-        <SheetHeader className="px-4 py-3 border-b flex-shrink-0">
-          <div className="flex items-center gap-3">
+      <SheetContent className="w-[460px] sm:max-w-[460px] p-0 flex flex-col">
+        {/* Drawer header */}
+        <SheetHeader className="px-5 pt-5 pb-0 flex-shrink-0">
+          <div className="flex items-center gap-3 mb-3">
             <Avatar className="size-10">
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+              <AvatarFallback className="bg-muted text-foreground font-semibold">
                 {candidate.name.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <SheetTitle className="text-base">{candidate.name}</SheetTitle>
+            <div className="flex-1 min-w-0">
+              <SheetTitle className="text-sm font-semibold">{candidate.name}</SheetTitle>
               <p className="text-xs text-muted-foreground mt-0.5">{candidate.exp} · {candidate.location} · {candidate.visa}</p>
             </div>
-            <div className="ml-auto flex items-center gap-1.5">
-              <Button size="sm" className="h-7 text-xs">Submit</Button>
-              <Button variant="outline" size="sm" className="h-7 text-xs">
-                <Phone className="size-3 mr-1" />
-                Call
-              </Button>
+            <div className="flex gap-1.5">
+              <Button size="sm" className="h-7 text-xs px-3">Submit</Button>
+              <Button variant="outline" size="sm" className="h-7 text-xs px-3">Email</Button>
             </div>
           </div>
-          <div className="flex gap-1 mt-3">
-            {['profile','resume','notes','submissions','messages','checks','activity'].map(t => (
+          {/* Sub-tabs */}
+          <div className="flex gap-0 border-b">
+            {drawerTabs.map(t => (
               <button
-                key={t}
-                onClick={() => setDrawerTab(t)}
-                className={`text-xs px-2.5 py-1 rounded-md capitalize transition-colors ${
-                  drawerTab === t
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`text-xs px-3 py-2 border-b-2 transition-colors ${
+                  tab === t.id
+                    ? 'border-foreground text-foreground font-medium'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {t === 'checks' ? 'Hiring Checks' : t === 'submissions' ? 'Submissions' : t.charAt(0).toUpperCase() + t.slice(1)}
+                {t.label}
               </button>
             ))}
           </div>
         </SheetHeader>
-        <ScrollArea className="flex-1 p-4">
-          {drawerTab === 'profile' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: 'Match Score', value: `${candidate.score}%` },
-                  { label: 'Stage', value: STAGES.find(s => s.id === candidate.stage)?.label ?? candidate.stage },
-                  { label: 'Visa Status', value: candidate.visa },
-                  { label: 'Recruiter', value: candidate.recruiter },
-                ].map(({ label, value }) => (
-                  <div key={label} className="bg-muted/40 rounded-lg p-3">
-                    <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                    <p className="text-sm font-medium">{value}</p>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Move to Stage</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {STAGES.map(s => (
-                    <button
-                      key={s.id}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                        s.id === candidate.stage
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Skills Match</p>
-                <div className="space-y-2">
+
+        <ScrollArea className="flex-1">
+          <div className="p-5 space-y-5">
+            {tab === 'profile' && (
+              <>
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-2">
                   {[
-                    { skill: 'Java Spring Boot', match: 95 },
-                    { skill: 'Microservices', match: 88 },
-                    { skill: 'AWS', match: 72 },
-                    { skill: 'Kubernetes', match: 60 },
-                  ].map(({ skill, match }) => (
-                    <div key={skill} className="flex items-center gap-2">
-                      <span className="text-xs w-32 truncate">{skill}</span>
-                      <Progress value={match} className="flex-1 h-1.5" />
-                      <span className="text-xs text-muted-foreground w-8 text-right">{match}%</span>
+                    { label: 'Match Score', value: `${candidate.score}%` },
+                    { label: 'Stage', value: STAGES.find(s => s.id === candidate.stage)?.label ?? candidate.stage },
+                    { label: 'Visa', value: candidate.visa },
+                    { label: 'Recruiter', value: candidate.recruiter },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="bg-muted/40 rounded-lg p-3 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                      <p className="text-sm font-semibold">{value}</p>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          )}
-          {drawerTab === 'notes' && (
-            <div className="space-y-3">
-              <div className="border border-border rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Avatar className="size-5">
-                    <AvatarFallback className="text-[10px]">AR</AvatarFallback>
-                  </Avatar>
-                  <span className="text-xs font-medium">Arun</span>
-                  <span className="text-[10px] text-muted-foreground ml-auto">2h ago</span>
-                </div>
-                <p className="text-xs text-foreground">Strong Java background. Available in 2 weeks. Asked about remote flexibility — client is open to hybrid.</p>
-              </div>
-              <textarea
-                placeholder="Add a note... (@mention teammates)"
-                className="w-full text-xs border border-border rounded-lg p-3 resize-none h-20 focus:outline-none focus:ring-1 focus:ring-ring"
-              />
-              <Button size="sm" className="h-7 text-xs w-full">Add Note</Button>
-            </div>
-          )}
-          {drawerTab === 'checks' && (
-            <div className="space-y-2">
-              {[
-                { label: 'Visa Verification', done: true },
-                { label: 'Education Verification', done: true },
-                { label: 'Background Check', done: false },
-                { label: 'Drug Screen', done: false },
-                { label: 'Security Clearance', done: false },
-                { label: 'Reference Check', done: false },
-              ].map(({ label, done }) => (
-                <div key={label} className="flex items-center gap-3 p-2.5 border border-border rounded-lg">
-                  <div className={`size-4 rounded-full flex items-center justify-center ${done ? 'bg-emerald-500' : 'bg-muted border border-border'}`}>
-                    {done && (
-                      <svg viewBox="0 0 12 12" className="size-2.5 text-white" fill="currentColor">
-                        <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
+
+                {/* Move stage */}
+                <div>
+                  <SectionLabel>Move to Stage</SectionLabel>
+                  <div className="flex flex-wrap gap-1.5">
+                    {STAGES.map(s => (
+                      <button
+                        key={s.id}
+                        className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
+                          s.id === candidate.stage
+                            ? 'bg-foreground text-background border-foreground'
+                            : 'border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
                   </div>
-                  <span className={`text-xs ${done ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{label}</span>
-                  {!done && (
-                    <button className="ml-auto text-[10px] text-primary hover:underline">Initiate</button>
-                  )}
                 </div>
-              ))}
-            </div>
-          )}
-          {(drawerTab === 'resume' || drawerTab === 'submissions' || drawerTab === 'messages' || drawerTab === 'activity') && (
-            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
-              <FileText className="size-8 mb-2 opacity-30" />
-              <p className="text-sm">Coming soon</p>
-            </div>
-          )}
+
+                {/* Skills */}
+                <div>
+                  <SectionLabel>Skills Match</SectionLabel>
+                  <div className="space-y-2">
+                    {[
+                      { skill: 'Java Spring Boot', match: 95 },
+                      { skill: 'Microservices',    match: 88 },
+                      { skill: 'AWS',              match: 72 },
+                      { skill: 'Kubernetes',       match: 60 },
+                    ].map(({ skill, match }) => (
+                      <div key={skill} className="flex items-center gap-3">
+                        <span className="text-xs w-32 truncate text-foreground">{skill}</span>
+                        <Progress value={match} className="flex-1 h-1.5" />
+                        <span className="text-xs text-muted-foreground w-8 text-right tabular-nums">{match}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {tab === 'notes' && (
+              <div className="space-y-3">
+                <div className="border border-border rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar className="size-5">
+                      <AvatarFallback className="text-[10px]">AR</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium">Arun</span>
+                    <span className="text-xs text-muted-foreground ml-auto">2h ago</span>
+                  </div>
+                  <p className="text-xs text-foreground leading-relaxed">
+                    Strong Java background. Available in 2 weeks. Asked about remote flexibility — client is open to hybrid.
+                  </p>
+                </div>
+                <textarea
+                  placeholder="Add a note… (@mention teammates)"
+                  className="w-full text-xs border border-input rounded-lg p-3 resize-none h-20 focus:outline-none focus:ring-1 focus:ring-ring bg-background"
+                />
+                <Button size="sm" className="h-7 text-xs w-full">Add Note</Button>
+              </div>
+            )}
+
+            {tab === 'checks' && (
+              <div className="space-y-2">
+                <SectionLabel>Compliance Checklist</SectionLabel>
+                {[
+                  { label: 'Visa Verification',    done: true },
+                  { label: 'Education Verification', done: true },
+                  { label: 'Background Check',      done: false },
+                  { label: 'Drug Screen',           done: false },
+                  { label: 'Security Clearance',    done: false },
+                  { label: 'Reference Check',       done: false },
+                ].map(({ label, done }) => (
+                  <div key={label} className="flex items-center gap-3 p-2.5 border border-border rounded-lg">
+                    <div className={`size-4 rounded-full flex items-center justify-center shrink-0 ${done ? 'bg-emerald-500' : 'border border-border bg-muted'}`}>
+                      {done && (
+                        <svg viewBox="0 0 12 12" className="size-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M2 6l3 3 5-5" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className={`text-xs flex-1 ${done ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{label}</span>
+                    {!done && <button className="text-[10px] text-primary hover:underline shrink-0">Initiate</button>}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(tab === 'resume' || tab === 'activity') && (
+              <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
+                <FileText className="size-7 mb-2 opacity-30" />
+                <p className="text-sm">Coming soon</p>
+              </div>
+            )}
+          </div>
         </ScrollArea>
       </SheetContent>
     </Sheet>
   )
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Right panel section wrapper ────────────────────────────────────────────────
+
+function PanelSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="px-4 py-3 border-b border-border/60 last:border-0">
+      <SectionLabel>{title}</SectionLabel>
+      {children}
+    </div>
+  )
+}
+
+// ─── Main component ─────────────────────────────────────────────────────────────
 
 export function JobDetailClient({ job }: { job: JobDetailData }) {
   const router = useRouter()
@@ -359,25 +401,27 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const location = [job.city, job.state].filter(Boolean).join(', ')
-  const empType = EMP_LABELS[job.employment_type ?? ''] ?? job.employment_type ?? ''
+  const empType  = EMP_LABELS[job.employment_type ?? ''] ?? job.employment_type ?? ''
   const workMode = WORK_MODE_LABELS[job.work_mode ?? ''] ?? job.work_mode ?? ''
 
-  // mock rates
-  const billRate = job.salary_max ? Math.round(job.salary_max / 100 / 2080) : 85
-  const payRate  = job.salary_min ? Math.round(job.salary_min / 100 / 2080) : 65
-  const margin   = billRate - payRate
+  const billRate  = job.salary_max ? Math.round(job.salary_max / 100 / 2080) : 85
+  const payRate   = job.salary_min ? Math.round(job.salary_min / 100 / 2080) : 65
+  const margin    = billRate - payRate
   const marginPct = billRate > 0 ? ((margin / billRate) * 100).toFixed(1) : '0.0'
 
+  const status   = STATUS_MAP[job.status]   ?? STATUS_MAP['open']!
+  const priority = PRIORITY_MAP[job.priority ?? 'medium'] ?? PRIORITY_MAP['medium']!
+
   const kpis = [
-    { id: 'candidates',  label: 'Candidates',  value: 42, icon: Users,    color: 'text-blue-600' },
-    { id: 'submitted',   label: 'Submitted',   value: 12, icon: Send,     color: 'text-violet-600' },
-    { id: 'interviews',  label: 'Interviews',  value: 5,  icon: MessageSquare, color: 'text-amber-600' },
-    { id: 'offers',      label: 'Offers',      value: 2,  icon: Star,     color: 'text-orange-600' },
-    { id: 'starts',      label: 'Starts',      value: 1,  icon: Zap,      color: 'text-emerald-600' },
-    { id: 'rejected',    label: 'Rejected',    value: 8,  icon: XCircle,  color: 'text-red-500' },
+    { id: 'candidates', label: 'Candidates', value: 42, icon: Users,       color: 'text-blue-600' },
+    { id: 'submitted',  label: 'Submitted',  value: 12, icon: Send,        color: 'text-violet-600' },
+    { id: 'interviews', label: 'Interviews', value: 5,  icon: MessageSquare,color: 'text-amber-600' },
+    { id: 'offers',     label: 'Offers',     value: 2,  icon: Star,        color: 'text-orange-600' },
+    { id: 'starts',     label: 'Starts',     value: 1,  icon: Zap,         color: 'text-emerald-600' },
+    { id: 'rejected',   label: 'Rejected',   value: 8,  icon: XCircle,     color: 'text-red-500' },
   ]
 
-  const requiredSkills = ['Java', 'Spring Boot', 'Microservices', 'REST APIs', 'AWS', 'SQL']
+  const requiredSkills  = ['Java', 'Spring Boot', 'Microservices', 'REST APIs', 'AWS', 'SQL']
   const preferredSkills = ['Kubernetes', 'Docker', 'Kafka', 'CI/CD']
 
   function handleCandidateClick(c: typeof MOCK_CANDIDATES[0]) {
@@ -385,100 +429,87 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
     setDrawerOpen(true)
   }
 
-  async function handleDelete() {
-    if (!confirm('Delete this job?')) return
+  function handleStatusChange(s: string) {
     startTransition(async () => {
-      await deleteJobAction(job.id)
-    })
-  }
-
-  async function handleStatusChange(status: string) {
-    startTransition(async () => {
-      await updateJobStatusAction(job.id, status)
+      await updateJobStatusAction(job.id, s)
       router.refresh()
     })
   }
 
+  function handleDelete() {
+    if (!confirm('Delete this job?')) return
+    startTransition(async () => { await deleteJobAction(job.id) })
+  }
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-background">
-      {/* ── Sticky Header ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-background border-b shadow-sm">
 
-        {/* Row 1: nav + title + actions */}
-        <div className="flex items-center gap-3 px-5 pt-3 pb-2">
-          {/* Back */}
-          <Link href="/dashboard/jobs" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0">
-            <ArrowLeft className="size-3.5" />
-            <span>Jobs</span>
-          </Link>
-          <ChevronRight className="size-3 text-muted-foreground/40 shrink-0" />
+      {/* ── Job Header ─────────────────────────────────────────────────────── */}
+      <div className="bg-background border-b">
 
-          {/* Title + badges */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+        {/* Row 1: identity + actions */}
+        <div className="flex items-center gap-3 px-6 pt-4 pb-2">
+          {/* ID + Title + Badges */}
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
             {job.display_id && (
-              <span className="text-xs font-mono text-muted-foreground shrink-0">{job.display_id}</span>
+              <span className="text-xs font-mono text-muted-foreground shrink-0 bg-muted px-1.5 py-0.5 rounded">
+                {job.display_id}
+              </span>
             )}
-            <h1 className="text-sm font-semibold tracking-tight truncate">{job.title}</h1>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <StatusBadge status={job.status} />
-              <PriorityBadge priority={job.priority} />
-              {workMode && (
-                <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground bg-muted/60">
-                  {workMode}
-                </span>
-              )}
-              {job.client_type && (
-                <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground bg-muted/60">
-                  {job.client_type === 'vms' ? 'VMS' : 'Direct'}
-                </span>
-              )}
-            </div>
+            <h1 className="text-base font-semibold text-foreground truncate">{job.title}</h1>
+            <Chip label={status.label} cls={status.cls} />
+            <Chip label={priority.label} cls={priority.cls} />
+            {workMode && (
+              <Chip label={workMode} cls="bg-muted text-muted-foreground border-border" />
+            )}
+            {job.client_type && (
+              <Chip
+                label={job.client_type === 'vms' ? 'VMS' : 'Direct'}
+                cls="bg-muted text-muted-foreground border-border"
+              />
+            )}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <Button size="sm" className="h-8 gap-1.5 text-xs">
+          <div className="flex items-center gap-2 shrink-0">
+            <Button size="sm" className="h-8 gap-1.5 text-sm">
               <Plus className="size-3.5" />Add Candidate
             </Button>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-sm">
               <Send className="size-3.5" />Submit
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-1 text-xs">
-                  More<ChevronDown className="size-3" />
+                <Button variant="outline" size="sm" className="h-8 gap-1 text-sm">
+                  More<ChevronDown className="size-3.5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/jobs/${job.id}/edit`} className="flex items-center gap-2">
+                  <Link href={`/dashboard/jobs/${job.id}/edit`} className="flex items-center gap-2 text-sm">
                     <Pencil className="size-3.5" />Edit Job
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
-                  <Share2 className="size-3.5" />Share Job
-                </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
-                  <Copy className="size-3.5" />Clone Job
-                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 text-sm"><Share2 className="size-3.5" />Share Job</DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 text-sm"><Copy className="size-3.5" />Clone Job</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {job.status === 'open' && (
-                  <DropdownMenuItem onClick={() => handleStatusChange('on_hold')} className="gap-2">
+                  <DropdownMenuItem onClick={() => handleStatusChange('on_hold')} className="gap-2 text-sm">
                     <Clock className="size-3.5" />Put on Hold
                   </DropdownMenuItem>
                 )}
                 {(job.status === 'on_hold' || job.status === 'closed') && (
-                  <DropdownMenuItem onClick={() => handleStatusChange('open')} className="gap-2">
+                  <DropdownMenuItem onClick={() => handleStatusChange('open')} className="gap-2 text-sm">
                     <Activity className="size-3.5" />Reopen Job
                   </DropdownMenuItem>
                 )}
                 {job.status !== 'filled' && (
-                  <DropdownMenuItem onClick={() => handleStatusChange('filled')} className="gap-2">
+                  <DropdownMenuItem onClick={() => handleStatusChange('filled')} className="gap-2 text-sm">
                     <CheckSquare className="size-3.5" />Mark Filled
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleDelete} className="gap-2 text-destructive focus:text-destructive">
+                <DropdownMenuItem onClick={handleDelete} className="gap-2 text-sm text-destructive focus:text-destructive">
                   <XCircle className="size-3.5" />Delete Job
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -487,57 +518,63 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
         </div>
 
         {/* Row 2: meta + rates */}
-        <div className="flex items-center gap-0 px-5 pb-2">
-          {/* Left meta */}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground flex-1 min-w-0">
+        <div className="flex items-center gap-6 px-6 pb-3">
+          {/* Meta pills */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             {job.client && (
-              <span className="flex items-center gap-1.5 shrink-0">
-                <Building2 className="size-3" />{job.client}
+              <span className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+                <Building2 className="size-3 shrink-0" />{job.client}
               </span>
             )}
             {location && (
-              <span className="flex items-center gap-1.5 shrink-0">
-                <MapPin className="size-3" />{location}
+              <span className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+                <MapPin className="size-3 shrink-0" />{location}
               </span>
             )}
             {empType && (
-              <span className="flex items-center gap-1.5 shrink-0">
-                <Briefcase className="size-3" />{empType}
+              <span className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+                <Briefcase className="size-3 shrink-0" />{empType}
               </span>
             )}
-            <span className="flex items-center gap-1.5 shrink-0">
-              <Users className="size-3" />{job.openings ?? 1} {(job.openings ?? 1) === 1 ? 'Opening' : 'Openings'}
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+              <Users className="size-3 shrink-0" />
+              {job.openings ?? 1} {(job.openings ?? 1) === 1 ? 'Opening' : 'Openings'}
             </span>
           </div>
 
-          {/* Rates pill */}
-          <div className="flex items-center gap-3 shrink-0 bg-muted/50 border border-border rounded-lg px-3 py-1.5 text-xs">
-            <span className="text-muted-foreground">Bill <span className="text-foreground font-semibold">${billRate}/hr</span></span>
+          {/* Rates */}
+          <div className="flex items-center gap-4 shrink-0 text-xs">
+            <span className="text-muted-foreground">
+              Bill Rate <span className="text-foreground font-semibold ml-1">${billRate}/hr</span>
+            </span>
             <div className="w-px h-3 bg-border" />
-            <span className="text-muted-foreground">Pay <span className="text-foreground font-semibold">${payRate}/hr</span></span>
+            <span className="text-muted-foreground">
+              Pay Rate <span className="text-foreground font-semibold ml-1">${payRate}/hr</span>
+            </span>
             <div className="w-px h-3 bg-border" />
-            <span className="text-muted-foreground">Margin <span className="text-emerald-600 font-semibold">${margin}/hr</span></span>
-            <span className="text-emerald-600 font-semibold">({marginPct}%)</span>
+            <span className="text-muted-foreground">
+              Margin <span className="text-emerald-600 font-semibold ml-1">${margin}/hr ({marginPct}%)</span>
+            </span>
           </div>
         </div>
 
-        {/* KPI Bar */}
-        <div className="flex items-center border-t overflow-x-auto">
-          {kpis.map((kpi) => {
+        {/* KPI bar */}
+        <div className="flex items-center border-t overflow-x-auto px-2">
+          {kpis.map(kpi => {
             const Icon = kpi.icon
             const active = activeKPI === kpi.id
             return (
               <button
                 key={kpi.id}
                 onClick={() => setActiveKPI(active ? null : kpi.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 transition-colors border-b-2 whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
                   active
-                    ? 'border-primary text-primary bg-primary/5'
-                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40'
+                    ? 'border-foreground text-foreground bg-muted/40'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                 }`}
               >
-                <Icon className={`size-3.5 ${active ? 'text-primary' : kpi.color}`} />
-                <span className="text-sm font-semibold">{kpi.value}</span>
+                <Icon className={`size-3.5 ${active ? 'text-foreground' : kpi.color}`} />
+                <span className="text-sm font-semibold tabular-nums">{kpi.value}</span>
                 <span className="text-xs">{kpi.label}</span>
               </button>
             )
@@ -545,48 +582,50 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
         </div>
       </div>
 
-      {/* ── Body: two-column ──────────────────────────────────────────────── */}
+      {/* ── Body ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Left: main workspace 70% */}
+        {/* Left: tabs workspace */}
         <div className="flex-1 min-w-0 overflow-auto flex flex-col">
           <Tabs defaultValue="pipeline" className="flex flex-col flex-1 overflow-hidden">
-            <div className="px-6 pt-4 pb-0 border-b">
-              <TabsList className="h-9 bg-transparent gap-0 p-0">
+
+            {/* Tab list */}
+            <div className="border-b bg-background px-6 flex-shrink-0">
+              <TabsList className="h-10 bg-transparent gap-0 p-0 w-full justify-start">
                 {[
-                  { id: 'pipeline',  label: 'Pipeline',       icon: LayoutGrid },
-                  { id: 'summary',   label: 'Summary',        icon: FileText },
-                  { id: 'checks',    label: 'Hiring Checks',  icon: CheckSquare },
-                  { id: 'notes',     label: 'Notes',          icon: StickyNote },
-                  { id: 'documents', label: 'Documents',      icon: Paperclip },
-                  { id: 'insights',  label: 'Insights',       icon: BarChart2 },
+                  { id: 'pipeline',  label: 'Pipeline',      icon: LayoutGrid  },
+                  { id: 'summary',   label: 'Summary',       icon: FileText    },
+                  { id: 'checks',    label: 'Hiring Checks', icon: CheckSquare },
+                  { id: 'notes',     label: 'Notes',         icon: StickyNote  },
+                  { id: 'documents', label: 'Documents',     icon: Paperclip   },
+                  { id: 'insights',  label: 'Insights',      icon: BarChart2   },
                 ].map(({ id, label, icon: Icon }) => (
                   <TabsTrigger
                     key={id}
                     value={id}
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none h-9 gap-1.5 px-3 text-muted-foreground data-[state=active]:text-primary"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none h-10 gap-1.5 px-3 text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:font-medium"
                   >
-                    <Icon className="size-3.5" />
-                    {label}
+                    <Icon className="size-3.5" />{label}
                   </TabsTrigger>
                 ))}
               </TabsList>
             </div>
 
-            {/* ── Pipeline Tab ──────────────────────────────────────────── */}
-            <TabsContent value="pipeline" className="flex-1 m-0 p-0">
-              <div className="px-6 py-3 flex items-center gap-2 border-b bg-muted/20">
-                <div className="relative flex-1 max-w-xs">
+            {/* ── Pipeline ─────────────────────────────────────────────────── */}
+            <TabsContent value="pipeline" className="flex-1 m-0 flex flex-col overflow-hidden">
+              {/* Toolbar */}
+              <div className="flex items-center gap-2 px-6 py-3 border-b bg-muted/20 flex-shrink-0">
+                <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                   <input
-                    placeholder="Search candidates..."
-                    className="w-full h-8 pl-8 pr-3 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                    placeholder="Search candidates…"
+                    className="h-8 w-56 pl-8 pr-3 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
-                <Button variant="outline" size="sm" className="h-8 gap-1.5">
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-sm">
                   <Filter className="size-3.5" />Filter
                 </Button>
-                <div className="flex items-center border border-input rounded-md overflow-hidden ml-auto">
+                <div className="ml-auto flex items-center border border-input rounded-md overflow-hidden">
                   <button className="px-2.5 h-8 text-muted-foreground hover:bg-muted transition-colors border-r border-input">
                     <LayoutGrid className="size-3.5" />
                   </button>
@@ -595,105 +634,105 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                   </button>
                 </div>
               </div>
-              <div className="px-6 pt-4 overflow-x-auto">
+              {/* Board */}
+              <div className="flex-1 overflow-x-auto px-6 pt-4">
                 <KanbanBoard onCandidateClick={handleCandidateClick} />
               </div>
             </TabsContent>
 
-            {/* ── Summary Tab ───────────────────────────────────────────── */}
-            <TabsContent value="summary" className="m-0 p-6 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                {/* Job Description */}
-                <div className="col-span-2">
-                  <h3 className="text-sm font-semibold mb-3">Job Description</h3>
-                  <div className="prose prose-sm max-w-none text-foreground">
-                    {job.description ? (
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">{job.description}</p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic">No description added yet.</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                {job.requirements && (
-                  <div className="col-span-2">
-                    <h3 className="text-sm font-semibold mb-3">Requirements</h3>
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">{job.requirements}</p>
-                  </div>
-                )}
+            {/* ── Summary ──────────────────────────────────────────────────── */}
+            <TabsContent value="summary" className="m-0 flex-1 overflow-auto">
+              <div className="p-6 space-y-6 max-w-3xl">
 
                 {/* AI Insights */}
-                <div className="col-span-2">
-                  <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="size-5 rounded-full bg-violet-600 flex items-center justify-center">
-                        <Zap className="size-3 text-white" />
+                <section>
+                  <SectionLabel>AI Insights</SectionLabel>
+                  <div className="bg-muted/40 border border-border rounded-lg p-4 grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Market Availability',  value: '1,200+ matching profiles in DFW area' },
+                      { label: 'Avg. Time to Fill',    value: '18 days for similar Java roles' },
+                      { label: 'Suggested Search',     value: '"Java Spring Boot" AND "Microservices" AND "AWS"' },
+                      { label: 'Missing Skills',       value: 'Consider adding Kafka — 65% of candidates have it' },
+                    ].map(({ label, value }) => (
+                      <div key={label}>
+                        <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                        <p className="text-xs text-foreground font-medium">{value}</p>
                       </div>
-                      <span className="text-sm font-semibold text-violet-900">AI Insights</span>
-                      <span className="text-xs text-violet-500 ml-auto">Updated just now</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Market Availability', value: 'High — 1,200+ matching profiles in DFW area' },
-                        { label: 'Avg. Time to Fill',   value: '18 days for similar Java roles' },
-                        { label: 'Suggested Search',    value: '"Java Spring Boot" AND "Microservices" AND "AWS"' },
-                        { label: 'Missing Skills',      value: 'Consider adding Kafka — 65% of matching candidates have it' },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="bg-white/60 rounded-lg p-3">
-                          <p className="text-xs text-violet-600 font-medium mb-1">{label}</p>
-                          <p className="text-xs text-violet-900">{value}</p>
-                        </div>
-                      ))}
-                    </div>
+                    ))}
                   </div>
-                </div>
-              </div>
+                </section>
 
-              {/* Hiring Team */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Hiring Team</h3>
-                <div className="flex flex-wrap gap-3">
-                  {[
-                    { role: 'Recruiter',       name: job.recruiter_name ?? 'Unassigned', initials: job.recruiter_name?.slice(0, 2).toUpperCase() ?? 'UN' },
-                    { role: 'Account Manager', name: 'Unassigned', initials: 'AM' },
-                    { role: 'Client Contact',  name: 'Unassigned', initials: 'CC' },
-                  ].map(({ role, name, initials }) => (
-                    <div key={role} className="flex items-center gap-2.5 border border-border rounded-lg px-3 py-2 bg-background">
-                      <Avatar className="size-7">
-                        <AvatarFallback className="text-xs bg-primary/10 text-primary">{initials}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-xs text-muted-foreground">{role}</p>
-                        <p className="text-sm font-medium">{name}</p>
+                <Separator />
+
+                {/* Description */}
+                <section>
+                  <SectionLabel>Job Description</SectionLabel>
+                  {job.description ? (
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{job.description}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">No description added yet. <Link href={`/dashboard/jobs/${job.id}/edit`} className="text-foreground underline underline-offset-2">Add one →</Link></p>
+                  )}
+                </section>
+
+                {job.requirements && (
+                  <>
+                    <Separator />
+                    <section>
+                      <SectionLabel>Requirements</SectionLabel>
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
+                    </section>
+                  </>
+                )}
+
+                <Separator />
+
+                {/* Hiring team */}
+                <section>
+                  <SectionLabel>Hiring Team</SectionLabel>
+                  <div className="flex flex-wrap gap-3">
+                    {[
+                      { role: 'Recruiter',       name: job.recruiter_name ?? '—' },
+                      { role: 'Account Manager', name: '—' },
+                      { role: 'Client Contact',  name: '—' },
+                    ].map(({ role, name }) => (
+                      <div key={role} className="flex items-center gap-2.5 border border-border rounded-lg px-3 py-2 bg-card">
+                        <Avatar className="size-7">
+                          <AvatarFallback className="text-xs bg-muted text-foreground">
+                            {name !== '—' ? name.slice(0, 2).toUpperCase() : role.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-xs text-muted-foreground">{role}</p>
+                          <p className="text-sm font-medium">{name}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </section>
               </div>
             </TabsContent>
 
-            {/* ── Hiring Checks Tab ─────────────────────────────────────── */}
-            <TabsContent value="checks" className="m-0 p-6">
-              <div className="space-y-3 max-w-lg">
-                <p className="text-sm text-muted-foreground mb-4">Track onboarding and compliance requirements per candidate.</p>
+            {/* ── Hiring Checks ─────────────────────────────────────────────── */}
+            <TabsContent value="checks" className="m-0 flex-1 overflow-auto">
+              <div className="p-6 max-w-lg space-y-3">
+                <SectionLabel>Compliance Requirements</SectionLabel>
                 {[
-                  { label: 'Visa Verification',    candidates: 3, done: 3, total: 3 },
-                  { label: 'Education Verification', candidates: 3, done: 2, total: 3 },
-                  { label: 'Background Check',      candidates: 2, done: 1, total: 2 },
-                  { label: 'Drug Screen',           candidates: 2, done: 0, total: 2 },
-                  { label: 'Security Clearance',    candidates: 1, done: 0, total: 1 },
-                  { label: 'Reference Check',       candidates: 3, done: 3, total: 3 },
+                  { label: 'Visa Verification',     done: 3, total: 3 },
+                  { label: 'Education Verification', done: 2, total: 3 },
+                  { label: 'Background Check',       done: 1, total: 2 },
+                  { label: 'Drug Screen',            done: 0, total: 2 },
+                  { label: 'Security Clearance',     done: 0, total: 1 },
+                  { label: 'Reference Check',        done: 3, total: 3 },
                 ].map(({ label, done, total }) => (
-                  <div key={label} className="flex items-center gap-4 border border-border rounded-lg p-3">
+                  <div key={label} className="flex items-center gap-4 border border-border rounded-lg p-3 bg-card">
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-sm font-medium">{label}</span>
-                        <span className="text-xs text-muted-foreground">{done}/{total}</span>
+                        <span className="text-xs text-muted-foreground tabular-nums">{done}/{total}</span>
                       </div>
                       <Progress value={(done / total) * 100} className="h-1.5" />
                     </div>
-                    <span className={`text-xs font-medium ${done === total ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    <span className={`text-xs font-medium shrink-0 ${done === total ? 'text-emerald-600' : 'text-amber-600'}`}>
                       {done === total ? 'Complete' : 'In Progress'}
                     </span>
                   </div>
@@ -701,29 +740,27 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
               </div>
             </TabsContent>
 
-            {/* ── Notes Tab ─────────────────────────────────────────────── */}
-            <TabsContent value="notes" className="m-0 p-6">
-              <div className="max-w-2xl space-y-4">
-                <div className="flex gap-2">
+            {/* ── Notes ────────────────────────────────────────────────────── */}
+            <TabsContent value="notes" className="m-0 flex-1 overflow-auto">
+              <div className="p-6 max-w-2xl space-y-4">
+                <div className="flex items-center gap-2">
                   {['All', 'Internal', 'Client', 'Candidate'].map(t => (
-                    <button key={t} className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                      t === 'All' ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:text-foreground'
-                    }`}>
-                      {t}
-                    </button>
+                    <button key={t} className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
+                      t === 'All' ? 'bg-foreground text-background border-foreground' : 'border-border text-muted-foreground hover:text-foreground'
+                    }`}>{t}</button>
                   ))}
                   <Button size="sm" className="h-7 text-xs ml-auto gap-1.5">
                     <Plus className="size-3" />Add Note
                   </Button>
                 </div>
                 {[
-                  { author: 'AR', name: 'Arun', time: '2 hours ago', type: 'Internal', content: 'Client confirmed they need 3 resources by end of month. Budget is firm at $85/hr. They prefer USC/GC only.' },
-                  { author: 'SK', name: 'Suresh', time: '1 day ago', type: 'Client', content: 'Spoke with hiring manager at ABC Corp. They are flexible on hybrid vs onsite. 2 rounds of interviews max.' },
+                  { author: 'AR', name: 'Arun',   time: '2 hours ago', type: 'Internal', content: 'Client confirmed they need 3 resources by end of month. Budget is firm at $85/hr. Prefer USC/GC only.' },
+                  { author: 'SK', name: 'Suresh', time: '1 day ago',   type: 'Client',   content: 'Spoke with hiring manager at ABC Corp. Flexible on hybrid vs onsite. 2 rounds of interviews max.' },
                 ].map(({ author, name, time, type, content }) => (
-                  <div key={time} className="border border-border rounded-lg p-4">
+                  <div key={time} className="border border-border rounded-lg p-4 bg-card">
                     <div className="flex items-center gap-2 mb-2">
                       <Avatar className="size-6">
-                        <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{author}</AvatarFallback>
+                        <AvatarFallback className="text-[10px] bg-muted text-foreground">{author}</AvatarFallback>
                       </Avatar>
                       <span className="text-sm font-medium">{name}</span>
                       <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{type}</span>
@@ -735,9 +772,9 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
               </div>
             </TabsContent>
 
-            {/* ── Documents Tab ─────────────────────────────────────────── */}
-            <TabsContent value="documents" className="m-0 p-6">
-              <div className="max-w-2xl space-y-4">
+            {/* ── Documents ────────────────────────────────────────────────── */}
+            <TabsContent value="documents" className="m-0 flex-1 overflow-auto">
+              <div className="p-6 max-w-2xl space-y-5">
                 {[
                   { category: 'Job Documents',       docs: ['Job Description.pdf', 'SOW_v2.pdf', 'Rate Card.xlsx'] },
                   { category: 'Client Documents',    docs: [] },
@@ -745,20 +782,20 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                 ].map(({ category, docs }) => (
                   <div key={category}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-semibold">{category}</h3>
-                      <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">
+                      <SectionLabel>{category}</SectionLabel>
+                      <Button variant="ghost" size="sm" className="h-6 text-xs gap-1">
                         <Plus className="size-3" />Upload
                       </Button>
                     </div>
-                    <div className="border border-border rounded-lg overflow-hidden">
+                    <div className="border border-border rounded-lg overflow-hidden bg-card">
                       {docs.length > 0 ? docs.map(doc => (
                         <div key={doc} className="flex items-center gap-3 px-3 py-2.5 hover:bg-muted/40 transition-colors border-b border-border last:border-0">
                           <FileText className="size-4 text-muted-foreground shrink-0" />
                           <span className="text-sm flex-1">{doc}</span>
-                          <button className="text-xs text-primary hover:underline">Download</button>
+                          <button className="text-xs text-muted-foreground hover:text-foreground">Download</button>
                         </div>
                       )) : (
-                        <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                        <div className="px-3 py-8 text-center text-xs text-muted-foreground">
                           No documents. Drag & drop or click Upload.
                         </div>
                       )}
@@ -768,156 +805,120 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
               </div>
             </TabsContent>
 
-            {/* ── Insights Tab ──────────────────────────────────────────── */}
-            <TabsContent value="insights" className="m-0 p-6">
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                {[
-                  { label: 'Fill Rate',      value: '2.4%', sub: '1 of 3 openings', color: 'text-blue-600' },
-                  { label: 'Submit Rate',    value: '28.6%',sub: '12 submitted of 42', color: 'text-violet-600' },
-                  { label: 'Offer Rate',     value: '16.7%',sub: '2 offers of 12 submissions', color: 'text-orange-600' },
-                  { label: 'Avg Time to Submit', value: '3.2 days', sub: 'From sourced to submitted', color: 'text-amber-600' },
-                  { label: 'Est. Revenue',   value: `$${(billRate * 2080).toLocaleString()}`, sub: 'Annual per placement', color: 'text-emerald-600' },
-                  { label: 'Est. Margin',    value: `$${(margin * 2080).toLocaleString()}`, sub: `${marginPct}% margin`, color: 'text-emerald-600' },
-                ].map(({ label, value, sub, color }) => (
-                  <Card key={label}>
-                    <CardContent className="pt-4">
-                      <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                      <p className={`text-2xl font-bold ${color}`}>{value}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              <div className="text-sm text-muted-foreground text-center py-8 border border-dashed border-border rounded-xl">
-                Full pipeline funnel charts coming soon
+            {/* ── Insights ─────────────────────────────────────────────────── */}
+            <TabsContent value="insights" className="m-0 flex-1 overflow-auto">
+              <div className="p-6">
+                <div className="grid grid-cols-3 gap-4 mb-6 max-w-3xl">
+                  {[
+                    { label: 'Fill Rate',          value: '2.4%',   sub: '1 of 3 openings filled',         color: 'text-blue-600' },
+                    { label: 'Submit Rate',        value: '28.6%',  sub: '12 submitted of 42 candidates',  color: 'text-violet-600' },
+                    { label: 'Offer Rate',         value: '16.7%',  sub: '2 offers from 12 submissions',   color: 'text-orange-600' },
+                    { label: 'Time to Submit',     value: '3.2 days', sub: 'From sourced to submitted',    color: 'text-amber-600' },
+                    { label: 'Est. Annual Revenue',value: `$${(billRate * 2080).toLocaleString()}`, sub: 'Per placement', color: 'text-emerald-600' },
+                    { label: 'Est. Annual Margin', value: `$${(margin * 2080).toLocaleString()}`,  sub: `${marginPct}% margin`, color: 'text-emerald-600' },
+                  ].map(({ label, value, sub, color }) => (
+                    <Card key={label} className="bg-card">
+                      <CardContent className="pt-4">
+                        <p className="text-xs text-muted-foreground mb-1">{label}</p>
+                        <p className={`text-2xl font-bold tabular-nums ${color}`}>{value}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <div className="max-w-3xl text-sm text-muted-foreground text-center py-10 border border-dashed border-border rounded-xl">
+                  Pipeline funnel chart coming soon
+                </div>
               </div>
             </TabsContent>
           </Tabs>
         </div>
 
-        {/* Right: job details panel 30% */}
-        <div className="w-72 shrink-0 border-l bg-muted/20 overflow-auto">
-          <ScrollArea className="h-full">
-            <div className="p-4 space-y-5">
+        {/* ── Right panel ──────────────────────────────────────────────────── */}
+        <div className="w-64 shrink-0 border-l bg-muted/10 overflow-auto">
 
-              {/* Job Details */}
-              <div>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Job Details</p>
-                <div className="space-y-2">
-                  {[
-                    { label: 'Client',       value: job.client },
-                    { label: 'Location',     value: location || null },
-                    { label: 'Type',         value: empType || null },
-                    { label: 'Work Mode',    value: workMode || null },
-                    { label: 'Client Type',  value: job.client_type === 'vms' ? 'VMS' : job.client_type === 'direct' ? 'Direct Client' : null },
-                    { label: 'Openings',     value: String(job.openings ?? 1) },
-                    { label: 'Department',   value: job.department },
-                    { label: 'Recruiter',    value: job.recruiter_name },
-                    { label: 'Created',      value: new Date(job.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) },
-                  ].filter(r => r.value).map(({ label, value }) => (
-                    <div key={label} className="flex justify-between gap-2 text-xs">
-                      <span className="text-muted-foreground shrink-0">{label}</span>
-                      <span className="text-foreground text-right font-medium truncate">{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Skills */}
-              <div>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Required Skills</p>
-                <div className="flex flex-wrap gap-1">
-                  {requiredSkills.map(s => (
-                    <span key={s} className="text-xs bg-primary/10 text-primary border border-primary/20 rounded-full px-2 py-0.5 font-medium">{s}</span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Preferred Skills</p>
-                <div className="flex flex-wrap gap-1">
-                  {preferredSkills.map(s => (
-                    <span key={s} className="text-xs bg-muted text-muted-foreground border border-border rounded-full px-2 py-0.5">{s}</span>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Rates & Margin */}
-              <div>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Rates & Margin</p>
-                <div className="space-y-2">
-                  {[
-                    { label: 'Bill Rate',  value: `$${billRate}/hr`,  highlight: false },
-                    { label: 'Pay Rate',   value: `$${payRate}/hr`,   highlight: false },
-                    { label: 'Margin',     value: `$${margin}/hr`,    highlight: true },
-                    { label: 'Margin %',   value: `${marginPct}%`,    highlight: true },
-                  ].map(({ label, value, highlight }) => (
-                    <div key={label} className="flex justify-between gap-2 text-xs">
-                      <span className="text-muted-foreground">{label}</span>
-                      <span className={`font-semibold ${highlight ? 'text-emerald-600' : 'text-foreground'}`}>{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* AI Insights mini */}
-              <div>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">AI Insights</p>
-                <div className="space-y-2">
-                  {[
-                    { label: '1,200+ profiles', sub: 'matching in DFW', icon: Users },
-                    { label: '18 days avg fill',  sub: 'for similar roles',  icon: Clock },
-                    { label: 'High availability', sub: 'Java talent pool',   icon: TrendingUp },
-                  ].map(({ label, sub, icon: Icon }) => (
-                    <div key={label} className="flex items-center gap-2 bg-violet-50 border border-violet-100 rounded-lg p-2.5">
-                      <Icon className="size-3.5 text-violet-500 shrink-0" />
-                      <div>
-                        <p className="text-xs font-medium text-violet-900">{label}</p>
-                        <p className="text-[10px] text-violet-500">{sub}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <button className="w-full text-xs text-primary hover:underline text-left flex items-center gap-1 mt-1">
-                    View full insights
-                    <ChevronRight className="size-3" />
-                  </button>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Contacts */}
-              <div>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Contacts</p>
-                <div className="space-y-2">
-                  {[
-                    { role: 'Recruiter', name: job.recruiter_name ?? '—', initials: job.recruiter_name?.slice(0,2).toUpperCase() ?? 'RR' },
-                    { role: 'Account Manager', name: '—', initials: 'AM' },
-                    { role: 'Client Contact', name: '—', initials: 'CC' },
-                  ].map(({ role, name, initials }) => (
-                    <div key={role} className="flex items-center gap-2">
-                      <Avatar className="size-6 shrink-0">
-                        <AvatarFallback className="text-[9px] bg-muted text-muted-foreground">{initials}</AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-muted-foreground">{role}</p>
-                        <p className="text-xs font-medium truncate">{name}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <PanelSection title="Job Details">
+            <div>
+              <MetaRow label="Client"      value={job.client} />
+              <MetaRow label="Location"    value={location || null} />
+              <MetaRow label="Type"        value={empType || null} />
+              <MetaRow label="Work Mode"   value={workMode || null} />
+              <MetaRow label="Client Type" value={job.client_type === 'vms' ? 'VMS' : job.client_type === 'direct' ? 'Direct' : null} />
+              <MetaRow label="Openings"    value={String(job.openings ?? 1)} />
+              <MetaRow label="Department"  value={job.department} />
+              <MetaRow label="Recruiter"   value={job.recruiter_name} />
+              <MetaRow label="Created"     value={new Date(job.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} />
             </div>
-          </ScrollArea>
+          </PanelSection>
+
+          <PanelSection title="Required Skills">
+            <div className="flex flex-wrap gap-1">
+              {requiredSkills.map(s => (
+                <span key={s} className="text-xs bg-foreground/5 text-foreground border border-border rounded px-2 py-0.5 font-medium">{s}</span>
+              ))}
+            </div>
+          </PanelSection>
+
+          <PanelSection title="Preferred Skills">
+            <div className="flex flex-wrap gap-1">
+              {preferredSkills.map(s => (
+                <span key={s} className="text-xs bg-muted text-muted-foreground border border-border/50 rounded px-2 py-0.5">{s}</span>
+              ))}
+            </div>
+          </PanelSection>
+
+          <PanelSection title="Rates & Margin">
+            <div>
+              <MetaRow label="Bill Rate" value={`$${billRate}/hr`} />
+              <MetaRow label="Pay Rate"  value={`$${payRate}/hr`} />
+              <MetaRow label="Margin"    value={<span className="text-emerald-600">${margin}/hr</span>} />
+              <MetaRow label="Margin %"  value={<span className="text-emerald-600">{marginPct}%</span>} />
+            </div>
+          </PanelSection>
+
+          <PanelSection title="Contacts">
+            <div className="space-y-2.5">
+              {[
+                { role: 'Recruiter',       name: job.recruiter_name ?? '—' },
+                { role: 'Account Manager', name: '—' },
+                { role: 'Client Contact',  name: '—' },
+              ].map(({ role, name }) => (
+                <div key={role} className="flex items-center gap-2">
+                  <Avatar className="size-6 shrink-0">
+                    <AvatarFallback className="text-[9px] bg-muted text-muted-foreground">
+                      {name !== '—' ? name.slice(0, 2).toUpperCase() : role.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-muted-foreground leading-none mb-0.5">{role}</p>
+                    <p className="text-xs font-medium truncate">{name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </PanelSection>
+
+          <PanelSection title="AI Insights">
+            <div className="space-y-2">
+              {[
+                { label: '1,200+ profiles', sub: 'matching in DFW' },
+                { label: '18 days avg',     sub: 'time to fill' },
+                { label: 'High pool',       sub: 'Java talent market' },
+              ].map(({ label, sub }) => (
+                <div key={label} className="flex items-start gap-2 bg-muted/60 rounded-md p-2">
+                  <Zap className="size-3 text-muted-foreground shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-medium text-foreground leading-none mb-0.5">{label}</p>
+                    <p className="text-[10px] text-muted-foreground">{sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </PanelSection>
         </div>
       </div>
 
-      {/* Candidate Drawer */}
+      {/* Candidate drawer */}
       <CandidateDrawer
         candidate={selectedCandidate}
         open={drawerOpen}
