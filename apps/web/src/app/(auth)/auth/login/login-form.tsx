@@ -18,6 +18,10 @@ interface Props {
 export function LoginForm({ redirectTo, reset }: Props) {
   const [state, action] = useActionState(loginAction, null)
 
+  if (state?.redirectTo) {
+    window.location.href = state.redirectTo
+  }
+
   return (
     <AuthCard
       title="Welcome back"

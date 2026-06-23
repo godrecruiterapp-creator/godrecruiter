@@ -26,7 +26,7 @@ export async function loginAction(prevState: ActionState, formData: FormData): P
     return { error: 'Something went wrong. Please try again.' }
   }
 
-  redirect(redirectTo ?? '/select-workspace')
+  return { redirectTo: redirectTo ?? '/select-workspace' }
 }
 
 // ── SIGNUP ──────────────���────────────────────────────────��───────────────────
@@ -117,4 +117,5 @@ export async function logoutAction() {
 export type ActionState = {
   error?: string
   success?: string
+  redirectTo?: string
 } | null
