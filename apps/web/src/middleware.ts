@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   '/auth/callback',
   '/auth/sso',
   '/auth/logout',
+  '/api/auth/',
 ]
 
 const PORTAL_PATH_PREFIXES = ['/careers/', '/portal/']
