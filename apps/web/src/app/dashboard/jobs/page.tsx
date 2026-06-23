@@ -1,11 +1,8 @@
 export const revalidate = 0
 
-import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 import { JobsTableClient, type Job } from './jobs-table-client'
 
 export default async function JobsPage() {
@@ -36,24 +33,5 @@ export default async function JobsPage() {
     console.error('Jobs fetch error:', err)
   }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">Jobs</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'}
-          </p>
-        </div>
-        <Button asChild size="sm">
-          <Link href="/dashboard/jobs/new">
-            <Plus className="size-3.5 mr-1.5" />
-            Post a job
-          </Link>
-        </Button>
-      </div>
-
-      <JobsTableClient jobs={jobs} />
-    </div>
-  )
+  return <JobsTableClient jobs={jobs} />
 }

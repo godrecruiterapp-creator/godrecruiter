@@ -239,11 +239,11 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
   }
 
   return (
-    <>
+    <div className="space-y-2">
       {/* ── toolbar ── */}
-      <div className="flex items-center gap-3">
-        {/* Filter button */}
-        <Button variant="outline" size="sm" onClick={openDrawer} className="gap-1.5">
+      <div className="flex items-center gap-2 flex-wrap">
+        {/* Filters button */}
+        <Button variant="outline" size="sm" onClick={openDrawer} className="gap-1.5 shrink-0">
           <SlidersHorizontal className="size-3.5" />
           Filters
           {activeCount > 0 && (
@@ -255,7 +255,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
 
         {/* Active filter chips */}
         {activeCount > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap flex-1">
             {applied.status     && <ActiveChip label={`Status: ${STATUS_BADGE[applied.status]?.label ?? applied.status}`} onRemove={() => setApplied(p => ({ ...p, status: '' }))} />}
             {applied.client     && <ActiveChip label={`Client: ${applied.client}`} onRemove={() => setApplied(p => ({ ...p, client: '' }))} />}
             {applied.recruiter  && <ActiveChip label={`Recruiter: ${applied.recruiter}`} onRemove={() => setApplied(p => ({ ...p, recruiter: '' }))} />}
@@ -267,15 +267,20 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
             {(applied.dateFrom || applied.dateTo) && (
               <ActiveChip label={`Date: ${applied.dateFrom || '…'} – ${applied.dateTo || '…'}`} onRemove={() => setApplied(p => ({ ...p, dateFrom: '', dateTo: '' }))} />
             )}
-            <button onClick={clearApplied} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 ml-1">
+            <button onClick={clearApplied} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
               Clear all
             </button>
           </div>
         )}
 
-        <span className="ml-auto text-xs text-muted-foreground shrink-0">
-          {filtered.length} of {jobs.length} jobs
-        </span>
+        <div className="ml-auto shrink-0">
+          <Button asChild size="sm">
+            <Link href="/dashboard/jobs/new">
+              <Plus className="size-3.5 mr-1.5" />
+              Post a job
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* ── selection action bar ── */}
@@ -501,7 +506,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
           </SheetFooter>
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   )
 }
 
