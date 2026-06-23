@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
@@ -15,6 +16,9 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub,
   DropdownMenuSubTrigger, DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu'
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter,
+} from '@/components/ui/sheet'
 import {
   Plus, Briefcase, ChevronDown, X, SlidersHorizontal, Trash2,
 } from 'lucide-react'
@@ -37,6 +41,25 @@ export type Job = {
   openings: number
   created_at: string
   updated_at: string
+}
+
+type Filters = {
+  status: string
+  client: string
+  recruiter: string
+  empType: string
+  priority: string
+  clientType: string
+  workMode: string
+  agingMin: string
+  dateFrom: string
+  dateTo: string
+}
+
+const EMPTY_FILTERS: Filters = {
+  status: '', client: '', recruiter: '', empType: '',
+  priority: '', clientType: '', workMode: '', agingMin: '',
+  dateFrom: '', dateTo: '',
 }
 
 // ── badge configs ────────────────────────────────────────────
@@ -68,31 +91,28 @@ function fmt(date: string | null) {
   if (!date) return '—'
   return new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })
 }
-
 function aging(createdAt: string) {
   return Math.floor((Date.now() - new Date(createdAt).getTime()) / 86_400_000)
 }
 
-// ── filter select ─────────────────────────────────────────────
-function FilterSelect({
-  label, value, onChange, options,
+// ── filter select (inside drawer) ────────────────────────────
+const selClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+
+function DrawerSelect({
+  id, label, value, onChange, options, placeholder = '— All —',
 }: {
-  label: string
-  value: string
+  id: string; label: string; value: string
   onChange: (v: string) => void
   options: { value: string; label: string }[]
+  placeholder?: string
 }) {
   return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className="h-8 rounded-md border border-input bg-background px-2.5 pr-7 text-xs text-foreground shadow-sm appearance-none focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-      >
-        <option value="">{label}</option>
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+      <select id={id} value={value} onChange={e => onChange(e.target.value)} className={selClass}>
+        <option value="">{placeholder}</option>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
     </div>
   )
 }
@@ -102,55 +122,70 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  // ── filter state
-  const [fStatus,     setFStatus]     = useState('')
-  const [fClient,     setFClient]     = useState('')
-  const [fRecruiter,  setFRecruiter]  = useState('')
-  const [fEmpType,    setFEmpType]    = useState('')
-  const [fPriority,   setFPriority]   = useState('')
-  const [fClientType, setFClientType] = useState('')
-  const [fWorkMode,   setFWorkMode]   = useState('')
-  const [fAgingMin,   setFAgingMin]   = useState('')
-  const [fDateFrom,   setFDateFrom]   = useState('')
-  const [fDateTo,     setFDateTo]     = useState('')
+  // drawer open state
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
-  // ── selection state
+  // draft filters (inside drawer, not yet applied)
+  const [draft, setDraft] = useState<Filters>(EMPTY_FILTERS)
+
+  // applied filters (used to filter the table)
+  const [applied, setApplied] = useState<Filters>(EMPTY_FILTERS)
+
+  // selection
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
-  // ── derived filter options (unique values from data)
-  const clients    = useMemo(() => [...new Set(jobs.map(j => j.client).filter(Boolean))].sort() as string[], [jobs])
-  const recruiters = useMemo(() => [...new Set(jobs.map(j => j.recruiter_name).filter(Boolean))].sort() as string[], [jobs])
-
-  // ── filtered jobs
-  const filtered = useMemo(() => {
-    return jobs.filter(j => {
-      if (fStatus     && j.status !== fStatus) return false
-      if (fClient     && j.client !== fClient) return false
-      if (fRecruiter  && j.recruiter_name !== fRecruiter) return false
-      if (fEmpType    && j.employment_type !== fEmpType) return false
-      if (fPriority   && j.priority !== fPriority) return false
-      if (fClientType && j.client_type !== fClientType) return false
-      if (fWorkMode   && j.work_mode !== fWorkMode) return false
-      if (fAgingMin   && aging(j.created_at) < parseInt(fAgingMin)) return false
-      if (fDateFrom   && new Date(j.created_at) < new Date(fDateFrom)) return false
-      if (fDateTo     && new Date(j.created_at) > new Date(fDateTo + 'T23:59:59')) return false
-      return true
-    })
-  }, [jobs, fStatus, fClient, fRecruiter, fEmpType, fPriority, fClientType, fWorkMode, fAgingMin, fDateFrom, fDateTo])
-
-  const activeFilters = [fStatus, fClient, fRecruiter, fEmpType, fPriority, fClientType, fWorkMode, fAgingMin, fDateFrom, fDateTo].filter(Boolean).length
-
-  function clearFilters() {
-    setFStatus(''); setFClient(''); setFRecruiter(''); setFEmpType('')
-    setFPriority(''); setFClientType(''); setFWorkMode(''); setFAgingMin('')
-    setFDateFrom(''); setFDateTo('')
+  function setDraftField<K extends keyof Filters>(key: K, value: string) {
+    setDraft(prev => ({ ...prev, [key]: value }))
   }
 
-  // ── selection helpers
+  function openDrawer() {
+    setDraft(applied) // seed draft with currently applied values
+    setDrawerOpen(true)
+  }
+
+  function applyFilters() {
+    setApplied(draft)
+    setDrawerOpen(false)
+  }
+
+  function clearDraft() {
+    setDraft(EMPTY_FILTERS)
+  }
+
+  function clearApplied() {
+    setApplied(EMPTY_FILTERS)
+    setDraft(EMPTY_FILTERS)
+  }
+
+  // unique values for dynamic options
+  const clients    = useMemo(() => [...new Set(jobs.map(j => j.client).filter(Boolean))].sort() as string[], [jobs])
+  const recruiters = useMemo(() => [...new Set(jobs.map(j => j.recruiter_name).filter(Boolean))].sort() as string[], [jobs])
+  const cities     = useMemo(() => [...new Set(jobs.map(j => j.city).filter(Boolean))].sort() as string[], [jobs])
+
+  // filtered jobs (using applied filters)
+  const filtered = useMemo(() => {
+    const f = applied
+    return jobs.filter(j => {
+      if (f.status     && j.status !== f.status) return false
+      if (f.client     && j.client !== f.client) return false
+      if (f.recruiter  && j.recruiter_name !== f.recruiter) return false
+      if (f.empType    && j.employment_type !== f.empType) return false
+      if (f.priority   && j.priority !== f.priority) return false
+      if (f.clientType && j.client_type !== f.clientType) return false
+      if (f.workMode   && j.work_mode !== f.workMode) return false
+      if (f.agingMin   && aging(j.created_at) < parseInt(f.agingMin)) return false
+      if (f.dateFrom   && new Date(j.created_at) < new Date(f.dateFrom)) return false
+      if (f.dateTo     && new Date(j.created_at) > new Date(f.dateTo + 'T23:59:59')) return false
+      return true
+    })
+  }, [jobs, applied])
+
+  const activeCount = Object.values(applied).filter(Boolean).length
+
+  // selection
   const allIds = filtered.map(j => j.id)
   const allSelected = allIds.length > 0 && allIds.every(id => selected.has(id))
   const someSelected = allIds.some(id => selected.has(id))
-  const selectedInView = allIds.filter(id => selected.has(id))
 
   function toggleAll() {
     if (allSelected) {
@@ -163,27 +198,24 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
     setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
   }
 
-  // ── bulk actions
+  // bulk actions
   async function handleBulkStatus(status: string) {
     startTransition(async () => {
       await bulkUpdateJobsAction([...selected], { status })
-      setSelected(new Set())
-      router.refresh()
+      setSelected(new Set()); router.refresh()
     })
   }
   async function handleBulkPriority(priority: string) {
     startTransition(async () => {
       await bulkUpdateJobsAction([...selected], { priority })
-      setSelected(new Set())
-      router.refresh()
+      setSelected(new Set()); router.refresh()
     })
   }
   async function handleBulkDelete() {
     if (!confirm(`Delete ${selected.size} job(s)? This cannot be undone.`)) return
     startTransition(async () => {
       await bulkDeleteJobsAction([...selected])
-      setSelected(new Set())
-      router.refresh()
+      setSelected(new Set()); router.refresh()
     })
   }
 
@@ -207,94 +239,42 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
   }
 
   return (
-    <div className="space-y-3">
-      {/* ── filter bar ── */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <>
+      {/* ── toolbar ── */}
+      <div className="flex items-center gap-3">
+        {/* Filter button */}
+        <Button variant="outline" size="sm" onClick={openDrawer} className="gap-1.5">
           <SlidersHorizontal className="size-3.5" />
-          <span className="font-medium">Filters</span>
-        </div>
+          Filters
+          {activeCount > 0 && (
+            <span className="flex items-center justify-center size-4 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
+              {activeCount}
+            </span>
+          )}
+        </Button>
 
-        <FilterSelect label="Status" value={fStatus} onChange={setFStatus} options={[
-          { value: 'open', label: 'Open' }, { value: 'on_hold', label: 'On Hold' },
-          { value: 'closed', label: 'Closed' }, { value: 'filled', label: 'Filled' },
-        ]} />
-
-        {clients.length > 0 && (
-          <FilterSelect label="Client" value={fClient} onChange={setFClient}
-            options={clients.map(c => ({ value: c, label: c }))} />
+        {/* Active filter chips */}
+        {activeCount > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {applied.status     && <ActiveChip label={`Status: ${STATUS_BADGE[applied.status]?.label ?? applied.status}`} onRemove={() => setApplied(p => ({ ...p, status: '' }))} />}
+            {applied.client     && <ActiveChip label={`Client: ${applied.client}`} onRemove={() => setApplied(p => ({ ...p, client: '' }))} />}
+            {applied.recruiter  && <ActiveChip label={`Recruiter: ${applied.recruiter}`} onRemove={() => setApplied(p => ({ ...p, recruiter: '' }))} />}
+            {applied.empType    && <ActiveChip label={`Type: ${EMP_LABELS[applied.empType] ?? applied.empType}`} onRemove={() => setApplied(p => ({ ...p, empType: '' }))} />}
+            {applied.priority   && <ActiveChip label={`Priority: ${applied.priority}`} onRemove={() => setApplied(p => ({ ...p, priority: '' }))} />}
+            {applied.clientType && <ActiveChip label={applied.clientType === 'vms' ? 'VMS' : 'Direct Client'} onRemove={() => setApplied(p => ({ ...p, clientType: '' }))} />}
+            {applied.workMode   && <ActiveChip label={`Mode: ${applied.workMode}`} onRemove={() => setApplied(p => ({ ...p, workMode: '' }))} />}
+            {applied.agingMin   && <ActiveChip label={`Aging: ${applied.agingMin}+ days`} onRemove={() => setApplied(p => ({ ...p, agingMin: '' }))} />}
+            {(applied.dateFrom || applied.dateTo) && (
+              <ActiveChip label={`Date: ${applied.dateFrom || '…'} – ${applied.dateTo || '…'}`} onRemove={() => setApplied(p => ({ ...p, dateFrom: '', dateTo: '' }))} />
+            )}
+            <button onClick={clearApplied} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 ml-1">
+              Clear all
+            </button>
+          </div>
         )}
 
-        {recruiters.length > 0 && (
-          <FilterSelect label="Recruiter" value={fRecruiter} onChange={setFRecruiter}
-            options={recruiters.map(r => ({ value: r, label: r }))} />
-        )}
-
-        <FilterSelect label="Job Type" value={fEmpType} onChange={setFEmpType} options={[
-          { value: 'full_time', label: 'Full-Time' }, { value: 'contract', label: 'Contract' },
-          { value: 'cth', label: 'CTH' }, { value: 'direct_hire', label: 'Direct Hire' },
-          { value: 'remote', label: 'Remote' }, { value: 'hybrid', label: 'Hybrid' },
-        ]} />
-
-        <FilterSelect label="Priority" value={fPriority} onChange={setFPriority} options={[
-          { value: 'high', label: 'High' }, { value: 'medium', label: 'Medium' }, { value: 'low', label: 'Low' },
-        ]} />
-
-        <FilterSelect label="Client Type" value={fClientType} onChange={setFClientType} options={[
-          { value: 'direct', label: 'Direct Client' }, { value: 'vms', label: 'VMS' },
-        ]} />
-
-        <FilterSelect label="Work Mode" value={fWorkMode} onChange={setFWorkMode} options={[
-          { value: 'remote', label: 'Remote' }, { value: 'hybrid', label: 'Hybrid' }, { value: 'onsite', label: 'Onsite' },
-        ]} />
-
-        {/* Aging */}
-        <div className="relative">
-          <select
-            value={fAgingMin}
-            onChange={e => setFAgingMin(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2.5 pr-7 text-xs text-foreground shadow-sm appearance-none focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-          >
-            <option value="">Aging</option>
-            <option value="7">7+ days</option>
-            <option value="14">14+ days</option>
-            <option value="30">30+ days</option>
-            <option value="60">60+ days</option>
-            <option value="90">90+ days</option>
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
-        </div>
-
-        {/* Date range */}
-        <div className="flex items-center gap-1">
-          <input
-            type="date"
-            value={fDateFrom}
-            onChange={e => setFDateFrom(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            title="Created from"
-          />
-          <span className="text-xs text-muted-foreground">–</span>
-          <input
-            type="date"
-            value={fDateTo}
-            onChange={e => setFDateTo(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            title="Created to"
-          />
-        </div>
-
-        {activeFilters > 0 && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1 h-8 px-2.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent border border-dashed border-muted-foreground/30 transition-colors"
-          >
-            <X className="size-3" /> Clear {activeFilters}
-          </button>
-        )}
-
-        <span className="ml-auto text-xs text-muted-foreground">
-          {filtered.length} of {jobs.length}
+        <span className="ml-auto text-xs text-muted-foreground shrink-0">
+          {filtered.length} of {jobs.length} jobs
         </span>
       </div>
 
@@ -313,7 +293,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Change status</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
-                  {['open','on_hold','closed','filled'].map(s => (
+                  {(['open','on_hold','closed','filled'] as const).map(s => (
                     <DropdownMenuItem key={s} onClick={() => handleBulkStatus(s)}>
                       {STATUS_BADGE[s]?.label ?? s}
                     </DropdownMenuItem>
@@ -323,7 +303,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Change priority</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
-                  {['high','medium','low'].map(p => (
+                  {(['high','medium','low'] as const).map(p => (
                     <DropdownMenuItem key={p} onClick={() => handleBulkPriority(p)}>
                       {PRIORITY_BADGE[p]?.label ?? p}
                     </DropdownMenuItem>
@@ -336,10 +316,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <button
-            onClick={() => setSelected(new Set())}
-            className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <button onClick={() => setSelected(new Set())} className="ml-auto text-muted-foreground hover:text-foreground transition-colors">
             <X className="size-4" />
           </button>
         </div>
@@ -359,49 +336,43 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
                     aria-label="Select all"
                   />
                 </TableHead>
-                <TableHead className="w-[100px] font-medium text-xs">Job ID</TableHead>
-                <TableHead className="min-w-[180px] font-medium text-xs">Job Title</TableHead>
-                <TableHead className="min-w-[130px] font-medium text-xs">Client</TableHead>
-                <TableHead className="min-w-[100px] font-medium text-xs">City</TableHead>
-                <TableHead className="min-w-[100px] font-medium text-xs">State</TableHead>
-                <TableHead className="min-w-[110px] font-medium text-xs">Emp. Type</TableHead>
-                <TableHead className="min-w-[90px] font-medium text-xs">Status</TableHead>
-                <TableHead className="min-w-[90px] font-medium text-xs">Priority</TableHead>
-                <TableHead className="min-w-[130px] font-medium text-xs">Recruiter</TableHead>
-                <TableHead className="text-center w-[75px] font-medium text-xs">Openings</TableHead>
-                <TableHead className="text-center w-[80px] font-medium text-xs">Submitted</TableHead>
-                <TableHead className="text-center w-[80px] font-medium text-xs">Interviews</TableHead>
-                <TableHead className="text-center w-[70px] font-medium text-xs">Offers</TableHead>
-                <TableHead className="min-w-[95px] font-medium text-xs">Created</TableHead>
-                <TableHead className="min-w-[95px] font-medium text-xs">Modified</TableHead>
-                <TableHead className="text-center w-[65px] font-medium text-xs">Aging</TableHead>
+                <TableHead className="w-[105px] text-xs font-medium">Job ID</TableHead>
+                <TableHead className="min-w-[180px] text-xs font-medium">Job Title</TableHead>
+                <TableHead className="min-w-[130px] text-xs font-medium">Client</TableHead>
+                <TableHead className="min-w-[100px] text-xs font-medium">City</TableHead>
+                <TableHead className="min-w-[100px] text-xs font-medium">State</TableHead>
+                <TableHead className="min-w-[110px] text-xs font-medium">Emp. Type</TableHead>
+                <TableHead className="min-w-[90px] text-xs font-medium">Status</TableHead>
+                <TableHead className="min-w-[90px] text-xs font-medium">Priority</TableHead>
+                <TableHead className="min-w-[130px] text-xs font-medium">Recruiter</TableHead>
+                <TableHead className="text-center w-[75px] text-xs font-medium">Openings</TableHead>
+                <TableHead className="text-center w-[80px] text-xs font-medium">Submitted</TableHead>
+                <TableHead className="text-center w-[80px] text-xs font-medium">Interviews</TableHead>
+                <TableHead className="text-center w-[70px] text-xs font-medium">Offers</TableHead>
+                <TableHead className="min-w-[95px] text-xs font-medium">Created</TableHead>
+                <TableHead className="min-w-[95px] text-xs font-medium">Modified</TableHead>
+                <TableHead className="text-center w-[65px] text-xs font-medium">Aging</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={17} className="text-center py-10 text-sm text-muted-foreground">
-                    No jobs match the current filters.
+                    No jobs match the current filters.{' '}
+                    <button onClick={clearApplied} className="underline underline-offset-2">Clear filters</button>
                   </TableCell>
                 </TableRow>
               ) : filtered.map((job) => {
-                const status   = STATUS_BADGE[job.status]   ?? STATUS_BADGE['open']!
-                const priority = PRIORITY_BADGE[job.priority] ?? PRIORITY_BADGE['medium']!
-                const empType  = EMP_LABELS[job.employment_type ?? ''] ?? '—'
-                const days     = aging(job.created_at)
-                const isSelected = selected.has(job.id)
+                const st  = STATUS_BADGE[job.status]    ?? STATUS_BADGE['open']!
+                const pri = PRIORITY_BADGE[job.priority] ?? PRIORITY_BADGE['medium']!
+                const emp = EMP_LABELS[job.employment_type ?? ''] ?? '—'
+                const days = aging(job.created_at)
+                const isSel = selected.has(job.id)
 
                 return (
-                  <TableRow
-                    key={job.id}
-                    className={`cursor-pointer transition-colors ${isSelected ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-muted/30'}`}
-                  >
-                    <TableCell className="w-10 px-3" onClick={e => { e.stopPropagation() }}>
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => toggleOne(job.id)}
-                        aria-label={`Select ${job.title}`}
-                      />
+                  <TableRow key={job.id} className={`cursor-pointer transition-colors ${isSel ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-muted/30'}`}>
+                    <TableCell className="w-10 px-3" onClick={e => e.stopPropagation()}>
+                      <Checkbox checked={isSel} onCheckedChange={() => toggleOne(job.id)} aria-label={`Select ${job.title}`} />
                     </TableCell>
                     <TableCell className="text-xs font-medium text-foreground whitespace-nowrap">
                       <Link href={`/dashboard/jobs/${job.id}`} className="hover:underline">
@@ -409,16 +380,14 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
                       </Link>
                     </TableCell>
                     <TableCell className="font-medium text-sm">
-                      <Link href={`/dashboard/jobs/${job.id}`} className="hover:underline line-clamp-1">
-                        {job.title}
-                      </Link>
+                      <Link href={`/dashboard/jobs/${job.id}`} className="hover:underline line-clamp-1">{job.title}</Link>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{job.client ?? '—'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{job.city ?? '—'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{job.state ?? '—'}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{empType}</TableCell>
-                    <TableCell><Chip label={status.label} className={status.className} /></TableCell>
-                    <TableCell><Chip label={priority.label} className={priority.className} /></TableCell>
+                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{emp}</TableCell>
+                    <TableCell><Chip label={st.label} className={st.className} /></TableCell>
+                    <TableCell><Chip label={pri.label} className={pri.className} /></TableCell>
                     <TableCell className="text-sm text-muted-foreground">{job.recruiter_name ?? '—'}</TableCell>
                     <TableCell className="text-center text-sm">{job.openings}</TableCell>
                     <TableCell className="text-center text-sm text-muted-foreground">0</TableCell>
@@ -438,6 +407,112 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
           </Table>
         </div>
       </Card>
-    </div>
+
+      {/* ── filter drawer ── */}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent side="right" className="w-80 sm:w-96 flex flex-col p-0">
+          <SheetHeader className="px-5 py-4 border-b">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-base">Filters</SheetTitle>
+              {Object.values(draft).some(Boolean) && (
+                <button onClick={clearDraft} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                  Clear all
+                </button>
+              )}
+            </div>
+          </SheetHeader>
+
+          {/* scrollable filter body */}
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+
+            <DrawerSelect id="f-status" label="Status" value={draft.status} onChange={v => setDraftField('status', v)} options={[
+              { value: 'open', label: 'Open' }, { value: 'on_hold', label: 'On Hold' },
+              { value: 'closed', label: 'Closed' }, { value: 'filled', label: 'Filled' },
+            ]} />
+
+            <DrawerSelect id="f-client" label="Client" value={draft.client} onChange={v => setDraftField('client', v)}
+              options={clients.map(c => ({ value: c, label: c }))}
+              placeholder={clients.length ? '— All clients —' : '— No clients yet —'}
+            />
+
+            <DrawerSelect id="f-recruiter" label="Recruiter" value={draft.recruiter} onChange={v => setDraftField('recruiter', v)}
+              options={recruiters.map(r => ({ value: r, label: r }))}
+              placeholder={recruiters.length ? '— All recruiters —' : '— No recruiters yet —'}
+            />
+
+            <DrawerSelect id="f-emptype" label="Job Type / Employment" value={draft.empType} onChange={v => setDraftField('empType', v)} options={[
+              { value: 'full_time', label: 'Full-Time' }, { value: 'contract', label: 'Contract' },
+              { value: 'cth', label: 'CTH (Contract to Hire)' }, { value: 'direct_hire', label: 'Direct Hire' },
+              { value: 'remote', label: 'Remote' }, { value: 'hybrid', label: 'Hybrid' },
+            ]} />
+
+            <DrawerSelect id="f-priority" label="Priority" value={draft.priority} onChange={v => setDraftField('priority', v)} options={[
+              { value: 'high', label: 'High' }, { value: 'medium', label: 'Medium' }, { value: 'low', label: 'Low' },
+            ]} />
+
+            <DrawerSelect id="f-clienttype" label="VMS / Direct Client" value={draft.clientType} onChange={v => setDraftField('clientType', v)} options={[
+              { value: 'direct', label: 'Direct Client' }, { value: 'vms', label: 'VMS' },
+            ]} />
+
+            <DrawerSelect id="f-workmode" label="Remote / Hybrid / Onsite" value={draft.workMode} onChange={v => setDraftField('workMode', v)} options={[
+              { value: 'remote', label: 'Remote' }, { value: 'hybrid', label: 'Hybrid' }, { value: 'onsite', label: 'Onsite' },
+            ]} />
+
+            <DrawerSelect id="f-aging" label="Aging (days open)" value={draft.agingMin} onChange={v => setDraftField('agingMin', v)} options={[
+              { value: '7', label: '7+ days' }, { value: '14', label: '14+ days' },
+              { value: '30', label: '30+ days' }, { value: '60', label: '60+ days' },
+              { value: '90', label: '90+ days' },
+            ]} />
+
+            {/* Date range */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Created date range</Label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 space-y-1">
+                  <span className="text-[11px] text-muted-foreground">From</span>
+                  <input
+                    type="date"
+                    value={draft.dateFrom}
+                    onChange={e => setDraftField('dateFrom', e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <span className="text-[11px] text-muted-foreground">To</span>
+                  <input
+                    type="date"
+                    value={draft.dateTo}
+                    onChange={e => setDraftField('dateTo', e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* sticky footer */}
+          <SheetFooter className="px-5 py-4 border-t gap-2 flex-row">
+            <Button variant="outline" className="flex-1" onClick={() => setDrawerOpen(false)}>
+              Cancel
+            </Button>
+            <Button className="flex-1" onClick={applyFilters}>
+              Apply filters
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </>
+  )
+}
+
+// ── small active-filter chip ──────────────────────────────────
+function ActiveChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 h-6 pl-2 pr-1 rounded-full border border-primary/30 bg-primary/5 text-xs text-foreground">
+      {label}
+      <button onClick={onRemove} className="flex items-center justify-center size-3.5 rounded-full hover:bg-primary/10 transition-colors" aria-label="Remove filter">
+        <X className="size-2.5" />
+      </button>
+    </span>
   )
 }
