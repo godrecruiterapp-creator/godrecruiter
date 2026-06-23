@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState } from 'react'
 import Link from 'next/link'
 import { AuthCard }     from '@/components/auth/auth-card'
 import { FormField }    from '@/components/auth/form-field'
@@ -17,12 +17,6 @@ interface Props {
 
 export function LoginForm({ redirectTo, reset }: Props) {
   const [state, action] = useActionState(loginAction, null)
-
-  useEffect(() => {
-    if (state?.redirectTo) {
-      window.location.href = state.redirectTo
-    }
-  }, [state?.redirectTo])
 
   return (
     <AuthCard
