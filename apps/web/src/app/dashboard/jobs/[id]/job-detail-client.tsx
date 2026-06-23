@@ -402,81 +402,51 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-background">
       {/* ── Sticky Header ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-background border-b">
-        <div className="flex items-start gap-4 px-6 py-3">
-          {/* Back */}
-          <Button variant="ghost" size="icon" className="size-8 mt-0.5 shrink-0" asChild>
-            <Link href="/dashboard/jobs"><ArrowLeft className="size-4" /></Link>
-          </Button>
+      <div className="sticky top-0 z-20 bg-background border-b shadow-sm">
 
-          {/* Title block */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              {job.display_id && (
-                <span className="text-xs font-mono text-muted-foreground">{job.display_id}</span>
-              )}
-              <h1 className="text-base font-semibold tracking-tight truncate">{job.title}</h1>
+        {/* Row 1: nav + title + actions */}
+        <div className="flex items-center gap-3 px-5 pt-3 pb-2">
+          {/* Back */}
+          <Link href="/dashboard/jobs" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0">
+            <ArrowLeft className="size-3.5" />
+            <span>Jobs</span>
+          </Link>
+          <ChevronRight className="size-3 text-muted-foreground/40 shrink-0" />
+
+          {/* Title + badges */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {job.display_id && (
+              <span className="text-xs font-mono text-muted-foreground shrink-0">{job.display_id}</span>
+            )}
+            <h1 className="text-sm font-semibold tracking-tight truncate">{job.title}</h1>
+            <div className="flex items-center gap-1.5 flex-wrap">
               <StatusBadge status={job.status} />
               <PriorityBadge priority={job.priority} />
               {workMode && (
-                <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-foreground bg-muted">
+                <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground bg-muted/60">
                   {workMode}
                 </span>
               )}
               {job.client_type && (
-                <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-foreground bg-muted">
-                  {job.client_type === 'vms' ? 'VMS' : 'Direct Client'}
+                <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground bg-muted/60">
+                  {job.client_type === 'vms' ? 'VMS' : 'Direct'}
                 </span>
               )}
-            </div>
-            <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground flex-wrap">
-              {job.client && (
-                <span className="flex items-center gap-1">
-                  <Building2 className="size-3" />{job.client}
-                </span>
-              )}
-              {location && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="size-3" />{location}
-                </span>
-              )}
-              {empType && (
-                <span className="flex items-center gap-1">
-                  <Briefcase className="size-3" />{empType}
-                </span>
-              )}
-              {(job.openings ?? 1) > 0 && (
-                <span className="flex items-center gap-1">
-                  <Users className="size-3" />{job.openings ?? 1} {(job.openings ?? 1) === 1 ? 'Opening' : 'Openings'}
-                </span>
-              )}
-              {/* Rates */}
-              <Separator orientation="vertical" className="h-3" />
-              <span className="flex items-center gap-1 text-foreground font-medium">
-                <DollarSign className="size-3" />Bill: ${billRate}/hr
-              </span>
-              <span className="text-muted-foreground">Pay: ${payRate}/hr</span>
-              <span className="flex items-center gap-1 text-emerald-600 font-medium">
-                <TrendingUp className="size-3" />Margin: ${margin}/hr ({marginPct}%)
-              </span>
             </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <Button size="sm" className="h-8 gap-1.5">
-              <Plus className="size-3.5" />
-              Add Candidate
+            <Button size="sm" className="h-8 gap-1.5 text-xs">
+              <Plus className="size-3.5" />Add Candidate
             </Button>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5">
-              <Send className="size-3.5" />
-              Submit
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+              <Send className="size-3.5" />Submit
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-1">
-                  More
-                  <ChevronDown className="size-3" />
+                <Button variant="outline" size="sm" className="h-8 gap-1 text-xs">
+                  More<ChevronDown className="size-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
@@ -516,23 +486,58 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
           </div>
         </div>
 
+        {/* Row 2: meta + rates */}
+        <div className="flex items-center gap-0 px-5 pb-2">
+          {/* Left meta */}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground flex-1 min-w-0">
+            {job.client && (
+              <span className="flex items-center gap-1.5 shrink-0">
+                <Building2 className="size-3" />{job.client}
+              </span>
+            )}
+            {location && (
+              <span className="flex items-center gap-1.5 shrink-0">
+                <MapPin className="size-3" />{location}
+              </span>
+            )}
+            {empType && (
+              <span className="flex items-center gap-1.5 shrink-0">
+                <Briefcase className="size-3" />{empType}
+              </span>
+            )}
+            <span className="flex items-center gap-1.5 shrink-0">
+              <Users className="size-3" />{job.openings ?? 1} {(job.openings ?? 1) === 1 ? 'Opening' : 'Openings'}
+            </span>
+          </div>
+
+          {/* Rates pill */}
+          <div className="flex items-center gap-3 shrink-0 bg-muted/50 border border-border rounded-lg px-3 py-1.5 text-xs">
+            <span className="text-muted-foreground">Bill <span className="text-foreground font-semibold">${billRate}/hr</span></span>
+            <div className="w-px h-3 bg-border" />
+            <span className="text-muted-foreground">Pay <span className="text-foreground font-semibold">${payRate}/hr</span></span>
+            <div className="w-px h-3 bg-border" />
+            <span className="text-muted-foreground">Margin <span className="text-emerald-600 font-semibold">${margin}/hr</span></span>
+            <span className="text-emerald-600 font-semibold">({marginPct}%)</span>
+          </div>
+        </div>
+
         {/* KPI Bar */}
-        <div className="flex items-center gap-0 px-6 pb-0 overflow-x-auto border-t">
-          {kpis.map((kpi, i) => {
+        <div className="flex items-center border-t overflow-x-auto">
+          {kpis.map((kpi) => {
             const Icon = kpi.icon
             const active = activeKPI === kpi.id
             return (
               <button
                 key={kpi.id}
                 onClick={() => setActiveKPI(active ? null : kpi.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition-colors border-b-2 whitespace-nowrap ${
+                className={`flex items-center gap-2 px-5 py-2.5 transition-colors border-b-2 whitespace-nowrap ${
                   active
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                    ? 'border-primary text-primary bg-primary/5'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40'
                 }`}
               >
                 <Icon className={`size-3.5 ${active ? 'text-primary' : kpi.color}`} />
-                <span className="font-medium">{kpi.value}</span>
+                <span className="text-sm font-semibold">{kpi.value}</span>
                 <span className="text-xs">{kpi.label}</span>
               </button>
             )
