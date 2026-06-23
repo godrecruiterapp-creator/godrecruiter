@@ -3,8 +3,17 @@
 import { useActionState } from 'react'
 import { createCandidateAction } from '../actions'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react'
 
 const initialState = { error: '' }
+
+const selectClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 
 export default function NewCandidatePage() {
   const [state, formAction, pending] = useActionState(
@@ -16,192 +25,146 @@ export default function NewCandidatePage() {
   )
 
   return (
-    <div style={{ maxWidth: '680px' }}>
-
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-        <Link href="/dashboard/candidates" style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: '30px', height: '30px', borderRadius: '6px',
-          border: '1px solid #E0E0E0', background: '#FFFFFF',
-          textDecoration: 'none', color: '#777777',
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </Link>
+    <div className="max-w-2xl">
+      <div className="flex items-center gap-3 mb-6">
+        <Button variant="outline" size="icon" className="size-8" asChild>
+          <Link href="/dashboard/candidates"><ArrowLeft className="size-4" /></Link>
+        </Button>
         <div>
-          <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#0A0A0A', margin: 0, letterSpacing: '-0.02em' }}>
-            Add candidate
-          </h1>
-          <p style={{ fontSize: '13px', color: '#777777', margin: '2px 0 0' }}>
-            Add a candidate to your talent pool.
-          </p>
+          <h1 className="text-lg font-semibold tracking-tight">Add candidate</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Add a candidate to your talent pool.</p>
         </div>
       </div>
 
       {state.error && (
-        <div style={{
-          padding: '12px 16px', marginBottom: '16px',
-          background: '#FFF1F1', border: '1px solid #FECACA',
-          borderRadius: '6px', fontSize: '13px', color: '#DC2626',
-        }}>
-          {state.error}
-        </div>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="size-4" />
+          <AlertDescription>{state.error}</AlertDescription>
+        </Alert>
       )}
 
-      <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <form action={formAction} className="space-y-4">
 
-        <Section title="Personal information">
-          <Row>
-            <Field label="First name" name="first_name" placeholder="e.g. Priya" required />
-            <Field label="Last name" name="last_name" placeholder="e.g. Sharma" required />
-          </Row>
-          <Field label="Email" name="email" type="email" placeholder="priya@example.com" required />
-          <Field label="Phone" name="phone" type="tel" placeholder="+91 98765 43210" />
-        </Section>
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm font-medium">Personal information</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="first_name">First name <span className="text-destructive">*</span></Label>
+                <Input id="first_name" name="first_name" placeholder="e.g. Priya" required />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="last_name">Last name <span className="text-destructive">*</span></Label>
+                <Input id="last_name" name="last_name" placeholder="e.g. Sharma" required />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
+              <Input id="email" name="email" type="email" placeholder="priya@example.com" required />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="phone">Phone</Label>
+              <Input id="phone" name="phone" type="tel" placeholder="+91 98765 43210" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <Section title="Professional details">
-          <Row>
-            <Field label="Current title" name="current_title" placeholder="e.g. Senior Engineer" />
-            <Field label="Current company" name="current_company" placeholder="e.g. Infosys" />
-          </Row>
-          <Field label="Location" name="location" placeholder="e.g. Bengaluru, Karnataka" />
-          <Field label="LinkedIn URL" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/priya-sharma" />
-        </Section>
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm font-medium">Professional details</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="current_title">Current title</Label>
+                <Input id="current_title" name="current_title" placeholder="e.g. Senior Engineer" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="current_company">Current company</Label>
+                <Input id="current_company" name="current_company" placeholder="e.g. Infosys" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="location">Location</Label>
+              <Input id="location" name="location" placeholder="e.g. Bengaluru, Karnataka" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="linkedin_url">LinkedIn URL</Label>
+              <Input id="linkedin_url" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/priya-sharma" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <Section title="Recruitment details">
-          <Row>
-            <Select label="Candidate type" name="candidate_type" options={[
-              { value: 'permanent', label: 'Permanent' },
-              { value: 'contract', label: 'Contract' },
-              { value: 'temp', label: 'Temp' },
-              { value: 'unknown', label: 'Not specified' },
-            ]} />
-            <Select label="Notice period" name="notice_period" options={[
-              { value: '', label: 'Not specified' },
-              { value: 'Immediate', label: 'Immediate' },
-              { value: '1 Week', label: '1 Week' },
-              { value: '2 Weeks', label: '2 Weeks' },
-              { value: '1 Month', label: '1 Month' },
-              { value: '2 Months', label: '2 Months' },
-              { value: '3 Months', label: '3 Months' },
-            ]} />
-          </Row>
-          <Row>
-            <Field label="Current CTC (₹/year)" name="current_ctc" type="number" placeholder="e.g. 1200000" />
-            <Field label="Expected CTC (₹/year)" name="expected_ctc" type="number" placeholder="e.g. 1600000" />
-          </Row>
-          <Select label="Source" name="source" options={[
-            { value: '', label: 'Not specified' },
-            { value: 'linkedin', label: 'LinkedIn' },
-            { value: 'referral', label: 'Referral' },
-            { value: 'inbound', label: 'Inbound' },
-            { value: 'naukri', label: 'Naukri' },
-            { value: 'indeed', label: 'Indeed' },
-            { value: 'import', label: 'Import' },
-            { value: 'other', label: 'Other' },
-          ]} />
-        </Section>
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm font-medium">Recruitment details</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="candidate_type">Candidate type</Label>
+                <select id="candidate_type" name="candidate_type" defaultValue="permanent" className={selectClass}>
+                  <option value="permanent">Permanent</option>
+                  <option value="contract">Contract</option>
+                  <option value="temp">Temp</option>
+                  <option value="unknown">Not specified</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="notice_period">Notice period</Label>
+                <select id="notice_period" name="notice_period" defaultValue="" className={selectClass}>
+                  <option value="">Not specified</option>
+                  <option value="Immediate">Immediate</option>
+                  <option value="1 Week">1 Week</option>
+                  <option value="2 Weeks">2 Weeks</option>
+                  <option value="1 Month">1 Month</option>
+                  <option value="2 Months">2 Months</option>
+                  <option value="3 Months">3 Months</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="current_ctc">Current CTC (₹/year)</Label>
+                <Input id="current_ctc" name="current_ctc" type="number" placeholder="e.g. 1200000" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="expected_ctc">Expected CTC (₹/year)</Label>
+                <Input id="expected_ctc" name="expected_ctc" type="number" placeholder="e.g. 1600000" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="source">Source</Label>
+              <select id="source" name="source" defaultValue="" className={selectClass}>
+                <option value="">Not specified</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="referral">Referral</option>
+                <option value="inbound">Inbound</option>
+                <option value="naukri">Naukri</option>
+                <option value="indeed">Indeed</option>
+                <option value="import">Import</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </CardContent>
+        </Card>
 
-        <Section title="Notes">
-          <Textarea label="Internal notes" name="notes" placeholder="Any additional context about this candidate…" rows={4} />
-        </Section>
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-sm font-medium">Notes</CardTitle></CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              <Label htmlFor="notes">Internal notes</Label>
+              <Textarea id="notes" name="notes" rows={4} placeholder="Any additional context about this candidate…" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <div style={{ display: 'flex', gap: '8px', paddingBottom: '40px' }}>
-          <button type="submit" disabled={pending} style={{
-            padding: '9px 18px', background: pending ? '#555555' : '#0A0A0A', color: '#FFFFFF',
-            border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500',
-            cursor: pending ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
-          }}>
+        <div className="flex gap-2 pb-10">
+          <Button type="submit" disabled={pending}>
+            {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
             {pending ? 'Saving…' : 'Save candidate'}
-          </button>
-          <a href="/dashboard/candidates" style={{
-            padding: '9px 14px', background: '#FFFFFF', color: '#555555',
-            border: '1px solid #E0E0E0', borderRadius: '6px',
-            fontSize: '13px', fontWeight: '500', textDecoration: 'none', display: 'inline-block',
-          }}>
-            Cancel
-          </a>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/candidates">Cancel</Link>
+          </Button>
         </div>
       </form>
-    </div>
-  )
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', overflow: 'hidden' }}>
-      <div style={{
-        padding: '13px 18px', borderBottom: '1px solid #EBEBEB',
-        fontSize: '13px', fontWeight: '500', color: '#0A0A0A',
-        background: '#FAFAFA',
-      }}>
-        {title}
-      </div>
-      <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function Row({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-      {children}
-    </div>
-  )
-}
-
-const inputStyle: React.CSSProperties = {
-  height: '38px', padding: '0 12px',
-  fontSize: '14px', color: '#0A0A0A',
-  background: '#FFFFFF', border: '1px solid #E0E0E0',
-  borderRadius: '6px', outline: 'none',
-  width: '100%', boxSizing: 'border-box',
-  fontFamily: 'inherit',
-}
-
-function Field({ label, name, type = 'text', placeholder, required }: {
-  label: string; name: string; type?: string; placeholder?: string; required?: boolean
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>
-        {label}{required && <span style={{ color: '#DC2626', marginLeft: 2 }}>*</span>}
-      </label>
-      <input name={name} type={type} placeholder={placeholder} required={required} style={inputStyle} />
-    </div>
-  )
-}
-
-function Select({ label, name, options }: {
-  label: string; name: string; options: { value: string; label: string }[]
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>{label}</label>
-      <select name={name} defaultValue={options[0]?.value} style={{ ...inputStyle, cursor: 'pointer' }}>
-        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-    </div>
-  )
-}
-
-function Textarea({ label, name, placeholder, rows = 4 }: {
-  label: string; name: string; placeholder?: string; rows?: number
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>{label}</label>
-      <textarea name={name} placeholder={placeholder} rows={rows} style={{
-        padding: '10px 12px', fontSize: '14px', color: '#0A0A0A',
-        background: '#FFFFFF', border: '1px solid #E0E0E0',
-        borderRadius: '6px', outline: 'none', resize: 'vertical',
-        width: '100%', boxSizing: 'border-box', lineHeight: '1.6',
-        fontFamily: 'inherit',
-      }} />
     </div>
   )
 }

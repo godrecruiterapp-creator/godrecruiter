@@ -4,6 +4,17 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { Plus, ChevronRight, Briefcase } from 'lucide-react'
+
+const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+  draft:     { label: 'Draft',     variant: 'secondary' },
+  published: { label: 'Published', variant: 'default' },
+  paused:    { label: 'Paused',    variant: 'outline' },
+  closed:    { label: 'Closed',    variant: 'destructive' },
+}
 
 export default async function JobsPage() {
   const supabase = await createClient()
@@ -16,7 +27,7 @@ export default async function JobsPage() {
     const { data: membership } = await admin
       .from('platform_user_tenants')
       .select('tenant_id')
-      .eq('platform_user_id', user!.id)
+      .eq('platform_user_id', user.id)
       .eq('is_active', true)
       .single()
 
@@ -33,109 +44,63 @@ export default async function JobsPage() {
     console.error('Jobs fetch error:', err)
   }
 
-  const statusBadge: Record<string, { label: string; color: string; bg: string }> = {
-    draft:     { label: 'Draft',     color: '#555555', bg: '#F5F5F5' },
-    published: { label: 'Published', color: '#16A34A', bg: '#F0FDF4' },
-    paused:    { label: 'Paused',    color: '#CA8A04', bg: '#FEFCE8' },
-    closed:    { label: 'Closed',    color: '#DC2626', bg: '#FFF1F1' },
-  }
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '880px' }}>
-
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="space-y-5 max-w-3xl">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#0A0A0A', margin: 0, letterSpacing: '-0.02em' }}>
-            Jobs
-          </h1>
-          <p style={{ fontSize: '13px', color: '#777777', margin: '3px 0 0' }}>
+          <h1 className="text-lg font-semibold tracking-tight">Jobs</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'}
           </p>
         </div>
-        <Link href="/dashboard/jobs/new" style={{
-          padding: '8px 14px',
-          background: '#0A0A0A', color: '#FFFFFF',
-          borderRadius: '6px', fontSize: '13px', fontWeight: '500',
-          textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px',
-        }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          Post a job
-        </Link>
-      </div>
-
-      {/* Empty state */}
-      {jobs.length === 0 && (
-        <div style={{
-          background: '#FFFFFF', border: '1px solid #EBEBEB',
-          borderRadius: '8px', padding: '60px 24px', textAlign: 'center',
-        }}>
-          <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 6px' }}>No jobs yet</p>
-          <p style={{ fontSize: '13px', color: '#999999', margin: '0 0 20px' }}>
-            Post your first job to start receiving applications.
-          </p>
-          <Link href="/dashboard/jobs/new" style={{
-            display: 'inline-block', padding: '8px 16px',
-            background: '#0A0A0A', color: '#FFFFFF',
-            borderRadius: '6px', fontSize: '13px', fontWeight: '500', textDecoration: 'none',
-          }}>
+        <Button asChild size="sm">
+          <Link href="/dashboard/jobs/new">
+            <Plus className="size-3.5 mr-1.5" />
             Post a job
           </Link>
-        </div>
-      )}
+        </Button>
+      </div>
 
-      {/* Jobs list */}
-      {jobs.length > 0 && (
-        <div style={{ background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 100px 20px',
-            padding: '10px 20px', borderBottom: '1px solid #EBEBEB', background: '#F9F9F9',
-          }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Job</span>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>Status</span>
-            <span />
+      {jobs.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center gap-3">
+            <div className="size-10 rounded-full bg-muted flex items-center justify-center">
+              <Briefcase className="size-4 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">No jobs yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Post your first job to start receiving applications.</p>
+            </div>
+            <Button asChild size="sm" className="mt-1">
+              <Link href="/dashboard/jobs/new">Post a job</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="divide-y">
+            {jobs.map((job) => {
+              const badge = STATUS_BADGE[job.status ?? ''] ?? STATUS_BADGE['draft']!
+              const meta = [job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')
+              return (
+                <Link
+                  key={job.id}
+                  href={`/dashboard/jobs/${job.id}`}
+                  className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/50 transition-colors group"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{job.title}</p>
+                    {meta && <p className="text-xs text-muted-foreground mt-0.5">{meta}</p>}
+                  </div>
+                  <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+                    <Badge variant={badge.variant}>{badge.label}</Badge>
+                    <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                  </div>
+                </Link>
+              )
+            })}
           </div>
-
-          {jobs.map((job: Record<string, string | null>, i) => {
-            const badge = statusBadge[job.status ?? ''] ?? { label: 'Draft', color: '#555555', bg: '#F5F5F5' }
-            const meta = [job.department, job.location, job.work_mode?.replace('_', ' ')].filter(Boolean).join(' · ')
-            return (
-              <Link
-                key={job.id}
-                href={`/dashboard/jobs/${job.id}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 100px 20px',
-                  alignItems: 'center',
-                  padding: '14px 20px',
-                  borderBottom: i < jobs.length - 1 ? '1px solid #F5F5F5' : 'none',
-                  textDecoration: 'none',
-                  background: 'transparent',
-                }}
-              >
-                <div>
-                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 2px' }}>
-                    {job.title}
-                  </p>
-                  {meta && <p style={{ fontSize: '12px', color: '#AAAAAA', margin: 0 }}>{meta}</p>}
-                </div>
-                <span style={{
-                  padding: '3px 10px', borderRadius: '4px',
-                  fontSize: '11px', fontWeight: '500',
-                  background: badge.bg, color: badge.color,
-                  textAlign: 'center', display: 'block',
-                }}>
-                  {badge.label}
-                </span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"/>
-                </svg>
-              </Link>
-            )
-          })}
-        </div>
+        </Card>
       )}
     </div>
   )

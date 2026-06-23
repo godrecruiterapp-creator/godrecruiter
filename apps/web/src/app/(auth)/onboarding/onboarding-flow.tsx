@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { AuthCard }     from '@/components/auth/auth-card'
-import { FormField }    from '@/components/auth/form-field'
-import { SubmitButton } from '@/components/auth/submit-button'
-import { Alert }        from '@/components/auth/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { createWorkspaceAction } from './actions'
 
 interface Props {
@@ -13,10 +15,8 @@ interface Props {
   userFullName: string
 }
 
-type Step = 'workspace' | 'creating' | 'done'
-
 export function OnboardingFlow({ userEmail, userFullName }: Props) {
-  const [step, setStep]     = useState<Step>('workspace')
+  const [step, setStep]     = useState<'workspace' | 'creating'>('workspace')
   const [error, setError]   = useState<string | null>(null)
   const [slug, setSlug]     = useState('')
   const [name, setName]     = useState('')
@@ -51,128 +51,84 @@ export function OnboardingFlow({ userEmail, userFullName }: Props) {
 
   if (step === 'creating') {
     return (
-      <AuthCard title="Setting up your workspace…" subtitle="This only takes a moment.">
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '16px 0' }}>
-          <div style={{
-            width: '40px', height: '40px',
-            border: '3px solid var(--border-subtle)',
-            borderTopColor: 'var(--accent-primary)',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }} />
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Creating your private workspace…
-          </p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+        <div className="w-full max-w-sm">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle>Setting up your workspace…</CardTitle>
+              <CardDescription>This only takes a moment.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center pb-8">
+              <Loader2 className="size-8 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
         </div>
-      </AuthCard>
+      </div>
     )
   }
 
   return (
-    <AuthCard
-      title="Create your workspace"
-      subtitle={`Welcome, ${userFullName || userEmail}. Set up your God Recruiter workspace.`}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-        {/* Step indicator */}
-        <div style={{ display: 'flex', gap: '6px', marginBottom: '4px' }}>
-          {['Workspace', 'Invite team', 'Done'].map((label, i) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
-              <div style={{
-                width: '20px', height: '20px', borderRadius: '50%',
-                background: i === 0 ? 'var(--accent-primary)' : 'var(--bg-subtle)',
-                border: `1px solid ${i === 0 ? 'var(--accent-primary)' : 'var(--border-default)'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '10px', fontWeight: '700',
-                color: i === 0 ? '#fff' : 'var(--text-tertiary)',
-                flexShrink: 0,
-              }}>
-                {i + 1}
-              </div>
-              <span style={{ fontSize: '10px', color: i === 0 ? 'var(--text-primary)' : 'var(--text-tertiary)', fontWeight: i === 0 ? '600' : '400' }}>
-                {label}
-              </span>
-              {i < 2 && <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />}
-            </div>
-          ))}
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-2.5">
+            <div className="size-8 rounded-lg bg-foreground flex items-center justify-center text-background font-bold text-sm">G</div>
+            <span className="text-lg font-semibold tracking-tight">God Recruiter</span>
+          </div>
         </div>
 
-        {error && <Alert type="error" message={error} />}
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl">Create your workspace</CardTitle>
+            <CardDescription>Welcome, {userFullName || userEmail}. Set up your God Recruiter workspace.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertCircle className="size-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="name">Workspace name <span className="text-destructive">*</span></Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={handleNameChange}
+                  placeholder="Acme Staffing"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">Usually your company or agency name.</p>
+              </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <label style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-secondary)' }}>
-              Workspace name <span style={{ color: 'var(--status-danger)' }}>*</span>
-            </label>
-            <input
-              name="name"
-              value={name}
-              onChange={handleNameChange}
-              placeholder="Acme Staffing"
-              required
-              style={{
-                width: '100%', height: '36px', padding: '0 12px',
-                fontSize: '13px', color: 'var(--text-primary)',
-                background: 'var(--bg-app)',
-                border: '1px solid var(--border-default)',
-                borderRadius: '6px', outline: 'none',
-              }}
-            />
-            <p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-              This is usually your company or agency name.
-            </p>
-          </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="slug">Workspace URL <span className="text-destructive">*</span></Label>
+                <div className="flex rounded-md border border-input overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+                  <span className="flex items-center px-3 bg-muted text-muted-foreground text-xs border-r border-input whitespace-nowrap">
+                    app.godrecruiter.com/
+                  </span>
+                  <input
+                    id="slug"
+                    value={slug}
+                    onChange={(e) => setSlug(toSlug(e.target.value))}
+                    placeholder="acme-staffing"
+                    required
+                    className="flex-1 h-9 px-3 text-sm bg-transparent outline-none"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Lowercase letters, numbers, and hyphens only.</p>
+              </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <label style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-secondary)' }}>
-              Workspace URL <span style={{ color: 'var(--status-danger)' }}>*</span>
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border-default)', borderRadius: '6px', overflow: 'hidden', background: 'var(--bg-app)' }}>
-              <span style={{
-                padding: '0 10px', height: '36px', display: 'flex', alignItems: 'center',
-                fontSize: '12px', color: 'var(--text-tertiary)',
-                background: 'var(--bg-subtle)',
-                borderRight: '1px solid var(--border-default)',
-                whiteSpace: 'nowrap',
-              }}>
-                app.godrecruiter.com/
-              </span>
-              <input
-                name="slug"
-                value={slug}
-                onChange={(e) => setSlug(toSlug(e.target.value))}
-                placeholder="acme-staffing"
-                required
-                style={{
-                  flex: 1, height: '36px', padding: '0 10px',
-                  fontSize: '13px', color: 'var(--text-primary)',
-                  background: 'transparent', border: 'none', outline: 'none',
-                }}
-              />
-            </div>
-            <p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-              Only lowercase letters, numbers, and hyphens.
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isPending || !name || !slug}
-            style={{
-              width: '100%', height: '38px',
-              background: (!name || !slug) ? 'var(--text-disabled)' : 'var(--accent-primary)',
-              color: '#fff', border: 'none', borderRadius: '6px',
-              fontSize: '13px', fontWeight: '600',
-              cursor: (!name || !slug) ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Create workspace →
-          </button>
-        </form>
+              <Button type="submit" className="w-full" disabled={isPending || !name || !slug}>
+                {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+                Create workspace →
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
-    </AuthCard>
+    </div>
   )
 }

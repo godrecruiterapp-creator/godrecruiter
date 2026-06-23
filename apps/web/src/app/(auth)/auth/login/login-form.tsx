@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AuthCard }     from '@/components/auth/auth-card'
-import { FormField }    from '@/components/auth/form-field'
-import { SubmitButton } from '@/components/auth/submit-button'
-import { GoogleButton } from '@/components/auth/google-button'
-import { Divider }      from '@/components/auth/divider'
-import { Alert }        from '@/components/auth/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 interface Props {
   redirectTo?: string | undefined
@@ -49,7 +49,6 @@ export function LoginForm({ redirectTo, reset }: Props) {
         return
       }
 
-      // Cookies are now set — do a full page navigation
       window.location.replace(redirectTo ?? '/dashboard')
     } catch {
       setError('Something went wrong. Please try again.')
@@ -58,71 +57,83 @@ export function LoginForm({ redirectTo, reset }: Props) {
   }
 
   return (
-    <AuthCard
-      title="Welcome back"
-      subtitle="Sign in to your God Recruiter workspace."
-      footer={
-        <span>
-          No account?{' '}
-          <Link
-            href="/auth/signup"
-            style={{ color: 'var(--accent-primary)', fontWeight: '500', textDecoration: 'none' }}
-          >
-            Create one free
-          </Link>
-        </span>
-      }
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-        {reset === 'success' && (
-          <Alert type="success" message="Password updated. Sign in with your new password." />
-        )}
-
-        {error && <Alert type="error" message={error} />}
-
-        <GoogleButton label="Continue with Google" />
-
-        <Divider />
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <FormField
-            label="Work email"
-            name="email"
-            type="email"
-            placeholder="you@company.com"
-            autoComplete="email"
-            required
-          />
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <label htmlFor="password" style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>
-                Password
-              </label>
-              <Link href="/auth/forgot-password" style={{ fontSize: '12px', color: '#555555', textDecoration: 'none' }}>
-                Forgot password?
-              </Link>
-            </div>
-            <input
-              id="password" name="password" type="password"
-              placeholder="••••••••" autoComplete="current-password" required
-              style={{
-                width: '100%', height: '40px', padding: '0 12px',
-                fontSize: '14px', color: '#0A0A0A',
-                background: '#FFFFFF', border: '1px solid #E0E0E0',
-                borderRadius: '6px', outline: 'none',
-                transition: 'border-color 0.12s', fontFamily: 'inherit',
-              }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#0A0A0A' }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = '#E0E0E0' }}
-            />
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-2.5">
+            <div className="size-8 rounded-lg bg-foreground flex items-center justify-center text-background font-bold text-sm">G</div>
+            <span className="text-lg font-semibold tracking-tight">God Recruiter</span>
           </div>
+        </div>
 
-          <SubmitButton label="Sign in" loadingLabel="Signing in…" pending={pending} />
-        </form>
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl">Welcome back</CardTitle>
+            <CardDescription>Sign in to your workspace</CardDescription>
+          </CardHeader>
 
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {reset === 'success' && (
+                <Alert className="border-success/30 bg-success/5 text-success">
+                  <CheckCircle2 className="size-4" />
+                  <AlertDescription>Password updated. Sign in with your new password.</AlertDescription>
+                </Alert>
+              )}
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="size-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Work email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    Forgot password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  required
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={pending}>
+                {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
+                {pending ? 'Signing in…' : 'Sign in'}
+              </Button>
+            </form>
+          </CardContent>
+
+          <CardFooter className="justify-center">
+            <p className="text-sm text-muted-foreground">
+              No account?{' '}
+              <Link href="/auth/signup" className="text-foreground font-medium hover:underline underline-offset-4">
+                Create one free
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
       </div>
-    </AuthCard>
+    </div>
   )
 }

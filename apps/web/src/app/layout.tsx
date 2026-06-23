@@ -6,7 +6,6 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -18,7 +17,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.variable}>{children}</body>
+      <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
     </html>
   )
 }

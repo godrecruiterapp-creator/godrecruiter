@@ -1,14 +1,12 @@
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Sidebar } from '@/components/app/sidebar'
+import { AppSidebar } from '@/components/app/sidebar'
 import { Header } from '@/components/app/header'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -20,33 +18,24 @@ export default async function DashboardLayout({
     'User'
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
-      <Sidebar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <SidebarProvider>
+      <AppSidebar />
+      <div className="flex flex-col flex-1 min-w-0 min-h-screen">
         <Header userName={fullName} userEmail={user.email ?? ''} />
-        <main style={{ flex: 1, overflow: 'auto', padding: '28px 28px', background: '#FAFAFA' }}>
+        <main className="flex-1 overflow-auto bg-muted/30 p-6">
           <Suspense fallback={<PageSkeleton />}>
             {children}
           </Suspense>
         </main>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }
 
 function PageSkeleton() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      {[1, 2, 3].map(i => (
-        <div key={i} style={{
-          height: '56px',
-          background: '#FFFFFF',
-          border: '1px solid #EBEBEB',
-          borderRadius: '8px',
-          animation: 'pulse 1.5s ease-in-out infinite',
-        }} />
-      ))}
-      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
+    <div className="space-y-3">
+      {[1, 2, 3].map(i => <Skeleton key={i} className="h-14 w-full" />)}
     </div>
   )
 }

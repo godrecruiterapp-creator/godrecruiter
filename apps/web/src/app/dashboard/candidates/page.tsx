@@ -4,6 +4,16 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Card, CardContent } from '@/components/ui/card'
+import { Plus, ChevronRight, Users } from 'lucide-react'
+
+const TYPE_LABEL: Record<string, string> = {
+  permanent: 'Permanent',
+  contract: 'Contract',
+  temp: 'Temp',
+}
 
 export default async function CandidatesPage() {
   const supabase = await createClient()
@@ -33,113 +43,71 @@ export default async function CandidatesPage() {
     console.error('Candidates fetch error:', err)
   }
 
-  const typeLabel: Record<string, string> = {
-    permanent: 'Permanent',
-    contract: 'Contract',
-    temp: 'Temp',
-    unknown: '',
-  }
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '880px' }}>
-
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="space-y-5 max-w-3xl">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: '18px', fontWeight: '600', color: '#0A0A0A', margin: 0, letterSpacing: '-0.02em' }}>
-            Candidates
-          </h1>
-          <p style={{ fontSize: '13px', color: '#777777', margin: '3px 0 0' }}>
+          <h1 className="text-lg font-semibold tracking-tight">Candidates</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {candidates.length} {candidates.length === 1 ? 'candidate' : 'candidates'}
           </p>
         </div>
-        <Link href="/dashboard/candidates/new" style={{
-          padding: '8px 14px',
-          background: '#0A0A0A', color: '#FFFFFF',
-          borderRadius: '6px', fontSize: '13px', fontWeight: '500',
-          textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px',
-        }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          Add candidate
-        </Link>
-      </div>
-
-      {/* Empty state */}
-      {candidates.length === 0 && (
-        <div style={{
-          background: '#FFFFFF', border: '1px solid #EBEBEB',
-          borderRadius: '8px', padding: '60px 24px', textAlign: 'center',
-        }}>
-          <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 6px' }}>No candidates yet</p>
-          <p style={{ fontSize: '13px', color: '#999999', margin: '0 0 20px' }}>
-            Add your first candidate to start building your talent pool.
-          </p>
-          <Link href="/dashboard/candidates/new" style={{
-            display: 'inline-block', padding: '8px 16px',
-            background: '#0A0A0A', color: '#FFFFFF',
-            borderRadius: '6px', fontSize: '13px', fontWeight: '500', textDecoration: 'none',
-          }}>
+        <Button asChild size="sm">
+          <Link href="/dashboard/candidates/new">
+            <Plus className="size-3.5 mr-1.5" />
             Add candidate
           </Link>
-        </div>
-      )}
+        </Button>
+      </div>
 
-      {/* Candidates list */}
-      {candidates.length > 0 && (
-        <div style={{ background: '#FFFFFF', border: '1px solid #EBEBEB', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 130px 20px',
-            padding: '10px 20px', borderBottom: '1px solid #EBEBEB', background: '#F9F9F9',
-          }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate</span>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Type</span>
-            <span />
+      {candidates.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center gap-3">
+            <div className="size-10 rounded-full bg-muted flex items-center justify-center">
+              <Users className="size-4 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">No candidates yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Add your first candidate to build your talent pool.</p>
+            </div>
+            <Button asChild size="sm" className="mt-1">
+              <Link href="/dashboard/candidates/new">Add candidate</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="divide-y">
+            {candidates.map((c) => {
+              const name = [c.first_name, c.last_name].filter(Boolean).join(' ')
+              const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join('').toUpperCase()
+              const meta = [c.current_title, c.current_company, c.location].filter(Boolean).join(' · ')
+              const type = TYPE_LABEL[c.candidate_type ?? ''] ?? ''
+
+              return (
+                <Link
+                  key={c.id}
+                  href={`/dashboard/candidates/${c.id}`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-muted/50 transition-colors group"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <Avatar className="size-8 flex-shrink-0">
+                      <AvatarFallback className="text-xs font-medium">{initials || '?'}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">{name}</p>
+                      {meta && <p className="text-xs text-muted-foreground mt-0.5 truncate">{meta}</p>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+                    {type && <span className="text-xs text-muted-foreground">{type}</span>}
+                    <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                  </div>
+                </Link>
+              )
+            })}
           </div>
-
-          {candidates.map((c: Record<string, string | null>, i) => {
-            const name = [c.first_name, c.last_name].filter(Boolean).join(' ')
-            const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join('').toUpperCase()
-            const meta = [c.current_title, c.current_company, c.location].filter(Boolean).join(' · ')
-            const type = typeLabel[c.candidate_type ?? ''] ?? ''
-
-            return (
-              <Link
-                key={c.id}
-                href={`/dashboard/candidates/${c.id}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 130px 20px',
-                  alignItems: 'center',
-                  padding: '12px 20px',
-                  borderBottom: i < candidates.length - 1 ? '1px solid #F5F5F5' : 'none',
-                  textDecoration: 'none',
-                  background: 'transparent',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    background: '#F0F0F0', color: '#555555',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '11px', fontWeight: '600', flexShrink: 0,
-                  }}>
-                    {initials || '?'}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#0A0A0A', margin: '0 0 2px' }}>{name}</p>
-                    {meta && <p style={{ fontSize: '12px', color: '#AAAAAA', margin: 0 }}>{meta}</p>}
-                  </div>
-                </div>
-                <span style={{ fontSize: '12px', color: '#777777' }}>{type || '—'}</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"/>
-                </svg>
-              </Link>
-            )
-          })}
-        </div>
+        </Card>
       )}
     </div>
   )
