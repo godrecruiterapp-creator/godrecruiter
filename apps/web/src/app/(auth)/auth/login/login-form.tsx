@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { AuthCard }     from '@/components/auth/auth-card'
 import { FormField }    from '@/components/auth/form-field'
@@ -8,7 +8,6 @@ import { SubmitButton } from '@/components/auth/submit-button'
 import { GoogleButton } from '@/components/auth/google-button'
 import { Divider }      from '@/components/auth/divider'
 import { Alert }        from '@/components/auth/alert'
-import { loginAction }  from '../../actions'
 
 interface Props {
   redirectTo?: string | undefined
@@ -16,13 +15,47 @@ interface Props {
 }
 
 export function LoginForm({ redirectTo, reset }: Props) {
-  const [state, action] = useActionState(loginAction, null)
+  const [error, setError] = useState<string | null>(null)
+  const [pending, setPending] = useState(false)
 
-  useEffect(() => {
-    if (state?.redirectTo) {
-      window.location.replace(state.redirectTo)
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    setPending(true)
+
+    const form = e.currentTarget
+    const email    = (form.elements.namedItem('email')    as HTMLInputElement).value
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'same-origin',
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        const msg = data.error ?? 'Something went wrong.'
+        if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) {
+          setError('Incorrect email or password.')
+        } else if (msg.includes('Email not confirmed')) {
+          setError('Please verify your email before signing in.')
+        } else {
+          setError(msg)
+        }
+        setPending(false)
+        return
+      }
+
+      // Cookies are now set — do a full page navigation
+      window.location.replace(redirectTo ?? '/dashboard')
+    } catch {
+      setError('Something went wrong. Please try again.')
+      setPending(false)
     }
-  }, [state?.redirectTo])
+  }
 
   return (
     <AuthCard
@@ -46,15 +79,13 @@ export function LoginForm({ redirectTo, reset }: Props) {
           <Alert type="success" message="Password updated. Sign in with your new password." />
         )}
 
-        {state?.error && <Alert type="error" message={state.error} />}
+        {error && <Alert type="error" message={error} />}
 
         <GoogleButton label="Continue with Google" />
 
         <Divider />
 
-        <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <input type="hidden" name="redirectTo" value={redirectTo ?? ''} />
-
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <FormField
             label="Work email"
             name="email"
@@ -88,7 +119,7 @@ export function LoginForm({ redirectTo, reset }: Props) {
             />
           </div>
 
-          <SubmitButton label="Sign in" loadingLabel="Signing in…" />
+          <SubmitButton label="Sign in" loadingLabel="Signing in…" pending={pending} />
         </form>
 
       </div>

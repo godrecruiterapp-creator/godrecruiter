@@ -5,10 +5,12 @@ import { useFormStatus } from 'react-dom'
 interface SubmitButtonProps {
   label: string
   loadingLabel?: string
+  pending?: boolean
 }
 
-export function SubmitButton({ label, loadingLabel }: SubmitButtonProps) {
-  const { pending } = useFormStatus()
+export function SubmitButton({ label, loadingLabel, pending: pendingProp }: SubmitButtonProps) {
+  const { pending: formPending } = useFormStatus()
+  const pending = pendingProp ?? formPending
 
   return (
     <button
