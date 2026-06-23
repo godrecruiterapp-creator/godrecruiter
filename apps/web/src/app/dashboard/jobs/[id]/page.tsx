@@ -42,7 +42,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   ].filter(Boolean)
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Button variant="outline" size="sm" asChild>
           <Link href="/dashboard/jobs">

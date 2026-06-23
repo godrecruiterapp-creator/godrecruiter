@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react'
 
 export default function NewJobPage() {
   return (
-    <div className="max-w-2xl">
+    <div>
       <div className="flex items-center gap-3 mb-6">
         <Button variant="outline" size="icon" className="size-8" asChild>
           <Link href="/dashboard/jobs">

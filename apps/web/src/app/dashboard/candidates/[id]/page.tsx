@@ -44,7 +44,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Button variant="outline" size="sm" asChild>
           <Link href="/dashboard/candidates">
