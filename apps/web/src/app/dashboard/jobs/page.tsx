@@ -68,7 +68,7 @@ export default async function JobsPage() {
     if (membership) {
       const { data } = await admin
         .from('jobs')
-        .select('id, title, client, city, state, employment_type, status, priority, recruiter_name, openings, created_at, updated_at')
+        .select('id, display_id, job_number, title, client, city, state, employment_type, status, priority, recruiter_name, openings, created_at, updated_at')
         .eq('tenant_id', membership.tenant_id)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
@@ -141,7 +141,7 @@ export default async function JobsPage() {
                   const status   = STATUS_BADGE[String(job.status ?? 'open')] ?? STATUS_BADGE['open']!
                   const priority = PRIORITY_BADGE[String(job.priority ?? 'medium')] ?? PRIORITY_BADGE['medium']!
                   const empType  = EMPLOYMENT_LABELS[String(job.employment_type ?? '')] ?? '—'
-                  const jobIdShort = String(job.id ?? '').slice(-8).toUpperCase()
+                  const jobIdShort = String(job.display_id ?? job.id ?? '').slice(-8).toUpperCase()
                   const aging = job.created_at
                     ? Math.floor((Date.now() - new Date(String(job.created_at)).getTime()) / 86_400_000)
                     : null
@@ -150,7 +150,7 @@ export default async function JobsPage() {
                     <TableRow key={String(job.id)} className="group cursor-pointer hover:bg-muted/30">
                       <TableCell className="font-mono text-xs text-muted-foreground">
                         <Link href={`/dashboard/jobs/${job.id}`} className="hover:text-foreground hover:underline">
-                          …{jobIdShort}
+                          {job.display_id ? String(job.display_id) : `…${jobIdShort}`}
                         </Link>
                       </TableCell>
                       <TableCell className="font-medium">
