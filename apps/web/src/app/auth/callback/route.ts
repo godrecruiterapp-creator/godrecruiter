@@ -25,9 +25,23 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error && data.user) {
+      // Ensure platform_users record exists (may not exist if email confirmation was required)
+      const { createAdminClient } = await import('@/lib/supabase/admin')
+      const admin = createAdminClient()
+      const fullName =
+        data.user.user_metadata?.full_name ??
+        data.user.user_metadata?.name ??
+        data.user.email?.split('@')[0] ??
+        'User'
+      await admin.from('platform_users').upsert({
+        id: data.user.id,
+        email: data.user.email!,
+        full_name: fullName,
+      }, { onConflict: 'id' })
+
+      return NextResponse.redirect(`${origin}/select-workspace`)
     }
   }
 

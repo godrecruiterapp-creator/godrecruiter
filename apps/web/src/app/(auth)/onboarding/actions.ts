@@ -32,14 +32,13 @@ export async function createWorkspaceAction(
     'Team Owner'
 
   try {
-    const tenant = await provisionTenant(
+    await provisionTenant(
       parsed.data,
       user.id,
       user.email!,
       fullName
     )
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://godrecruiter-4bmm.vercel.app'
-    return { redirectTo: `${appUrl}/dashboard` }
+    return { redirectTo: '/dashboard' }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
 
