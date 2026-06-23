@@ -38,7 +38,7 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
   const salaryMax = job.salary_max ? String(Math.round(job.salary_max / 100)) : ''
 
   return (
-    <div>
+    <div className="p-6 overflow-auto flex-1">
       <div className="flex items-center gap-3 mb-6">
         <Button variant="outline" size="icon" className="size-8" asChild>
           <Link href={`/dashboard/jobs/${id}`}><ArrowLeft className="size-4" /></Link>

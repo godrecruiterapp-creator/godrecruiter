@@ -21,8 +21,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <AppSidebar />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header userName={fullName} userEmail={user.email ?? ''} />
-        <main className="flex-1 overflow-auto bg-muted/30 p-6">
-          <Suspense fallback={<PageSkeleton />}>
+        <main className="flex-1 overflow-hidden bg-muted/30 flex flex-col">
+          <Suspense fallback={<div className="p-6"><PageSkeleton /></div>}>
             {children}
           </Suspense>
         </main>

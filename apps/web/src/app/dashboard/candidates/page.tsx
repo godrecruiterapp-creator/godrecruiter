@@ -44,7 +44,7 @@ export default async function CandidatesPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 p-6 overflow-auto flex-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Candidates</h1>

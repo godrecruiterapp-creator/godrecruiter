@@ -239,7 +239,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 p-6 overflow-auto flex-1">
       {/* ── toolbar ── */}
       <div className="flex items-center gap-2 flex-wrap">
         {/* Filters button */}

@@ -11,7 +11,7 @@ const sel = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 
 
 export default function NewJobPage() {
   return (
-    <div>
+    <div className="p-6 overflow-auto flex-1">
       <div className="flex items-center gap-3 mb-6">
         <Button variant="outline" size="icon" className="size-8" asChild>
           <Link href="/dashboard/jobs"><ArrowLeft className="size-4" /></Link>

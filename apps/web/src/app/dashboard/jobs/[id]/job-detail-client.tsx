@@ -400,7 +400,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   }
 
   return (
-    <div className="-mx-6 -mt-6 flex flex-col min-h-full">
+    <div className="flex flex-col flex-1 overflow-hidden bg-background">
       {/* ── Sticky Header ─────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-20 bg-background border-b">
         <div className="flex items-start gap-4 px-6 py-3">
@@ -541,11 +541,11 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
       </div>
 
       {/* ── Body: two-column ──────────────────────────────────────────────── */}
-      <div className="flex gap-0 min-h-0 flex-1">
+      <div className="flex flex-1 overflow-hidden">
 
         {/* Left: main workspace 70% */}
-        <div className="flex-1 min-w-0 overflow-auto">
-          <Tabs defaultValue="pipeline" className="h-full flex flex-col">
+        <div className="flex-1 min-w-0 overflow-auto flex flex-col">
+          <Tabs defaultValue="pipeline" className="flex flex-col flex-1 overflow-hidden">
             <div className="px-6 pt-4 pb-0 border-b">
               <TabsList className="h-9 bg-transparent gap-0 p-0">
                 {[
@@ -791,8 +791,8 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
         </div>
 
         {/* Right: job details panel 30% */}
-        <div className="w-72 shrink-0 border-l bg-muted/20">
-          <ScrollArea className="h-[calc(100vh-160px)]">
+        <div className="w-72 shrink-0 border-l bg-muted/20 overflow-auto">
+          <ScrollArea className="h-full">
             <div className="p-4 space-y-5">
 
               {/* Job Details */}
