@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AppSidebar } from '@/components/app/sidebar'
 import { Header } from '@/components/app/header'
-import { SidebarProvider } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -18,9 +17,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     'User'
 
   return (
-    <SidebarProvider>
+    <div className="flex h-screen overflow-hidden bg-background">
       <AppSidebar />
-      <div className="flex flex-col flex-1 min-w-0 min-h-screen overflow-hidden">
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header userName={fullName} userEmail={user.email ?? ''} />
         <main className="flex-1 overflow-auto bg-muted/30 p-6">
           <Suspense fallback={<PageSkeleton />}>
@@ -28,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </Suspense>
         </main>
       </div>
-    </SidebarProvider>
+    </div>
   )
 }
 
