@@ -887,7 +887,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                   <TabsTrigger
                     key={id}
                     value={id}
-                    className="h-11 px-4 rounded-none border-b-2 border-transparent text-sm font-medium text-muted-foreground bg-transparent shadow-none
+                    className="h-11 px-4 rounded-none border-b-2 border-transparent text-sm font-medium text-muted-foreground bg-transparent shadow-none -mb-px
                       data-[state=active]:border-brand data-[state=active]:text-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
                     {label}
