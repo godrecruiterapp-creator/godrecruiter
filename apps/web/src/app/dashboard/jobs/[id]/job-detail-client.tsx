@@ -551,11 +551,18 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
   )
 }
 
+const SELECT_CLS = "h-9 pl-3 pr-8 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-brand text-foreground"
+
 // ── Notes tab ─────────────────────────────────────────────────────────────────
 
 function NotesTab() {
   const [notes, setNotes] = useState<Note[]>(INITIAL_NOTES)
   const [text, setText] = useState('')
+  const [byFilter, setByFilter] = useState('')
+  // ponytail: date filter is UI-only; wire when notes have real timestamps
+
+  const authors = [...new Set(INITIAL_NOTES.map(n => n.author))]
+  const visible = byFilter ? notes.filter(n => n.author === byFilter) : notes
 
   function addNote() {
     if (!text.trim()) return
@@ -565,31 +572,42 @@ function NotesTab() {
   }
 
   return (
-    <div className="px-6 py-6 space-y-5">
+    <div className="flex flex-col h-full">
       {/* Compose */}
-      <div className="border border-border rounded-lg overflow-hidden">
-        <textarea
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder="Write a note about this job…"
-          className="w-full h-24 text-sm px-4 py-3 resize-none focus:outline-none bg-background placeholder:text-muted-foreground"
-        />
-        <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20">
-          <span className="text-xs text-muted-foreground">Visible to all team members</span>
-          <Button
-            onClick={addNote}
-            disabled={!text.trim()}
-            size="sm"
-            className="h-8 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40"
-          >
-            Post Note
-          </Button>
+      <div className="px-6 pt-6 pb-4 shrink-0">
+        <div className="border border-border rounded-lg overflow-hidden">
+          <textarea
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder="Write a note about this job…"
+            className="w-full h-24 text-sm px-4 py-3 resize-none focus:outline-none bg-background placeholder:text-muted-foreground"
+          />
+          <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20">
+            <span className="text-xs text-muted-foreground">Visible to all team members</span>
+            <Button onClick={addNote} disabled={!text.trim()} size="sm"
+              className="h-8 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40">
+              Post Note
+            </Button>
+          </div>
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="flex items-center gap-2.5 px-6 py-2.5 border-b border-t shrink-0 bg-muted/10">
+        <select className={SELECT_CLS} value="" onChange={() => {}}>
+          <option value="">Date</option>
+          <option>Today</option><option>This week</option><option>This month</option>
+        </select>
+        <select className={SELECT_CLS} value={byFilter} onChange={e => setByFilter(e.target.value)}>
+          <option value="">Added By</option>
+          {authors.map(a => <option key={a}>{a}</option>)}
+        </select>
+        {byFilter && <button onClick={() => setByFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
+      </div>
+
       {/* Notes list */}
-      <div className="space-y-3">
-        {notes.map(n => (
+      <div className="flex-1 overflow-auto px-6 py-4 space-y-3">
+        {visible.map(n => (
           <div key={n.id} className="border border-border rounded-lg p-4">
             <div className="flex items-center gap-2.5 mb-2.5">
               <Avatar className="size-8">
@@ -610,16 +628,16 @@ function NotesTab() {
 
 function DocumentsTab() {
   const [docs, setDocs] = useState<Doc[]>(INITIAL_DOCS)
+  const [typeFilter, setTypeFilter] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  // ponytail: date + created-by filters are UI-only; wire when docs have real metadata
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     const newDocs: Doc[] = files.map(f => ({
       id: Date.now().toString() + Math.random(),
       name: f.name,
-      size: f.size > 1024 * 1024
-        ? `${(f.size / 1024 / 1024).toFixed(1)} MB`
-        : `${Math.round(f.size / 1024)} KB`,
+      size: f.size > 1024 * 1024 ? `${(f.size / 1024 / 1024).toFixed(1)} MB` : `${Math.round(f.size / 1024)} KB`,
       type: f.name.split('.').pop() ?? 'file',
       uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     }))
@@ -627,46 +645,48 @@ function DocumentsTab() {
     e.target.value = ''
   }
 
-  function removeDoc(id: string) {
-    setDocs(prev => prev.filter(d => d.id !== id))
-  }
-
   const iconColor: Record<string, string> = {
     pdf: 'text-red-500', doc: 'text-blue-500', docx: 'text-blue-500',
     xls: 'text-emerald-500', xlsx: 'text-emerald-500',
   }
+  const types = [...new Set(docs.map(d => d.type))]
+  const visible = typeFilter ? docs.filter(d => d.type === typeFilter) : docs
 
   return (
-    <div className="px-6 py-6 space-y-5">
-      {/* Upload area */}
-      <div
-        onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-border rounded-lg py-10 flex flex-col items-center gap-3 cursor-pointer hover:border-brand hover:bg-brand-muted/30 transition-colors text-center"
-      >
-        <div className="size-12 rounded-xl bg-muted flex items-center justify-center">
-          <Upload className="size-5 text-muted-foreground" />
-        </div>
-        <div>
-          <p className="text-sm font-medium text-foreground">Click to upload files</p>
-          <p className="text-xs text-muted-foreground mt-1">PDF, Word, Excel, images — up to 25 MB each</p>
-        </div>
-        <Button size="sm" className="bg-brand hover:bg-brand/90 text-white border-0 text-sm">
-          Choose Files
+    <div className="flex flex-col h-full">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2.5 px-6 py-2.5 border-b shrink-0 bg-muted/10">
+        <Button size="sm" onClick={() => inputRef.current?.click()}
+          className="h-9 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0">
+          <Upload className="size-3.5" />Add Document
         </Button>
         <input ref={inputRef} type="file" multiple className="hidden" onChange={handleFileChange} />
+        <select className={SELECT_CLS} value="" onChange={() => {}}>
+          <option value="">Date</option>
+          <option>Today</option><option>This week</option><option>This month</option>
+        </select>
+        <select className={SELECT_CLS} value="" onChange={() => {}}>
+          <option value="">Created By</option>
+          <option>Arun</option><option>Suresh</option>
+        </select>
+        <select className={SELECT_CLS} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+          <option value="">Document Type</option>
+          {types.map(t => <option key={t} value={t}>{t.toUpperCase()}</option>)}
+        </select>
+        {typeFilter && <button onClick={() => setTypeFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
       </div>
 
       {/* File list */}
-      {docs.length > 0 && (
-        <div className="border border-border rounded-lg overflow-hidden">
-          <div className="px-4 py-2.5 border-b bg-muted/30">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              {docs.length} file{docs.length !== 1 ? 's' : ''}
-            </span>
+      <div className="flex-1 overflow-auto">
+        {visible.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-2 text-center">
+            <File className="size-8 text-muted-foreground/30" />
+            <p className="text-sm text-muted-foreground">No documents yet</p>
           </div>
+        ) : (
           <div className="divide-y divide-border">
-            {docs.map(doc => (
-              <div key={doc.id} className="flex items-center gap-3.5 px-4 py-3 group hover:bg-muted/20 transition-colors">
+            {visible.map(doc => (
+              <div key={doc.id} className="flex items-center gap-3.5 px-6 py-3 group hover:bg-muted/20 transition-colors">
                 <div className={`shrink-0 ${iconColor[doc.type] ?? 'text-muted-foreground'}`}>
                   <File className="size-5" />
                 </div>
@@ -675,18 +695,17 @@ function DocumentsTab() {
                   <p className="text-xs text-muted-foreground">{doc.size} · {doc.uploadedAt}</p>
                 </div>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="text-xs text-foreground border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">
-                    Download
-                  </button>
-                  <button onClick={() => removeDoc(doc.id)} className="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors">
+                  <button className="text-xs text-foreground border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
+                  <button onClick={() => setDocs(prev => prev.filter(d => d.id !== doc.id))}
+                    className="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors">
                     <Trash2 className="size-3.5" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -1029,8 +1048,14 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
 
             {/* ── Activity ───────────────────────────────────────────────── */}
             {activeTab === 'activity' && (
-              <div className="flex-1 overflow-auto">
-                <div className="px-6 py-7">
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex items-center gap-2.5 px-6 py-2.5 border-b shrink-0 bg-muted/10">
+                  <select className={SELECT_CLS} value="" onChange={() => {}}>
+                    <option value="">Date</option>
+                    <option>Today</option><option>This week</option><option>This month</option>
+                  </select>
+                </div>
+                <div className="flex-1 overflow-auto px-6 py-6">
                   <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-6">Activity Log</p>
                   {[
                     { text:'Job created',                      time:`${ageDays} days ago`, user:'AR' },
