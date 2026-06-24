@@ -565,7 +565,7 @@ function NotesTab() {
   }
 
   return (
-    <div className="max-w-2xl px-6 py-6 space-y-5">
+    <div className="px-6 py-6 space-y-5">
       {/* Compose */}
       <div className="border border-border rounded-lg overflow-hidden">
         <textarea
@@ -637,7 +637,7 @@ function DocumentsTab() {
   }
 
   return (
-    <div className="max-w-2xl px-6 py-6 space-y-5">
+    <div className="px-6 py-6 space-y-5">
       {/* Upload area */}
       <div
         onClick={() => inputRef.current?.click()}
