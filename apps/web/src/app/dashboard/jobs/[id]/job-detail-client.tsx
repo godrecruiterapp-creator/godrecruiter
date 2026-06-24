@@ -19,7 +19,11 @@ import {
   Clock, Zap, ChevronRight, X, Check,
   Upload, File, Trash2,
 } from 'lucide-react'
-import { deleteJobAction, updateJobStatusAction } from '../actions'
+import {
+  deleteJobAction, updateJobStatusAction,
+  addJobNoteAction, deleteJobNoteAction,
+  uploadJobDocumentAction, deleteJobDocumentAction,
+} from '../actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -61,8 +65,9 @@ type Candidate = {
   exp: string; expYears: number; location: string
   visa: string; score: number; stage: string
 }
-type Note = { id: string; author: string; initials: string; text: string; time: string }
-type Doc  = { id: string; name: string; size: string; type: string; uploadedAt: string }
+type Note         = { id: string; author: string; initials: string; text: string; time: string }
+type Doc          = { id: string; name: string; size: string; type: string; uploadedAt: string }
+type ActivityItem = { id: string; actor: string; action: string; time: string }
 
 // ponytail: CANDIDATES/NOTES/DOCS are empty until job_candidates/job_notes/job_documents tables exist
 
@@ -512,20 +517,35 @@ const SELECT_CLS = "h-9 pl-3 pr-8 text-sm border border-input rounded-md bg-back
 
 // ── Notes tab ─────────────────────────────────────────────────────────────────
 
-function NotesTab() {
-  const [notes, setNotes] = useState<Note[]>([])
+function NotesTab({ jobId, notes, setNotes }: {
+  jobId: string
+  notes: Note[]
+  setNotes: React.Dispatch<React.SetStateAction<Note[]>>
+}) {
   const [text, setText] = useState('')
   const [byFilter, setByFilter] = useState('')
-  // ponytail: date filter is UI-only; wire when notes have real timestamps
 
   const authors = [...new Set(notes.map(n => n.author))]
   const visible = byFilter ? notes.filter(n => n.author === byFilter) : notes
 
-  function addNote() {
+  async function addNote() {
     if (!text.trim()) return
-    const now = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-    setNotes(prev => [{ id: Date.now().toString(), author: 'You', initials: 'ME', text: text.trim(), time: `Today at ${now}` }, ...prev])
+    const draft = text.trim()
+    const tempId = `temp_${Date.now()}`
+    setNotes(prev => [{ id: tempId, author: 'You', initials: 'ME', text: draft, time: 'Just now' }, ...prev])
     setText('')
+    const res = await addJobNoteAction(jobId, draft)
+    if ('error' in res) {
+      setNotes(prev => prev.filter(n => n.id !== tempId))
+    } else {
+      const initials = res.author_name.split(' ').map((w: string) => w[0] ?? '').join('').toUpperCase().slice(0, 2) || 'ME'
+      setNotes(prev => prev.map(n => n.id === tempId ? { ...n, id: res.id, author: res.author_name, initials } : n))
+    }
+  }
+
+  async function deleteNote(noteId: string) {
+    setNotes(prev => prev.filter(n => n.id !== noteId))
+    await deleteJobNoteAction(noteId)
   }
 
   return (
@@ -545,14 +565,21 @@ function NotesTab() {
           {byFilter && <button onClick={() => setByFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
         </div>
         <div className="flex-1 overflow-auto px-5 py-4 space-y-3">
+          {visible.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-10">No notes yet</p>
+          )}
           {visible.map(n => (
-            <div key={n.id} className="border border-border rounded-lg p-4">
+            <div key={n.id} className="border border-border rounded-lg p-4 group">
               <div className="flex items-center gap-2.5 mb-2.5">
                 <Avatar className="size-8">
                   <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{n.initials}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-semibold text-foreground">{n.author}</span>
                 <span className="text-xs text-muted-foreground ml-auto">{n.time}</span>
+                <button onClick={() => deleteNote(n.id)}
+                  className="size-6 flex items-center justify-center text-muted-foreground hover:text-destructive rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Trash2 className="size-3.5" />
+                </button>
               </div>
               <p className="text-sm text-foreground leading-relaxed">{n.text}</p>
             </div>
@@ -586,23 +613,38 @@ function NotesTab() {
 
 // ── Documents tab ─────────────────────────────────────────────────────────────
 
-function DocumentsTab() {
-  const [docs, setDocs] = useState<Doc[]>([])
+function DocumentsTab({ jobId, docs, setDocs }: {
+  jobId: string
+  docs: Doc[]
+  setDocs: React.Dispatch<React.SetStateAction<Doc[]>>
+}) {
   const [typeFilter, setTypeFilter] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  // ponytail: date + created-by filters are UI-only; wire when docs have real metadata
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
-    const newDocs: Doc[] = files.map(f => ({
-      id: Date.now().toString() + Math.random(),
-      name: f.name,
-      size: f.size > 1024 * 1024 ? `${(f.size / 1024 / 1024).toFixed(1)} MB` : `${Math.round(f.size / 1024)} KB`,
-      type: f.name.split('.').pop() ?? 'file',
-      uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    }))
-    setDocs(prev => [...newDocs, ...prev])
     e.target.value = ''
+    for (const f of files) {
+      const tempId = `temp_${Date.now()}_${Math.random()}`
+      const size = f.size > 1024 * 1024 ? `${(f.size / 1024 / 1024).toFixed(1)} MB` : `${Math.round(f.size / 1024)} KB`
+      setDocs(prev => [{
+        id: tempId, name: f.name, size,
+        type: f.name.split('.').pop() ?? 'file',
+        uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      }, ...prev])
+      const fd = new FormData(); fd.append('file', f)
+      const res = await uploadJobDocumentAction(jobId, fd)
+      if ('error' in res) {
+        setDocs(prev => prev.filter(d => d.id !== tempId))
+      } else {
+        setDocs(prev => prev.map(d => d.id === tempId ? { ...d, id: res.id } : d))
+      }
+    }
+  }
+
+  async function deleteDoc(docId: string) {
+    setDocs(prev => prev.filter(d => d.id !== docId))
+    await deleteJobDocumentAction(docId)
   }
 
   const iconColor: Record<string, string> = {
@@ -656,7 +698,7 @@ function DocumentsTab() {
                 </div>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button className="text-xs text-foreground border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
-                  <button onClick={() => setDocs(prev => prev.filter(d => d.id !== doc.id))}
+                  <button onClick={() => deleteDoc(doc.id)}
                     className="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors">
                     <Trash2 className="size-3.5" />
                   </button>
@@ -672,11 +714,19 @@ function DocumentsTab() {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function JobDetailClient({ job }: { job: JobDetailData }) {
+export function JobDetailClient({ job, initialNotes, initialDocs, initialActivity }: {
+  job: JobDetailData
+  initialNotes: Note[]
+  initialDocs: Doc[]
+  initialActivity: ActivityItem[]
+}) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
   const [candidates, setCandidates]           = useState<Candidate[]>([])
+  const [notes, setNotes]                     = useState<Note[]>(initialNotes)
+  const [docs, setDocs]                       = useState<Doc[]>(initialDocs)
+  const [activity]                            = useState<ActivityItem[]>(initialActivity)
   const [sidebarOpen, setSidebarOpen]         = useState(true)
   const [activeTab, setActiveTab]             = useState<'pipeline' | 'details' | 'notes' | 'documents' | 'activity'>('details')
   const [descOpen, setDescOpen]               = useState(false)
@@ -996,14 +1046,14 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
             {/* ── Notes ──────────────────────────────────────────────────── */}
             {activeTab === 'notes' && (
               <div className="flex-1 overflow-auto">
-                <NotesTab />
+                <NotesTab jobId={job.id} notes={notes} setNotes={setNotes} />
               </div>
             )}
 
             {/* ── Documents ──────────────────────────────────────────────── */}
             {activeTab === 'documents' && (
               <div className="flex-1 overflow-auto">
-                <DocumentsTab />
+                <DocumentsTab jobId={job.id} docs={docs} setDocs={setDocs} />
               </div>
             )}
 
@@ -1018,8 +1068,25 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                 </div>
                 <div className="flex-1 overflow-auto px-6 py-6">
                   <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-6">Activity Log</p>
-                  {/* ponytail: wire from activity_log table when it exists */}
-                  <p className="text-sm text-muted-foreground">No activity yet.</p>
+                  {activity.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No activity yet.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {activity.map(a => (
+                        <div key={a.id} className="flex gap-3">
+                          <Avatar className="size-7 shrink-0 mt-0.5">
+                            <AvatarFallback className="text-xs font-bold bg-muted text-muted-foreground">
+                              {a.actor.split(' ').map(w => w[0] ?? '').join('').toUpperCase().slice(0, 2) || '??'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-sm"><span className="font-medium">{a.actor}</span> {a.action}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{a.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
