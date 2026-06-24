@@ -4,7 +4,7 @@ import { useState, useTransition, useRef, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+// Tabs replaced with custom implementation to avoid shadcn style conflicts
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
@@ -465,14 +465,9 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
         <>
           <div className="flex items-center justify-between px-5 h-11 border-b shrink-0">
             <span className="text-sm font-semibold">Job Info</span>
-            <div className="flex items-center gap-3">
-              <Link href={`/dashboard/jobs/${job.id}/edit`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-brand transition-colors">
-                <Pencil className="size-3" />Edit
-              </Link>
-              <button onClick={onToggle} className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors">
-                <ChevronRight className="size-4" />
-              </button>
-            </div>
+            <button onClick={onToggle} className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors">
+              <ChevronRight className="size-4" />
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto min-h-0">
@@ -703,6 +698,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   const [, startTransition] = useTransition()
 
   const [sidebarOpen, setSidebarOpen]         = useState(true)
+  const [activeTab, setActiveTab]             = useState<'pipeline' | 'details' | 'notes' | 'documents' | 'activity'>('pipeline')
   const [activeCandidate, setActiveCandidate] = useState<Candidate | null>(null)
   const [drawerOpen, setDrawerOpen]           = useState(false)
   const [search, setSearch]                   = useState('')
@@ -858,10 +854,10 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
         })}
       </div>
 
-      {/* ── Stat cards (smaller, less round) ─────────────────────────────── */}
-      <div className="flex items-center gap-2.5 px-5 py-2.5 border-b bg-background shrink-0 overflow-x-auto">
+      {/* ── Stat cards (equal width) ──────────────────────────────────────── */}
+      <div className="flex items-center gap-2.5 px-5 py-2.5 border-b bg-background shrink-0">
         {statCards.map(({ label, value, bg, border, num, sub }) => (
-          <div key={label} className={`flex flex-col items-center shrink-0 rounded-lg border px-4 py-2 min-w-[76px] ${bg} ${border}`}>
+          <div key={label} className={`flex flex-col items-center flex-1 rounded-lg border px-4 py-2 ${bg} ${border}`}>
             <span className={`text-xl font-bold tabular-nums leading-none mb-0.5 ${num}`}>{value}</span>
             <span className={`text-xs font-medium whitespace-nowrap ${sub}`}>{label}</span>
           </div>
@@ -872,139 +868,148 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
       <div className="flex flex-1 overflow-hidden">
 
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-          <Tabs defaultValue="pipeline" className="flex flex-col flex-1 overflow-hidden">
 
-            {/* Tab bar — single border comes from this wrapper div only */}
-            <div className="border-b shrink-0 px-5">
-              <TabsList className="h-11 bg-transparent justify-start rounded-none w-full gap-0 p-0">
-                {[
-                  { id: 'pipeline',  label: 'Pipeline'    },
-                  { id: 'details',   label: 'Description' },
-                  { id: 'notes',     label: 'Notes'       },
-                  { id: 'documents', label: 'Documents'   },
-                  { id: 'activity',  label: 'Activity'    },
-                ].map(({ id, label }) => (
-                  <TabsTrigger
-                    key={id}
-                    value={id}
-                    className="h-11 px-4 rounded-none border-b-2 border-transparent text-sm font-medium text-muted-foreground bg-transparent shadow-none -mb-px
-                      data-[state=active]:border-brand data-[state=active]:text-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                  >
-                    {label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+            {/* ── Tab bar (custom — no shadcn interference) ──────────────── */}
+            <div className="border-b shrink-0 px-5 flex">
+              {([
+                { id: 'pipeline',  label: 'Pipeline'    },
+                { id: 'details',   label: 'Description' },
+                { id: 'notes',     label: 'Notes'       },
+                { id: 'documents', label: 'Documents'   },
+                { id: 'activity',  label: 'Activity'    },
+              ] as const).map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`h-11 px-4 text-sm font-medium -mb-px border-b-2 transition-colors whitespace-nowrap ${
+                    activeTab === id
+                      ? 'border-brand text-brand'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
 
-            {/* ── Pipeline (table only, no board) ────────────────────────── */}
-            <TabsContent value="pipeline" className="flex-1 m-0 flex flex-col overflow-hidden">
-              {/* Toolbar */}
-              <div className="flex items-center gap-2.5 px-5 py-3 border-b shrink-0 bg-muted/10">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                  <input
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search candidates…"
-                    className="h-9 w-56 pl-9 pr-8 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-brand placeholder:text-muted-foreground"
-                  />
-                  {search && (
-                    <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                      <X className="size-4" />
-                    </button>
-                  )}
-                </div>
-                <FilterPopover stageFilter={stageFilter} setStageFilter={setStageFilter} visaFilter={visaFilter} setVisaFilter={setVisaFilter} onClear={() => { setStageFilter(new Set()); setVisaFilter(new Set()); setSearch('') }} />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className={`h-9 flex items-center gap-2 px-3 rounded-md border text-sm transition-colors
-                      ${sortBy !== 'score' || sortDir !== 'desc' ? 'border-brand bg-brand-muted text-brand' : 'border-border bg-background text-foreground hover:bg-muted'}`}
-                    >
-                      <ArrowUpDown className="size-3.5" />
-                      {sortBy !== 'score' || sortDir !== 'desc' ? activeSortLabel : 'Sort'}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-48">
-                    {sortOptions.map(o => (
-                      <DropdownMenuItem key={`${o.key}-${o.dir}`} onClick={() => { setSortBy(o.key); setSortDir(o.dir) }}
-                        className={`text-sm gap-2 ${o.key === sortBy && o.dir === sortDir ? 'text-brand font-semibold' : ''}`}
+            {/* ── Pipeline ───────────────────────────────────────────────── */}
+            {activeTab === 'pipeline' && (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Toolbar */}
+                <div className="flex items-center gap-2.5 px-5 py-3 border-b shrink-0 bg-muted/10">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      placeholder="Search candidates…"
+                      className="h-9 w-56 pl-9 pr-8 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-brand placeholder:text-muted-foreground"
+                    />
+                    {search && (
+                      <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                        <X className="size-4" />
+                      </button>
+                    )}
+                  </div>
+                  <FilterPopover stageFilter={stageFilter} setStageFilter={setStageFilter} visaFilter={visaFilter} setVisaFilter={setVisaFilter} onClear={() => { setStageFilter(new Set()); setVisaFilter(new Set()); setSearch('') }} />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className={`h-9 flex items-center gap-2 px-3 rounded-md border text-sm transition-colors
+                        ${sortBy !== 'score' || sortDir !== 'desc' ? 'border-brand bg-brand-muted text-brand' : 'border-border bg-background text-foreground hover:bg-muted'}`}
                       >
-                        {o.key === sortBy && o.dir === sortDir && <Check className="size-3.5 text-brand shrink-0" />}
-                        {o.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {(search || stageFilter.size > 0 || visaFilter.size > 0) && (
-                  <span className="text-sm text-muted-foreground">{filteredCandidates.length} of {CANDIDATES.length}</span>
-                )}
+                        <ArrowUpDown className="size-3.5" />
+                        {sortBy !== 'score' || sortDir !== 'desc' ? activeSortLabel : 'Sort'}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-48">
+                      {sortOptions.map(o => (
+                        <DropdownMenuItem key={`${o.key}-${o.dir}`} onClick={() => { setSortBy(o.key); setSortDir(o.dir) }}
+                          className={`text-sm gap-2 ${o.key === sortBy && o.dir === sortDir ? 'text-brand font-semibold' : ''}`}
+                        >
+                          {o.key === sortBy && o.dir === sortDir && <Check className="size-3.5 text-brand shrink-0" />}
+                          {o.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {(search || stageFilter.size > 0 || visaFilter.size > 0) && (
+                    <span className="text-sm text-muted-foreground">{filteredCandidates.length} of {CANDIDATES.length}</span>
+                  )}
+                </div>
+                {/* Table */}
+                <div className="flex-1 overflow-auto">
+                  <CandidateTable
+                    candidates={filteredCandidates}
+                    onSelect={c => { setActiveCandidate(c); setDrawerOpen(true) }}
+                  />
+                </div>
               </div>
-              {/* Table */}
-              <div className="flex-1 overflow-auto">
-                <CandidateTable
-                  candidates={filteredCandidates}
-                  onSelect={c => { setActiveCandidate(c); setDrawerOpen(true) }}
-                />
-              </div>
-            </TabsContent>
+            )}
 
-            {/* ── Description ──────────────────────────────────────────────── */}
-            <TabsContent value="details" className="flex-1 m-0 overflow-auto">
-              <div className="max-w-2xl px-6 py-7 space-y-7">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Job Description</p>
-                  {job.description ? (
-                    <p className="text-sm text-foreground leading-7 whitespace-pre-wrap">{job.description}</p>
-                  ) : (
-                    <div className="border-2 border-dashed border-border rounded-lg py-14 flex flex-col items-center gap-3 text-center">
-                      <FileText className="size-8 text-muted-foreground/30" />
-                      <p className="text-sm text-muted-foreground">No description yet</p>
-                      <Link href={`/dashboard/jobs/${job.id}/edit`} className="text-sm text-brand hover:underline">Add description →</Link>
+            {/* ── Description ────────────────────────────────────────────── */}
+            {activeTab === 'details' && (
+              <div className="flex-1 overflow-auto">
+                <div className="px-6 py-7 space-y-7">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Job Description</p>
+                    {job.description ? (
+                      <p className="text-sm text-foreground leading-7 whitespace-pre-wrap">{job.description}</p>
+                    ) : (
+                      <div className="border-2 border-dashed border-border rounded-lg py-14 flex flex-col items-center gap-3 text-center">
+                        <FileText className="size-8 text-muted-foreground/30" />
+                        <p className="text-sm text-muted-foreground">No description yet</p>
+                        <Link href={`/dashboard/jobs/${job.id}/edit`} className="text-sm text-brand hover:underline">Add description →</Link>
+                      </div>
+                    )}
+                  </div>
+                  {job.requirements && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Requirements</p>
+                      <p className="text-sm text-foreground leading-7 whitespace-pre-wrap">{job.requirements}</p>
                     </div>
                   )}
                 </div>
-                {job.requirements && (
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Requirements</p>
-                    <p className="text-sm text-foreground leading-7 whitespace-pre-wrap">{job.requirements}</p>
-                  </div>
-                )}
               </div>
-            </TabsContent>
+            )}
 
-            {/* ── Notes ────────────────────────────────────────────────────── */}
-            <TabsContent value="notes" className="flex-1 m-0 overflow-auto">
-              <NotesTab />
-            </TabsContent>
+            {/* ── Notes ──────────────────────────────────────────────────── */}
+            {activeTab === 'notes' && (
+              <div className="flex-1 overflow-auto">
+                <NotesTab />
+              </div>
+            )}
 
-            {/* ── Documents ────────────────────────────────────────────────── */}
-            <TabsContent value="documents" className="flex-1 m-0 overflow-auto">
-              <DocumentsTab />
-            </TabsContent>
+            {/* ── Documents ──────────────────────────────────────────────── */}
+            {activeTab === 'documents' && (
+              <div className="flex-1 overflow-auto">
+                <DocumentsTab />
+              </div>
+            )}
 
-            {/* ── Activity ─────────────────────────────────────────────────── */}
-            <TabsContent value="activity" className="flex-1 m-0 overflow-auto">
-              <div className="max-w-xl px-6 py-7">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-6">Activity Log</p>
-                {[
-                  { text:'Job created',                      time:`${ageDays} days ago`, user:'AR' },
-                  { text:'Priya Sharma added to Sourced',    time:'2 days ago',           user:'AR' },
-                  { text:'Dinesh Singh moved to Qualified',  time:'1 day ago',            user:'SK' },
-                  { text:'Aditya Kumar submitted to client', time:'18 hours ago',         user:'AR' },
-                ].map(({ text, time, user }, i) => (
-                  <div key={i} className="flex items-start gap-4 py-4 border-b border-border last:border-0">
-                    <Avatar className="size-8 shrink-0 mt-0.5">
-                      <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{user}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm text-foreground">{text}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{time}</p>
+            {/* ── Activity ───────────────────────────────────────────────── */}
+            {activeTab === 'activity' && (
+              <div className="flex-1 overflow-auto">
+                <div className="px-6 py-7">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-6">Activity Log</p>
+                  {[
+                    { text:'Job created',                      time:`${ageDays} days ago`, user:'AR' },
+                    { text:'Priya Sharma added to Sourced',    time:'2 days ago',           user:'AR' },
+                    { text:'Dinesh Singh moved to Qualified',  time:'1 day ago',            user:'SK' },
+                    { text:'Aditya Kumar submitted to client', time:'18 hours ago',         user:'AR' },
+                  ].map(({ text, time, user }, i) => (
+                    <div key={i} className="flex items-start gap-4 py-4 border-b border-border last:border-0">
+                      <Avatar className="size-8 shrink-0 mt-0.5">
+                        <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{user}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm text-foreground">{text}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{time}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </TabsContent>
-          </Tabs>
+            )}
         </div>
 
         {/* Right sidebar */}
