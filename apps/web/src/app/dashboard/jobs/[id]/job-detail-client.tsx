@@ -802,7 +802,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <h1 className="text-base font-semibold text-foreground truncate">{job.title}</h1>
           {job.display_id && (
-            <span className="shrink-0 text-xs font-mono text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
+            <span className="shrink-0 text-xs font-sans text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
               {job.display_id}
             </span>
           )}
