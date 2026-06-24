@@ -9,11 +9,12 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
 import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react'
 
 const initialState = { error: '' }
-
-const selectClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 
 export default function NewCandidatePage() {
   const [state, formAction, pending] = useActionState(
@@ -99,24 +100,30 @@ export default function NewCandidatePage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="candidate_type">Candidate type</Label>
-                <select id="candidate_type" name="candidate_type" defaultValue="permanent" className={selectClass}>
-                  <option value="permanent">Permanent</option>
-                  <option value="contract">Contract</option>
-                  <option value="temp">Temp</option>
-                  <option value="unknown">Not specified</option>
-                </select>
+                <Select name="candidate_type" defaultValue="permanent">
+                  <SelectTrigger id="candidate_type"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="permanent">Permanent</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="temp">Temp</SelectItem>
+                    <SelectItem value="unknown">Not specified</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="notice_period">Notice period</Label>
-                <select id="notice_period" name="notice_period" defaultValue="" className={selectClass}>
-                  <option value="">Not specified</option>
-                  <option value="Immediate">Immediate</option>
-                  <option value="1 Week">1 Week</option>
-                  <option value="2 Weeks">2 Weeks</option>
-                  <option value="1 Month">1 Month</option>
-                  <option value="2 Months">2 Months</option>
-                  <option value="3 Months">3 Months</option>
-                </select>
+                <Select name="notice_period" defaultValue="">
+                  <SelectTrigger id="notice_period"><SelectValue placeholder="Not specified" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Not specified</SelectItem>
+                    <SelectItem value="Immediate">Immediate</SelectItem>
+                    <SelectItem value="1 Week">1 Week</SelectItem>
+                    <SelectItem value="2 Weeks">2 Weeks</SelectItem>
+                    <SelectItem value="1 Month">1 Month</SelectItem>
+                    <SelectItem value="2 Months">2 Months</SelectItem>
+                    <SelectItem value="3 Months">3 Months</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -131,16 +138,19 @@ export default function NewCandidatePage() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="source">Source</Label>
-              <select id="source" name="source" defaultValue="" className={selectClass}>
-                <option value="">Not specified</option>
-                <option value="linkedin">LinkedIn</option>
-                <option value="referral">Referral</option>
-                <option value="inbound">Inbound</option>
-                <option value="naukri">Naukri</option>
-                <option value="indeed">Indeed</option>
-                <option value="import">Import</option>
-                <option value="other">Other</option>
-              </select>
+              <Select name="source" defaultValue="">
+                <SelectTrigger id="source"><SelectValue placeholder="Not specified" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Not specified</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  <SelectItem value="referral">Referral</SelectItem>
+                  <SelectItem value="inbound">Inbound</SelectItem>
+                  <SelectItem value="naukri">Naukri</SelectItem>
+                  <SelectItem value="indeed">Indeed</SelectItem>
+                  <SelectItem value="import">Import</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>

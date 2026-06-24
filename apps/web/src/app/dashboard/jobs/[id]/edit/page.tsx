@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
 import { ArrowLeft } from 'lucide-react'
-
-const sel = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 
 export default async function EditJobPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -96,32 +97,41 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="employment_type">Employment type</Label>
-                <select id="employment_type" name="employment_type" defaultValue={job.employment_type ?? 'full_time'} className={sel}>
-                  <option value="full_time">Full-Time</option>
-                  <option value="contract">Contract</option>
-                  <option value="cth">Contract to Hire (CTH)</option>
-                  <option value="direct_hire">Direct Hire</option>
-                  <option value="remote">Remote</option>
-                  <option value="hybrid">Hybrid</option>
-                </select>
+                <Select name="employment_type" defaultValue={job.employment_type ?? 'full_time'}>
+                  <SelectTrigger id="employment_type"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full_time">Full-Time</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="cth">Contract to Hire (CTH)</SelectItem>
+                    <SelectItem value="direct_hire">Direct Hire</SelectItem>
+                    <SelectItem value="remote">Remote</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="work_mode">Work mode</Label>
-                <select id="work_mode" name="work_mode" defaultValue={job.work_mode ?? 'onsite'} className={sel}>
-                  <option value="onsite">On-site</option>
-                  <option value="hybrid">Hybrid</option>
-                  <option value="remote">Remote</option>
-                </select>
+                <Select name="work_mode" defaultValue={job.work_mode ?? 'onsite'}>
+                  <SelectTrigger id="work_mode"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="onsite">On-site</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                    <SelectItem value="remote">Remote</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="client_type">Client type</Label>
-                <select id="client_type" name="client_type" defaultValue={job.client_type ?? ''} className={sel}>
-                  <option value="">— Select —</option>
-                  <option value="direct">Direct Client</option>
-                  <option value="vms">VMS</option>
-                </select>
+                <Select name="client_type" defaultValue={job.client_type ?? ''}>
+                  <SelectTrigger id="client_type"><SelectValue placeholder="— Select —" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">— Select —</SelectItem>
+                    <SelectItem value="direct">Direct Client</SelectItem>
+                    <SelectItem value="vms">VMS</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="openings">Openings</Label>
@@ -171,20 +181,26 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="status">Status</Label>
-                <select id="status" name="status" defaultValue={job.status ?? 'open'} className={sel}>
-                  <option value="open">Open</option>
-                  <option value="on_hold">On Hold</option>
-                  <option value="closed">Closed</option>
-                  <option value="filled">Filled</option>
-                </select>
+                <Select name="status" defaultValue={job.status ?? 'open'}>
+                  <SelectTrigger id="status"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="on_hold">On Hold</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="filled">Filled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="priority">Priority</Label>
-                <select id="priority" name="priority" defaultValue={job.priority ?? 'medium'} className={sel}>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
+                <Select name="priority" defaultValue={job.priority ?? 'medium'}>
+                  <SelectTrigger id="priority"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>

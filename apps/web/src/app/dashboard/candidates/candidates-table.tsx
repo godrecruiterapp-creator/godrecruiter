@@ -4,6 +4,17 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table'
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { MoreHorizontal, Settings2, GripVertical, Check, ExternalLink, Trash2, Users, Plus } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -51,10 +62,7 @@ const DEFAULT_COLS: ColKey[] = [
 ]
 
 const WORK_AUTH: Record<string, string> = {
-  permanent: 'Citizen / PR',
-  contract:  'Work Visa',
-  temp:      'Temp / OPT',
-  unknown:   'Unknown',
+  permanent: 'Citizen / PR', contract: 'Work Visa', temp: 'Temp / OPT', unknown: 'Unknown',
 }
 
 function relTime(iso: string) {
@@ -68,20 +76,15 @@ function relTime(iso: string) {
 
 function formatCtc(ctc: number) {
   if (ctc >= 100_000) return `₹${(ctc / 100_000).toFixed(1)}L`
-  if (ctc >= 1_000)   return `₹${(ctc / 1_000).toFixed(0)}K`
+  if (ctc >= 1_000) return `₹${(ctc / 1_000).toFixed(0)}K`
   return `₹${ctc}`
 }
 
 // ── Column picker ─────────────────────────────────────────────────────────────
 
-function ColPicker({
-  cols, allCols, onChange,
-}: {
-  cols: ColKey[]
-  allCols: ColKey[]
-  onChange: (cols: ColKey[]) => void
+function ColPicker({ cols, allCols, onChange }: {
+  cols: ColKey[]; allCols: ColKey[]; onChange: (cols: ColKey[]) => void
 }) {
-  const [open, setOpen] = useState(false)
   const dragKey = useRef<ColKey | null>(null)
   const hidden = allCols.filter(k => !cols.includes(k))
 
@@ -93,13 +96,12 @@ function ColPicker({
       onChange(last ? [...cols.slice(0, -1), key, last] : [...cols, key])
     }
   }
-
   function onDragStart(key: ColKey) { dragKey.current = key }
   function onDrop(targetKey: ColKey) {
     if (!dragKey.current || dragKey.current === targetKey) return
     const next = [...cols]
     const from = next.indexOf(dragKey.current)
-    const to   = next.indexOf(targetKey)
+    const to = next.indexOf(targetKey)
     next.splice(from, 1)
     next.splice(to, 0, dragKey.current)
     onChange(next)
@@ -107,106 +109,79 @@ function ColPicker({
   }
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className={`h-9 flex items-center gap-2 px-3 rounded-md border text-sm transition-colors ${
-          open ? 'border-brand bg-brand-muted text-brand' : 'border-border bg-background text-foreground hover:bg-muted'
-        }`}
-      >
-        <Settings2 className="size-3.5" />
-        Columns
-      </button>
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-50 w-60 bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
-            <div className="px-4 py-2.5 border-b flex items-center justify-between">
-              <span className="text-sm font-semibold">Columns</span>
-              <button onClick={() => onChange(DEFAULT_COLS)} className="text-xs text-brand hover:underline">Reset</button>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1.5">
+          <Settings2 className="size-3.5" />Columns
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-60 p-0">
+        <div className="px-4 py-2.5 border-b flex items-center justify-between">
+          <span className="text-sm font-semibold">Columns</span>
+          <button onClick={() => onChange(DEFAULT_COLS)} className="text-xs text-brand hover:underline">Reset</button>
+        </div>
+        <div className="px-2 py-2 border-b max-h-72 overflow-y-auto">
+          <p className="text-xs text-muted-foreground px-2 pb-1.5 font-medium">Visible</p>
+          {cols.map(key => (
+            <div key={key} draggable onDragStart={() => onDragStart(key)}
+              onDragOver={e => e.preventDefault()} onDrop={() => onDrop(key)}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-grab active:cursor-grabbing group"
+            >
+              <GripVertical className="size-3.5 text-muted-foreground/40 shrink-0" />
+              <span className="size-4 rounded border flex items-center justify-center shrink-0 bg-brand border-brand">
+                <Check className="size-2.5 text-white" strokeWidth={3} />
+              </span>
+              <span className="text-sm flex-1">{COL_META[key].label}</span>
+              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-xs">✕</span>
+              </button>
             </div>
-
-            {/* Visible + reorderable */}
-            <div className="px-2 py-2 border-b max-h-72 overflow-y-auto">
-              <p className="text-xs text-muted-foreground px-2 pb-1.5 font-medium">Visible</p>
-              {cols.map(key => (
-                <div
-                  key={key}
-                  draggable
-                  onDragStart={() => onDragStart(key)}
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={() => onDrop(key)}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-grab active:cursor-grabbing group"
-                >
-                  <GripVertical className="size-3.5 text-muted-foreground/40 shrink-0" />
-                  <span className={`size-4 rounded border flex items-center justify-center shrink-0 transition-colors bg-brand border-brand`}>
-                    <Check className="size-2.5 text-white" strokeWidth={3} />
-                  </span>
-                  <span className="text-sm flex-1">{COL_META[key].label}</span>
-                  <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-xs">✕</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Hidden columns */}
-            {hidden.length > 0 && (
-              <div className="px-2 py-2 max-h-48 overflow-y-auto">
-                <p className="text-xs text-muted-foreground px-2 pb-1.5 font-medium">Hidden</p>
-                {hidden.map(key => (
-                  <button
-                    key={key}
-                    onClick={() => toggle(key)}
-                    className="flex items-center gap-2 w-full px-2 py-1.5 rounded-md hover:bg-muted/60 text-left"
-                  >
-                    <div className="size-3.5 shrink-0" />
-                    <span className="size-4 rounded border border-border flex items-center justify-center shrink-0" />
-                    <span className="text-sm text-muted-foreground">{COL_META[key].label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+          ))}
+        </div>
+        {hidden.length > 0 && (
+          <div className="px-2 py-2 max-h-48 overflow-y-auto">
+            <p className="text-xs text-muted-foreground px-2 pb-1.5 font-medium">Hidden</p>
+            {hidden.map(key => (
+              <button key={key} onClick={() => toggle(key)}
+                className="flex items-center gap-2 w-full px-2 py-1.5 rounded-md hover:bg-muted/60 text-left"
+              >
+                <div className="size-3.5 shrink-0" />
+                <span className="size-4 rounded border border-border flex items-center justify-center shrink-0" />
+                <span className="text-sm text-muted-foreground">{COL_META[key].label}</span>
+              </button>
+            ))}
           </div>
-        </>
-      )}
-    </div>
+        )}
+      </PopoverContent>
+    </Popover>
   )
 }
 
-// ── Row actions menu ──────────────────────────────────────────────────────────
+// ── Row actions ───────────────────────────────────────────────────────────────
 
 function RowActions({ id }: { id: string }) {
-  const [open, setOpen] = useState(false)
   return (
-    <div className="relative" onClick={e => e.stopPropagation()}>
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="size-7 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground transition-colors"
-      >
-        <MoreHorizontal className="size-4" />
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-8 z-50 w-36 bg-popover border border-border rounded-lg shadow-lg overflow-hidden py-1">
-            <Link href={`/dashboard/candidates/${id}`}
-              className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted w-full text-left">
-              <ExternalLink className="size-3.5" /> View
-            </Link>
-            <Link href={`/dashboard/candidates/${id}/edit`}
-              className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted w-full text-left">
-              Edit
-            </Link>
-            <div className="border-t my-1" />
-            <button className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted text-destructive w-full text-left">
-              <Trash2 className="size-3.5" /> Delete
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="size-7 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground transition-colors">
+          <MoreHorizontal className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-36">
+        <DropdownMenuItem asChild>
+          <Link href={`/dashboard/candidates/${id}`} className="flex items-center gap-2">
+            <ExternalLink className="size-3.5" /> View
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={`/dashboard/candidates/${id}/edit`}>Edit</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-destructive focus:text-destructive">
+          <Trash2 className="size-3.5 mr-2" />Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -217,19 +192,25 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const allSelected = candidates.length > 0 && candidates.every(c => selected.has(c.id))
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(candidates.map(c => c.id)))
+  const someSelected = candidates.some(c => selected.has(c.id)) && !allSelected
+
+  function toggleAll(checked: boolean) {
+    setSelected(checked ? new Set(candidates.map(c => c.id)) : new Set())
   }
-  function toggleRow(id: string) {
+  function toggleRow(id: string, checked: boolean) {
     const next = new Set(selected)
-    next.has(id) ? next.delete(id) : next.add(id)
+    checked ? next.add(id) : next.delete(id)
     setSelected(next)
   }
 
   function renderHeader(key: ColKey) {
     if (key === 'select') return (
-      <input type="checkbox" checked={allSelected} onChange={toggleAll}
-        className="size-4 rounded accent-brand cursor-pointer" />
+      <Checkbox
+        checked={allSelected}
+        data-state={someSelected ? 'indeterminate' : undefined}
+        onCheckedChange={toggleAll}
+        aria-label="Select all"
+      />
     )
     if (key === 'actions') return null
     return COL_META[key].label
@@ -240,33 +221,28 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
     const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'
     switch (key) {
       case 'select':
-        return (
-          <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleRow(c.id)}
-            className="size-4 rounded accent-brand cursor-pointer" />
-        )
+        return <Checkbox checked={selected.has(c.id)} onCheckedChange={v => toggleRow(c.id, !!v)} aria-label={`Select ${name}`} />
       case 'name':
         return (
           <div className="flex items-center gap-2.5 min-w-0">
             <Avatar className="size-7 shrink-0">
               <AvatarFallback className="text-xs font-medium bg-brand-muted text-brand">{initials}</AvatarFallback>
             </Avatar>
-            <Link href={`/dashboard/candidates/${c.id}`} className="font-medium text-sm truncate hover:text-brand transition-colors">
-              {name}
-            </Link>
+            <Link href={`/dashboard/candidates/${c.id}`} className="font-medium text-sm truncate hover:text-brand transition-colors">{name}</Link>
           </div>
         )
       case 'job_title':     return <span className="text-sm truncate">{c.current_title ?? '—'}</span>
       case 'stage':         return <span className="text-sm text-muted-foreground">—</span> // ponytail: no job_candidates table yet
-      case 'experience':    return <span className="text-sm text-muted-foreground">—</span> // ponytail: no experience column in candidates
-      case 'skills':        return <span className="text-sm text-muted-foreground">—</span> // ponytail: no skills column in candidates
+      case 'experience':    return <span className="text-sm text-muted-foreground">—</span> // ponytail: no experience column yet
+      case 'skills':        return <span className="text-sm text-muted-foreground">—</span> // ponytail: no skills column yet
       case 'email':         return <span className="text-sm text-muted-foreground truncate">{c.email}</span>
       case 'phone':         return <span className="text-sm text-muted-foreground">{c.phone ?? '—'}</span>
-      case 'city':          return <span className="text-sm text-muted-foreground truncate">{c.location ?? '—'}</span> // ponytail: location is combined city+state
+      case 'city':          return <span className="text-sm text-muted-foreground truncate">{c.location ?? '—'}</span>
       case 'state':         return <span className="text-sm text-muted-foreground">—</span> // ponytail: no separate state field
       case 'work_auth':     return <span className="text-sm text-muted-foreground">{WORK_AUTH[c.candidate_type ?? ''] ?? '—'}</span>
       case 'availability':  return <span className="text-sm text-muted-foreground">{c.notice_period ?? '—'}</span>
       case 'pay':           return <span className="text-sm text-muted-foreground">{c.expected_ctc ? formatCtc(c.expected_ctc) : '—'}</span>
-      case 'recruiter':     return <span className="text-sm text-muted-foreground">—</span> // ponytail: no recruiter field on candidates yet
+      case 'recruiter':     return <span className="text-sm text-muted-foreground">—</span> // ponytail: no recruiter field yet
       case 'last_activity': return <span className="text-sm text-muted-foreground">{relTime(c.updated_at)}</span>
       case 'created':       return <span className="text-sm text-muted-foreground">{relTime(c.created_at)}</span>
       case 'actions':       return <RowActions id={c.id} />
@@ -294,9 +270,7 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
       <div className="flex items-center justify-between pb-4 shrink-0">
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Candidates</h1>
-          {selected.size > 0 && (
-            <p className="text-xs text-muted-foreground mt-0.5">{selected.size} selected</p>
-          )}
+          {selected.size > 0 && <p className="text-xs text-muted-foreground mt-0.5">{selected.size} selected</p>}
         </div>
         <div className="flex items-center gap-2">
           <ColPicker cols={cols} allCols={DEFAULT_COLS} onChange={setCols} />
@@ -310,39 +284,36 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
 
       {/* Table */}
       <div className="border border-border rounded-lg overflow-auto flex-1">
-        <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 z-10 bg-muted/60 backdrop-blur-sm">
-            <tr>
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-muted/60 backdrop-blur-sm">
+            <TableRow className="hover:bg-transparent border-b">
               {cols.map(key => (
-                <th
+                <TableHead
                   key={key}
                   style={{ width: COL_META[key].width, minWidth: COL_META[key].width }}
-                  className="px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground tracking-wide whitespace-nowrap border-b border-border"
+                  className="text-xs font-semibold whitespace-nowrap"
                 >
                   {renderHeader(key)}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {candidates.map(c => (
-              <tr
-                key={c.id}
-                className={`group transition-colors hover:bg-muted/30 ${selected.has(c.id) ? 'bg-brand-muted' : ''}`}
-              >
+              <TableRow key={c.id} className={selected.has(c.id) ? 'bg-brand-muted hover:bg-brand-muted' : 'hover:bg-muted/30'}>
                 {cols.map(key => (
-                  <td
+                  <TableCell
                     key={key}
                     style={{ width: COL_META[key].width, minWidth: COL_META[key].width }}
-                    className="px-3 py-2.5 overflow-hidden"
+                    className="overflow-hidden"
                   >
                     {renderCell(key, c)}
-                  </td>
+                  </TableCell>
                 ))}
-              </tr>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   )
