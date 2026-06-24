@@ -1,11 +1,8 @@
 export const revalidate = 30
 
-import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 import { CandidatesTable } from './candidates-table'
 import type { CandidateRow } from './candidates-table'
 
@@ -38,22 +35,7 @@ export default async function CandidatesPage() {
   }
 
   return (
-    <div className="flex flex-col h-full p-6 gap-4 overflow-hidden">
-      <div className="flex items-center justify-between shrink-0">
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">Candidates</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {candidates.length} {candidates.length === 1 ? 'candidate' : 'candidates'}
-          </p>
-        </div>
-        <Button asChild size="sm">
-          <Link href="/dashboard/candidates/new">
-            <Plus className="size-3.5 mr-1.5" />
-            Add candidate
-          </Link>
-        </Button>
-      </div>
-
+    <div className="flex flex-col h-full p-6 overflow-hidden">
       <CandidatesTable candidates={candidates} />
     </div>
   )

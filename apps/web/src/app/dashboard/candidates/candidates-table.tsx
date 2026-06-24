@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontal, Settings2, GripVertical, Check, ExternalLink, Trash2, Users } from 'lucide-react'
+import { MoreHorizontal, Settings2, GripVertical, Check, ExternalLink, Trash2, Users, Plus } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -290,12 +290,22 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-1 pb-3 shrink-0">
-        <span className="text-sm text-muted-foreground">
-          {selected.size > 0 ? `${selected.size} selected` : `${candidates.length} candidates`}
-        </span>
-        <ColPicker cols={cols} allCols={DEFAULT_COLS} onChange={setCols} />
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 shrink-0">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">Candidates</h1>
+          {selected.size > 0 && (
+            <p className="text-xs text-muted-foreground mt-0.5">{selected.size} selected</p>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <ColPicker cols={cols} allCols={DEFAULT_COLS} onChange={setCols} />
+          <Button asChild size="sm">
+            <Link href="/dashboard/candidates/new">
+              <Plus className="size-3.5 mr-1.5" />Add candidate
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
