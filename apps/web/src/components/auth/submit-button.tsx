@@ -18,7 +18,7 @@ export function SubmitButton({ label, loadingLabel, pending: pendingProp }: Subm
       disabled={pending}
       style={{
         width: '100%', height: '40px',
-        background: pending ? '#555555' : '#0A0A0A',
+        background: pending ? '#eb9678' : '#dd7456',
         color: '#FFFFFF', border: 'none', borderRadius: '6px',
         fontSize: '14px', fontWeight: '500',
         cursor: pending ? 'not-allowed' : 'pointer',
@@ -27,8 +27,8 @@ export function SubmitButton({ label, loadingLabel, pending: pendingProp }: Subm
         fontFamily: 'inherit',
         letterSpacing: '-0.01em',
       }}
-      onMouseEnter={(e) => { if (!pending) e.currentTarget.style.background = '#222222' }}
-      onMouseLeave={(e) => { if (!pending) e.currentTarget.style.background = '#0A0A0A' }}
+      onMouseEnter={(e) => { if (!pending) e.currentTarget.style.background = '#c45e3e' }}
+      onMouseLeave={(e) => { if (!pending) e.currentTarget.style.background = '#dd7456' }}
     >
       {pending && (
         <span style={{
