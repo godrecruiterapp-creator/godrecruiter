@@ -13,10 +13,10 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-  ArrowLeft, Pencil, Plus, MoreHorizontal, MapPin, Briefcase,
-  Users, Calendar, Search, SlidersHorizontal, ArrowUpDown,
+  ArrowLeft, Pencil, Plus, MoreHorizontal,
+  Users, Search, SlidersHorizontal, ArrowUpDown,
   Mail, Phone, Send, ChevronDown, FileText, CheckSquare,
-  Clock, Zap, Building2, ChevronRight, X, Check,
+  Clock, Zap, ChevronRight, X, Check,
   Upload, File, Trash2,
 } from 'lucide-react'
 import { deleteJobAction, updateJobStatusAction } from '../actions'
@@ -698,7 +698,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   const [, startTransition] = useTransition()
 
   const [sidebarOpen, setSidebarOpen]         = useState(true)
-  const [activeTab, setActiveTab]             = useState<'pipeline' | 'details' | 'notes' | 'documents' | 'activity'>('pipeline')
+  const [activeTab, setActiveTab]             = useState<'pipeline' | 'details' | 'notes' | 'documents' | 'activity'>('details')
   const [activeCandidate, setActiveCandidate] = useState<Candidate | null>(null)
   const [drawerOpen, setDrawerOpen]           = useState(false)
   const [search, setSearch]                   = useState('')
@@ -835,34 +835,24 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
         </div>
       </div>
 
-      {/* ── Meta bar (taller, larger font) ───────────────────────────────── */}
-      <div className="flex items-center gap-6 px-5 h-11 border-b bg-muted/15 shrink-0 overflow-x-auto">
+      {/* ── Meta bar ─────────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2 px-5 h-12 border-b bg-muted/15 shrink-0 overflow-x-auto">
         {[
-          job.client && { icon: Building2, text: job.client },
-          location   && { icon: MapPin,    text: location   },
-          empType    && { icon: Briefcase, text: empType    },
-          workMode   && { icon: Briefcase, text: workMode   },
-          { icon: Users,    text: `${job.openings ?? 1} opening${(job.openings ?? 1) !== 1 ? 's' : ''}` },
-          { icon: Calendar, text: `Open ${ageDays}d` },
-        ].filter(Boolean).map((item, i) => {
-          const { icon: Icon, text } = item as { icon: React.ComponentType<{ className?: string }>; text: string }
-          return (
-            <span key={i} className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
-              <Icon className="size-4 shrink-0" />{text}
-            </span>
-          )
-        })}
-      </div>
-
-      {/* ── Stat cards (equal width) ──────────────────────────────────────── */}
-      <div className="flex items-center gap-2.5 px-5 py-2.5 border-b bg-background shrink-0">
-        {statCards.map(({ label, value, bg, border, num, sub }) => (
-          <div key={label} className={`flex flex-col items-center flex-1 rounded-lg border px-4 py-2 ${bg} ${border}`}>
-            <span className={`text-xl font-bold tabular-nums leading-none mb-0.5 ${num}`}>{value}</span>
-            <span className={`text-xs font-medium whitespace-nowrap ${sub}`}>{label}</span>
-          </div>
+          job.client && job.client,
+          location   || null,
+          empType    || null,
+          workMode   || null,
+          `${job.openings ?? 1} opening${(job.openings ?? 1) !== 1 ? 's' : ''}`,
+          `Open ${ageDays}d`,
+          `Bill $${billRate}/hr`,
+          `Pay $${payRate}/hr`,
+        ].filter(Boolean).map((text, i) => (
+          <span key={i} className="shrink-0 text-xs font-medium text-foreground bg-muted border border-border rounded-full px-3 py-1 whitespace-nowrap">
+            {text as string}
+          </span>
         ))}
       </div>
+
 
       {/* ── Body ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
@@ -872,8 +862,8 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
             {/* ── Tab bar (custom — no shadcn interference) ──────────────── */}
             <div className="border-b shrink-0 px-5 flex">
               {([
-                { id: 'pipeline',  label: 'Pipeline'    },
-                { id: 'details',   label: 'Description' },
+                { id: 'pipeline',  label: 'Candidates'  },
+                { id: 'details',   label: 'Overview'    },
                 { id: 'notes',     label: 'Notes'       },
                 { id: 'documents', label: 'Documents'   },
                 { id: 'activity',  label: 'Activity'    },
@@ -892,9 +882,18 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
               ))}
             </div>
 
-            {/* ── Pipeline ───────────────────────────────────────────────── */}
+            {/* ── Candidates ─────────────────────────────────────────────── */}
             {activeTab === 'pipeline' && (
               <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Stat cards */}
+                <div className="flex items-center gap-2.5 px-5 py-2.5 border-b bg-background shrink-0">
+                  {statCards.map(({ label, value, bg, border, num, sub }) => (
+                    <div key={label} className={`flex flex-col items-center flex-1 rounded-lg border px-4 py-2 ${bg} ${border}`}>
+                      <span className={`text-xl font-bold tabular-nums leading-none mb-0.5 ${num}`}>{value}</span>
+                      <span className={`text-xs font-medium whitespace-nowrap ${sub}`}>{label}</span>
+                    </div>
+                  ))}
+                </div>
                 {/* Toolbar */}
                 <div className="flex items-center gap-2.5 px-5 py-3 border-b shrink-0 bg-muted/10">
                   <div className="relative">
