@@ -572,15 +572,46 @@ function NotesTab() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Compose */}
-      <div className="px-6 pt-6 pb-4 shrink-0">
+    <div className="flex h-full divide-x divide-border">
+
+      {/* Left 50% — filters + list */}
+      <div className="w-1/2 flex flex-col overflow-hidden">
+        <div className="flex items-center gap-2.5 px-5 py-2.5 border-b shrink-0 bg-muted/10">
+          <select className={SELECT_CLS} value="" onChange={() => {}}>
+            <option value="">Date</option>
+            <option>Today</option><option>This week</option><option>This month</option>
+          </select>
+          <select className={SELECT_CLS} value={byFilter} onChange={e => setByFilter(e.target.value)}>
+            <option value="">Added By</option>
+            {authors.map(a => <option key={a}>{a}</option>)}
+          </select>
+          {byFilter && <button onClick={() => setByFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
+        </div>
+        <div className="flex-1 overflow-auto px-5 py-4 space-y-3">
+          {visible.map(n => (
+            <div key={n.id} className="border border-border rounded-lg p-4">
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <Avatar className="size-8">
+                  <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{n.initials}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-semibold text-foreground">{n.author}</span>
+                <span className="text-xs text-muted-foreground ml-auto">{n.time}</span>
+              </div>
+              <p className="text-sm text-foreground leading-relaxed">{n.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right 50% — compose */}
+      <div className="w-1/2 px-6 py-6">
+        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Add Note</p>
         <div className="border border-border rounded-lg overflow-hidden">
           <textarea
             value={text}
             onChange={e => setText(e.target.value)}
             placeholder="Write a note about this job…"
-            className="w-full h-24 text-sm px-4 py-3 resize-none focus:outline-none bg-background placeholder:text-muted-foreground"
+            className="w-full h-36 text-sm px-4 py-3 resize-none focus:outline-none bg-background placeholder:text-muted-foreground"
           />
           <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20">
             <span className="text-xs text-muted-foreground">Visible to all team members</span>
@@ -592,34 +623,6 @@ function NotesTab() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-2.5 px-6 py-2.5 border-b border-t shrink-0 bg-muted/10">
-        <select className={SELECT_CLS} value="" onChange={() => {}}>
-          <option value="">Date</option>
-          <option>Today</option><option>This week</option><option>This month</option>
-        </select>
-        <select className={SELECT_CLS} value={byFilter} onChange={e => setByFilter(e.target.value)}>
-          <option value="">Added By</option>
-          {authors.map(a => <option key={a}>{a}</option>)}
-        </select>
-        {byFilter && <button onClick={() => setByFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
-      </div>
-
-      {/* Notes list */}
-      <div className="flex-1 overflow-auto px-6 py-4 space-y-3">
-        {visible.map(n => (
-          <div key={n.id} className="border border-border rounded-lg p-4">
-            <div className="flex items-center gap-2.5 mb-2.5">
-              <Avatar className="size-8">
-                <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{n.initials}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm font-semibold text-foreground">{n.author}</span>
-              <span className="text-xs text-muted-foreground ml-auto">{n.time}</span>
-            </div>
-            <p className="text-sm text-foreground leading-relaxed">{n.text}</p>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
