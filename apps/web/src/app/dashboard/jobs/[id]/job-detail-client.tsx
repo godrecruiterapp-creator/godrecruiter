@@ -64,33 +64,7 @@ type Candidate = {
 type Note = { id: string; author: string; initials: string; text: string; time: string }
 type Doc  = { id: string; name: string; size: string; type: string; uploadedAt: string }
 
-const CANDIDATES: Candidate[] = [
-  { id:'1',  name:'Priya Sharma',   initials:'PS', exp:'7 yrs', expYears:7,  location:'Dallas, TX',  visa:'H1B', score:95, stage:'sourced'   },
-  { id:'2',  name:'Rajan Mehta',    initials:'RM', exp:'9 yrs', expYears:9,  location:'Austin, TX',  visa:'USC', score:91, stage:'sourced'   },
-  { id:'3',  name:'Amit Choudhary', initials:'AC', exp:'6 yrs', expYears:6,  location:'Irving, TX',  visa:'H1B', score:89, stage:'sourced'   },
-  { id:'4',  name:'Neha Verma',     initials:'NV', exp:'5 yrs', expYears:5,  location:'Remote',      visa:'GC',  score:88, stage:'qualified' },
-  { id:'5',  name:'Dinesh Singh',   initials:'DS', exp:'8 yrs', expYears:8,  location:'Frisco, TX',  visa:'H1B', score:85, stage:'qualified' },
-  { id:'6',  name:'Pooja Kulkarni', initials:'PK', exp:'4 yrs', expYears:4,  location:'Plano, TX',   visa:'USC', score:84, stage:'qualified' },
-  { id:'7',  name:'Aditya Kumar',   initials:'AK', exp:'11 yrs',expYears:11, location:'Houston, TX', visa:'USC', score:86, stage:'submitted' },
-  { id:'8',  name:'Suresh Patel',   initials:'SP', exp:'8 yrs', expYears:8,  location:'Dallas, TX',  visa:'H1B', score:82, stage:'submitted' },
-  { id:'9',  name:'Nitin Tomar',    initials:'NT', exp:'7 yrs', expYears:7,  location:'Irving, TX',  visa:'H1B', score:81, stage:'submitted' },
-  { id:'10', name:'Sonal Joshi',    initials:'SJ', exp:'6 yrs', expYears:6,  location:'Dallas, TX',  visa:'H1B', score:83, stage:'interview' },
-  { id:'11', name:'Mayank Bansal',  initials:'MB', exp:'7 yrs', expYears:7,  location:'Frisco, TX',  visa:'GC',  score:80, stage:'interview' },
-  { id:'12', name:'Vikram Sharma',  initials:'VS', exp:'8 yrs', expYears:8,  location:'Austin, TX',  visa:'GC',  score:88, stage:'offer'     },
-  { id:'13', name:'Anjali Patel',   initials:'AP', exp:'7 yrs', expYears:7,  location:'Dallas, TX',  visa:'H1B', score:90, stage:'start'     },
-]
-
-const INITIAL_NOTES: Note[] = [
-  { id:'1', author:'Arun',   initials:'AR', text:'Client confirmed 3 resources by end of month. Budget firm at $85/hr. Prefer USC or GC only.', time:'2 hours ago' },
-  { id:'2', author:'Suresh', initials:'SK', text:'Spoke with hiring manager. Flexible on hybrid vs onsite. Max 2 interview rounds.',             time:'1 day ago'   },
-]
-
-const INITIAL_DOCS: Doc[] = [
-  { id:'1', name:'Job Description v2.pdf', size:'142 KB', type:'pdf', uploadedAt:'Jun 20, 2026' },
-  { id:'2', name:'Rate Card Q2.xlsx',      size:'38 KB',  type:'xls', uploadedAt:'Jun 19, 2026' },
-]
-
-const ALL_VISAS = [...new Set(CANDIDATES.map(c => c.visa))]
+// ponytail: CANDIDATES/NOTES/DOCS are empty until job_candidates/job_notes/job_documents tables exist
 
 // ── Score badge ───────────────────────────────────────────────────────────────
 
@@ -110,11 +84,11 @@ function ScoreBadge({ score }: { score: number }) {
 // ── Filter popover ────────────────────────────────────────────────────────────
 
 function FilterPopover({
-  stageFilter, setStageFilter, visaFilter, setVisaFilter, onClear,
+  stageFilter, setStageFilter, visaFilter, setVisaFilter, onClear, allVisas,
 }: {
   stageFilter: Set<string>; setStageFilter: (s: Set<string>) => void
   visaFilter: Set<string>;  setVisaFilter:  (s: Set<string>) => void
-  onClear: () => void
+  onClear: () => void; allVisas: string[]
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -173,7 +147,7 @@ function FilterPopover({
           <div className="px-4 py-3">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Visa</p>
             <div className="space-y-2">
-              {ALL_VISAS.map(v => (
+              {allVisas.map(v => (
                 <button key={v} onClick={() => toggleVisa(v)} className="flex items-center gap-2.5 w-full text-left">
                   <span className={`size-4 rounded border flex items-center justify-center shrink-0 transition-colors ${visaFilter.has(v) ? 'bg-brand border-brand' : 'border-border'}`}>
                     {visaFilter.has(v) && <Check className="size-2.5 text-white" strokeWidth={3} />}
@@ -506,23 +480,6 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
               <Separator />
 
               <section>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Required Skills</p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {['Java', 'Spring Boot', 'Microservices', 'REST APIs', 'AWS', 'SQL'].map(s => (
-                    <span key={s} className="text-xs border border-border rounded-md px-2.5 py-1 bg-background text-foreground">{s}</span>
-                  ))}
-                </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Nice to Have</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {['Kubernetes', 'Docker', 'Terraform'].map(s => (
-                    <span key={s} className="text-xs border border-dashed border-border rounded-md px-2.5 py-1 text-muted-foreground">{s}</span>
-                  ))}
-                </div>
-              </section>
-
-              <Separator />
-
-              <section>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Hiring Team</p>
                 <div className="space-y-3.5">
                   {team.map(({ initials, name, role }) => (
@@ -556,12 +513,12 @@ const SELECT_CLS = "h-9 pl-3 pr-8 text-sm border border-input rounded-md bg-back
 // ── Notes tab ─────────────────────────────────────────────────────────────────
 
 function NotesTab() {
-  const [notes, setNotes] = useState<Note[]>(INITIAL_NOTES)
+  const [notes, setNotes] = useState<Note[]>([])
   const [text, setText] = useState('')
   const [byFilter, setByFilter] = useState('')
   // ponytail: date filter is UI-only; wire when notes have real timestamps
 
-  const authors = [...new Set(INITIAL_NOTES.map(n => n.author))]
+  const authors = [...new Set(notes.map(n => n.author))]
   const visible = byFilter ? notes.filter(n => n.author === byFilter) : notes
 
   function addNote() {
@@ -630,7 +587,7 @@ function NotesTab() {
 // ── Documents tab ─────────────────────────────────────────────────────────────
 
 function DocumentsTab() {
-  const [docs, setDocs] = useState<Doc[]>(INITIAL_DOCS)
+  const [docs, setDocs] = useState<Doc[]>([])
   const [typeFilter, setTypeFilter] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   // ponytail: date + created-by filters are UI-only; wire when docs have real metadata
@@ -719,6 +676,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
+  const [candidates, setCandidates]           = useState<Candidate[]>([])
   const [sidebarOpen, setSidebarOpen]         = useState(true)
   const [activeTab, setActiveTab]             = useState<'pipeline' | 'details' | 'notes' | 'documents' | 'activity'>('details')
   const [descOpen, setDescOpen]               = useState(false)
@@ -743,7 +701,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
   const prioColor = { high: 'text-red-600', medium: 'text-amber-600', low: 'text-zinc-500' }[job.priority ?? 'medium'] ?? 'text-amber-600'
 
   const filteredCandidates = useMemo(() => {
-    let list = CANDIDATES.filter(c => {
+    let list = candidates.filter(c => {
       if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
       if (stageFilter.size && !stageFilter.has(c.stage)) return false
       if (visaFilter.size && !visaFilter.has(c.visa)) return false
@@ -753,15 +711,15 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
       let d = sortBy === 'score' ? a.score - b.score : sortBy === 'name' ? a.name.localeCompare(b.name) : a.expYears - b.expYears
       return sortDir === 'desc' ? -d : d
     })
-  }, [search, stageFilter, visaFilter, sortBy, sortDir])
+  }, [candidates, search, stageFilter, visaFilter, sortBy, sortDir])
 
   const counts = {
-    total:        CANDIDATES.length,
-    qualified:    CANDIDATES.filter(c => ['qualified','submitted','interview','offer','start'].includes(c.stage)).length,
-    submitted:    CANDIDATES.filter(c => ['submitted','interview','offer','start'].includes(c.stage)).length,
-    interviewing: CANDIDATES.filter(c => ['interview','offer','start'].includes(c.stage)).length,
-    offers:       CANDIDATES.filter(c => ['offer','start'].includes(c.stage)).length,
-    placements:   CANDIDATES.filter(c => c.stage === 'start').length,
+    total:        candidates.length,
+    qualified:    candidates.filter(c => ['qualified','submitted','interview','offer','start'].includes(c.stage)).length,
+    submitted:    candidates.filter(c => ['submitted','interview','offer','start'].includes(c.stage)).length,
+    interviewing: candidates.filter(c => ['interview','offer','start'].includes(c.stage)).length,
+    offers:       candidates.filter(c => ['offer','start'].includes(c.stage)).length,
+    placements:   candidates.filter(c => c.stage === 'start').length,
   }
 
   const statCards = [
@@ -933,7 +891,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                       </button>
                     )}
                   </div>
-                  <FilterPopover stageFilter={stageFilter} setStageFilter={setStageFilter} visaFilter={visaFilter} setVisaFilter={setVisaFilter} onClear={() => { setStageFilter(new Set()); setVisaFilter(new Set()); setSearch('') }} />
+                  <FilterPopover stageFilter={stageFilter} setStageFilter={setStageFilter} visaFilter={visaFilter} setVisaFilter={setVisaFilter} onClear={() => { setStageFilter(new Set()); setVisaFilter(new Set()); setSearch('') }} allVisas={[...new Set(candidates.map(c => c.visa))]} />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className={`h-9 flex items-center gap-2 px-3 rounded-md border text-sm transition-colors
@@ -955,7 +913,7 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                   {(search || stageFilter.size > 0 || visaFilter.size > 0) && (
-                    <span className="text-sm text-muted-foreground">{filteredCandidates.length} of {CANDIDATES.length}</span>
+                    <span className="text-sm text-muted-foreground">{filteredCandidates.length} of {candidates.length}</span>
                   )}
                 </div>
                 {/* Table */}
@@ -999,10 +957,10 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                   {/* 30% — Job details */}
                   <div className="w-[30%] px-5 py-6 space-y-5 overflow-auto">
                     {[
-                      { label: 'Required Skills',  value: 'Java, Spring Boot, Microservices, REST APIs, AWS, SQL' },
-                      { label: 'Experience',        value: job.requirements ? '5–10 years' : 'Not specified' },
-                      { label: 'Shift Timings',     value: workMode === 'Remote' ? 'Flexible' : '9 AM – 6 PM CST' },
-                      { label: 'Duration',          value: empType || 'Not specified' },
+                      { label: 'Department', value: job.department || '—' },
+                      { label: 'Duration',   value: empType       || '—' },
+                      { label: 'Work Mode',  value: workMode      || '—' },
+                      { label: 'Openings',   value: String(job.openings ?? 1) },
                     ].map(({ label, value }) => (
                       <div key={label}>
                         <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">{label}</p>
@@ -1060,22 +1018,8 @@ export function JobDetailClient({ job }: { job: JobDetailData }) {
                 </div>
                 <div className="flex-1 overflow-auto px-6 py-6">
                   <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-6">Activity Log</p>
-                  {[
-                    { text:'Job created',                      time:`${ageDays} days ago`, user:'AR' },
-                    { text:'Priya Sharma added to Sourced',    time:'2 days ago',           user:'AR' },
-                    { text:'Dinesh Singh moved to Qualified',  time:'1 day ago',            user:'SK' },
-                    { text:'Aditya Kumar submitted to client', time:'18 hours ago',         user:'AR' },
-                  ].map(({ text, time, user }, i) => (
-                    <div key={i} className="flex items-start gap-4 py-4 border-b border-border last:border-0">
-                      <Avatar className="size-8 shrink-0 mt-0.5">
-                        <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{user}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm text-foreground">{text}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{time}</p>
-                      </div>
-                    </div>
-                  ))}
+                  {/* ponytail: wire from activity_log table when it exists */}
+                  <p className="text-sm text-muted-foreground">No activity yet.</p>
                 </div>
               </div>
             )}
