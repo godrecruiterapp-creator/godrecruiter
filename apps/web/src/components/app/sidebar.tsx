@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutDashboard, Briefcase, Users, Kanban,
-  CalendarCheck, BarChart3, Settings, LogOut, ChevronLeft, ChevronRight,
+  CalendarCheck, BarChart3, Settings, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -84,38 +84,23 @@ export function AppSidebar() {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="border-t px-2 py-2 space-y-0.5">
-          {collapsed ? (
-            <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setCollapsed(false)}
-                    className="flex items-center justify-center w-full py-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                    aria-label="Expand sidebar"
-                  >
-                    <ChevronRight className="size-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">Expand</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <a href="/auth/logout" className="flex items-center justify-center w-full py-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
-                    <LogOut className="size-4" />
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent side="right">Sign out</TooltipContent>
-              </Tooltip>
-            </>
-          ) : (
-            <a href="/auth/logout" className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-              <LogOut className="size-4 flex-shrink-0" />
-              <span>Sign out</span>
-            </a>
-          )}
-        </div>
+        {/* Footer — collapse toggle only */}
+        {collapsed && (
+          <div className="border-t px-2 py-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setCollapsed(false)}
+                  className="flex items-center justify-center w-full py-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  aria-label="Expand sidebar"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Expand</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </aside>
     </TooltipProvider>
   )

@@ -235,10 +235,7 @@ export function Header({ userName, userEmail }: Props) {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden sm:block text-left min-w-0">
-                <p className="text-sm font-medium leading-tight truncate max-w-[120px]">{userName}</p>
-                <p className="text-xs text-muted-foreground leading-tight truncate max-w-[120px]">{userEmail}</p>
-              </div>
+              <p className="hidden sm:block text-sm font-medium leading-tight truncate max-w-[120px]">{userName}</p>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
