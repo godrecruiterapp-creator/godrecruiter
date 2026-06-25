@@ -21,6 +21,7 @@ import { MoreHorizontal, Settings2, GripVertical, Check, ExternalLink, Trash2, U
 
 export type CandidateRow = {
   id: string
+  candidate_number: number
   first_name: string | null; last_name: string | null
   current_title: string | null; current_company: string | null
   email: string; phone: string | null; location: string | null
@@ -228,7 +229,10 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
             <Avatar className="size-7 shrink-0">
               <AvatarFallback className="text-xs font-medium bg-brand-muted text-brand">{initials}</AvatarFallback>
             </Avatar>
-            <Link href={`/dashboard/candidates/${c.id}`} className="font-medium text-sm truncate hover:text-brand transition-colors">{name}</Link>
+            <div className="flex flex-col min-w-0">
+              <Link href={`/dashboard/candidates/${c.id}`} className="font-medium text-sm truncate hover:text-brand transition-colors">{name}</Link>
+              <span className="text-xs text-muted-foreground font-mono">CAN-{String(c.candidate_number).padStart(4, '0')}</span>
+            </div>
           </div>
         )
       case 'job_title':     return <span className="text-sm truncate">{c.current_title ?? '—'}</span>

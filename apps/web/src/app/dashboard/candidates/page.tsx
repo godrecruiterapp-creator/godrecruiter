@@ -24,7 +24,7 @@ export default async function CandidatesPage() {
     if (membership) {
       const { data } = await admin
         .from('candidates')
-        .select('id, first_name, last_name, current_title, current_company, email, phone, location, candidate_type, notice_period, expected_ctc, source, created_at, updated_at')
+        .select('id, candidate_number, first_name, last_name, current_title, current_company, email, phone, location, candidate_type, notice_period, expected_ctc, source, created_at, updated_at')
         .eq('tenant_id', membership.tenant_id)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })

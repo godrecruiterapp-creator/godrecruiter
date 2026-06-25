@@ -14,7 +14,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   const admin = createAdminClient()
   const { data: candidate } = await admin
     .from('candidates')
-    .select('id, first_name, last_name, email, phone, location, linkedin_url, source, current_title, current_company, candidate_type, notice_period, current_ctc, expected_ctc, notes, created_at, updated_at')
+    .select('id, candidate_number, first_name, last_name, email, phone, location, linkedin_url, source, current_title, current_company, candidate_type, notice_period, current_ctc, expected_ctc, notes, created_at, updated_at')
     .eq('id', id)
     .is('deleted_at', null)
     .single()

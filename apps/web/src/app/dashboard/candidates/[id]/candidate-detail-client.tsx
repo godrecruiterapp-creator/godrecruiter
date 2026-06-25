@@ -24,6 +24,7 @@ import { deleteCandidateAction } from '../actions'
 
 export interface CandidateDetailData {
   id: string
+  candidate_number: number
   first_name: string | null; last_name: string | null
   email: string; phone: string | null; location: string | null
   linkedin_url: string | null; source: string | null
@@ -273,6 +274,9 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
         </Avatar>
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <h1 className="text-base font-semibold truncate">{name}</h1>
+          <span className="shrink-0 text-xs text-muted-foreground font-mono bg-muted border border-border px-2 py-0.5 rounded-md">
+            CAN-{String(candidate.candidate_number).padStart(4, '0')}
+          </span>
           {candidate.current_title && (
             <span className="shrink-0 text-xs text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
               {candidate.current_title}
