@@ -175,8 +175,11 @@ export function Header({ userName, userEmail }: Props) {
                             <div className="size-6 rounded-full bg-brand-muted flex items-center justify-center shrink-0">
                               <User className="size-3 text-brand" />
                             </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                                <span className="text-xs text-muted-foreground shrink-0">{c.candidateId}</span>
+                              </div>
                               {c.title && <p className="text-xs text-muted-foreground truncate">{c.title}</p>}
                             </div>
                           </button>
@@ -195,9 +198,12 @@ export function Header({ userName, userEmail }: Props) {
                             <div className="size-6 rounded-full bg-muted flex items-center justify-center shrink-0">
                               <Briefcase className="size-3 text-muted-foreground" />
                             </div>
-                            <div className="flex-1 min-w-0 flex items-center gap-2">
-                              <p className="text-sm font-medium text-foreground truncate">{j.title}</p>
-                              {j.client && <p className="text-xs text-muted-foreground truncate shrink-0">{j.client}</p>}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium text-foreground truncate">{j.title}</p>
+                                {j.display_id && <span className="text-xs text-muted-foreground shrink-0">{j.display_id}</span>}
+                              </div>
+                              {j.client && <p className="text-xs text-muted-foreground truncate">{j.client}</p>}
                             </div>
                             <span className={`size-1.5 rounded-full shrink-0 ${STATUS_DOT[j.status] ?? 'bg-zinc-400'}`} />
                           </button>
