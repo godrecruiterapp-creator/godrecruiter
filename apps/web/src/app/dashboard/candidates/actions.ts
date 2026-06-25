@@ -82,6 +82,32 @@ export async function deleteCandidateAction(candidateId: string) {
   redirect('/dashboard/candidates')
 }
 
+// ── Preview data ───────────────────────────────────────────────────────────────
+
+export async function getCandidatePreviewAction(candidateId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { notes: [], jobs: [], resume_url: null }
+  const admin = createAdminClient()
+  const [notesRes, jobsRes, candRes] = await Promise.all([
+    admin.from('candidate_notes').select('id, author_name, text, created_at').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
+    admin.from('job_candidates').select('id, stage, jobs(id, title, client, status)').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
+    admin.from('candidates').select('resume_url').eq('id', candidateId).single(),
+  ])
+  function rel(iso: string) {
+    const d = Date.now() - new Date(iso).getTime()
+    if (d < 3_600_000) return `${Math.floor(d / 60_000)}m ago`
+    if (d < 86_400_000) return `${Math.floor(d / 3_600_000)}h ago`
+    if (d < 7 * 86_400_000) return `${Math.floor(d / 86_400_000)}d ago`
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+  return {
+    resume_url: (candRes.data as any)?.resume_url ?? null,
+    notes: (notesRes.data ?? []).map((n: any) => ({ id: n.id, author: n.author_name, text: n.text, time: rel(n.created_at) })),
+    jobs: (jobsRes.data ?? []).map((jc: any) => ({ submissionId: jc.id, stage: jc.stage, jobId: jc.jobs?.id ?? '', title: jc.jobs?.title ?? '—', client: jc.jobs?.client ?? null, status: jc.jobs?.status ?? '—' })),
+  }
+}
+
 // ── Shared context ─────────────────────────────────────────────────────────────
 
 async function getCandidateUserContext() {
