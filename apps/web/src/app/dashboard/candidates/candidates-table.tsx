@@ -32,12 +32,13 @@ export type CandidateRow = {
 }
 
 type ColKey =
-  | 'select' | 'name' | 'job_title' | 'stage' | 'experience' | 'skills'
+  | 'select' | 'candidate_id' | 'name' | 'job_title' | 'stage' | 'experience' | 'skills'
   | 'email' | 'phone' | 'city' | 'state' | 'work_auth' | 'availability'
   | 'pay' | 'recruiter' | 'last_activity' | 'created' | 'actions'
 
 const COL_META: Record<ColKey, { label: string; width: string }> = {
   select:        { label: 'Select',             width: '48px'  },
+  candidate_id:  { label: 'Candidate ID',       width: '110px' },
   name:          { label: 'Candidate Name',     width: '200px' },
   job_title:     { label: 'Job Title',          width: '150px' },
   stage:         { label: 'Stage',              width: '110px' },
@@ -57,7 +58,7 @@ const COL_META: Record<ColKey, { label: string; width: string }> = {
 }
 
 const DEFAULT_COLS: ColKey[] = [
-  'select', 'name', 'job_title', 'stage', 'experience', 'skills',
+  'select', 'candidate_id', 'name', 'job_title', 'stage', 'experience', 'skills',
   'email', 'phone', 'city', 'state', 'work_auth', 'availability',
   'pay', 'recruiter', 'last_activity', 'created', 'actions',
 ]
@@ -223,16 +224,15 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
     switch (key) {
       case 'select':
         return <Checkbox checked={selected.has(c.id)} onCheckedChange={v => toggleRow(c.id, !!v)} aria-label={`Select ${name}`} />
+      case 'candidate_id':
+        return <span className="text-sm text-muted-foreground">CAN-{String(c.candidate_number).padStart(4, '0')}</span>
       case 'name':
         return (
           <div className="flex items-center gap-2.5 min-w-0">
             <Avatar className="size-7 shrink-0">
               <AvatarFallback className="text-xs font-medium bg-brand-muted text-brand">{initials}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col min-w-0">
-              <Link href={`/dashboard/candidates/${c.id}`} className="font-medium text-sm truncate hover:text-brand transition-colors">{name}</Link>
-              <span className="text-xs text-muted-foreground font-mono">CAN-{String(c.candidate_number).padStart(4, '0')}</span>
-            </div>
+            <Link href={`/dashboard/candidates/${c.id}`} className="font-medium text-sm truncate hover:text-brand transition-colors">{name}</Link>
           </div>
         )
       case 'job_title':     return <span className="text-sm truncate">{c.current_title ?? '—'}</span>
