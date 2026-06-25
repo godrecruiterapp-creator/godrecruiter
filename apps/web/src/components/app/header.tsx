@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ChevronRight, Search, User, Briefcase, X, LogOut } from 'lucide-react'
+import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useTheme } from 'next-themes'
 import { globalSearchAction, type SearchResult } from '@/app/dashboard/search-action'
 
 interface Props {
@@ -47,6 +48,7 @@ export function Header({ userName, userEmail }: Props) {
   const initials = userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   const crumbs = useBreadcrumbs()
   const router = useRouter()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult | null>(null)
@@ -226,6 +228,13 @@ export function Header({ userName, userEmail }: Props) {
 
       {/* User — right */}
       <div className="flex items-center gap-3 shrink-0 w-[220px] justify-end">
+        <button
+          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+          className="size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Toggle dark mode"
+        >
+          {resolvedTheme === 'dark' ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+        </button>
         <Separator orientation="vertical" className="h-4" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
