@@ -5,7 +5,10 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ChevronRight, Search, User, Briefcase, X } from 'lucide-react'
+import { ChevronRight, Search, User, Briefcase, X, LogOut } from 'lucide-react'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { globalSearchAction, type SearchResult } from '@/app/dashboard/search-action'
 
 interface Props {
@@ -224,17 +227,38 @@ export function Header({ userName, userEmail }: Props) {
       {/* User — right */}
       <div className="flex items-center gap-3 shrink-0 w-[220px] justify-end">
         <Separator orientation="vertical" className="h-4" />
-        <div className="flex items-center gap-2.5">
-          <Avatar className="size-7 rounded-md">
-            <AvatarFallback className="rounded-md bg-foreground text-background text-xs font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="hidden sm:block">
-            <p className="text-sm font-medium leading-tight">{userName}</p>
-            <p className="text-xs text-muted-foreground leading-tight">{userEmail}</p>
-          </div>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2.5 rounded-md hover:bg-muted px-1.5 py-1 transition-colors outline-none">
+              <Avatar className="size-7 rounded-md shrink-0">
+                <AvatarFallback className="rounded-md bg-foreground text-background text-xs font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden sm:block text-left min-w-0">
+                <p className="text-sm font-medium leading-tight truncate max-w-[120px]">{userName}</p>
+                <p className="text-xs text-muted-foreground leading-tight truncate max-w-[120px]">{userEmail}</p>
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-52">
+            <div className="px-3 py-2 border-b">
+              <p className="text-sm font-medium truncate">{userName}</p>
+              <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+            </div>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/profile" className="cursor-pointer">
+                <User className="size-3.5 mr-2" />My Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <a href="/auth/logout" className="cursor-pointer text-destructive focus:text-destructive">
+                <LogOut className="size-3.5 mr-2" />Sign out
+              </a>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )
