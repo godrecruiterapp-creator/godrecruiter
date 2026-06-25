@@ -239,16 +239,6 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
 
   const name     = [candidate.first_name, candidate.last_name].filter(Boolean).join(' ') || 'Unnamed'
   const initials = [candidate.first_name?.[0], candidate.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'
-  const ageDays  = Math.floor((Date.now() - new Date(candidate.created_at).getTime()) / 86_400_000)
-
-  const chips = [
-    candidate.current_title,
-    candidate.current_company,
-    candidate.location,
-    candidate.candidate_type ? TYPE_LABEL[candidate.candidate_type] : null,
-    candidate.notice_period ? `${candidate.notice_period} notice` : null,
-  ].filter(Boolean) as string[]
-
   async function handleDelete() {
     if (!confirm('Delete this candidate? This cannot be undone.')) return
     await deleteCandidateAction(candidate.id)
@@ -338,7 +328,8 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
 
       {/* ── Meta bar ─────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-2 px-5 h-12 border-b bg-muted/15 shrink-0 overflow-x-auto">
-        {[candidate.email, candidate.phone, ...chips, `${ageDays}d ago`]
+        {[candidate.email, candidate.phone, candidate.location,
+            candidate.candidate_type ? TYPE_LABEL[candidate.candidate_type] : null]
           .filter(Boolean).map((text, i) => (
             <span key={i} className="shrink-0 text-xs font-medium text-foreground bg-muted border border-border rounded-full px-3 py-1 whitespace-nowrap">
               {text as string}
