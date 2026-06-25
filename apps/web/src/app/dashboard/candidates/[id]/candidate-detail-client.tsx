@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -16,9 +16,15 @@ import {
 import {
   ArrowLeft, Pencil, MoreHorizontal, Send,
   Mail, Phone, Globe, Briefcase, FileText, Users,
-  Upload, File, Trash2,
+  Upload, File, Trash2, Download, Maximize2, X,
+  Sparkles, ArrowUpDown, SlidersHorizontal,
 } from 'lucide-react'
-import { deleteCandidateAction } from '../actions'
+import {
+  deleteCandidateAction,
+  addCandidateNoteAction, deleteCandidateNoteAction,
+  uploadCandidateDocumentAction, deleteCandidateDocumentAction,
+  uploadCandidateResumeAction,
+} from '../actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -32,8 +38,14 @@ export interface CandidateDetailData {
   candidate_type: string | null; notice_period: string | null
   current_ctc: number | null; expected_ctc: number | null
   notes: string | null
+  resume_url: string | null
   created_at: string; updated_at: string
 }
+
+export type NoteRow     = { id: string; author: string; initials: string; text: string; time: string }
+export type DocRow      = { id: string; name: string; size: string; type: string; docType: string; uploadedAt: string; storagePath: string | null }
+export type ActivityRow = { id: string; actor: string; action: string; time: string }
+export type JobRow      = { submissionId: string; stage: string; submittedAt: string; jobId: string; title: string; client: string | null; status: string; location: string | null }
 
 const TYPE_LABEL: Record<string, string> = {
   permanent: 'Citizen / PR', contract: 'Work Visa', temp: 'Temp / OPT', unknown: 'Unknown',
@@ -42,6 +54,13 @@ const SOURCE_LABEL: Record<string, string> = {
   linkedin: 'LinkedIn', referral: 'Referral', inbound: 'Inbound',
   naukri: 'Naukri', indeed: 'Indeed', import: 'Import', other: 'Other',
 }
+const STAGE_LABEL: Record<string, string> = {
+  sourced: 'Sourced', qualified: 'Qualified', submitted: 'Submitted',
+  interview: 'Interview', offer: 'Offer', start: 'Started',
+}
+const STATUS_DOT: Record<string, string> = {
+  open: 'bg-emerald-500', on_hold: 'bg-amber-500', filled: 'bg-blue-500', closed: 'bg-zinc-400',
+}
 
 function fmt(val: number | null) {
   if (!val) return null
@@ -49,35 +68,42 @@ function fmt(val: number | null) {
   if (val >= 1_000) return `₹${(val / 1_000).toFixed(0)}K`
   return `₹${val}`
 }
-function relTime(iso: string) {
-  const d = Date.now() - new Date(iso).getTime()
-  if (d < 3_600_000) return `${Math.floor(d / 60_000)}m ago`
-  if (d < 86_400_000) return `${Math.floor(d / 3_600_000)}h ago`
-  if (d < 7 * 86_400_000) return `${Math.floor(d / 86_400_000)}d ago`
-  return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })
-}
 
-// ── Notes tab (mirrors job detail NotesTab layout) ────────────────────────────
+// ── Notes tab ─────────────────────────────────────────────────────────────────
 
-type Note = { id: string; author: string; initials: string; text: string; time: string }
-
-function NotesTab() {
+function NotesTab({ candidateId, notes, setNotes }: {
+  candidateId: string
+  notes: NoteRow[]
+  setNotes: React.Dispatch<React.SetStateAction<NoteRow[]>>
+}) {
   const [text, setText] = useState('')
-  const [notes, setNotes] = useState<Note[]>([])
   const [byFilter, setByFilter] = useState('')
 
   const authors = [...new Set(notes.map(n => n.author))]
   const visible  = byFilter ? notes.filter(n => n.author === byFilter) : notes
 
-  function addNote() {
+  async function addNote() {
     if (!text.trim()) return
-    setNotes(prev => [{ id: Date.now().toString(), author: 'You', initials: 'ME', text: text.trim(), time: 'Just now' }, ...prev])
+    const draft = text.trim()
+    const tempId = `temp_${Date.now()}`
+    setNotes(prev => [{ id: tempId, author: 'You', initials: 'ME', text: draft, time: 'Just now' }, ...prev])
     setText('')
+    const res = await addCandidateNoteAction(candidateId, draft)
+    if ('error' in res) {
+      setNotes(prev => prev.filter(n => n.id !== tempId))
+    } else {
+      const initials = res.author_name.split(' ').map((w: string) => w[0] ?? '').join('').toUpperCase().slice(0, 2) || 'ME'
+      setNotes(prev => prev.map(n => n.id === tempId ? { ...n, id: res.id, author: res.author_name, initials } : n))
+    }
+  }
+
+  async function deleteNote(noteId: string) {
+    setNotes(prev => prev.filter(n => n.id !== noteId))
+    await deleteCandidateNoteAction(noteId)
   }
 
   return (
     <div className="flex h-full divide-x divide-border">
-      {/* Left — filters + list */}
       <div className="w-1/2 flex flex-col overflow-hidden">
         <div className="flex items-center gap-2.5 px-5 py-2.5 border-b shrink-0 bg-muted/10">
           <Select value="__all__" onValueChange={() => {}}>
@@ -108,19 +134,18 @@ function NotesTab() {
                 <Avatar className="size-8">
                   <AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{n.initials}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-semibold">{n.author}</span>
+                <span className="text-sm font-semibold text-foreground">{n.author}</span>
                 <span className="text-xs text-muted-foreground ml-auto">{n.time}</span>
-                <button onClick={() => setNotes(prev => prev.filter(x => x.id !== n.id))}
+                <button onClick={() => deleteNote(n.id)}
                   className="size-6 flex items-center justify-center text-muted-foreground hover:text-destructive rounded opacity-0 group-hover:opacity-100 transition-opacity">
                   <Trash2 className="size-3.5" />
                 </button>
               </div>
-              <p className="text-sm leading-relaxed">{n.text}</p>
+              <p className="text-sm text-foreground leading-relaxed">{n.text}</p>
             </div>
           ))}
         </div>
       </div>
-      {/* Right — compose */}
       <div className="w-1/2 px-6 py-6">
         <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Add Note</p>
         <div className="border border-border rounded-lg overflow-hidden">
@@ -143,27 +168,42 @@ function NotesTab() {
   )
 }
 
-// ── Documents tab (mirrors job detail DocumentsTab layout) ────────────────────
+// ── Documents tab ─────────────────────────────────────────────────────────────
 
-type Doc = { id: string; name: string; size: string; type: string; uploadedAt: string }
-
-function DocumentsTab() {
-  const [docs, setDocs] = useState<Doc[]>([])
+function DocumentsTab({ candidateId, docs, setDocs }: {
+  candidateId: string
+  docs: DocRow[]
+  setDocs: React.Dispatch<React.SetStateAction<DocRow[]>>
+}) {
   const [typeFilter, setTypeFilter] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     e.target.value = ''
     for (const f of files) {
+      const tempId = `temp_${Date.now()}_${Math.random()}`
       const size = f.size > 1024 * 1024 ? `${(f.size / 1024 / 1024).toFixed(1)} MB` : `${Math.round(f.size / 1024)} KB`
       setDocs(prev => [{
-        id: `${Date.now()}_${Math.random()}`, name: f.name, size,
-        type: f.name.split('.').pop()?.toLowerCase() ?? 'file',
+        id: tempId, name: f.name, size,
+        type: f.name.split('.').pop() ?? 'file',
+        docType: 'other',
+        storagePath: null,
         uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       }, ...prev])
+      const fd = new FormData(); fd.append('file', f)
+      const res = await uploadCandidateDocumentAction(candidateId, fd)
+      if ('error' in res) {
+        setDocs(prev => prev.filter(d => d.id !== tempId))
+      } else {
+        setDocs(prev => prev.map(d => d.id === tempId ? { ...d, id: res.id } : d))
+      }
     }
-    // ponytail: no upload action yet — local preview only
+  }
+
+  async function deleteDoc(docId: string) {
+    setDocs(prev => prev.filter(d => d.id !== docId))
+    await deleteCandidateDocumentAction(docId)
   }
 
   const iconColor: Record<string, string> = {
@@ -218,7 +258,7 @@ function DocumentsTab() {
                 </div>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button className="text-xs border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
-                  <button onClick={() => setDocs(prev => prev.filter(d => d.id !== doc.id))}
+                  <button onClick={() => deleteDoc(doc.id)}
                     className="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors">
                     <Trash2 className="size-3.5" />
                   </button>
@@ -232,21 +272,236 @@ function DocumentsTab() {
   )
 }
 
+// ── Jobs tab ──────────────────────────────────────────────────────────────────
+
+function JobsTab({ jobs }: { jobs: JobRow[] }) {
+  const [stageFilter, setStageFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
+
+  const stages  = [...new Set(jobs.map(j => j.stage))]
+  const statuses = [...new Set(jobs.map(j => j.status))]
+
+  const visible = jobs
+    .filter(j => (!stageFilter || j.stage === stageFilter) && (!statusFilter || j.status === statusFilter))
+    .sort((a, b) => {
+      const d = new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
+      return sortDir === 'desc' ? -d : d
+    })
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-2.5 px-5 py-2.5 border-b shrink-0 bg-muted/10">
+        <Button size="sm" className="h-9 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0">
+          <Sparkles className="size-3.5" />AI Candidate Match
+        </Button>
+        <div className="w-px h-5 bg-border mx-1" />
+        <Select value={stageFilter || '__all__'} onValueChange={v => setStageFilter(v === '__all__' ? '' : v)}>
+          <SelectTrigger className="h-9 text-sm w-36"><SelectValue placeholder="Stage" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Stages</SelectItem>
+            {stages.map(s => <SelectItem key={s} value={s}>{STAGE_LABEL[s] ?? s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter || '__all__'} onValueChange={v => setStatusFilter(v === '__all__' ? '' : v)}>
+          <SelectTrigger className="h-9 text-sm w-36"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Statuses</SelectItem>
+            {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <button
+          onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')}
+          className="h-9 flex items-center gap-2 px-3 rounded-md border border-border text-sm text-foreground hover:bg-muted transition-colors"
+        >
+          <ArrowUpDown className="size-3.5" />
+          {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
+        </button>
+        {(stageFilter || statusFilter) && (
+          <button onClick={() => { setStageFilter(''); setStatusFilter('') }} className="text-xs text-brand hover:underline">Clear</button>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {visible.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="size-10 rounded-full bg-muted flex items-center justify-center">
+              <Briefcase className="size-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium">No job submissions yet</p>
+            <p className="text-sm text-muted-foreground">Jobs this candidate has been submitted to will appear here.</p>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="sticky top-0 bg-muted/60 backdrop-blur-sm border-b border-border">
+              <tr>
+                {['Job Title', 'Client', 'Location', 'Stage', 'Status', 'Submitted', ''].map(h => (
+                  <th key={h} className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground px-5 h-9 whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {visible.map(j => (
+                <tr key={j.submissionId} className="hover:bg-muted/30 transition-colors group">
+                  <td className="px-5 py-2.5">
+                    <Link href={`/dashboard/jobs/${j.jobId}`} className="text-sm font-medium hover:text-brand transition-colors">
+                      {j.title}
+                    </Link>
+                  </td>
+                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.client ?? '—'}</span></td>
+                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.location ?? '—'}</span></td>
+                  <td className="px-5 py-2.5">
+                    <span className="text-xs bg-muted text-foreground px-2.5 py-1 rounded-md">
+                      {STAGE_LABEL[j.stage] ?? j.stage}
+                    </span>
+                  </td>
+                  <td className="px-5 py-2.5">
+                    <span className="flex items-center gap-1.5 text-sm text-foreground">
+                      <span className={`size-1.5 rounded-full ${STATUS_DOT[j.status] ?? 'bg-zinc-400'}`} />
+                      {j.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedAt}</span></td>
+                  <td className="px-5 py-2.5">
+                    <Link href={`/dashboard/jobs/${j.jobId}`}
+                      className="text-xs border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100">
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Resume section ────────────────────────────────────────────────────────────
+
+function ResumeSection({ candidateId, initialUrl }: { candidateId: string; initialUrl: string | null }) {
+  const [resumeUrl, setResumeUrl] = useState<string | null>(initialUrl)
+  const [resumeName, setResumeName] = useState<string | null>(
+    initialUrl ? initialUrl.split('/').pop()?.split('?')[0] ?? 'Resume' : null
+  )
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setUploading(true)
+    const fd = new FormData(); fd.append('file', file)
+    const res = await uploadCandidateResumeAction(candidateId, fd)
+    setUploading(false)
+    if ('success' in res) {
+      setResumeUrl(res.resumeUrl)
+      setResumeName(res.resumeName)
+    }
+  }
+
+  if (!resumeUrl) {
+    return (
+      <div className="border-2 border-dashed border-border rounded-lg py-14 flex flex-col items-center gap-3 text-center">
+        <FileText className="size-8 text-muted-foreground/30" />
+        <p className="text-sm font-medium text-foreground">No resume uploaded</p>
+        <p className="text-sm text-muted-foreground">Supports PDF and Word documents</p>
+        <Button variant="outline" size="sm" disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="mt-1 text-brand border-brand hover:bg-brand-muted gap-1.5">
+          <Upload className="size-3.5" />{uploading ? 'Uploading…' : 'Upload Resume'}
+        </Button>
+        <input ref={inputRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleUpload} />
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="border border-border rounded-lg p-4 flex items-center gap-3.5">
+        <div className="text-red-500 shrink-0">
+          <FileText className="size-6" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">{resumeName ?? 'Resume'}</p>
+          <p className="text-xs text-muted-foreground">Resume</p>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={() => setPreviewOpen(true)}
+            title="Preview"
+            className="size-8 flex items-center justify-center border border-border rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <Maximize2 className="size-3.5" />
+          </button>
+          <a href={resumeUrl} download target="_blank" rel="noopener noreferrer"
+            className="size-8 flex items-center justify-center border border-border rounded-md text-muted-foreground hover:text-brand hover:border-brand transition-colors"
+            title="Download">
+            <Download className="size-3.5" />
+          </a>
+          <Button variant="outline" size="sm" disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+            className="h-8 text-xs gap-1 text-muted-foreground">
+            <Upload className="size-3" />{uploading ? 'Uploading…' : 'Replace'}
+          </Button>
+        </div>
+        <input ref={inputRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleUpload} />
+      </div>
+
+      {/* Preview modal */}
+      {previewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setPreviewOpen(false)}>
+          <div className="bg-background rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ width: '80vw', height: '85vh' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3 border-b shrink-0">
+              <p className="text-sm font-semibold truncate">{resumeName ?? 'Resume'}</p>
+              <div className="flex items-center gap-2">
+                <a href={resumeUrl} download target="_blank" rel="noopener noreferrer"
+                  className="h-8 flex items-center gap-1.5 px-3 border border-border rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <Download className="size-3.5" />Download
+                </a>
+                <button onClick={() => setPreviewOpen(false)}
+                  className="size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+            <iframe src={resumeUrl} className="flex-1 w-full border-0" title="Resume preview" />
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function CandidateDetailClient({ candidate }: { candidate: CandidateDetailData }) {
+export function CandidateDetailClient({ candidate, initialNotes, initialDocs, initialActivity, initialJobs }: {
+  candidate: CandidateDetailData
+  initialNotes: NoteRow[]
+  initialDocs: DocRow[]
+  initialActivity: ActivityRow[]
+  initialJobs: JobRow[]
+}) {
   const router = useRouter()
+  const [, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'notes' | 'documents' | 'activity'>('overview')
+  const [notes, setNotes]   = useState<NoteRow[]>(initialNotes)
+  const [docs, setDocs]     = useState<DocRow[]>(initialDocs)
 
   const name     = [candidate.first_name, candidate.last_name].filter(Boolean).join(' ') || 'Unnamed'
   const initials = [candidate.first_name?.[0], candidate.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'
-  async function handleDelete() {
+
+  function handleDelete() {
     if (!confirm('Delete this candidate? This cannot be undone.')) return
-    await deleteCandidateAction(candidate.id)
-    router.push('/dashboard/candidates')
+    startTransition(async () => { await deleteCandidateAction(candidate.id) })
   }
 
-  // Overview right-panel rows (contact + compensation, formerly in sidebar)
   const infoRows: { label: string; value: string | null; href?: string }[] = [
     { label: 'Email',        value: candidate.email,         href: `mailto:${candidate.email}` },
     { label: 'Phone',        value: candidate.phone,         ...(candidate.phone ? { href: `tel:${candidate.phone}` } : {}) },
@@ -257,7 +512,6 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
     { label: 'Notice',       value: candidate.notice_period },
     { label: 'Current CTC',  value: fmt(candidate.current_ctc) },
     { label: 'Expected CTC', value: fmt(candidate.expected_ctc) },
-    { label: 'Added',        value: relTime(candidate.created_at) },
   ].filter(r => r.value)
 
   return (
@@ -274,7 +528,7 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
         </Avatar>
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <h1 className="text-base font-semibold truncate">{name}</h1>
-          <span className="shrink-0 text-xs text-muted-foreground font-mono bg-muted border border-border px-2 py-0.5 rounded-md">
+          <span className="shrink-0 text-xs text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
             CAN-{String(candidate.candidate_number).padStart(4, '0')}
           </span>
           {candidate.current_title && (
@@ -284,7 +538,6 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {/* Icon-only contact buttons */}
           {candidate.email && (
             <a href={`mailto:${candidate.email}`}
               className="size-9 flex items-center justify-center border border-border rounded-md text-muted-foreground hover:text-brand hover:border-brand hover:bg-brand-muted transition-colors"
@@ -349,13 +602,13 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
           {([
             { id: 'overview',  label: 'Overview'  },
             { id: 'jobs',      label: 'Jobs'       },
-            { id: 'notes',     label: 'Notes'      },
+            { id: 'notes',     label: `Notes${notes.length > 0 ? ` (${notes.length})` : ''}` },
             { id: 'documents', label: 'Documents'  },
             { id: 'activity',  label: 'Activity'   },
           ] as const).map(({ id, label }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id)}
+              onClick={() => setActiveTab(id as typeof activeTab)}
               className={`h-11 px-4 text-sm font-medium -mb-px border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === id
                   ? 'border-brand text-brand'
@@ -371,21 +624,10 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
         {activeTab === 'overview' && (
           <div className="flex-1 overflow-auto">
             <div className="flex h-full divide-x divide-border">
-
-              {/* Left 70% — resume */}
               <div className="w-[70%] px-6 py-6 overflow-auto">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Resume</p>
-                <div className="border-2 border-dashed border-border rounded-lg py-14 flex flex-col items-center gap-3 text-center">
-                  <FileText className="size-8 text-muted-foreground/30" />
-                  <p className="text-sm font-medium text-foreground">No resume uploaded</p>
-                  <p className="text-sm text-muted-foreground">Supports PDF and Word documents</p>
-                  <Button variant="outline" size="sm" className="mt-1 text-brand border-brand hover:bg-brand-muted gap-1.5">
-                    <Upload className="size-3.5" />Upload Resume
-                  </Button>
-                </div>
+                <ResumeSection candidateId={candidate.id} initialUrl={candidate.resume_url} />
               </div>
-
-              {/* Right 30% — candidate info (contact + compensation) */}
               <div className="w-[30%] px-5 py-6 overflow-auto">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Candidate Info</p>
                 <div className="space-y-3.5">
@@ -411,26 +653,22 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
 
         {/* ── Jobs ─────────────────────────────────────────────────────── */}
         {activeTab === 'jobs' && (
-          <div className="flex-1 flex flex-col items-center justify-center py-20 gap-3">
-            <div className="size-10 rounded-full bg-muted flex items-center justify-center">
-              <Briefcase className="size-4 text-muted-foreground" />
-            </div>
-            <p className="text-sm font-medium">No active applications</p>
-            <p className="text-sm text-muted-foreground">Job applications will appear here once linked.</p>
+          <div className="flex-1 overflow-hidden">
+            <JobsTab jobs={initialJobs} />
           </div>
         )}
 
         {/* ── Notes ────────────────────────────────────────────────────── */}
         {activeTab === 'notes' && (
           <div className="flex-1 overflow-hidden">
-            <NotesTab />
+            <NotesTab candidateId={candidate.id} notes={notes} setNotes={setNotes} />
           </div>
         )}
 
         {/* ── Documents ────────────────────────────────────────────────── */}
         {activeTab === 'documents' && (
           <div className="flex-1 overflow-hidden">
-            <DocumentsTab />
+            <DocumentsTab candidateId={candidate.id} docs={docs} setDocs={setDocs} />
           </div>
         )}
 
@@ -450,10 +688,28 @@ export function CandidateDetailClient({ candidate }: { candidate: CandidateDetai
             </div>
             <div className="flex-1 overflow-auto px-6 py-6">
               <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-6">Activity Log</p>
-              <div className="flex flex-col items-center justify-center py-10 gap-2">
-                <Users className="size-7 text-muted-foreground/30" />
-                <p className="text-sm text-muted-foreground">No activity yet</p>
-              </div>
+              {initialActivity.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-2">
+                  <Users className="size-7 text-muted-foreground/30" />
+                  <p className="text-sm text-muted-foreground">No activity yet</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {initialActivity.map(a => (
+                    <div key={a.id} className="flex gap-3">
+                      <Avatar className="size-7 shrink-0 mt-0.5">
+                        <AvatarFallback className="text-xs font-bold bg-muted text-muted-foreground">
+                          {a.actor.split(' ').map(w => w[0] ?? '').join('').toUpperCase().slice(0, 2) || '??'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm"><span className="font-medium">{a.actor}</span> {a.action}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{a.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

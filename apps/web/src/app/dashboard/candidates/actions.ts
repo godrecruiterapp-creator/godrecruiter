@@ -81,3 +81,115 @@ export async function deleteCandidateAction(candidateId: string) {
 
   redirect('/dashboard/candidates')
 }
+
+// ── Shared context ─────────────────────────────────────────────────────────────
+
+async function getCandidateUserContext() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const admin = createAdminClient()
+  const [{ data: membership }, { data: profile }] = await Promise.all([
+    admin.from('platform_user_tenants').select('tenant_id').eq('platform_user_id', user.id).eq('is_active', true).single(),
+    admin.from('platform_users').select('full_name').eq('id', user.id).single(),
+  ])
+  if (!membership) return null
+  return { user, tenant_id: membership.tenant_id, name: profile?.full_name || user.email || 'Unknown' }
+}
+
+// ── Notes ──────────────────────────────────────────────────────────────────────
+
+export async function addCandidateNoteAction(candidateId: string, text: string) {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const admin = createAdminClient()
+  const id = ulid()
+  const created_at = new Date().toISOString()
+  const { error } = await admin.from('candidate_notes').insert({
+    id, candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    author_id: ctx.user.id, author_name: ctx.name, text,
+  })
+  if (error) return { error: error.message }
+  await admin.from('candidate_activity').insert({
+    id: ulid(), candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    actor_id: ctx.user.id, actor_name: ctx.name, action: 'Added a note',
+  })
+  return { success: true as const, id, author_name: ctx.name, created_at }
+}
+
+export async function deleteCandidateNoteAction(noteId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+  await createAdminClient().from('candidate_notes').delete().eq('id', noteId)
+  return { success: true }
+}
+
+// ── Documents ──────────────────────────────────────────────────────────────────
+
+export async function uploadCandidateDocumentAction(candidateId: string, formData: FormData, docType = 'other') {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const file = formData.get('file') as File
+  if (!file) return { error: 'No file.' }
+  const admin = createAdminClient()
+  const fileId = ulid()
+  const ext = file.name.split('.').pop()
+  const path = `${ctx.tenant_id}/${candidateId}/${fileId}.${ext}`
+  const { error: upErr } = await admin.storage.from('candidate-documents').upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type })
+  if (upErr) return { error: upErr.message }
+  const created_at = new Date().toISOString()
+  const { error: dbErr } = await admin.from('candidate_documents').insert({
+    id: fileId, candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    name: file.name, size: file.size, file_type: file.type,
+    storage_path: path, doc_type: docType,
+    uploader_id: ctx.user.id, uploader_name: ctx.name,
+  })
+  if (dbErr) return { error: dbErr.message }
+  await admin.from('candidate_activity').insert({
+    id: ulid(), candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    actor_id: ctx.user.id, actor_name: ctx.name, action: `Uploaded document: ${file.name}`,
+  })
+  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at }
+}
+
+export async function deleteCandidateDocumentAction(docId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+  const admin = createAdminClient()
+  const { data: doc } = await admin.from('candidate_documents').select('storage_path').eq('id', docId).single()
+  if (doc?.storage_path) await admin.storage.from('candidate-documents').remove([doc.storage_path])
+  await admin.from('candidate_documents').delete().eq('id', docId)
+  return { success: true }
+}
+
+// ── Resume ─────────────────────────────────────────────────────────────────────
+
+export async function uploadCandidateResumeAction(candidateId: string, formData: FormData) {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const file = formData.get('file') as File
+  if (!file) return { error: 'No file.' }
+  const admin = createAdminClient()
+  const fileId = ulid()
+  const ext = file.name.split('.').pop()
+  const path = `${ctx.tenant_id}/${candidateId}/${fileId}.${ext}`
+  const { error: upErr } = await admin.storage.from('candidate-resumes').upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type })
+  if (upErr) return { error: upErr.message }
+  const { data: { publicUrl } } = admin.storage.from('candidate-resumes').getPublicUrl(path)
+  const { error: dbErr } = await admin.from('candidates').update({ resume_url: publicUrl }).eq('id', candidateId)
+  if (dbErr) return { error: dbErr.message }
+  // Insert into candidate_documents too so it shows in Documents tab
+  await admin.from('candidate_documents').insert({
+    id: fileId, candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    name: file.name, size: file.size, file_type: file.type,
+    storage_path: path, doc_type: 'resume',
+    uploader_id: ctx.user.id, uploader_name: ctx.name,
+  })
+  await admin.from('candidate_activity').insert({
+    id: ulid(), candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    actor_id: ctx.user.id, actor_name: ctx.name, action: `Uploaded resume: ${file.name}`,
+  })
+  return { success: true as const, resumeUrl: publicUrl, resumeName: file.name }
+}
