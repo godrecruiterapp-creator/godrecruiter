@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
@@ -16,7 +18,7 @@ import {
   Settings2, GripVertical, Check, ExternalLink, Trash2, Users, Plus,
   ChevronUp, ChevronDown, ChevronsUpDown, Search, X,
   Mail, Phone, Send, Eye, Pencil, ChevronLeft, ChevronRight,
-  BookmarkPlus, Bookmark, Download,
+  BookmarkPlus, Bookmark, Download, SlidersHorizontal,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -97,14 +99,71 @@ function formatCtc(ctc: number) {
 
 function canId(n: number) { return `CAN-${String(n).padStart(4, '0')}` }
 
+// ── Filters ───────────────────────────────────────────────────────────────────
+
+type Filters = {
+  search: string
+  stage: string
+  work_auth: string
+  notice: string
+  city: string
+  state: string
+  pay_min: string
+  pay_max: string
+  source: string
+  date_from: string
+  date_to: string
+}
+const EMPTY_FILTERS: Filters = {
+  search: '', stage: '', work_auth: '', notice: '', city: '', state: '',
+  pay_min: '', pay_max: '', source: '', date_from: '', date_to: '',
+}
+
+function activeFilterCount(f: Filters) {
+  return [f.stage, f.work_auth, f.notice, f.city, f.state, f.pay_min, f.pay_max, f.source, f.date_from, f.date_to].filter(Boolean).length
+}
+
 // ── Saved views ───────────────────────────────────────────────────────────────
 
-type Filters = { search: string; work_auth: string; notice: string; source: string }
-const EMPTY_FILTERS: Filters = { search: '', work_auth: '', notice: '', source: '' }
 type SavedView = { name: string; cols: ColKey[]; filters: Filters; sortKey: ColKey | null; sortDir: 'asc' | 'desc' }
-const VIEWS_KEY = 'gr:candidate-views-v1'
+const VIEWS_KEY = 'gr:candidate-views-v2'
 function loadViews(): SavedView[] { try { return JSON.parse(localStorage.getItem(VIEWS_KEY) ?? '[]') } catch { return [] } }
 function persistViews(v: SavedView[]) { localStorage.setItem(VIEWS_KEY, JSON.stringify(v)) }
+
+// ── Small helpers ─────────────────────────────────────────────────────────────
+
+function ActiveChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 h-6 pl-2 pr-1 rounded-full border border-brand/30 bg-brand-muted text-xs text-foreground">
+      {label}
+      <button onClick={onRemove} className="flex items-center justify-center size-3.5 rounded-full hover:bg-brand/10 transition-colors" aria-label="Remove filter">
+        <X className="size-2.5" />
+      </button>
+    </span>
+  )
+}
+
+function DrawerSelect({ id, label, value, onChange, options, placeholder = 'All' }: {
+  id: string; label: string; value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+  placeholder?: string
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+      <Select value={value || '__all__'} onValueChange={v => onChange(v === '__all__' ? '' : v)}>
+        <SelectTrigger id={id} className="h-9 text-sm">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="__all__">{placeholder}</SelectItem>
+          {options.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
 
 // ── Column picker ─────────────────────────────────────────────────────────────
 
@@ -189,7 +248,6 @@ function PreviewDrawer({ candidate, onClose }: { candidate: CandidateRow | null;
   return (
     <div className={`shrink-0 border-l bg-background flex flex-col transition-[width] duration-300 ease-in-out overflow-hidden ${candidate ? 'w-72' : 'w-0'}`}>
       {candidate && <>
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <Avatar className="size-8 shrink-0">
@@ -205,7 +263,6 @@ function PreviewDrawer({ candidate, onClose }: { candidate: CandidateRow | null;
           </button>
         </div>
 
-        {/* Quick actions */}
         <div className="grid grid-cols-3 gap-1 px-3 py-2.5 border-b shrink-0">
           <Link href={`/dashboard/candidates/${candidate.id}`}
             className="h-7 flex items-center justify-center gap-1 rounded-md border border-border text-xs text-foreground hover:bg-muted transition-colors">
@@ -232,7 +289,6 @@ function PreviewDrawer({ candidate, onClose }: { candidate: CandidateRow | null;
           )}
         </div>
 
-        {/* Info rows */}
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5">
           {[
             { label: 'Email',    value: candidate.email,           href: `mailto:${candidate.email}` },
@@ -256,7 +312,6 @@ function PreviewDrawer({ candidate, onClose }: { candidate: CandidateRow | null;
           ))}
         </div>
 
-        {/* Footer */}
         <div className="px-3 py-2.5 border-t shrink-0">
           <Link href={`/dashboard/candidates/${candidate.id}`}
             className="flex items-center justify-center gap-1.5 w-full h-7 rounded-md border border-border text-xs text-foreground hover:bg-muted transition-colors">
@@ -277,7 +332,9 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
   const [colWidths, setColWidths]   = useState<Partial<Record<ColKey, number>>>({})
   const [selected, setSelected]     = useState<Set<string>>(new Set())
   const [preview, setPreview]       = useState<CandidateRow | null>(null)
-  const [filters, setFilters]       = useState<Filters>(EMPTY_FILTERS)
+  const [applied, setApplied]       = useState<Filters>(EMPTY_FILTERS)
+  const [draft, setDraft]           = useState<Filters>(EMPTY_FILTERS)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [sortKey, setSortKey]       = useState<ColKey | null>(null)
   const [sortDir, setSortDir]       = useState<'asc' | 'desc'>('asc')
   const [page, setPage]             = useState(0)
@@ -288,25 +345,39 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
 
   useEffect(() => { setViews(loadViews()) }, [])
 
-  function applyFilters(f: Filters) { setFilters(f); setPage(0) }
+  function setDraftField<K extends keyof Filters>(key: K, value: string) {
+    setDraft(prev => ({ ...prev, [key]: value }))
+  }
+  function openDrawer() { setDraft(applied); setDrawerOpen(true) }
+  function applyFilters() { setApplied(draft); setDrawerOpen(false); setPage(0) }
+  function clearDraft() { setDraft(EMPTY_FILTERS) }
+  function clearApplied() { setApplied(EMPTY_FILTERS); setDraft(EMPTY_FILTERS); setPage(0) }
 
-  // ── Derived data ──────────────────────────────────────────────────────
-  const sources = [...new Set(all.map(c => c.source).filter(Boolean))] as string[]
-  const notices = [...new Set(all.map(c => c.notice_period).filter(Boolean))] as string[]
+  // ── Options derived from data ─────────────────────────────────────────
+  const cities    = useMemo(() => [...new Set(all.map(c => c.location).filter(Boolean))].sort() as string[], [all])
+  const notices   = useMemo(() => [...new Set(all.map(c => c.notice_period).filter(Boolean))].sort() as string[], [all])
+  const sources   = useMemo(() => [...new Set(all.map(c => c.source).filter(Boolean))].sort() as string[], [all])
 
-  const filtered = all.filter(c => {
-    if (filters.search) {
-      const q = filters.search.toLowerCase()
+  // ── Filter ────────────────────────────────────────────────────────────
+  const filtered = useMemo(() => all.filter(c => {
+    if (applied.search) {
+      const q = applied.search.toLowerCase()
       const n = [c.first_name, c.last_name].filter(Boolean).join(' ').toLowerCase()
       if (!n.includes(q) && !c.email.toLowerCase().includes(q) && !canId(c.candidate_number).toLowerCase().includes(q) && !(c.current_title ?? '').toLowerCase().includes(q)) return false
     }
-    if (filters.work_auth && c.candidate_type !== filters.work_auth) return false
-    if (filters.notice && c.notice_period !== filters.notice) return false
-    if (filters.source && c.source !== filters.source) return false
+    if (applied.work_auth && c.candidate_type !== applied.work_auth) return false
+    if (applied.notice    && c.notice_period !== applied.notice) return false
+    if (applied.city      && c.location !== applied.city) return false
+    if (applied.source    && c.source !== applied.source) return false
+    if (applied.pay_min   && (c.expected_ctc ?? 0) < parseInt(applied.pay_min)) return false
+    if (applied.pay_max   && (c.expected_ctc ?? 0) > parseInt(applied.pay_max)) return false
+    if (applied.date_from && new Date(c.created_at) < new Date(applied.date_from)) return false
+    if (applied.date_to   && new Date(c.created_at) > new Date(applied.date_to + 'T23:59:59')) return false
     return true
-  })
+  }), [all, applied])
 
-  const sorted = sortKey ? [...filtered].sort((a, b) => {
+  // ── Sort ──────────────────────────────────────────────────────────────
+  const sorted = useMemo(() => sortKey ? [...filtered].sort((a, b) => {
     const get = (c: CandidateRow): string => {
       if (sortKey === 'name') return [c.first_name, c.last_name].filter(Boolean).join(' ')
       if (sortKey === 'candidate_id') return String(c.candidate_number)
@@ -319,7 +390,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
     }
     const cmp = get(a).localeCompare(get(b), undefined, { numeric: true })
     return sortDir === 'asc' ? cmp : -cmp
-  }) : filtered
+  }) : filtered, [filtered, sortKey, sortDir])
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize))
   const paginated  = sorted.slice(page * pageSize, (page + 1) * pageSize)
@@ -330,7 +401,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
   function toggleAll(v: boolean) { setSelected(v ? new Set(paginated.map(c => c.id)) : new Set()) }
   function toggleRow(id: string, v: boolean) { const n = new Set(selected); v ? n.add(id) : n.delete(id); setSelected(n) }
 
-  // ── Sort ──────────────────────────────────────────────────────────────
+  // ── Sort toggle ───────────────────────────────────────────────────────
   function handleSort(key: ColKey) {
     if (!COL_META[key].sortable) return
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -354,15 +425,15 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
   // ── Saved views ───────────────────────────────────────────────────────
   function saveView() {
     if (!viewName.trim()) return
-    const v: SavedView = { name: viewName.trim(), cols, filters, sortKey, sortDir }
+    const v: SavedView = { name: viewName.trim(), cols, filters: applied, sortKey, sortDir }
     const next = [...views.filter(x => x.name !== v.name), v]
     setViews(next); persistViews(next); setViewName(''); setSavingView(false)
   }
-  function loadView(v: SavedView) { setCols(v.cols); setFilters(v.filters); setSortKey(v.sortKey); setSortDir(v.sortDir); setPage(0) }
+  function loadView(v: SavedView) { setCols(v.cols); setApplied(v.filters); setDraft(v.filters); setSortKey(v.sortKey); setSortDir(v.sortDir); setPage(0) }
   function deleteView(name: string) { const next = views.filter(v => v.name !== name); setViews(next); persistViews(next) }
 
   const colW = (k: ColKey) => colWidths[k] ?? COL_META[k].width
-  const activeFilters = [filters.work_auth, filters.notice, filters.source].filter(Boolean).length
+  const activeCount = activeFilterCount(applied)
 
   function SortChevron({ k }: { k: ColKey }) {
     if (!COL_META[k].sortable) return null
@@ -434,34 +505,37 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
 
       {/* ── Top bar ───────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between pb-3 shrink-0 gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="shrink-0">
-            <h1 className="text-lg font-semibold tracking-tight">Candidates</h1>
-            <p className="text-xs text-muted-foreground">
-              {filtered.length !== all.length ? `${filtered.length} of ${all.length}` : all.length} candidates
-            </p>
+        {/* Left: search + saved views */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="relative shrink-0">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+            <Input value={applied.search}
+              onChange={e => { setApplied(p => ({ ...p, search: e.target.value })); setPage(0) }}
+              placeholder="Search by name, email, ID…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+            {applied.search && (
+              <button onClick={() => { setApplied(p => ({ ...p, search: '' })); setPage(0) }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                <X className="size-3.5" />
+              </button>
+            )}
           </div>
+
           {/* Saved view chips */}
-          {views.length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {views.map(v => (
-                <div key={v.name} className="flex items-center">
-                  <button onClick={() => loadView(v)}
-                    className="h-6 px-2.5 text-xs rounded-l-md border border-border hover:bg-muted transition-colors flex items-center gap-1.5">
-                    <Bookmark className="size-2.5" />{v.name}
-                  </button>
-                  <button onClick={() => deleteView(v.name)}
-                    className="h-6 w-5 flex items-center justify-center rounded-r-md border border-l-0 border-border text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
-                    <X className="size-2.5" />
-                  </button>
-                </div>
-              ))}
+          {views.length > 0 && views.map(v => (
+            <div key={v.name} className="flex items-center shrink-0">
+              <button onClick={() => loadView(v)}
+                className="h-6 px-2.5 text-xs rounded-l-md border border-border hover:bg-muted transition-colors flex items-center gap-1.5">
+                <Bookmark className="size-2.5" />{v.name}
+              </button>
+              <button onClick={() => deleteView(v.name)}
+                className="h-6 w-5 flex items-center justify-center rounded-r-md border border-l-0 border-border text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                <X className="size-2.5" />
+              </button>
             </div>
-          )}
+          ))}
         </div>
 
+        {/* Right: actions */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Save view */}
           {savingView ? (
             <div className="flex items-center gap-1">
               <input autoFocus value={viewName} onChange={e => setViewName(e.target.value)}
@@ -477,67 +551,45 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <BookmarkPlus className="size-3" />Save view
             </button>
           )}
+
+          <Button variant="outline" size="sm" onClick={openDrawer} className="gap-1.5 h-8">
+            <SlidersHorizontal className="size-3.5" />
+            Filters
+            {activeCount > 0 && (
+              <span className="flex items-center justify-center size-4 rounded-full bg-brand text-white text-[10px] font-semibold">
+                {activeCount}
+              </span>
+            )}
+          </Button>
+
           <ColPicker cols={cols} onChange={setCols} />
+
           <Button asChild size="sm" className="h-8">
             <Link href="/dashboard/candidates/new"><Plus className="size-3.5 mr-1.5" />Add candidate</Link>
           </Button>
         </div>
       </div>
 
-      {/* ── Filter bar ────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 pb-3 shrink-0 flex-wrap">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-          <Input value={filters.search} onChange={e => applyFilters({ ...filters, search: e.target.value })}
-            placeholder="Search by name, email, ID…" className="h-8 w-56 pl-8 pr-7 text-xs" />
-          {filters.search && (
-            <button onClick={() => applyFilters({ ...filters, search: '' })} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-              <X className="size-3.5" />
-            </button>
+      {/* ── Active filter chips ────────────────────────────────────────── */}
+      {activeCount > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap pb-3 shrink-0">
+          {applied.stage     && <ActiveChip label={`Stage: ${applied.stage}`} onRemove={() => setApplied(p => ({ ...p, stage: '' }))} />}
+          {applied.work_auth && <ActiveChip label={`Auth: ${WORK_AUTH[applied.work_auth] ?? applied.work_auth}`} onRemove={() => setApplied(p => ({ ...p, work_auth: '' }))} />}
+          {applied.notice    && <ActiveChip label={`Availability: ${applied.notice}`} onRemove={() => setApplied(p => ({ ...p, notice: '' }))} />}
+          {applied.city      && <ActiveChip label={`City: ${applied.city}`} onRemove={() => setApplied(p => ({ ...p, city: '' }))} />}
+          {applied.state     && <ActiveChip label={`State: ${applied.state}`} onRemove={() => setApplied(p => ({ ...p, state: '' }))} />}
+          {applied.source    && <ActiveChip label={`Source: ${applied.source}`} onRemove={() => setApplied(p => ({ ...p, source: '' }))} />}
+          {(applied.pay_min || applied.pay_max) && (
+            <ActiveChip label={`Pay: ${applied.pay_min ? `₹${applied.pay_min}` : '0'} – ${applied.pay_max ? `₹${applied.pay_max}` : '∞'}`}
+              onRemove={() => setApplied(p => ({ ...p, pay_min: '', pay_max: '' }))} />
           )}
+          {(applied.date_from || applied.date_to) && (
+            <ActiveChip label={`Created: ${applied.date_from || '…'} – ${applied.date_to || '…'}`}
+              onRemove={() => setApplied(p => ({ ...p, date_from: '', date_to: '' }))} />
+          )}
+          <button onClick={clearApplied} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
         </div>
-
-        <Select value={filters.work_auth || '__all__'} onValueChange={v => applyFilters({ ...filters, work_auth: v === '__all__' ? '' : v })}>
-          <SelectTrigger className={`h-8 text-xs w-36 ${filters.work_auth ? 'border-brand text-brand' : ''}`}>
-            <SelectValue placeholder="Work Auth" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">Work Auth</SelectItem>
-            {Object.entries(WORK_AUTH).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-          </SelectContent>
-        </Select>
-
-        {notices.length > 0 && (
-          <Select value={filters.notice || '__all__'} onValueChange={v => applyFilters({ ...filters, notice: v === '__all__' ? '' : v })}>
-            <SelectTrigger className={`h-8 text-xs w-32 ${filters.notice ? 'border-brand text-brand' : ''}`}>
-              <SelectValue placeholder="Availability" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">Availability</SelectItem>
-              {notices.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        )}
-
-        {sources.length > 0 && (
-          <Select value={filters.source || '__all__'} onValueChange={v => applyFilters({ ...filters, source: v === '__all__' ? '' : v })}>
-            <SelectTrigger className={`h-8 text-xs w-28 ${filters.source ? 'border-brand text-brand' : ''}`}>
-              <SelectValue placeholder="Source" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">Source</SelectItem>
-              {sources.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        )}
-
-        {activeFilters > 0 && (
-          <button onClick={() => applyFilters(EMPTY_FILTERS)}
-            className="h-8 px-2.5 text-xs text-brand border border-brand/30 rounded-md hover:bg-brand-muted transition-colors flex items-center gap-1.5">
-            <X className="size-3" />Clear ({activeFilters})
-          </button>
-        )}
-      </div>
+      )}
 
       {/* ── Bulk action bar ───────────────────────────────────────────── */}
       {selected.size > 0 && (
@@ -562,16 +614,14 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
         </div>
       )}
 
-      {/* ── Table + drawer ────────────────────────────────────────────── */}
+      {/* ── Table + preview drawer ────────────────────────────────────── */}
       <div className="flex flex-1 min-h-0 overflow-hidden border border-border rounded-lg">
-
-        {/* Table */}
         <div className="flex-1 overflow-auto">
           {paginated.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-2">
               <Search className="size-6 text-muted-foreground/30" />
               <p className="text-sm text-muted-foreground">No candidates match your filters</p>
-              <button onClick={() => applyFilters(EMPTY_FILTERS)} className="text-xs text-brand hover:underline">Clear filters</button>
+              <button onClick={clearApplied} className="text-xs text-brand hover:underline">Clear filters</button>
             </div>
           ) : (
             <table className="w-full border-collapse">
@@ -640,7 +690,6 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
           )}
         </div>
 
-        {/* Preview drawer — slides in from right on row click */}
         <PreviewDrawer candidate={preview} onClose={() => setPreview(null)} />
       </div>
 
@@ -682,6 +731,83 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
           </div>
         </div>
       </div>
+
+      {/* ── Filter drawer ─────────────────────────────────────────────── */}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent side="right" className="w-80 sm:w-96 flex flex-col p-0">
+          <SheetHeader className="px-5 py-4 border-b">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-base">Filters</SheetTitle>
+              {Object.values(draft).some(v => v && v !== '') && (
+                <button onClick={clearDraft} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
+              )}
+            </div>
+          </SheetHeader>
+
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+            <DrawerSelect id="f-stage" label="Stage" value={draft.stage} onChange={v => setDraftField('stage', v)} options={[
+              { value: 'sourced',   label: 'Sourced' },
+              { value: 'qualified', label: 'Qualified' },
+              { value: 'submitted', label: 'Submitted' },
+              { value: 'interview', label: 'Interview' },
+              { value: 'offer',     label: 'Offer' },
+              { value: 'start',     label: 'Start' },
+            ]} />
+
+            <DrawerSelect id="f-work-auth" label="Work Authorization" value={draft.work_auth} onChange={v => setDraftField('work_auth', v)} options={
+              Object.entries(WORK_AUTH).map(([k, v]) => ({ value: k, label: v }))
+            } />
+
+            <DrawerSelect id="f-notice" label="Availability" value={draft.notice} onChange={v => setDraftField('notice', v)}
+              options={notices.map(n => ({ value: n, label: n }))} placeholder={notices.length ? 'All' : 'No data yet'} />
+
+            <DrawerSelect id="f-city" label="City" value={draft.city} onChange={v => setDraftField('city', v)}
+              options={cities.map(c => ({ value: c, label: c }))} placeholder={cities.length ? 'All cities' : 'No data yet'} />
+
+            <DrawerSelect id="f-source" label="Source" value={draft.source} onChange={v => setDraftField('source', v)}
+              options={sources.map(s => ({ value: s, label: s }))} placeholder={sources.length ? 'All sources' : 'No data yet'} />
+
+            {/* Pay range */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Pay Expectation (₹)</Label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Min</span>
+                  <input type="number" placeholder="0" value={draft.pay_min} onChange={e => setDraftField('pay_min', e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Max</span>
+                  <input type="number" placeholder="∞" value={draft.pay_max} onChange={e => setDraftField('pay_max', e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                </div>
+              </div>
+            </div>
+
+            {/* Created date range */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Created date range</Label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 space-y-1">
+                  <span className="text-[11px] text-muted-foreground">From</span>
+                  <input type="date" value={draft.date_from} onChange={e => setDraftField('date_from', e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <span className="text-[11px] text-muted-foreground">To</span>
+                  <input type="date" value={draft.date_to} onChange={e => setDraftField('date_to', e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <SheetFooter className="px-5 py-4 border-t gap-2 flex-row">
+            <Button variant="outline" className="flex-1" onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            <Button className="flex-1" onClick={applyFilters}>Apply filters</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
     </div>
   )

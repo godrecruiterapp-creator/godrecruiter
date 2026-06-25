@@ -174,7 +174,6 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
 
       {/* Header */}
       <div className="flex items-center justify-between shrink-0">
-        <h1 className="text-lg font-semibold tracking-tight">Jobs</h1>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={openDrawer} className="gap-1.5">
             <SlidersHorizontal className="size-3.5" />
