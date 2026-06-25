@@ -94,7 +94,6 @@ export function LoginForm({ redirectTo, reset }: Props) {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="you@company.com"
                   autoComplete="email"
                   required
                 />
@@ -111,7 +110,6 @@ export function LoginForm({ redirectTo, reset }: Props) {
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="••••••••"
                   autoComplete="current-password"
                   required
                 />
@@ -121,6 +119,22 @@ export function LoginForm({ redirectTo, reset }: Props) {
                 {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
                 {pending ? 'Signing in…' : 'Sign in'}
               </Button>
+
+              {/* DEV: quick login — remove when done testing */}
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  const form = document.getElementById('email')?.closest('form') as HTMLFormElement | null
+                  if (!form) return
+                  ;(form.elements.namedItem('email') as HTMLInputElement).value = 'bethiarunkumar@gmail.com'
+                  ;(form.elements.namedItem('password') as HTMLInputElement).value = 'Arun@1234'
+                  form.requestSubmit()
+                }}
+                className="w-full h-9 rounded-md border border-dashed border-border text-xs text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+              >
+                Quick login (dev)
+              </button>
             </form>
           </CardContent>
 
