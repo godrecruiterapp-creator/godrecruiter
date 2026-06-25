@@ -400,8 +400,8 @@ function ResumeSection({ candidateId, initialUrl }: { candidateId: string; initi
     const res = await uploadCandidateResumeAction(candidateId, fd)
     setUploading(false)
     if ('success' in res) {
-      setResumeUrl(res.resumeUrl)
-      setResumeName(res.resumeName)
+      setResumeUrl(res.resumeUrl ?? null)
+      setResumeName(res.resumeName ?? null)
     }
   }
 
