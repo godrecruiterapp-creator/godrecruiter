@@ -44,7 +44,7 @@ export default function ReportBuilder() {
   }
 
   function addFilter() {
-    setFilters((prev) => [...prev, { field: cols[0], operator: 'equals', value: '' }])
+    setFilters((prev) => [...prev, { field: cols[0] ?? '', operator: 'equals', value: '' }])
   }
 
   function updateFilter(i: number, patch: Partial<Filter>) {
