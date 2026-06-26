@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/com
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
+  DropdownMenuLabel, DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -22,6 +23,9 @@ import {
   Plus, Briefcase, ChevronDown, X, SlidersHorizontal, Trash2,
   Settings2, GripVertical, Check, ChevronUp, ChevronsUpDown,
   Search, ChevronLeft, ChevronRight,
+  Users, Sparkles, Send, Mail, Phone, MessageSquare,
+  Code2, ClipboardList, FileText, PenLine, Zap,
+  Pencil, Globe, Share2, UserPlus, Copy, Link,
 } from 'lucide-react'
 import { bulkUpdateJobsAction, bulkDeleteJobsAction } from './actions'
 
@@ -458,27 +462,93 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
                   Manage <ChevronDown className="size-3.5 ml-1.5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Change status</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {(['open','on_hold','closed','filled'] as const).map(s => (
-                      <DropdownMenuItem key={s} onClick={() => handleBulkStatus(s)}>{STATUS_BADGE[s]?.label ?? s}</DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Change priority</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {(['high','medium','low'] as const).map(p => (
-                      <DropdownMenuItem key={p} onClick={() => handleBulkPriority(p)}>{PRIORITY_BADGE[p]?.label ?? p}</DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+              <DropdownMenuContent align="start" className="w-56">
+
+                {/* Candidates — find, evaluate, and submit candidates for the job */}
+                <DropdownMenuLabel className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 py-1.5">Candidates</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  {/* Find Candidates — search ATS database for matching candidates */}
+                  <DropdownMenuItem><Users className="size-3.5 mr-2" />Find Candidates</DropdownMenuItem>
+                  {/* AI Match — rank the best-fit candidates using AI */}
+                  <DropdownMenuItem><Sparkles className="size-3.5 mr-2" />AI Match</DropdownMenuItem>
+                  {/* Submit Candidate — send selected candidates to the client or hiring manager */}
+                  <DropdownMenuItem><Send className="size-3.5 mr-2" />Submit Candidate</DropdownMenuItem>
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator />
+
+                {/* Communication — connect with candidates throughout the hiring process */}
+                <DropdownMenuLabel className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 py-1.5">Communication</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  {/* Send Email — email selected candidates directly from the ATS */}
+                  <DropdownMenuItem><Mail className="size-3.5 mr-2" />Send Email</DropdownMenuItem>
+                  {/* Call — call candidates using the integrated dialer */}
+                  <DropdownMenuItem><Phone className="size-3.5 mr-2" />Call</DropdownMenuItem>
+                  {/* Send SMS — send text messages to selected candidates */}
+                  <DropdownMenuItem><MessageSquare className="size-3.5 mr-2" />Send SMS</DropdownMenuItem>
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator />
+
+                {/* AI Tools — accelerate sourcing, screening, and submissions */}
+                <DropdownMenuLabel className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 py-1.5">AI Tools</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  {/* Generate Boolean — create optimized Boolean search strings for external sourcing */}
+                  <DropdownMenuItem><Code2 className="size-3.5 mr-2" />Generate Boolean</DropdownMenuItem>
+                  {/* Screening Questions — generate job-specific candidate screening questions */}
+                  <DropdownMenuItem><ClipboardList className="size-3.5 mr-2" />Screening Questions</DropdownMenuItem>
+                  {/* Generate Outreach Email — create personalized outreach emails for candidates */}
+                  <DropdownMenuItem><Mail className="size-3.5 mr-2" />Generate Outreach Email</DropdownMenuItem>
+                  {/* Generate Submission Notes — generate a professional candidate summary for client submissions */}
+                  <DropdownMenuItem><FileText className="size-3.5 mr-2" />Generate Submission Notes</DropdownMenuItem>
+                  {/* Rewrite Job Description — improve and optimize the job description */}
+                  <DropdownMenuItem><PenLine className="size-3.5 mr-2" />Rewrite Job Description</DropdownMenuItem>
+                  {/* Extract Skills — identify required and preferred skills from the job description */}
+                  <DropdownMenuItem><Zap className="size-3.5 mr-2" />Extract Skills</DropdownMenuItem>
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator />
+
+                {/* Job Management — manage and maintain the job throughout its lifecycle */}
+                <DropdownMenuLabel className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 py-1.5">Job Management</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  {/* Edit Job — update the job details, requirements, or settings */}
+                  <DropdownMenuItem><Pencil className="size-3.5 mr-2" />Edit Job</DropdownMenuItem>
+                  {/* Post Job — publish the job to job boards and career sites */}
+                  <DropdownMenuItem><Globe className="size-3.5 mr-2" />Post Job</DropdownMenuItem>
+                  {/* Share Job — share with recruiters, hiring managers, or vendors */}
+                  <DropdownMenuItem><Share2 className="size-3.5 mr-2" />Share Job</DropdownMenuItem>
+                  {/* Assign — assign the job to recruiters, teams, or account managers */}
+                  <DropdownMenuItem><UserPlus className="size-3.5 mr-2" />Assign</DropdownMenuItem>
+                  {/* Duplicate — create a copy of the job for similar hiring needs */}
+                  <DropdownMenuItem><Copy className="size-3.5 mr-2" />Duplicate</DropdownMenuItem>
+                  {/* Copy Public Link — copy the public job URL to share externally */}
+                  <DropdownMenuItem><Link className="size-3.5 mr-2" />Copy Public Link</DropdownMenuItem>
+                  <DropdownMenuSub>
+                    {/* Change status — update the job's current status */}
+                    <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {(['open','on_hold','closed','filled'] as const).map(s => (
+                        <DropdownMenuItem key={s} onClick={() => handleBulkStatus(s)}>{STATUS_BADGE[s]?.label ?? s}</DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  <DropdownMenuSub>
+                    {/* Change priority — update the job's hiring priority */}
+                    <DropdownMenuSubTrigger>Change Priority</DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {(['high','medium','low'] as const).map(p => (
+                        <DropdownMenuItem key={p} onClick={() => handleBulkPriority(p)}>{PRIORITY_BADGE[p]?.label ?? p}</DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={handleBulkDelete}>
-                  <Trash2 className="size-3.5 mr-2" />Delete jobs
+                  <Trash2 className="size-3.5 mr-2" />Delete Jobs
                 </DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
             <button onClick={() => setSelected(new Set())} className="ml-auto size-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded transition-colors">
