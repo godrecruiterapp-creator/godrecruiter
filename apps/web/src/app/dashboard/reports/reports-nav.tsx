@@ -64,7 +64,7 @@ export function ReportsNav() {
             {group.label}
           </p>
           {group.links.map((link) => {
-            const active = link.exact ? pathname === link.href : pathname.startsWith(link.href)
+            const active = ('exact' in link && link.exact) ? pathname === link.href : pathname.startsWith(link.href)
             const Icon = link.icon
             return (
               <Link
