@@ -33,5 +33,9 @@ export default async function JobsPage() {
     console.error('Jobs fetch error:', err)
   }
 
-  return <JobsTableClient jobs={jobs} />
+  return (
+    <div className="flex flex-col h-full p-6 overflow-hidden">
+      <JobsTableClient jobs={jobs} />
+    </div>
+  )
 }
