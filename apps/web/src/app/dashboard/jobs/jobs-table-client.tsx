@@ -25,7 +25,7 @@ import {
   Search, ChevronLeft, ChevronRight,
   Users, Sparkles, Send, Mail, Phone, MessageSquare,
   Code2, ClipboardList, FileText, PenLine, Zap,
-  Pencil, Globe, Share2, UserPlus, Copy, Link,
+  Pencil, Globe, Share2, UserPlus, Copy, Link as LinkIcon,
 } from 'lucide-react'
 import { bulkUpdateJobsAction, bulkDeleteJobsAction } from './actions'
 
@@ -523,7 +523,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
                   {/* Duplicate — create a copy of the job for similar hiring needs */}
                   <DropdownMenuItem><Copy className="size-3.5 mr-2" />Duplicate</DropdownMenuItem>
                   {/* Copy Public Link — copy the public job URL to share externally */}
-                  <DropdownMenuItem><Link className="size-3.5 mr-2" />Copy Public Link</DropdownMenuItem>
+                  <DropdownMenuItem><LinkIcon className="size-3.5 mr-2" />Copy Public Link</DropdownMenuItem>
                   <DropdownMenuSub>
                     {/* Change status — update the job's current status */}
                     <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
