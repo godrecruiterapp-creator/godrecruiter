@@ -195,7 +195,7 @@ export default function ReportsDashboard() {
         </div>
         <ul className="space-y-2">
           {INSIGHTS.map((insight, i) => {
-            const Icon = INSIGHT_ICONS[i]
+            const Icon = INSIGHT_ICONS[i] ?? TrendingUp
             return (
               <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Icon className={`size-3.5 mt-0.5 shrink-0 ${INSIGHT_COLORS[i]}`} />
