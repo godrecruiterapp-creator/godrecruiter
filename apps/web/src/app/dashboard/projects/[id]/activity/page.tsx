@@ -37,8 +37,8 @@ export default function ProjectActivityPage() {
       <h2 className="text-sm font-semibold mb-4 shrink-0">Activity Timeline</h2>
       <div className="flex flex-col gap-0">
         {EVENTS.map((e, i) => {
-          const meta = EVT_META[e.type] ?? EVT_META.note
-          const Icon = meta.icon
+          const meta = EVT_META[e.type] ?? EVT_META.note!
+          const Icon = meta!.icon
           return (
             <div key={i} className="flex gap-3">
               <div className="flex flex-col items-center">
