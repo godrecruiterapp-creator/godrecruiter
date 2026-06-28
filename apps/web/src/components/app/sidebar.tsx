@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
-  LayoutDashboard, Briefcase, Users, Kanban,
+  LayoutDashboard, Briefcase, Users,
   CalendarCheck, BarChart3, Settings, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban, ListTodo,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -15,7 +15,6 @@ const NAV = [
   { label: 'Work Queue', href: '/dashboard/work-queue',    icon: ListTodo },
   { label: 'Jobs',       href: '/dashboard/jobs',          icon: Briefcase },
   { label: 'Candidates', href: '/dashboard/candidates', icon: Users },
-  { label: 'Pipeline',   href: '/dashboard/pipeline',   icon: Kanban },
   { label: 'Interviews', href: '/dashboard/interviews', icon: CalendarCheck },
   { label: 'Reports',    href: '/dashboard/reports',    icon: BarChart3 },
   { label: 'AI Agent Hub',  href: '/dashboard/agents',     icon: Bot },
