@@ -10,18 +10,22 @@ import {
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
-const NAV = [
-  { label: 'Dashboard',  href: '/dashboard',               icon: LayoutDashboard },
-  { label: 'Work Queue', href: '/dashboard/work-queue',    icon: ListTodo },
-  { label: 'Jobs',        href: '/dashboard/jobs',          icon: Briefcase },
-  { label: 'Placements', href: '/dashboard/placements',    icon: UserCheck },
-  { label: 'Candidates', href: '/dashboard/candidates',    icon: Users },
-  { label: 'Interviews', href: '/dashboard/interviews', icon: CalendarCheck },
-  { label: 'Reports',    href: '/dashboard/reports',    icon: BarChart3 },
-  { label: 'AI Agent Hub',  href: '/dashboard/agents',     icon: Bot },
-  { label: 'Projects',     href: '/dashboard/projects',   icon: FolderKanban },
-  { label: 'Automation',   href: '/dashboard/automation', icon: Zap },
-  { label: 'Settings',     href: '/dashboard/settings',   icon: Settings },
+type NavItem = { label: string; href: string; icon: React.ComponentType<{ className?: string }> } | 'divider'
+
+const NAV: NavItem[] = [
+  { label: 'Dashboard',   href: '/dashboard',              icon: LayoutDashboard },
+  { label: 'Work Queue',  href: '/dashboard/work-queue',   icon: ListTodo },
+  { label: 'Jobs',        href: '/dashboard/jobs',         icon: Briefcase },
+  { label: 'Candidates',  href: '/dashboard/candidates',   icon: Users },
+  { label: 'Interviews',  href: '/dashboard/interviews',   icon: CalendarCheck },
+  { label: 'Placements',  href: '/dashboard/placements',   icon: UserCheck },
+  { label: 'Projects',    href: '/dashboard/projects',     icon: FolderKanban },
+  { label: 'Reports',     href: '/dashboard/reports',      icon: BarChart3 },
+  'divider',
+  { label: 'AI Agent Hub',href: '/dashboard/agents',       icon: Bot },
+  { label: 'Automation',  href: '/dashboard/automation',   icon: Zap },
+  'divider',
+  { label: 'Settings',    href: '/dashboard/settings',     icon: Settings },
 ]
 
 export function AppSidebar() {
@@ -58,7 +62,11 @@ export function AppSidebar() {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
-          {NAV.map(({ label, href, icon: Icon }) => {
+          {NAV.map((entry, i) => {
+            if (entry === 'divider') {
+              return <div key={`divider-${i}`} className={cn('border-t border-border/60', collapsed ? 'mx-1 my-1' : 'mx-1 my-1')} />
+            }
+            const { label, href, icon: Icon } = entry
             const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
             const item = (
               <Link
