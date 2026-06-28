@@ -2,152 +2,195 @@
 
 import { useState } from 'react'
 import { Plus, GripVertical, Trash2 } from 'lucide-react'
-import { SettingsHeader, SettingsSection, SettingRow, TabNav, SaveBar, Toggle } from '../_components'
+import { Breadcrumb, PageHeader, SettingCard, SummaryGrid, CardRow, Toggle } from '../_components'
 
-const TABS = ['Stages', 'Job Settings', 'Candidate Sources', 'Skills & Tags']
+type Stage = { id: string; name: string }
+type Tag   = { id: string; label: string }
 
-const DEFAULT_STAGES = {
-  candidate: ['New','Reviewed','Contacted','Phone Screen','Submitted','Interview','Offer','Placed','Rejected','Future'],
-  job:       ['Draft','Open','On Hold','Filled','Cancelled','Archived'],
-  offer:     ['Pending','Verbal Accept','Written Offer','Accepted','Rejected','Rescinded'],
-}
-
-function StageList({ stages, onChange }: { stages: string[]; onChange: (s: string[]) => void }) {
-  const [newVal, setNewVal] = useState('')
+function StageList({ stages, setStages }: { stages: Stage[]; setStages: (s: Stage[]) => void }) {
+  const [adding, setAdding] = useState(false)
+  const [val, setVal]       = useState('')
   return (
-    <div className="divide-y divide-border/40">
-      {stages.map((s, i) => (
-        <div key={i} className="flex items-center gap-2 px-5 py-2.5 group">
-          <GripVertical className="size-3.5 text-muted-foreground/40 cursor-grab" />
-          <span className="flex-1 text-sm">{s}</span>
-          <button onClick={() => onChange(stages.filter((_, j) => j !== i))}
-            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all p-1">
-            <Trash2 className="size-3.5" />
-          </button>
-        </div>
-      ))}
-      <div className="flex gap-2 px-5 py-3">
-        <input value={newVal} onChange={e => setNewVal(e.target.value)} placeholder="New stage…"
-          className="flex-1 h-7 px-2.5 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-          onKeyDown={e => { if (e.key === 'Enter' && newVal.trim()) { onChange([...stages, newVal.trim()]); setNewVal('') } }} />
-        <button onClick={() => { if (newVal.trim()) { onChange([...stages, newVal.trim()]); setNewVal('') } }}
-          className="h-7 px-2.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1">
-          <Plus className="size-3.5" />Add
-        </button>
+    <div>
+      <div className="space-y-1 mb-2">
+        {stages.map((s, i) => (
+          <div key={s.id} className="flex items-center gap-2 py-1.5 group">
+            <GripVertical className="size-3.5 text-muted-foreground/40 shrink-0 cursor-grab" />
+            <span className="flex-1 text-sm">{s.name}</span>
+            <button onClick={() => setStages(stages.filter((_, j) => j !== i))}
+              className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-red-600 transition-all">
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
+        ))}
       </div>
+      {adding ? (
+        <div className="flex gap-2">
+          <input autoFocus value={val} onChange={e => setVal(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && val.trim()) { setStages([...stages, { id: Date.now().toString(), name: val.trim() }]); setVal(''); setAdding(false) } if (e.key === 'Escape') setAdding(false) }}
+            className="flex-1 h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Stage name…" />
+          <button onClick={() => { if (val.trim()) { setStages([...stages, { id: Date.now().toString(), name: val.trim() }]); setVal('') } setAdding(false) }}
+            className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">Add</button>
+        </div>
+      ) : (
+        <button onClick={() => setAdding(true)}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1">
+          <Plus className="size-3.5" />Add stage
+        </button>
+      )}
     </div>
   )
 }
 
-function TagEditor({ tags, onChange }: { tags: string[]; onChange: (t: string[]) => void }) {
-  const [input, setInput] = useState('')
+function TagEditor({ tags, setTags }: { tags: Tag[]; setTags: (t: Tag[]) => void }) {
+  const [val, setVal] = useState('')
   return (
-    <div className="px-5 py-4">
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        {tags.map((t, i) => (
-          <span key={i} className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-1 rounded">
-            {t}
-            <button onClick={() => onChange(tags.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-foreground ml-0.5">×</button>
-          </span>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input value={input} onChange={e => setInput(e.target.value)} placeholder="Add item…"
-          className="flex-1 h-7 px-2.5 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-          onKeyDown={e => { if (e.key === 'Enter' && input.trim()) { onChange([...tags, input.trim()]); setInput('') } }} />
-        <button onClick={() => { if (input.trim()) { onChange([...tags, input.trim()]); setInput('') } }}
-          className="h-7 px-2.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1">
-          <Plus className="size-3.5" />Add
-        </button>
-      </div>
+    <div className="flex items-center flex-wrap gap-1.5">
+      {tags.map(t => (
+        <span key={t.id} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-full bg-muted border border-border">
+          {t.label}
+          <button onClick={() => setTags(tags.filter(x => x.id !== t.id))}
+            className="text-muted-foreground hover:text-red-600 transition-colors ml-0.5">×</button>
+        </span>
+      ))}
+      <input value={val} onChange={e => setVal(e.target.value)}
+        onKeyDown={e => { if ((e.key === 'Enter' || e.key === ',') && val.trim()) { e.preventDefault(); setTags([...tags, { id: Date.now().toString(), label: val.trim() }]); setVal('') } }}
+        placeholder="Add tag…"
+        className="h-7 w-28 px-2 text-xs rounded-full border border-dashed border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
     </div>
   )
 }
 
 export default function RecruitmentPage() {
-  const [tab, setTab] = useState('Stages')
-  const [dirty, setDirty] = useState(false)
-  const [stages, setStages] = useState(DEFAULT_STAGES)
-  const [sources, setSources] = useState(['LinkedIn','Indeed','Dice','Monster','Referral','Direct','Career Portal','Rehire','Email','Phone Call','ZipRecruiter','CareerBuilder'])
-  const [skills, setSkills] = useState(['Java','Python','React','Node.js','AWS','ICU','ER','OR','NICU','CCRN','Travel Nurse','Healthcare','Kubernetes','DevOps'])
-  const [tags, setTags] = useState(['Hot','Travel OK','Visa Risk','Priority','Hard to Fill','Rare Tech','Preferred Client'])
-  const [rejectReasons, setRejectReasons] = useState(['Not interested','Found another job','Salary mismatch','Location issue','Visa restriction','No response','Skill mismatch','Client decline'])
+  const [candidateStages, setCandidateStages] = useState<Stage[]>([
+    { id: '1', name: 'New' }, { id: '2', name: 'Screening' }, { id: '3', name: 'Shortlisted' },
+    { id: '4', name: 'Submitted to Client' }, { id: '5', name: 'Interview Scheduled' },
+    { id: '6', name: 'Interviewed' }, { id: '7', name: 'Offered' }, { id: '8', name: 'Placed' },
+    { id: '9', name: 'Rejected' }, { id: '10', name: 'Withdrawn' },
+  ])
 
-  function markDirty() { setDirty(true) }
+  const [jobStatuses, setJobStatuses] = useState<Stage[]>([
+    { id: '1', name: 'Draft' }, { id: '2', name: 'Active' }, { id: '3', name: 'On Hold' },
+    { id: '4', name: 'Filled' }, { id: '5', name: 'Cancelled' },
+  ])
+
+  const [skills, setSkills] = useState<Tag[]>([
+    { id: '1', label: 'RN' }, { id: '2', label: 'CNA' }, { id: '3', label: 'ICU' },
+    { id: '4', label: 'Python' }, { id: '5', label: 'Java' }, { id: '6', label: 'React' },
+    { id: '7', label: 'CPA' }, { id: '8', label: 'ACLS' }, { id: '9', label: 'BLS' },
+  ])
+
+  const [sources, setSources] = useState<Tag[]>([
+    { id: '1', label: 'Beeline' }, { id: '2', label: 'Fieldglass' }, { id: '3', label: 'IQNavigator' },
+    { id: '4', label: 'LinkedIn' }, { id: '5', label: 'Indeed' }, { id: '6', label: 'Referral' },
+  ])
+
+  const [hotThreshold, setHotThreshold] = useState(7)
+  const [autoHot, setAutoHot]           = useState(true)
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 p-6 max-w-3xl">
-        <SettingsHeader title="Recruitment Settings" description="Configure candidate stages, job statuses, sources, skills, and classification tags." />
-        <TabNav tabs={TABS} active={tab} onChange={setTab} />
+    <div className="max-w-3xl mx-auto px-8 py-10">
+      <Breadcrumb />
+      <PageHeader title="Recruitment" description="Configure pipeline stages, job statuses, skills, and sourcing preferences." />
 
-        {tab === 'Stages' && (
-          <div className="space-y-4">
-            <SettingsSection title="Candidate Stages" description="The pipeline stages for tracking candidate progress.">
-              <StageList stages={stages.candidate} onChange={s => { setStages(p => ({ ...p, candidate: s })); markDirty() }} />
-            </SettingsSection>
-            <SettingsSection title="Job Statuses" description="Status options for open jobs.">
-              <StageList stages={stages.job} onChange={s => { setStages(p => ({ ...p, job: s })); markDirty() }} />
-            </SettingsSection>
-            <SettingsSection title="Offer Stages" description="Track the offer process from verbal to acceptance.">
-              <StageList stages={stages.offer} onChange={s => { setStages(p => ({ ...p, offer: s })); markDirty() }} />
-            </SettingsSection>
-          </div>
-        )}
-
-        {tab === 'Job Settings' && (
-          <div className="space-y-4">
-            <SettingsSection title="Employment Types">
-              <TagEditor tags={['Contract','Full Time','Part Time','Contract to Hire','Temp to Perm','Internship','Per Diem','Travel']} onChange={markDirty} />
-            </SettingsSection>
-            <SettingsSection title="Work Authorization Types">
-              <TagEditor tags={['USC','GC','GC-EAD','H1B','H4-EAD','TN','OPT','CPT','L2-EAD','No Sponsorship']} onChange={markDirty} />
-            </SettingsSection>
-            <SettingsSection title="Job Categories">
-              <TagEditor tags={['ICU Nursing','ER Nursing','Travel Nursing','Physician','Software Engineering','DevOps','Data Engineering','Finance','Healthcare Admin']} onChange={markDirty} />
-            </SettingsSection>
-            <SettingsSection title="Rejection Reasons">
-              <TagEditor tags={rejectReasons} onChange={r => { setRejectReasons(r); markDirty() }} />
-            </SettingsSection>
-            <SettingsSection title="Hot Job Rules">
-              <SettingRow label="Auto-flag Urgent" description="Automatically mark jobs as Urgent when SLA is within 4 hours.">
-                <Toggle checked={true} onChange={markDirty} />
-              </SettingRow>
-              <SettingRow label="Hot Job Priority Threshold" description="AI score threshold for auto-flagging as Hot Job.">
-                <input type="number" defaultValue={90} min={50} max={99}
-                  onChange={markDirty}
-                  className="w-20 h-8 px-3 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
-              </SettingRow>
-              <SettingRow label="Job Expiration" description="Auto-archive jobs after this many days with no activity.">
-                <div className="flex items-center gap-1.5 text-xs">
-                  <input type="number" defaultValue={30} min={7}
-                    onChange={markDirty}
-                    className="w-16 h-8 px-2 text-center rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
-                  <span className="text-muted-foreground">days</span>
+      <div className="space-y-4">
+        {/* Candidate Pipeline Stages */}
+        <SettingCard
+          title="Candidate Pipeline Stages"
+          description={`${candidateStages.length} stages · drag to reorder`}
+          summary={
+            <div className="flex flex-wrap gap-1.5">
+              {candidateStages.map((s, i) => (
+                <div key={s.id} className="flex items-center gap-1.5 text-xs">
+                  <span className="size-1.5 rounded-full bg-muted-foreground/30" />
+                  <span>{s.name}</span>
+                  {i < candidateStages.length - 1 && <span className="text-muted-foreground/30">›</span>}
                 </div>
-              </SettingRow>
-            </SettingsSection>
-          </div>
-        )}
+              ))}
+            </div>
+          }
+        >
+          <StageList stages={candidateStages} setStages={setCandidateStages} />
+        </SettingCard>
 
-        {tab === 'Candidate Sources' && (
-          <SettingsSection title="Candidate Sources" description="Track where your candidates come from.">
-            <TagEditor tags={sources} onChange={s => { setSources(s); markDirty() }} />
-          </SettingsSection>
-        )}
+        {/* Job Statuses */}
+        <SettingCard
+          title="Job Statuses"
+          description={`${jobStatuses.length} statuses`}
+          summary={
+            <div className="flex flex-wrap gap-2">
+              {jobStatuses.map(s => (
+                <span key={s.id} className="text-xs bg-muted px-2.5 py-1 rounded-full">{s.name}</span>
+              ))}
+            </div>
+          }
+        >
+          <StageList stages={jobStatuses} setStages={setJobStatuses} />
+        </SettingCard>
 
-        {tab === 'Skills & Tags' && (
-          <div className="space-y-4">
-            <SettingsSection title="Skills Library" description="Global skills list used for matching and search.">
-              <TagEditor tags={skills} onChange={s => { setSkills(s); markDirty() }} />
-            </SettingsSection>
-            <SettingsSection title="Recruitment Tags" description="Tags for classifying candidates and jobs.">
-              <TagEditor tags={tags} onChange={t => { setTags(t); markDirty() }} />
-            </SettingsSection>
+        {/* Skills Library */}
+        <SettingCard
+          title="Skills Library"
+          description={`${skills.length} skills available for candidate and job matching`}
+          summary={
+            <div className="flex flex-wrap gap-1.5">
+              {skills.slice(0, 8).map(s => (
+                <span key={s.id} className="text-xs bg-muted px-2 py-0.5 rounded-full">{s.label}</span>
+              ))}
+              {skills.length > 8 && <span className="text-xs text-muted-foreground">+{skills.length - 8} more</span>}
+            </div>
+          }
+        >
+          <TagEditor tags={skills} setTags={setSkills} />
+        </SettingCard>
+
+        {/* Candidate Sources */}
+        <SettingCard
+          title="Candidate Sources"
+          description="Track where candidates originate"
+          summary={
+            <div className="flex flex-wrap gap-1.5">
+              {sources.map(s => (
+                <span key={s.id} className="text-xs bg-muted px-2 py-0.5 rounded-full">{s.label}</span>
+              ))}
+            </div>
+          }
+        >
+          <TagEditor tags={sources} setTags={setSources} />
+        </SettingCard>
+
+        {/* Hot Job Rules */}
+        <SettingCard
+          title="Hot Job Rules"
+          description="Criteria for automatically flagging a job as high priority"
+          summary={
+            <SummaryGrid items={[
+              { label: 'SLA threshold',    value: `${hotThreshold} hours remaining` },
+              { label: 'Auto-flag',        value: autoHot ? 'Enabled' : 'Disabled' },
+              { label: 'Notify manager',   value: 'On flag' },
+            ]} />
+          }
+        >
+          <div className="space-y-3">
+            <CardRow label="Auto-flag as Hot when SLA ≤" description="Jobs near their SLA deadline are automatically marked urgent">
+              <div className="flex items-center gap-2">
+                <input type="number" value={hotThreshold} min={1} max={48} onChange={e => setHotThreshold(+e.target.value)}
+                  className="w-16 h-8 text-center text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                <span className="text-xs text-muted-foreground">hours</span>
+              </div>
+            </CardRow>
+            <CardRow label="Auto-flag enabled">
+              <Toggle checked={autoHot} onChange={setAutoHot} />
+            </CardRow>
+            <CardRow label="Notify manager on flag">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+            <CardRow label="Notify recruiter on flag">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
           </div>
-        )}
+        </SettingCard>
       </div>
-      <SaveBar dirty={dirty} onSave={() => setDirty(false)} onDiscard={() => setDirty(false)} />
     </div>
   )
 }

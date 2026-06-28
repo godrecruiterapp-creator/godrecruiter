@@ -1,258 +1,299 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, MapPin, Users, Clock } from 'lucide-react'
-import { SettingsHeader, SettingsSection, SettingRow, TabNav, Toggle, SaveBar, FieldInput, FieldSelect } from '../_components'
+import { Plus, Trash2, MapPin } from 'lucide-react'
+import { Breadcrumb, PageHeader, SettingCard, SummaryGrid, CardRow, Toggle } from '../_components'
 
-const TIMEZONES = [
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-  { value: 'America/Phoenix', label: 'Arizona (MST)' },
-]
-
-const CURRENCIES = [
-  { value: 'USD', label: 'USD — US Dollar' },
-  { value: 'CAD', label: 'CAD — Canadian Dollar' },
-  { value: 'EUR', label: 'EUR — Euro' },
-  { value: 'GBP', label: 'GBP — British Pound' },
-]
-
-const DATE_FORMATS = [
-  { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY (US)' },
-  { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (EU)' },
-  { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' },
-]
-
-const TABS = ['Company Info', 'Locations', 'Departments', 'Business Hours', 'Calendar']
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export default function OrganizationPage() {
-  const [tab, setTab] = useState('Company Info')
-  const [dirty, setDirty] = useState(false)
-  const mark = () => setDirty(true)
+  const [name, setName]         = useState('God Recruiter Inc.')
+  const [industry, setIndustry] = useState('Staffing & Recruiting')
+  const [size, setSize]         = useState('11–50 employees')
+  const [website, setWebsite]   = useState('https://godrecruiter.com')
+  const [timezone, setTimezone] = useState('America/Chicago (CST)')
+  const [language, setLanguage] = useState('English (US)')
 
-  // Company Info state
-  const [company, setCompany] = useState({
-    name: 'God Recruiter Inc.',
-    legalName: 'God Recruiter Inc.',
-    website: 'https://godrecruiter.com',
-    phone: '+1 (713) 555-0100',
-    email: 'godrecruiterapp@gmail.com',
-    address: '1234 Main St, Suite 100',
-    city: 'Houston',
-    state: 'TX',
-    zip: '77001',
-    country: 'United States',
-    industry: 'Staffing & Recruiting',
-    employees: '11–50',
-    timezone: 'America/Chicago',
-    currency: 'USD',
-    dateFormat: 'MM/DD/YYYY',
-    fiscalYear: 'January',
-    language: 'English',
-  })
+  const [phone, setPhone]       = useState('+1 713 555 0100')
+  const [email, setEmail]       = useState('info@godrecruiter.com')
+  const [address, setAddress]   = useState('1234 Main Street')
+  const [city, setCity]         = useState('Houston')
+  const [state, setState]       = useState('TX')
+  const [zip, setZip]           = useState('77002')
 
-  function setField(k: keyof typeof company, v: string) {
-    setCompany(p => ({ ...p, [k]: v }))
-    mark()
-  }
-
-  // Locations
   const [locations, setLocations] = useState([
-    { id: '1', name: 'Houston HQ', address: '1234 Main St, Houston TX 77001', type: 'Headquarters', phone: '+1 713 555 0100' },
-    { id: '2', name: 'Dallas Office', address: '456 Commerce St, Dallas TX 75201', type: 'Branch', phone: '+1 214 555 0200' },
+    { id: '1', name: 'Houston HQ',     address: '1234 Main St, Houston, TX' },
+    { id: '2', name: 'Dallas Office',  address: '500 Commerce St, Dallas, TX' },
+    { id: '3', name: 'Austin Office',  address: '301 Congress Ave, Austin, TX' },
   ])
 
-  // Departments
-  const [departments, setDepartments] = useState(['Healthcare Recruitment', 'IT Staffing', 'Finance & Accounting', 'Executive Search', 'Operations'])
-  const [newDept, setNewDept] = useState('')
-
-  // Business hours
-  const [hours, setHours] = useState({
-    Mon: { open: true, start: '08:00', end: '18:00' },
-    Tue: { open: true, start: '08:00', end: '18:00' },
-    Wed: { open: true, start: '08:00', end: '18:00' },
-    Thu: { open: true, start: '08:00', end: '18:00' },
-    Fri: { open: true, start: '08:00', end: '17:00' },
-    Sat: { open: false, start: '09:00', end: '13:00' },
-    Sun: { open: false, start: '09:00', end: '13:00' },
-  })
+  const [hours, setHours] = useState(
+    DAYS.map((d, i) => ({ day: d, open: i < 5, start: '08:00', end: '18:00' }))
+  )
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 p-6 max-w-3xl">
-        <SettingsHeader title="Organization" description="Manage your company profile, locations, departments, and business hours." />
-        <TabNav tabs={TABS} active={tab} onChange={setTab} />
+    <div className="max-w-3xl mx-auto px-8 py-10">
+      <Breadcrumb />
+      <PageHeader title="Organization" description="Manage company information, locations, and operating preferences." />
 
-        {tab === 'Company Info' && (
-          <div className="space-y-5">
-            <SettingsSection title="Company Profile">
-              <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FieldInput label="Company Name" value={company.name} onChange={v => setField('name', v)} />
-                <FieldInput label="Legal Name" value={company.legalName} onChange={v => setField('legalName', v)} />
-                <FieldInput label="Website" value={company.website} onChange={v => setField('website', v)} />
-                <FieldInput label="Company Phone" value={company.phone} onChange={v => setField('phone', v)} />
-                <FieldInput label="Company Email" value={company.email} onChange={v => setField('email', v)} type="email" />
-                <FieldSelect label="Industry" value={company.industry} onChange={v => setField('industry', v)} options={[
-                  { value: 'Staffing & Recruiting', label: 'Staffing & Recruiting' },
-                  { value: 'Healthcare Staffing', label: 'Healthcare Staffing' },
-                  { value: 'IT Staffing', label: 'IT Staffing' },
-                  { value: 'Executive Search', label: 'Executive Search' },
-                ]} />
-                <FieldSelect label="Company Size" value={company.employees} onChange={v => setField('employees', v)} options={[
-                  { value: '1–10', label: '1–10 employees' },
-                  { value: '11–50', label: '11–50 employees' },
-                  { value: '51–200', label: '51–200 employees' },
-                  { value: '201–500', label: '201–500 employees' },
-                  { value: '500+', label: '500+ employees' },
-                ]} />
-              </div>
-            </SettingsSection>
-
-            <SettingsSection title="Primary Address">
-              <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <FieldInput label="Street Address" value={company.address} onChange={v => setField('address', v)} />
-                </div>
-                <FieldInput label="City" value={company.city} onChange={v => setField('city', v)} />
-                <FieldInput label="State" value={company.state} onChange={v => setField('state', v)} />
-                <FieldInput label="ZIP / Postal Code" value={company.zip} onChange={v => setField('zip', v)} />
-                <FieldInput label="Country" value={company.country} onChange={v => setField('country', v)} />
-              </div>
-            </SettingsSection>
-
-            <SettingsSection title="Locale & Format">
-              <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FieldSelect label="Time Zone" value={company.timezone} onChange={v => setField('timezone', v)} options={TIMEZONES} />
-                <FieldSelect label="Currency" value={company.currency} onChange={v => setField('currency', v)} options={CURRENCIES} />
-                <FieldSelect label="Date Format" value={company.dateFormat} onChange={v => setField('dateFormat', v)} options={DATE_FORMATS} />
-                <FieldSelect label="Language" value={company.language} onChange={v => setField('language', v)} options={[
-                  { value: 'English', label: 'English' },
-                  { value: 'Spanish', label: 'Spanish' },
-                ]} />
-                <FieldSelect label="Fiscal Year Start" value={company.fiscalYear} onChange={v => setField('fiscalYear', v)} options={['January','April','July','October'].map(m => ({ value: m, label: m }))} />
-              </div>
-            </SettingsSection>
+      <div className="space-y-4">
+        {/* Company Profile */}
+        <SettingCard
+          title="Company Profile"
+          description="Basic information about your organization"
+          summary={
+            <SummaryGrid items={[
+              { label: 'Company name',  value: name },
+              { label: 'Industry',      value: industry },
+              { label: 'Size',          value: size },
+              { label: 'Website',       value: website },
+              { label: 'Timezone',      value: timezone },
+              { label: 'Language',      value: language },
+            ]} />
+          }
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2 space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Company name</label>
+              <input value={name} onChange={e => setName(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Industry</label>
+              <select value={industry} onChange={e => setIndustry(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option>Staffing & Recruiting</option>
+                <option>Healthcare Staffing</option>
+                <option>IT Staffing</option>
+                <option>Executive Search</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Company size</label>
+              <select value={size} onChange={e => setSize(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option>1–10 employees</option>
+                <option>11–50 employees</option>
+                <option>51–200 employees</option>
+                <option>201–500 employees</option>
+              </select>
+            </div>
+            <div className="col-span-2 space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Website</label>
+              <input value={website} onChange={e => setWebsite(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Timezone</label>
+              <select value={timezone} onChange={e => setTimezone(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option>America/Chicago (CST)</option>
+                <option>America/New_York (EST)</option>
+                <option>America/Denver (MST)</option>
+                <option>America/Los_Angeles (PST)</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Language</label>
+              <select value={language} onChange={e => setLanguage(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option>English (US)</option>
+                <option>English (UK)</option>
+                <option>Spanish</option>
+              </select>
+            </div>
           </div>
-        )}
+        </SettingCard>
 
-        {tab === 'Locations' && (
-          <div className="space-y-4">
-            <SettingsSection title="Office Locations" action={
-              <button onClick={() => mark()} className="h-7 px-2.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
-                <Plus className="size-3.5" />Add Location
-              </button>
-            }>
-              {locations.map(loc => (
-                <div key={loc.id} className="flex items-start gap-3 px-5 py-4">
-                  <div className="size-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                    <MapPin className="size-4 text-blue-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">{loc.name}</p>
-                      <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{loc.type}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{loc.address}</p>
-                    <p className="text-xs text-muted-foreground">{loc.phone}</p>
-                  </div>
-                  <button onClick={() => { setLocations(l => l.filter(x => x.id !== loc.id)); mark() }} className="text-muted-foreground hover:text-destructive transition-colors p-1">
-                    <Trash2 className="size-3.5" />
-                  </button>
+        {/* Contact Information */}
+        <SettingCard
+          title="Contact Information"
+          description="Primary contact details for your organization"
+          summary={
+            <SummaryGrid items={[
+              { label: 'Phone',    value: phone },
+              { label: 'Email',    value: email },
+              { label: 'Address',  value: `${address}, ${city}, ${state} ${zip}` },
+            ]} />
+          }
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Phone</label>
+              <input value={phone} onChange={e => setPhone(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="col-span-2 space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Street address</label>
+              <input value={address} onChange={e => setAddress(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">City</label>
+              <input value={city} onChange={e => setCity(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">State</label>
+                <input value={state} onChange={e => setState(e.target.value)}
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">ZIP</label>
+                <input value={zip} onChange={e => setZip(e.target.value)}
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+              </div>
+            </div>
+          </div>
+        </SettingCard>
+
+        {/* Locations */}
+        <SettingCard
+          title="Office Locations"
+          description={`${locations.length} offices`}
+          summary={
+            <div className="space-y-2.5">
+              {locations.map(l => (
+                <div key={l.id} className="flex items-center gap-2.5 text-sm">
+                  <MapPin className="size-3.5 text-muted-foreground shrink-0" />
+                  <span className="font-medium">{l.name}</span>
+                  <span className="text-muted-foreground">·</span>
+                  <span className="text-muted-foreground text-xs">{l.address}</span>
                 </div>
               ))}
-            </SettingsSection>
-          </div>
-        )}
-
-        {tab === 'Departments' && (
-          <SettingsSection title="Departments" description="Organize your recruiters into departments for reporting and permissions.">
-            <div className="px-5 py-4 flex gap-2">
-              <input
-                value={newDept}
-                onChange={e => setNewDept(e.target.value)}
-                placeholder="New department name…"
-                className="flex-1 h-8 px-3 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && newDept.trim()) {
-                    setDepartments(d => [...d, newDept.trim()])
-                    setNewDept('')
-                    mark()
-                  }
-                }}
-              />
-              <button onClick={() => { if (newDept.trim()) { setDepartments(d => [...d, newDept.trim()]); setNewDept(''); mark() } }}
-                className="h-8 px-3 text-xs rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1">
-                <Plus className="size-3.5" />Add
-              </button>
             </div>
-            {departments.map((d, i) => (
-              <div key={i} className="flex items-center justify-between px-5 py-3">
-                <div className="flex items-center gap-2.5">
-                  <Users className="size-3.5 text-muted-foreground" />
-                  <span className="text-sm">{d}</span>
-                </div>
-                <button onClick={() => { setDepartments(deps => deps.filter((_, j) => j !== i)); mark() }} className="text-muted-foreground hover:text-destructive transition-colors p-1">
+          }
+          action={
+            <button
+              onClick={() => setLocations(p => [...p, { id: Date.now().toString(), name: 'New Office', address: '' }])}
+              className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+              <Plus className="size-3.5" />Add
+            </button>
+          }
+        >
+          <div className="space-y-3">
+            {locations.map((l, i) => (
+              <div key={l.id} className="flex items-center gap-2">
+                <input value={l.name} onChange={e => setLocations(p => p.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
+                  placeholder="Office name"
+                  className="w-36 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                <input value={l.address} onChange={e => setLocations(p => p.map((x, j) => j === i ? { ...x, address: e.target.value } : x))}
+                  placeholder="Address"
+                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                <button onClick={() => setLocations(p => p.filter((_, j) => j !== i))}
+                  className="p-2 text-muted-foreground hover:text-red-600 transition-colors">
                   <Trash2 className="size-3.5" />
                 </button>
               </div>
             ))}
-          </SettingsSection>
-        )}
+          </div>
+        </SettingCard>
 
-        {tab === 'Business Hours' && (
-          <SettingsSection title="Business Hours" description="Set default working hours for SLA calculations and availability.">
-            {(Object.keys(hours) as (keyof typeof hours)[]).map(day => {
-              const h = hours[day]
-              return (
-                <div key={day} className="flex items-center gap-4 px-5 py-3">
-                  <div className="w-10 text-xs font-medium">{day}</div>
-                  <Toggle checked={h.open} onChange={v => { setHours(p => ({ ...p, [day]: { ...p[day], open: v } })); mark() }} />
-                  {h.open ? (
-                    <div className="flex items-center gap-2 text-xs">
-                      <input type="time" value={h.start} onChange={e => { setHours(p => ({ ...p, [day]: { ...p[day], start: e.target.value } })); mark() }}
-                        className="h-7 px-2 rounded-md border border-input bg-background text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
-                      <span className="text-muted-foreground">to</span>
-                      <input type="time" value={h.end} onChange={e => { setHours(p => ({ ...p, [day]: { ...p[day], end: e.target.value } })); mark() }}
-                        className="h-7 px-2 rounded-md border border-input bg-background text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
-                    </div>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">Closed</span>
-                  )}
-                </div>
-              )
-            })}
-          </SettingsSection>
-        )}
-
-        {tab === 'Calendar' && (
-          <SettingsSection title="Holiday Calendar" description="Add company holidays to exclude from SLA and business day calculations.">
-            <div className="px-5 py-4 space-y-2 text-xs text-muted-foreground">
-              {[
-                'Jan 1 — New Year\'s Day',
-                'May 26 — Memorial Day',
-                'Jul 4 — Independence Day',
-                'Sep 1 — Labor Day',
-                'Nov 27 — Thanksgiving',
-                'Dec 25 — Christmas Day',
-              ].map(h => (
-                <div key={h} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                  <div className="flex items-center gap-2">
-                    <Clock className="size-3.5 text-muted-foreground" />
-                    <span className="text-sm">{h}</span>
-                  </div>
-                  <button className="hover:text-destructive transition-colors"><Trash2 className="size-3.5" /></button>
+        {/* Business Hours */}
+        <SettingCard
+          title="Business Hours"
+          description="When your team is available for work and scheduling"
+          summary={
+            <div className="flex flex-wrap gap-x-6 gap-y-1.5">
+              {hours.filter(h => h.open).map(h => (
+                <div key={h.day} className="flex items-center gap-1.5 text-xs">
+                  <span className="font-medium w-8">{h.day.slice(0, 3)}</span>
+                  <span className="text-muted-foreground">{h.start} – {h.end}</span>
                 </div>
               ))}
-              <button onClick={mark} className="mt-2 h-7 px-3 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
-                <Plus className="size-3.5" />Add Holiday
-              </button>
+              {hours.filter(h => !h.open).length > 0 && (
+                <div className="text-xs text-muted-foreground">
+                  Closed: {hours.filter(h => !h.open).map(h => h.day.slice(0, 3)).join(', ')}
+                </div>
+              )}
             </div>
-          </SettingsSection>
-        )}
+          }
+        >
+          <div className="space-y-2">
+            {hours.map((h, i) => (
+              <div key={h.day} className="flex items-center gap-4">
+                <Toggle checked={h.open} onChange={v => setHours(p => p.map((x, j) => j === i ? { ...x, open: v } : x))} />
+                <span className="text-sm w-24">{h.day}</span>
+                {h.open ? (
+                  <div className="flex items-center gap-2 text-sm">
+                    <input type="time" value={h.start}
+                      onChange={e => setHours(p => p.map((x, j) => j === i ? { ...x, start: e.target.value } : x))}
+                      className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <span className="text-muted-foreground text-xs">to</span>
+                    <input type="time" value={h.end}
+                      onChange={e => setHours(p => p.map((x, j) => j === i ? { ...x, end: e.target.value } : x))}
+                      className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Closed</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </SettingCard>
+
+        {/* Default Preferences */}
+        <SettingCard
+          title="Default Preferences"
+          description="System-wide defaults applied across the platform"
+          summary={
+            <SummaryGrid items={[
+              { label: 'Currency',      value: 'USD ($)' },
+              { label: 'Date format',   value: 'MM/DD/YYYY' },
+              { label: 'Fiscal year',   value: 'January' },
+              { label: 'Work week',     value: 'Monday – Friday' },
+            ]} />
+          }
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Currency</label>
+              <select defaultValue="USD" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Date format</label>
+              <select defaultValue="mdy" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option value="mdy">MM/DD/YYYY</option>
+                <option value="dmy">DD/MM/YYYY</option>
+                <option value="ymd">YYYY-MM-DD</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Fiscal year starts</label>
+              <select defaultValue="jan" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m => (
+                  <option key={m} value={m.toLowerCase()}>{m}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Work week starts</label>
+              <select defaultValue="mon" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option value="mon">Monday</option>
+                <option value="sun">Sunday</option>
+              </select>
+            </div>
+          </div>
+          <div className="border-t border-border/40 pt-4 space-y-3">
+            <CardRow label="Show public holidays" description="Highlight public holidays in calendars and scheduling">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+            <CardRow label="24-hour time format" description="Use 24h clock instead of AM/PM">
+              <Toggle checked={false} onChange={() => {}} />
+            </CardRow>
+          </div>
+        </SettingCard>
       </div>
-      <SaveBar dirty={dirty} onSave={() => setDirty(false)} onDiscard={() => setDirty(false)} />
     </div>
   )
 }

@@ -2,146 +2,140 @@
 
 import { useState } from 'react'
 import { Globe, ExternalLink } from 'lucide-react'
-import { SettingsHeader, SettingsSection, SettingRow, TabNav, SaveBar, Toggle, FieldInput } from '../_components'
-
-const TABS = ['Career Site', 'Application', 'Privacy & Legal', 'Candidate Login']
+import { Breadcrumb, PageHeader, SettingCard, SummaryGrid, CardRow, Toggle } from '../_components'
 
 export default function CareerPortalPage() {
-  const [tab, setTab] = useState('Career Site')
-  const [dirty, setDirty] = useState(false)
-  const mark = () => setDirty(true)
+  const [enabled, setEnabled]       = useState(true)
+  const [subdomain, setSubdomain]   = useState('godrecruiter')
+  const [title, setTitle]           = useState('Work With Us')
+  const [desc, setDesc]             = useState('Join the God Recruiter team and build the future of healthcare staffing.')
+  const [applyEnabled, setApply]    = useState(true)
+  const [linkedinApply, setLinkedin] = useState(true)
+  const [showSalary, setShowSalary] = useState(false)
+  const [seoTitle, setSeoTitle]     = useState('Healthcare Staffing Jobs — God Recruiter')
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 p-6 max-w-3xl">
-        <SettingsHeader title="Career Portal" description="Configure your public job listing site, application form, and candidate experience." />
-        <TabNav tabs={TABS} active={tab} onChange={setTab} />
+    <div className="max-w-3xl mx-auto px-8 py-10">
+      <Breadcrumb />
+      <PageHeader title="Career Portal" description="Your public job site and candidate-facing experience." />
 
-        {tab === 'Career Site' && (
-          <div className="space-y-4">
-            <SettingsSection title="Career Site Settings">
-              <SettingRow label="Career portal is live" description="Make your career site publicly accessible.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Career site URL" description="Your current public job listing URL.">
-                <div className="flex items-center gap-2">
-                  <code className="text-xs bg-muted px-2 py-1 rounded">careers.godrecruiter.com</code>
-                  <button className="text-muted-foreground hover:text-foreground transition-colors"><ExternalLink className="size-3.5" /></button>
-                </div>
-              </SettingRow>
-            </SettingsSection>
-            <SettingsSection title="SEO & Sharing">
-              <div className="px-5 py-4 space-y-4">
-                <FieldInput label="Page Title" value="Careers at God Recruiter" onChange={mark} />
-                <FieldInput label="Meta Description" value="Explore open opportunities at God Recruiter. Join our team of talented recruiters." onChange={mark} />
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Social Sharing Image</label>
-                  <div className="h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center text-xs text-muted-foreground bg-muted/20">
-                    Upload OG image (1200×630px)
-                  </div>
-                </div>
+      <div className="space-y-4">
+        {/* Status + URL */}
+        <div className="rounded-xl border border-border bg-background p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`size-2.5 rounded-full ${enabled ? 'bg-emerald-500' : 'bg-muted-foreground/40'}`} />
+              <div>
+                <p className="text-sm font-semibold">{enabled ? 'Portal is live' : 'Portal is offline'}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {subdomain}.godrecruiter.com/careers
+                </p>
               </div>
-            </SettingsSection>
-            <SettingsSection title="Talent Community">
-              <SettingRow label="Enable talent community" description="Allow candidates to join without applying to a specific job.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Job alerts" description="Let candidates subscribe to alerts for new matching jobs.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-            </SettingsSection>
+            </div>
+            <div className="flex items-center gap-2">
+              {enabled && (
+                <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+                  <ExternalLink className="size-3.5" />Preview
+                </button>
+              )}
+              <Toggle checked={enabled} onChange={setEnabled} />
+            </div>
           </div>
-        )}
+        </div>
 
-        {tab === 'Application' && (
+        {/* Portal Settings */}
+        <SettingCard
+          title="Portal Settings"
+          description="URL, title, and description shown on the public job site"
+          summary={
+            <SummaryGrid items={[
+              { label: 'URL',         value: `${subdomain}.godrecruiter.com/careers` },
+              { label: 'Page title',  value: title },
+            ]} />
+          }
+        >
           <div className="space-y-4">
-            <SettingsSection title="Application Form Fields">
-              {[
-                { field: 'Full Name',           required: true,  enabled: true  },
-                { field: 'Email Address',        required: true,  enabled: true  },
-                { field: 'Phone Number',         required: true,  enabled: true  },
-                { field: 'Resume / CV',          required: true,  enabled: true  },
-                { field: 'LinkedIn Profile URL', required: false, enabled: true  },
-                { field: 'Location',             required: false, enabled: true  },
-                { field: 'Work Authorization',   required: false, enabled: true  },
-                { field: 'Desired Salary',       required: false, enabled: false },
-                { field: 'Cover Letter',         required: false, enabled: false },
-                { field: 'Portfolio / Website',  required: false, enabled: false },
-              ].map(f => (
-                <div key={f.field} className="flex items-center justify-between px-5 py-2.5 border-b border-border/40 last:border-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">{f.field}</span>
-                    {f.required && <span className="text-[9px] bg-red-100 text-red-700 px-1 py-0.5 rounded">Required</span>}
-                  </div>
-                  <Toggle checked={f.enabled} onChange={mark} />
-                </div>
-              ))}
-            </SettingsSection>
-            <SettingsSection title="Application Workflow">
-              <SettingRow label="Auto-acknowledge applications" description="Send confirmation email when application is received.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="AI screening" description="Auto-score applications with AI before recruiter review.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Duplicate check" description="Flag if the same candidate has applied before.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-            </SettingsSection>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Subdomain</label>
+              <div className="flex items-center gap-0">
+                <input value={subdomain} onChange={e => setSubdomain(e.target.value)}
+                  className="flex-1 h-9 px-3 text-sm rounded-l-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-muted border border-l-0 border-input rounded-r-lg">
+                  .godrecruiter.com/careers
+                </span>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Page title</label>
+              <input value={title} onChange={e => setTitle(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Description</label>
+              <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+            </div>
           </div>
-        )}
+        </SettingCard>
 
-        {tab === 'Privacy & Legal' && (
-          <div className="space-y-4">
-            <SettingsSection title="Legal Pages">
-              {[
-                { name: 'Privacy Policy',    status: 'configured' },
-                { name: 'Terms of Service',  status: 'configured' },
-                { name: 'Cookie Policy',     status: 'missing'    },
-              ].map(p => (
-                <div key={p.name} className="flex items-center justify-between px-5 py-3 border-b border-border/40 last:border-0">
-                  <div className="flex items-center gap-2">
-                    <Globe className="size-3.5 text-muted-foreground" />
-                    <span className="text-sm">{p.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${p.status === 'configured' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                      {p.status}
-                    </span>
-                    <button className="h-6 px-2 text-[10px] rounded-md border border-border hover:bg-muted/60 transition-colors">Edit</button>
-                  </div>
-                </div>
-              ))}
-            </SettingsSection>
-            <SettingsSection title="Compliance">
-              <SettingRow label="Show cookie consent banner" description="Display GDPR/CCPA cookie consent on first visit.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="GDPR data deletion" description="Allow candidates to request data deletion from the portal.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-            </SettingsSection>
+        {/* Application Settings */}
+        <SettingCard
+          title="Application Settings"
+          description="How candidates apply to your jobs"
+          summary={
+            <SummaryGrid items={[
+              { label: 'Online apply',     value: applyEnabled ? 'Enabled' : 'Disabled' },
+              { label: 'LinkedIn Apply',   value: linkedinApply ? 'Enabled' : 'Disabled' },
+              { label: 'Salary display',   value: showSalary ? 'Visible' : 'Hidden' },
+            ]} />
+          }
+        >
+          <div className="space-y-3">
+            <CardRow label="Enable online apply" description="Candidates can apply directly from the portal">
+              <Toggle checked={applyEnabled} onChange={setApply} />
+            </CardRow>
+            <CardRow label="LinkedIn Easy Apply" description="Let candidates apply with their LinkedIn profile">
+              <Toggle checked={linkedinApply} onChange={setLinkedin} />
+            </CardRow>
+            <CardRow label="Show salary / bill rate" description="Display pay range on job listings">
+              <Toggle checked={showSalary} onChange={setShowSalary} />
+            </CardRow>
+            <CardRow label="Require resume upload" description="Make resume mandatory on all applications">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
           </div>
-        )}
+        </SettingCard>
 
-        {tab === 'Candidate Login' && (
-          <SettingsSection title="Candidate Portal Access">
-            <SettingRow label="Candidate registration" description="Allow candidates to create accounts and track applications.">
-              <Toggle checked={true} onChange={mark} />
-            </SettingRow>
-            <SettingRow label="Social login (Google)" description="Candidates can sign up / sign in with Google.">
-              <Toggle checked={true} onChange={mark} />
-            </SettingRow>
-            <SettingRow label="Social login (LinkedIn)" description="Candidates can sign up / sign in with LinkedIn.">
-              <Toggle checked={false} onChange={mark} />
-            </SettingRow>
-            <SettingRow label="Application status visibility" description="Candidates can see their application stage.">
-              <Toggle checked={true} onChange={mark} />
-            </SettingRow>
-          </SettingsSection>
-        )}
+        {/* SEO */}
+        <SettingCard
+          title="SEO"
+          description="Search engine optimization for your career portal"
+          summary={
+            <SummaryGrid items={[
+              { label: 'Meta title',    value: seoTitle },
+              { label: 'Sitemap',       value: 'Auto-generated' },
+              { label: 'Schema markup', value: 'JobPosting (enabled)' },
+            ]} />
+          }
+        >
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Meta title</label>
+              <input value={seoTitle} onChange={e => setSeoTitle(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <CardRow label="Auto-generate sitemap">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+            <CardRow label="JobPosting schema markup" description="Improves Google for Jobs indexing">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+            <CardRow label="Canonical URL enforcement">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+          </div>
+        </SettingCard>
       </div>
-      <SaveBar dirty={dirty} onSave={() => setDirty(false)} onDiscard={() => setDirty(false)} />
     </div>
   )
 }

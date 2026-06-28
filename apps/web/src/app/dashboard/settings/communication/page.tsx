@@ -1,209 +1,184 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Mail, MessageSquare, CheckCircle2, XCircle, ExternalLink } from 'lucide-react'
-import { SettingsHeader, SettingsSection, SettingRow, TabNav, SaveBar, Toggle, FieldInput, Badge } from '../_components'
-
-const TABS = ['Email', 'Templates', 'SMS', 'Integrations', 'Calendar']
-
-const EMAIL_TEMPLATES = [
-  { name: 'New Candidate Introduction',   type: 'Email',   trigger: 'Manual',          status: 'active' },
-  { name: 'Interview Confirmation',        type: 'Email',   trigger: 'Interview Scheduled', status: 'active' },
-  { name: 'Submission Notification',       type: 'Email',   trigger: 'On Submission',   status: 'active' },
-  { name: 'Offer Letter',                  type: 'Email',   trigger: 'Offer Stage',     status: 'active' },
-  { name: 'Rejection Email',               type: 'Email',   trigger: 'Rejected',        status: 'active' },
-  { name: 'Follow-Up Reminder',            type: 'Email',   trigger: 'Auto (3 days)',   status: 'active' },
-  { name: 'Placement Congratulations',     type: 'Email',   trigger: 'Placed',          status: 'draft'  },
-  { name: 'New Job Assignment SMS',        type: 'SMS',     trigger: 'Job Assigned',    status: 'active' },
-  { name: 'SLA Warning SMS',              type: 'SMS',     trigger: 'Auto (SLA < 4h)', status: 'active' },
-]
-
-const INTEGRATIONS = [
-  { name: 'Outlook / Microsoft 365', icon: '📧', connected: true,  desc: 'Send emails and sync calendar via Microsoft 365' },
-  { name: 'Gmail / Google Workspace',icon: '📨', connected: false, desc: 'Send emails and sync calendar via Google' },
-  { name: 'Microsoft Teams',         icon: '💬', connected: false, desc: 'Send notifications and messages to Teams channels' },
-  { name: 'Slack',                   icon: '⚡', connected: false, desc: 'Post notifications to Slack channels' },
-  { name: 'Twilio SMS',              icon: '📱', connected: true,  desc: 'Send SMS messages to candidates and recruiters' },
-  { name: 'Zoom',                    icon: '🎥', connected: true,  desc: 'Generate Zoom links for interviews' },
-  { name: 'Google Meet',             icon: '🎬', connected: false, desc: 'Generate Google Meet links for interviews' },
-  { name: 'Microsoft Teams Meetings',icon: '📹', connected: false, desc: 'Generate Teams meeting links for interviews' },
-]
+import { CheckCircle2, XCircle, Plus } from 'lucide-react'
+import { Breadcrumb, PageHeader, SettingCard, SummaryGrid, CardRow, Toggle, Badge } from '../_components'
 
 export default function CommunicationPage() {
-  const [tab, setTab] = useState('Email')
-  const [dirty, setDirty] = useState(false)
-  const mark = () => setDirty(true)
-  const [smtp, setSmtp] = useState({ host: 'smtp.office365.com', port: '587', user: 'noreply@godrecruiter.com', from: 'God Recruiter <noreply@godrecruiter.com>', tls: true })
+  const [emailProvider, setEmailProvider]     = useState('Microsoft Outlook')
+  const [senderName, setSenderName]           = useState('God Recruiter')
+  const [senderEmail, setSenderEmail]         = useState('no-reply@godrecruiter.com')
+  const [smsEnabled, setSmsEnabled]           = useState(false)
+  const [smsProvider, setSmsProvider]         = useState('Twilio')
+  const [calendarEnabled, setCalendarEnabled] = useState(true)
+  const [sigEnabled, setSigEnabled]           = useState(true)
+
+  const TEMPLATES = [
+    { name: 'Candidate Application Received', trigger: 'On application submit',  status: 'active' },
+    { name: 'Interview Scheduled',            trigger: 'On interview create',     status: 'active' },
+    { name: 'Offer Extended',                 trigger: 'On offer send',           status: 'active' },
+    { name: 'Job Submission Confirmation',    trigger: 'On VMS submission',       status: 'active' },
+    { name: 'Candidate Rejection',            trigger: 'On stage reject',         status: 'draft' },
+    { name: 'Weekly Status Update',           trigger: 'Every Monday 8AM',        status: 'active' },
+  ]
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 p-6 max-w-3xl">
-        <SettingsHeader title="Communication" description="Configure email, SMS, templates, and messaging integrations." />
-        <TabNav tabs={TABS} active={tab} onChange={setTab} />
+    <div className="max-w-3xl mx-auto px-8 py-10">
+      <Breadcrumb />
+      <PageHeader title="Communication" description="Email provider, SMS, calendar integrations, and message templates." />
 
-        {tab === 'Email' && (
-          <div className="space-y-4">
-            <SettingsSection title="SMTP Configuration" description="Configure your outbound email server.">
-              <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FieldInput label="SMTP Host" value={smtp.host} onChange={v => { setSmtp(p => ({ ...p, host: v })); mark() }} placeholder="smtp.example.com" />
-                <FieldInput label="SMTP Port" value={smtp.port} onChange={v => { setSmtp(p => ({ ...p, port: v })); mark() }} placeholder="587" />
-                <FieldInput label="Username" value={smtp.user} onChange={v => { setSmtp(p => ({ ...p, user: v })); mark() }} />
-                <FieldInput label="From Address" value={smtp.from} onChange={v => { setSmtp(p => ({ ...p, from: v })); mark() }} />
+      <div className="space-y-4">
+        {/* Email */}
+        <SettingCard
+          title="Email"
+          description="Outbound email provider and sender identity"
+          summary={
+            <div className="flex items-center gap-3 text-sm">
+              <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+              <div>
+                <span className="font-medium">{emailProvider}</span>
+                <span className="text-muted-foreground text-xs ml-2">Connected · {senderEmail}</span>
               </div>
-              <SettingRow label="TLS / STARTTLS" description="Encrypt SMTP connection.">
-                <Toggle checked={smtp.tls} onChange={v => { setSmtp(p => ({ ...p, tls: v })); mark() }} />
-              </SettingRow>
-              <div className="px-5 pb-4">
-                <button className="h-7 px-3 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
-                  <Mail className="size-3.5" />Send Test Email
-                </button>
-              </div>
-            </SettingsSection>
-
-            <SettingsSection title="Email Signature" description="Default signature appended to all outbound emails.">
-              <div className="px-5 py-4">
-                <textarea
-                  rows={4}
-                  defaultValue={'Best regards,\n{recruiter_name}\n{company_name}\n{recruiter_phone}'}
-                  onChange={mark}
-                  className="w-full px-3 py-2 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring resize-none font-mono"
-                />
-                <p className="text-[10px] text-muted-foreground mt-1">Use: {'{recruiter_name}'}, {'{company_name}'}, {'{recruiter_phone}'}, {'{recruiter_email}'}</p>
-              </div>
-            </SettingsSection>
-
-            <SettingsSection title="Email Preferences">
-              <SettingRow label="Reply-To Override" description="Route all replies to a dedicated inbox.">
-                <Toggle checked={false} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Email Tracking" description="Track open and click rates on outbound emails.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Unsubscribe Footer" description="Automatically append unsubscribe link to mass emails.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-            </SettingsSection>
-          </div>
-        )}
-
-        {tab === 'Templates' && (
-          <SettingsSection title="Message Templates" action={
-            <button onClick={mark} className="h-7 px-2.5 text-xs rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
-              <Plus className="size-3.5" />New Template
-            </button>
-          }>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-border bg-muted/30">
-                    <th className="text-left px-5 py-2.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Template</th>
-                    <th className="text-left px-3 py-2.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Type</th>
-                    <th className="text-left px-3 py-2.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Trigger</th>
-                    <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                    <th className="px-3 py-2.5" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {EMAIL_TEMPLATES.map((t, i) => (
-                    <tr key={i} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                      <td className="px-5 py-3 font-medium">{t.name}</td>
-                      <td className="px-3 py-3">
-                        <Badge variant={t.type === 'SMS' ? 'info' : 'default'}>
-                          {t.type === 'SMS' ? <><MessageSquare className="size-2.5 mr-0.5 inline" />{t.type}</> : <><Mail className="size-2.5 mr-0.5 inline" />{t.type}</>}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-3 text-muted-foreground">{t.trigger}</td>
-                      <td className="px-3 py-3 text-center">
-                        <Badge variant={t.status === 'active' ? 'success' : 'default'}>{t.status}</Badge>
-                      </td>
-                      <td className="px-3 py-3">
-                        <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">Edit</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
-          </SettingsSection>
-        )}
-
-        {tab === 'SMS' && (
-          <div className="space-y-4">
-            <SettingsSection title="Twilio Configuration">
-              <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FieldInput label="Account SID" value="AC••••••••••••••••••••••••••••••••" onChange={mark} />
-                <FieldInput label="Auth Token" value="••••••••••••••••••••••••••••••••" onChange={mark} type="password" />
-                <FieldInput label="From Number" value="+1 (713) 555-0199" onChange={mark} />
-              </div>
-            </SettingsSection>
-            <SettingsSection title="SMS Preferences">
-              <SettingRow label="SMS Opt-Out" description="Honor STOP/UNSUBSCRIBE replies automatically.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Delivery Reports" description="Track SMS delivery status.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-            </SettingsSection>
+          }
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2 space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Email provider</label>
+              <select value={emailProvider} onChange={e => setEmailProvider(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                <option>Microsoft Outlook</option>
+                <option>Gmail / Google Workspace</option>
+                <option>SendGrid</option>
+                <option>Amazon SES</option>
+                <option>SMTP (Custom)</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Sender name</label>
+              <input value={senderName} onChange={e => setSenderName(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Sender email</label>
+              <input type="email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)}
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
           </div>
-        )}
+          <div className="border-t border-border/40 pt-3 space-y-3">
+            <CardRow label="Email signature" description="Append company signature to all outbound emails">
+              <Toggle checked={sigEnabled} onChange={setSigEnabled} />
+            </CardRow>
+            <CardRow label="Track email opens" description="Log when candidates open emails">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+          </div>
+        </SettingCard>
 
-        {tab === 'Integrations' && (
-          <SettingsSection title="Messaging & Calendar Integrations">
-            {INTEGRATIONS.map(int => (
-              <div key={int.name} className="flex items-center justify-between px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl shrink-0">{int.icon}</span>
-                  <div>
-                    <p className="text-sm font-medium">{int.name}</p>
-                    <p className="text-xs text-muted-foreground">{int.desc}</p>
-                  </div>
+        {/* SMS */}
+        <SettingCard
+          title="SMS"
+          description="Text message capabilities for candidate communication"
+          summary={
+            <div className="flex items-center gap-3 text-sm">
+              {smsEnabled
+                ? <><CheckCircle2 className="size-4 text-emerald-500" /><span className="font-medium">Twilio connected</span></>
+                : <><XCircle className="size-4 text-muted-foreground" /><span className="text-muted-foreground">SMS not enabled</span></>
+              }
+            </div>
+          }
+        >
+          <CardRow label="Enable SMS" description="Send text messages to candidates and contacts">
+            <Toggle checked={smsEnabled} onChange={setSmsEnabled} />
+          </CardRow>
+          {smsEnabled && (
+            <div className="border-t border-border/40 pt-3 grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">SMS provider</label>
+                <select value={smsProvider} onChange={e => setSmsProvider(e.target.value)}
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                  <option>Twilio</option>
+                  <option>Vonage</option>
+                  <option>AWS SNS</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">API key</label>
+                <input type="password" defaultValue="twilio_key_••••••••"
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+              </div>
+            </div>
+          )}
+        </SettingCard>
+
+        {/* Calendar */}
+        <SettingCard
+          title="Calendar"
+          description="Sync interviews and meetings with your calendar"
+          summary={
+            <div className="flex items-center gap-3 text-sm">
+              {calendarEnabled
+                ? <><CheckCircle2 className="size-4 text-emerald-500" /><span className="font-medium">Microsoft Calendar connected</span></>
+                : <><XCircle className="size-4 text-muted-foreground" /><span className="text-muted-foreground">Calendar not connected</span></>
+              }
+            </div>
+          }
+        >
+          <CardRow label="Calendar integration">
+            <select defaultValue="outlook" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <option value="outlook">Microsoft Outlook</option>
+              <option value="google">Google Calendar</option>
+              <option value="none">None</option>
+            </select>
+          </CardRow>
+          <div className="border-t border-border/40 pt-3 space-y-3">
+            <CardRow label="Auto-create calendar events for interviews">
+              <Toggle checked={calendarEnabled} onChange={setCalendarEnabled} />
+            </CardRow>
+            <CardRow label="Send calendar invites to candidates">
+              <Toggle checked={true} onChange={() => {}} />
+            </CardRow>
+          </div>
+        </SettingCard>
+
+        {/* Email Templates */}
+        <SettingCard
+          title="Email Templates"
+          description={`${TEMPLATES.filter(t => t.status === 'active').length} active templates`}
+          summary={
+            <div className="space-y-2">
+              {TEMPLATES.slice(0, 3).map(t => (
+                <div key={t.name} className="flex items-center gap-2 text-xs">
+                  <Badge variant={t.status === 'active' ? 'success' : 'default'}>{t.status}</Badge>
+                  <span className="font-medium">{t.name}</span>
+                  <span className="text-muted-foreground">· {t.trigger}</span>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  {int.connected
-                    ? <Badge variant="success"><CheckCircle2 className="size-2.5 mr-0.5 inline" />Connected</Badge>
-                    : <Badge variant="default"><XCircle className="size-2.5 mr-0.5 inline" />Not Connected</Badge>}
-                  <button className="h-7 px-2.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1">
-                    {int.connected ? 'Configure' : 'Connect'}
-                    <ExternalLink className="size-2.5 ml-1" />
-                  </button>
+              ))}
+              <p className="text-xs text-muted-foreground">+ {TEMPLATES.length - 3} more templates</p>
+            </div>
+          }
+          action={
+            <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+              <Plus className="size-3.5" />New template
+            </button>
+          }
+        >
+          <div className="space-y-0">
+            {TEMPLATES.map(t => (
+              <div key={t.name} className="flex items-center justify-between py-3 border-b border-border/40 last:border-0">
+                <div>
+                  <p className="text-sm font-medium">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.trigger}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={t.status === 'active' ? 'success' : 'default'}>{t.status}</Badge>
+                  <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">Edit</button>
                 </div>
               </div>
             ))}
-          </SettingsSection>
-        )}
-
-        {tab === 'Calendar' && (
-          <div className="space-y-4">
-            <SettingsSection title="Calendar Sync">
-              <SettingRow label="Auto-create calendar events" description="Create calendar events when interviews are scheduled.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Send calendar invites" description="Email calendar invites to all interview participants.">
-                <Toggle checked={true} onChange={mark} />
-              </SettingRow>
-              <SettingRow label="Default interview duration" description="Pre-fill when scheduling interviews.">
-                <select defaultValue="60" onChange={mark} className="h-8 px-2 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring">
-                  <option value="30">30 minutes</option>
-                  <option value="45">45 minutes</option>
-                  <option value="60">60 minutes</option>
-                  <option value="90">90 minutes</option>
-                </select>
-              </SettingRow>
-            </SettingsSection>
-            <SettingsSection title="Video Meeting Providers">
-              <SettingRow label="Default provider" description="Auto-generate meeting links using this provider.">
-                <select defaultValue="zoom" onChange={mark} className="h-8 px-2 text-xs rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring">
-                  <option value="zoom">Zoom</option>
-                  <option value="teams">Microsoft Teams</option>
-                  <option value="meet">Google Meet</option>
-                  <option value="none">No auto-generate</option>
-                </select>
-              </SettingRow>
-            </SettingsSection>
           </div>
-        )}
+        </SettingCard>
       </div>
-      <SaveBar dirty={dirty} onSave={() => setDirty(false)} onDiscard={() => setDirty(false)} />
     </div>
   )
 }

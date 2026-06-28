@@ -1,166 +1,140 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, XCircle, ExternalLink, Plus, Copy, Eye, EyeOff, RefreshCw } from 'lucide-react'
-import { SettingsHeader, SettingsSection, TabNav, SaveBar, FieldInput, Badge } from '../_components'
-
-const TABS = ['VMS', 'Job Boards', 'Cloud & Storage', 'API & Webhooks']
+import { CheckCircle2, XCircle, ExternalLink, RefreshCw, Eye, EyeOff } from 'lucide-react'
+import { Breadcrumb, PageHeader, Badge } from '../_components'
+import { cn } from '@/lib/utils'
 
 const VMS = [
-  { name: 'Beeline',       connected: true,  jobs: 8,  lastSync: '5 min ago',  logo: '🔵' },
-  { name: 'Fieldglass',    connected: true,  jobs: 6,  lastSync: '12 min ago', logo: '🟡' },
-  { name: 'IQNavigator',   connected: true,  jobs: 5,  lastSync: '8 min ago',  logo: '🟢' },
-  { name: 'Coupa',         connected: false, jobs: 0,  lastSync: 'Never',      logo: '🟠' },
-  { name: 'SAP Fieldglass',connected: false, jobs: 0,  lastSync: 'Never',      logo: '⚫' },
-  { name: 'Wand',          connected: false, jobs: 0,  lastSync: 'Never',      logo: '🔷' },
+  { name: 'Beeline',       desc: 'Enterprise VMS integration',          connected: true,  lastSync: '10 min ago',   jobs: 14 },
+  { name: 'Fieldglass',    desc: 'SAP Fieldglass workforce management',  connected: true,  lastSync: '43 min ago',   jobs: 6  },
+  { name: 'IQNavigator',   desc: 'Contingent workforce management',      connected: true,  lastSync: '2 hours ago',  jobs: 3  },
+  { name: 'Workday',       desc: 'HR and talent management platform',    connected: false, lastSync: 'Never',        jobs: 0  },
+  { name: 'Coupa',         desc: 'Business spend management',            connected: false, lastSync: 'Never',        jobs: 0  },
 ]
 
 const JOB_BOARDS = [
-  { name: 'LinkedIn',     connected: true,  posts: 24, logo: '💼' },
-  { name: 'Indeed',       connected: true,  posts: 18, logo: '🔍' },
-  { name: 'Dice',         connected: false, posts: 0,  logo: '🎲' },
-  { name: 'Monster',      connected: false, posts: 0,  logo: '👾' },
-  { name: 'CareerBuilder',connected: false, posts: 0,  logo: '🏗️' },
-  { name: 'ZipRecruiter', connected: false, posts: 0,  logo: '⚡' },
-]
-
-const CLOUD = [
-  { name: 'Google Drive',      connected: true,  desc: 'Store resumes and documents',     logo: '📁' },
-  { name: 'OneDrive',          connected: false, desc: 'Microsoft cloud storage',          logo: '☁️' },
-  { name: 'Dropbox',           connected: false, desc: 'File storage and sharing',         logo: '📦' },
-  { name: 'Google Workspace',  connected: true,  desc: 'Docs, Sheets, Gmail',              logo: '🗂️' },
-  { name: 'Microsoft 365',     connected: true,  desc: 'Outlook, Teams, OneDrive',         logo: '🪟' },
-  { name: 'Bullhorn',          connected: false, desc: 'Migrate data from Bullhorn ATS',   logo: '📊' },
-  { name: 'CEIPAL',            connected: false, desc: 'Migrate data from CEIPAL ATS',     logo: '📋' },
-]
-
-const API_KEYS = [
-  { name: 'Production API Key', key: 'gr_live_••••••••••••••••••••••••••••••••', created: 'Jun 1, 2026',    lastUsed: 'Today',      scopes: ['read', 'write'] },
-  { name: 'Zapier Integration', key: 'gr_live_••••••••••••••••••••••••••••••••', created: 'May 15, 2026',   lastUsed: '2 days ago', scopes: ['read'] },
-  { name: 'Power Automate',     key: 'gr_live_••••••••••••••••••••••••••••••••', created: 'Apr 20, 2026',   lastUsed: 'Yesterday',  scopes: ['read', 'write'] },
+  { name: 'Indeed',    connected: true  },
+  { name: 'LinkedIn',  connected: true  },
+  { name: 'ZipRecruiter', connected: false },
+  { name: 'Monster',   connected: false },
 ]
 
 export default function IntegrationsPage() {
-  const [tab, setTab] = useState('VMS')
-  const [dirty, setDirty] = useState(false)
-  const [showKey, setShowKey] = useState<Record<number, boolean>>({})
-
-  function IntegCard({ name, connected, logo, meta, onConnect }: { name: string; connected: boolean; logo: string; meta?: string; onConnect: () => void }) {
-    return (
-      <div className="flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-3">
-          <span className="text-xl shrink-0">{logo}</span>
-          <div>
-            <p className="text-sm font-medium">{name}</p>
-            {meta && <p className="text-xs text-muted-foreground">{meta}</p>}
-          </div>
-        </div>
-        <div className="flex items-center gap-3 shrink-0">
-          {connected
-            ? <Badge variant="success"><CheckCircle2 className="size-2.5 mr-0.5 inline" />Connected</Badge>
-            : <Badge><XCircle className="size-2.5 mr-0.5 inline" />Not Connected</Badge>}
-          <button onClick={onConnect} className="h-7 px-2.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1">
-            {connected ? 'Configure' : 'Connect'}<ExternalLink className="size-2.5 ml-1" />
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const [showApiKey, setShowApiKey] = useState(false)
+  const apiKey = 'gr_live_sk_••••••••••••••••••••••••••7a3f'
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 p-6 max-w-3xl">
-        <SettingsHeader title="Integrations" description="Connect VMS platforms, job boards, cloud storage, and external services." />
-        <TabNav tabs={TABS} active={tab} onChange={setTab} />
+    <div className="max-w-3xl mx-auto px-8 py-10">
+      <Breadcrumb />
+      <PageHeader title="Integrations" description="Connect VMS platforms, job boards, and external services." />
 
-        {tab === 'VMS' && (
-          <SettingsSection title="VMS Integrations" description="Jobs received from connected VMS platforms flow directly into Work Queue.">
+      <div className="space-y-6">
+        {/* VMS */}
+        <div>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">VMS Platforms</h2>
+          <div className="space-y-3">
             {VMS.map(v => (
-              <IntegCard key={v.name} name={v.name} connected={v.connected} logo={v.logo}
-                meta={v.connected ? `${v.jobs} active jobs · Last sync: ${v.lastSync}` : 'Not connected'}
-                onConnect={() => setDirty(true)} />
-            ))}
-          </SettingsSection>
-        )}
-
-        {tab === 'Job Boards' && (
-          <SettingsSection title="Job Boards" description="Post jobs directly to connected job boards.">
-            {JOB_BOARDS.map(b => (
-              <IntegCard key={b.name} name={b.name} connected={b.connected} logo={b.logo}
-                meta={b.connected ? `${b.posts} active postings` : 'Not connected'}
-                onConnect={() => setDirty(true)} />
-            ))}
-          </SettingsSection>
-        )}
-
-        {tab === 'Cloud & Storage' && (
-          <SettingsSection title="Cloud Services & Migrations">
-            {CLOUD.map(c => (
-              <IntegCard key={c.name} name={c.name} connected={c.connected} logo={c.logo} meta={c.desc} onConnect={() => setDirty(true)} />
-            ))}
-          </SettingsSection>
-        )}
-
-        {tab === 'API & Webhooks' && (
-          <div className="space-y-4">
-            <SettingsSection title="API Keys" action={
-              <button onClick={() => setDirty(true)} className="h-7 px-2.5 text-xs rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
-                <Plus className="size-3.5" />Generate Key
-              </button>
-            }>
-              {API_KEYS.map((k, i) => (
-                <div key={i} className="px-5 py-4 border-b border-border/50 last:border-0">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-sm font-medium">{k.name}</p>
-                    <div className="flex items-center gap-1">
-                      {k.scopes.map(s => <Badge key={s}>{s}</Badge>)}
+              <div key={v.name} className="rounded-xl border border-border bg-background p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className={cn('size-10 rounded-lg flex items-center justify-center text-xs font-bold shrink-0',
+                      v.connected ? 'bg-emerald-50 text-emerald-700' : 'bg-muted text-muted-foreground')}>
+                      {v.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold">{v.name}</p>
+                        <Badge variant={v.connected ? 'success' : 'default'}>
+                          {v.connected ? 'Connected' : 'Not connected'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{v.desc}</p>
+                      {v.connected && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Last sync: {v.lastSync} · {v.jobs} active jobs
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 text-[10px] font-mono bg-muted rounded px-2 py-1 text-muted-foreground">
-                      {showKey[i] ? k.key.replace(/•/g, 'x') : k.key}
-                    </code>
-                    <button onClick={() => setShowKey(p => ({ ...p, [i]: !p[i] }))} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
-                      {showKey[i] ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                    </button>
-                    <button className="p-1 text-muted-foreground hover:text-foreground transition-colors">
-                      <Copy className="size-3.5" />
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-1.5">Created {k.created} · Last used {k.lastUsed}</p>
-                </div>
-              ))}
-            </SettingsSection>
-
-            <SettingsSection title="Webhooks" description="Send real-time events to external systems." action={
-              <button onClick={() => setDirty(true)} className="h-7 px-2.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
-                <Plus className="size-3.5" />Add Webhook
-              </button>
-            }>
-              {[
-                { url: 'https://zapier.com/hooks/catch/••••••••', events: ['job.created','candidate.submitted'], active: true },
-                { url: 'https://flow.microsoft.com/api/•••••••', events: ['placement.completed'],              active: true },
-              ].map((w, i) => (
-                <div key={i} className="flex items-start justify-between px-5 py-3.5 border-b border-border/50 last:border-0">
-                  <div>
-                    <p className="text-xs font-mono text-muted-foreground">{w.url}</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {w.events.map(e => <Badge key={e}>{e}</Badge>)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 ml-3">
-                    <Badge variant="success">Active</Badge>
-                    <button className="p-1 text-muted-foreground hover:text-foreground transition-colors">
-                      <RefreshCw className="size-3.5" />
+                  <div className="flex items-center gap-2 shrink-0">
+                    {v.connected && (
+                      <button className="p-1.5 rounded-lg border border-border hover:bg-muted/60 transition-colors text-muted-foreground" title="Sync now">
+                        <RefreshCw className="size-3.5" />
+                      </button>
+                    )}
+                    <button className={cn('h-8 px-3.5 text-xs rounded-lg border transition-colors font-medium',
+                      v.connected
+                        ? 'border-border hover:bg-muted/60'
+                        : 'border-foreground bg-foreground text-background hover:bg-foreground/90')}>
+                      {v.connected ? 'Configure' : 'Connect'}
                     </button>
                   </div>
                 </div>
-              ))}
-            </SettingsSection>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+
+        {/* Job Boards */}
+        <div>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Job Boards</h2>
+          <div className="rounded-xl border border-border bg-background overflow-hidden">
+            {JOB_BOARDS.map((b, i) => (
+              <div key={b.name} className={cn('flex items-center justify-between px-5 py-4', i < JOB_BOARDS.length - 1 && 'border-b border-border/40')}>
+                <div className="flex items-center gap-3">
+                  {b.connected
+                    ? <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+                    : <XCircle className="size-4 text-muted-foreground/40 shrink-0" />
+                  }
+                  <span className="text-sm font-medium">{b.name}</span>
+                </div>
+                <button className="h-7 px-2.5 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+                  {b.connected ? 'Manage' : 'Connect'}
+                  <ExternalLink className="size-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* API Keys */}
+        <div>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">API Access</h2>
+          <div className="rounded-xl border border-border bg-background p-5 space-y-4">
+            <div>
+              <p className="text-sm font-semibold">API Key</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Use this key to authenticate API requests from external systems.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type={showApiKey ? 'text' : 'password'}
+                readOnly
+                value={apiKey}
+                className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-muted/40 font-mono focus:outline-none" />
+              <button onClick={() => setShowApiKey(s => !s)}
+                className="h-9 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+                {showApiKey ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                {showApiKey ? 'Hide' : 'Reveal'}
+              </button>
+              <button className="h-9 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">
+                Regenerate
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Webhooks */}
+        <div>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Webhooks</h2>
+          <div className="rounded-xl border border-border bg-background p-5">
+            <p className="text-sm text-muted-foreground">No webhooks configured. Add one to receive real-time event notifications.</p>
+            <button className="mt-3 h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">
+              Add webhook
+            </button>
+          </div>
+        </div>
       </div>
-      <SaveBar dirty={dirty} onSave={() => setDirty(false)} onDiscard={() => setDirty(false)} />
     </div>
   )
 }
