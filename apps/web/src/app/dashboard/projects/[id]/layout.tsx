@@ -31,7 +31,8 @@ const STATUS_CFG = {
 export default function ProjectDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams<{ id: string }>()
   const pathname = usePathname()
-  const project = PROJECTS.find(p => p.id === params.id) ?? PROJECTS[0]
+  const FALLBACK = PROJECTS[0] ?? { id: '', name: '', description: '', type: '', status: 'active' as const, owner: '', team: [], candidateCount: 0, openJobs: 0, createdAt: '', lastActivity: '', healthScore: 0, visibility: 'private' as const }
+  const project = PROJECTS.find(p => p.id === params.id) ?? FALLBACK
   const base = `/dashboard/projects/${params.id}`
 
   return (
