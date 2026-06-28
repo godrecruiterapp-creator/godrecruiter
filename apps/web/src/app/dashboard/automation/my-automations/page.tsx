@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Search, Plus, X, MoreHorizontal, Pencil, Copy, Trash2, Play, Zap, FlaskConical } from 'lucide-react'
+import { Search, Plus, X, MoreHorizontal, Pencil, Copy, Trash2, Zap, FlaskConical } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { CreateAutomationWizard } from '../create-automation-wizard'
 
 type Automation = {
   id: string
@@ -35,10 +35,10 @@ const AUTOMATIONS: Automation[] = [
 const CATEGORIES = ['All', 'Communication', 'Interviews', 'Compliance', 'Placements', 'AI']
 
 export default function MyAutomationsPage() {
+  const router = useRouter()
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
   const [category, setCategory] = useState('All')
-  const [wizardOpen, setWizardOpen] = useState(false)
   const [automations, setAutomations] = useState(AUTOMATIONS)
 
   const filtered = useMemo(() => {
@@ -55,8 +55,7 @@ export default function MyAutomationsPage() {
   }
 
   return (
-    <>
-      <div className="flex flex-col h-full p-6 overflow-hidden">
+    <div className="flex flex-col h-full p-6 overflow-hidden">
         {/* Top bar */}
         <div className="flex items-center justify-between pb-4 shrink-0 gap-3 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
@@ -85,7 +84,7 @@ export default function MyAutomationsPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button size="sm" className="h-8 shrink-0" onClick={() => setWizardOpen(true)}>
+          <Button size="sm" className="h-8 shrink-0" onClick={() => router.push('/dashboard/automation/new')}>
             <Plus className="size-3.5 mr-1.5" />New Automation
           </Button>
         </div>
@@ -97,7 +96,7 @@ export default function MyAutomationsPage() {
               <Zap className="size-10 text-muted-foreground/30 mb-3" />
               <p className="text-sm font-medium text-muted-foreground">No automations found</p>
               <p className="text-xs text-muted-foreground mt-1 mb-4">Create your first automation to get started.</p>
-              <Button size="sm" className="h-8 text-xs" onClick={() => setWizardOpen(true)}>
+              <Button size="sm" className="h-8 text-xs" onClick={() => router.push('/dashboard/automation/new')}>
                 <Plus className="size-3.5 mr-1.5" />New Automation
               </Button>
             </div>
@@ -109,10 +108,7 @@ export default function MyAutomationsPage() {
             </div>
           )}
         </div>
-      </div>
-
-      <CreateAutomationWizard open={wizardOpen} onClose={() => setWizardOpen(false)} />
-    </>
+    </div>
   )
 }
 
