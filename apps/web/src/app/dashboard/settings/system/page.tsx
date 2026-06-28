@@ -33,7 +33,7 @@ export default function SystemPage() {
   const total        = SERVICES.length
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="System" description="Service health, version info, feature flags, and system logs." />
 

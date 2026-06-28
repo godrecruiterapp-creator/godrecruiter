@@ -30,7 +30,7 @@ export default function AISettingsPage() {
   const tokenPct  = tokenUsed
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="AI Settings" description="Configure the AI provider, scoring thresholds, and active agents." />
 

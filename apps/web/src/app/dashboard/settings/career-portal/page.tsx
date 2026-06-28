@@ -15,7 +15,7 @@ export default function CareerPortalPage() {
   const [seoTitle, setSeoTitle]     = useState('Healthcare Staffing Jobs — God Recruiter')
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Career Portal" description="Your public job site and candidate-facing experience." />
 

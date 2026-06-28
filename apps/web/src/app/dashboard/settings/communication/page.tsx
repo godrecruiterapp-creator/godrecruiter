@@ -23,7 +23,7 @@ export default function CommunicationPage() {
   ]
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Communication" description="Email provider, SMS, calendar integrations, and message templates." />
 

@@ -80,7 +80,7 @@ export default function UsersPage() {
   )
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader
         title="Users & Teams"

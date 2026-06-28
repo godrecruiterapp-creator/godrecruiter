@@ -46,7 +46,7 @@ export default function SettingsDashboard() {
     : CARDS
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>

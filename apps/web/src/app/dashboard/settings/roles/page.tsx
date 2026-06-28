@@ -64,7 +64,7 @@ export default function RolesPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Roles & Permissions" description="Control what each role can see and do across God Recruiter." />
 

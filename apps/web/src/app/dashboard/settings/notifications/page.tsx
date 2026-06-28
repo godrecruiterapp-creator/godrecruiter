@@ -31,7 +31,7 @@ export default function NotificationsPage() {
     setEvents(p => p.map(e => e.id === id ? { ...e, [ch]: !e[ch] } : e))
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Notifications" description="Control how and when God Recruiter sends you notifications." />
 

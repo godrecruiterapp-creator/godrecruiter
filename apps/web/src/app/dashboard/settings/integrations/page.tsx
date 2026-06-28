@@ -25,7 +25,7 @@ export default function IntegrationsPage() {
   const apiKey = 'gr_live_sk_••••••••••••••••••••••••••7a3f'
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Integrations" description="Connect VMS platforms, job boards, and external services." />
 

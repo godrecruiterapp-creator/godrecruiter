@@ -14,7 +14,7 @@ const pct        = Math.round((totalUsed / totalLimit) * 100)
 
 export default function FilesPage() {
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Files & Storage" description="Storage usage, upload limits, and document processing settings." />
 

@@ -31,7 +31,7 @@ export default function SecurityPage() {
   const [clientId, setClientId]         = useState('')
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Security" description="Password policy, two-factor authentication, SSO, and access monitoring." />
 

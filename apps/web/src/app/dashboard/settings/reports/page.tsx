@@ -17,7 +17,7 @@ export default function ReportsPage() {
   const [schedules, setSchedules] = useState(TEMPLATES.map(t => ({ ...t, on: t.status === 'active' })))
 
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Reports" description="Report templates, scheduled delivery, and default export settings." />
 

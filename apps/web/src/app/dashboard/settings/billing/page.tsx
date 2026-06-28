@@ -22,7 +22,7 @@ const INVOICES = [
 
 export default function BillingPage() {
   return (
-    <div className="max-w-3xl mx-auto px-8 py-10">
+    <div className="px-8 py-10">
       <Breadcrumb />
       <PageHeader title="Billing" description="Subscription plan, usage, payment method, and invoices." />
 
