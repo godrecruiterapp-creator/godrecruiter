@@ -259,7 +259,7 @@ function KanbanView({ candidates }: { candidates: typeof PROJECT_CANDIDATES }) {
                   </div>
                 </div>
               ))}
-              {byStage[stage].length === 0 && (
+              {(byStage[stage]?.length ?? 0) === 0 && (
                 <div className="flex items-center justify-center h-12 text-[10px] text-muted-foreground/60">Drop candidates here</div>
               )}
             </div>
