@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation'
 import { Users, Briefcase, Send, CalendarCheck, Trophy, XCircle, UserCheck, Clock, CheckSquare, TrendingUp, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PROJECTS } from '../_data'
+import { PROJECTS, PROJECT_FALLBACK } from '../_data'
 import { cn } from '@/lib/utils'
 
 const KPI = [
@@ -49,7 +49,7 @@ const AI_INSIGHTS = [
 
 export default function ProjectOverviewPage() {
   const params = useParams<{ id: string }>()
-  const project = PROJECTS.find(p => p.id === params.id) ?? PROJECTS[0]
+  const project = PROJECTS.find(p => p.id === params.id) ?? PROJECT_FALLBACK
   const healthColor = project.healthScore >= 75 ? 'text-emerald-600' : project.healthScore >= 50 ? 'text-amber-500' : 'text-red-500'
   const healthBg = project.healthScore >= 75 ? 'bg-emerald-500' : project.healthScore >= 50 ? 'bg-amber-400' : 'bg-red-400'
 

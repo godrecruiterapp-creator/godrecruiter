@@ -16,6 +16,12 @@ export type Project = {
   visibility: 'private' | 'team' | 'organization'
 }
 
+export const PROJECT_FALLBACK: Project = {
+  id: '', name: '', description: '', type: '', status: 'active',
+  owner: '', team: [], candidateCount: 0, openJobs: 0,
+  createdAt: '', lastActivity: '', healthScore: 0, visibility: 'private',
+}
+
 export const PROJECTS: Project[] = [
   {
     id: '1', name: 'Texas ICU Nurses', description: 'Healthcare pipeline for critical care nurses across Texas hospitals.',

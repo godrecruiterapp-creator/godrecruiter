@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, Share2, Settings, MoreHorizontal, Users, Briefcase } from 'lucide-react'
-import { PROJECTS } from '../_data'
+import { PROJECTS, PROJECT_FALLBACK } from '../_data'
 
 const TABS = [
   { label: 'Overview',   href: '' },
@@ -31,8 +31,7 @@ const STATUS_CFG = {
 export default function ProjectDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams<{ id: string }>()
   const pathname = usePathname()
-  const FALLBACK = PROJECTS[0] ?? { id: '', name: '', description: '', type: '', status: 'active' as const, owner: '', team: [], candidateCount: 0, openJobs: 0, createdAt: '', lastActivity: '', healthScore: 0, visibility: 'private' as const }
-  const project = PROJECTS.find(p => p.id === params.id) ?? FALLBACK
+  const project = PROJECTS.find(p => p.id === params.id) ?? PROJECT_FALLBACK
   const base = `/dashboard/projects/${params.id}`
 
   return (
