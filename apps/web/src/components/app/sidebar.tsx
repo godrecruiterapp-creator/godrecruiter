@@ -76,7 +76,7 @@ export function AppSidebar() {
                   'flex items-center gap-2.5 rounded-md text-sm transition-colors',
                   collapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-2',
                   active
-                    ? 'bg-accent text-accent-foreground font-medium'
+                    ? 'bg-brand-muted text-brand font-medium'
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 )}
               >
