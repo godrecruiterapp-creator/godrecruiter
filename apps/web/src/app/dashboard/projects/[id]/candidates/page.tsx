@@ -238,7 +238,7 @@ function KanbanView({ candidates }: { candidates: typeof PROJECT_CANDIDATES }) {
               <div className="flex items-center gap-2">
                 <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold', STAGE_COLORS[stage] ?? 'bg-muted text-muted-foreground border-border')}>{stage}</span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium">{byStage[stage].length}</span>
+              <span className="text-xs text-muted-foreground font-medium">{byStage[stage]?.length ?? 0}</span>
             </div>
             <div className="flex-1 overflow-y-auto flex flex-col gap-2 min-h-16 rounded-xl bg-muted/30 border border-dashed border-border p-2">
               {byStage[stage].map(c => (
