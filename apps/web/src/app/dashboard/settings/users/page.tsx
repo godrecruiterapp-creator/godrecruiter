@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, MoreHorizontal, Mail, Shield, UserX, Search, ChevronDown } from 'lucide-react'
-import { SettingsHeader, SettingsSection, TabNav, SaveBar, Badge } from '../_components'
+import { SettingsHeader, SettingsSection, SettingRow, TabNav, SaveBar, Badge } from '../_components'
 import { cn } from '@/lib/utils'
 
 const TABS = ['Users', 'Teams', 'Recruiter Capacity', 'Defaults']
