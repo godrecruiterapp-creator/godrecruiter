@@ -422,7 +422,7 @@ export default function NewAutomationPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [blocks, setBlocks] = useState<Block[]>([makeBlock('trigger')])
-  const [activeId, setActiveId] = useState<string | null>(blocks[0].id)
+  const [activeId, setActiveId] = useState<string | null>(blocks[0]?.id ?? null)
   const [aiOpen, setAiOpen] = useState(false)
   const [aiInput, setAiInput] = useState('')
 
