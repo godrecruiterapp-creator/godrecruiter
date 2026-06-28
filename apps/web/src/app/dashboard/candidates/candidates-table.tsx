@@ -78,7 +78,7 @@ const WORK_AUTH: Record<string, string> = {
 }
 
 const STAGE_BADGE: Record<string, string> = {
-  sourced:   'bg-zinc-100 text-zinc-600 border-zinc-200',
+  sourced:   'bg-slate-100 text-slate-600 border-slate-200',
   qualified: 'bg-blue-50 text-blue-700 border-blue-200',
   submitted: 'bg-amber-50 text-amber-700 border-amber-200',
   interview: 'bg-violet-50 text-violet-700 border-violet-200',

@@ -18,7 +18,7 @@ const TABS = [
 function AgentSubNav() {
   const pathname = usePathname()
   return (
-    <div className="flex items-center gap-1 px-6 py-2 border-b bg-background shrink-0 overflow-x-auto">
+    <div className="flex items-center gap-0.5 px-6 border-b bg-background shrink-0 overflow-x-auto">
       {TABS.map(t => {
         const active = t.href === '/dashboard/agents'
           ? pathname === t.href
@@ -26,10 +26,10 @@ function AgentSubNav() {
         return (
           <Link key={t.href} href={t.href}
             className={cn(
-              'h-8 px-3 flex items-center text-xs font-medium rounded-md transition-colors whitespace-nowrap',
+              'px-3 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-colors',
               active
-                ? 'bg-accent text-accent-foreground'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                ? 'border-foreground text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
             )}>
             {t.label}
           </Link>

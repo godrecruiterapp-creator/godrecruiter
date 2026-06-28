@@ -21,14 +21,14 @@ export default function WorkQueueLayout({ children }: { children: React.ReactNod
       <div className="border-b bg-background shrink-0 px-6 pt-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-lg font-semibold leading-tight">Work Queue</h1>
+            <h1 className="text-xl font-bold tracking-tight">Work Queue</h1>
             <p className="text-xs text-muted-foreground mt-0.5">Distribute, monitor, and rebalance recruiting work</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="h-8 px-3 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+            <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
               <Users2 className="size-3.5" />Bulk Assign
             </button>
-            <button className="h-8 px-3 text-xs rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
+            <button className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
               <Sparkles className="size-3.5" />Auto-Assign AI
             </button>
           </div>
