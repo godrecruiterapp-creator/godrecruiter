@@ -5,14 +5,15 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutDashboard, Briefcase, Users, Kanban,
-  CalendarCheck, BarChart3, Settings, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban,
+  CalendarCheck, BarChart3, Settings, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban, ListTodo,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const NAV = [
-  { label: 'Dashboard',  href: '/dashboard',           icon: LayoutDashboard },
-  { label: 'Jobs',       href: '/dashboard/jobs',       icon: Briefcase },
+  { label: 'Dashboard',  href: '/dashboard',               icon: LayoutDashboard },
+  { label: 'Work Queue', href: '/dashboard/work-queue',    icon: ListTodo },
+  { label: 'Jobs',       href: '/dashboard/jobs',          icon: Briefcase },
   { label: 'Candidates', href: '/dashboard/candidates', icon: Users },
   { label: 'Pipeline',   href: '/dashboard/pipeline',   icon: Kanban },
   { label: 'Interviews', href: '/dashboard/interviews', icon: CalendarCheck },
