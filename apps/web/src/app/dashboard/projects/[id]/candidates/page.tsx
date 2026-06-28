@@ -241,7 +241,7 @@ function KanbanView({ candidates }: { candidates: typeof PROJECT_CANDIDATES }) {
               <span className="text-xs text-muted-foreground font-medium">{byStage[stage]?.length ?? 0}</span>
             </div>
             <div className="flex-1 overflow-y-auto flex flex-col gap-2 min-h-16 rounded-xl bg-muted/30 border border-dashed border-border p-2">
-              {byStage[stage].map(c => (
+              {(byStage[stage] ?? []).map(c => (
                 <div key={c.id} className="bg-background rounded-lg border border-border p-3 cursor-pointer hover:shadow-sm transition-shadow">
                   <div className="flex items-start justify-between gap-1 mb-1.5">
                     <p className="text-xs font-semibold leading-tight">{c.name}</p>
