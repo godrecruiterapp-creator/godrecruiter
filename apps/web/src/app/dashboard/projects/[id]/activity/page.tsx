@@ -43,7 +43,7 @@ export default function ProjectActivityPage() {
             <div key={i} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className={cn('size-7 rounded-full flex items-center justify-center shrink-0', meta.dot)}>
-                  <Icon className="size-3.5 text-white" strokeWidth={2} />
+                  <Icon className="size-3.5 text-white" />
                 </div>
                 {i < EVENTS.length - 1 && <div className="w-px flex-1 bg-border my-1" />}
               </div>
