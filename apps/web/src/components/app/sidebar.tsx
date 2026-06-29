@@ -76,8 +76,8 @@ export function AppSidebar() {
                   'flex items-center gap-2.5 rounded-md text-sm transition-colors',
                   collapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-2',
                   active
-                    ? 'bg-[#ededed] text-[#181818] font-medium'
-                    : 'text-[#636f7a] hover:bg-accent hover:text-accent-foreground'
+                    ? 'bg-[#ededed] text-[#181818] font-semibold'
+                    : 'text-[#636f7a] font-medium hover:bg-accent hover:text-accent-foreground'
                 )}
               >
                 <Icon className="size-4 flex-shrink-0" />
