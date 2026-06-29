@@ -108,7 +108,7 @@ function useBreadcrumbs() {
       continue
     }
 
-    const label = SEGMENT_LABELS[seg]
+    const label = seg ? SEGMENT_LABELS[seg] : undefined
     if (!label) continue
 
     // Skip 'Dashboard' if it's not the only crumb (keeps it as home anchor)
