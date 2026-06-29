@@ -16,27 +16,27 @@ type Event = { date: number; month: 'prev' | 'curr' | 'next'; label: string; col
 
 const EVENTS: Record<number, { label: string; color: string }[]> = {
   27: [
-    { label: '9AM Robert Kim', color: 'bg-slate-200 text-slate-700' },
-    { label: '9:30AM Sandra Davis', color: 'bg-amber-100 text-amber-800' },
-    { label: '3:30PM Lisa Thompson', color: 'bg-slate-200 text-slate-700' },
+    { label: '9AM Robert Kim', color: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300' },
+    { label: '9:30AM Sandra Davis', color: 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300' },
+    { label: '3:30PM Lisa Thompson', color: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300' },
   ],
   28: [
-    { label: '10AM Sarah Johnson', color: 'bg-blue-100 text-blue-800' },
-    { label: '2PM James Martinez', color: 'bg-emerald-100 text-emerald-800' },
+    { label: '10AM Sarah Johnson', color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300' },
+    { label: '2PM James Martinez', color: 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300' },
   ],
   29: [
-    { label: '11AM Emily Chen', color: 'bg-blue-100 text-blue-800' },
+    { label: '11AM Emily Chen', color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300' },
   ],
   30: [
-    { label: '1PM David Park', color: 'bg-blue-100 text-blue-800' },
+    { label: '1PM David Park', color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300' },
   ],
 }
 
 // July events shown in last row
 const JULY_EVENTS: Record<number, { label: string; color: string }[]> = {
-  1: [{ label: '11:30AM Amy Wilson', color: 'bg-blue-100 text-blue-800' }],
-  2: [{ label: '4PM Chris Lee', color: 'bg-blue-100 text-blue-800' }],
-  3: [{ label: '10AM Tom Anderson', color: 'bg-blue-100 text-blue-800' }],
+  1: [{ label: '11:30AM Amy Wilson', color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300' }],
+  2: [{ label: '4PM Chris Lee', color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300' }],
+  3: [{ label: '10AM Tom Anderson', color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300' }],
 }
 
 const VIEW_MODES: ViewMode[] = ['Day', 'Week', 'Month', 'Agenda'] as unknown as ViewMode[]
@@ -59,11 +59,11 @@ const GRID = buildGrid()
 const TODAY = 27 // June 27 2026
 
 const LEGEND = [
-  { label: 'Scheduled', color: 'bg-blue-100 border-blue-300' },
-  { label: 'Confirmed', color: 'bg-emerald-100 border-emerald-300' },
-  { label: 'Completed', color: 'bg-slate-200 border-slate-300' },
-  { label: 'Rescheduled', color: 'bg-amber-100 border-amber-300' },
-  { label: 'Cancelled', color: 'bg-red-100 border-red-300' },
+  { label: 'Scheduled', color: 'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700' },
+  { label: 'Confirmed', color: 'bg-emerald-100 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700' },
+  { label: 'Completed', color: 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600' },
+  { label: 'Rescheduled', color: 'bg-amber-100 dark:bg-amber-900 border-amber-300 dark:border-amber-700' },
+  { label: 'Cancelled', color: 'bg-red-100 dark:bg-red-900 border-red-300 dark:border-red-700' },
 ]
 
 export default function CalendarPage() {

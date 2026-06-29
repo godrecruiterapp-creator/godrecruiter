@@ -22,9 +22,9 @@ const PRIORITY_DOT: Record<string, string> = {
 }
 
 function slaColor(h: number) {
-  if (h <= 0) return 'text-red-600 bg-red-50 border-red-200'
-  if (h <= 4) return 'text-amber-600 bg-amber-50 border-amber-200'
-  return 'text-emerald-600 bg-emerald-50 border-emerald-200'
+  if (h <= 0) return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'
+  if (h <= 4) return 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800'
+  return 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800'
 }
 
 function JobCard({ job }: { job: WQJob }) {
@@ -44,7 +44,7 @@ function JobCard({ job }: { job: WQJob }) {
               <p className="text-xs text-muted-foreground mt-0.5">{job.client} · {job.location}</p>
             </div>
             {job.priority === 'Urgent' && (
-              <span className="inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-medium shrink-0">
+              <span className="inline-flex items-center gap-1 text-[10px] bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-400 px-1.5 py-0.5 rounded font-medium shrink-0">
                 <Zap className="size-2.5" />Urgent
               </span>
             )}
@@ -53,7 +53,7 @@ function JobCard({ job }: { job: WQJob }) {
           <div className="grid grid-cols-3 gap-3 mt-3">
             <div>
               <p className="text-[10px] text-muted-foreground">Bill Rate</p>
-              <p className="text-xs font-semibold text-emerald-600">{job.billRate}</p>
+              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{job.billRate}</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Reviewed</p>
@@ -75,7 +75,7 @@ function JobCard({ job }: { job: WQJob }) {
 
           {/* AI score */}
           {job.aiScore >= 85 && (
-            <div className="mt-2 flex items-center gap-1 text-[11px] text-amber-600">
+            <div className="mt-2 flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400">
               <Star className="size-3 fill-amber-500" />
               AI Score {job.aiScore} — High fill probability
             </div>
@@ -125,7 +125,7 @@ export default function RecruiterViewPage() {
       {/* recruiter header */}
       <div className="px-6 py-4 border-b shrink-0 bg-muted/20">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="size-10 rounded-full bg-violet-100 flex items-center justify-center text-sm font-bold text-violet-700">
+          <div className="size-10 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center text-sm font-bold text-violet-700 dark:text-violet-400">
             {ME?.initials}
           </div>
           <div>
@@ -148,7 +148,7 @@ export default function RecruiterViewPage() {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-muted-foreground">Submitted</p>
-              <p className="text-lg font-bold tabular-nums text-emerald-600">{myJobs.reduce((s,j)=>s+j.submitted,0)}</p>
+              <p className="text-lg font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{myJobs.reduce((s,j)=>s+j.submitted,0)}</p>
             </div>
           </div>
         </div>

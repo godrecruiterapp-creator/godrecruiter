@@ -20,12 +20,12 @@ const PRIORITY_DOT: Record<string, string> = {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  needs_assignment: 'bg-amber-100 text-amber-700',
-  assigned:         'bg-blue-100 text-blue-700',
-  in_progress:      'bg-violet-100 text-violet-700',
-  no_activity:      'bg-orange-100 text-orange-700',
-  completed:        'bg-emerald-100 text-emerald-700',
-  overdue:          'bg-red-100 text-red-700',
+  needs_assignment: 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-400',
+  assigned:         'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-400',
+  in_progress:      'bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-400',
+  no_activity:      'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-400',
+  completed:        'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400',
+  overdue:          'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400',
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -38,23 +38,23 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 function slaColor(h: number) {
-  if (h <= 0) return 'text-red-600'
-  if (h <= 2) return 'text-red-500'
-  if (h <= 8) return 'text-amber-600'
-  return 'text-emerald-600'
+  if (h <= 0) return 'text-red-600 dark:text-red-400'
+  if (h <= 2) return 'text-red-500 dark:text-red-400'
+  if (h <= 8) return 'text-amber-600 dark:text-amber-400'
+  return 'text-emerald-600 dark:text-emerald-400'
 }
 
 function slaBg(h: number) {
-  if (h <= 0) return 'bg-red-50 border-red-200'
-  if (h <= 2) return 'bg-red-50 border-red-200'
-  if (h <= 8) return 'bg-amber-50 border-amber-200'
-  return 'bg-emerald-50 border-emerald-200'
+  if (h <= 0) return 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'
+  if (h <= 2) return 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'
+  if (h <= 8) return 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800'
+  return 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800'
 }
 
 function scoreColor(s: number) {
-  if (s >= 85) return 'text-emerald-600'
-  if (s >= 65) return 'text-amber-600'
-  return 'text-red-500'
+  if (s >= 85) return 'text-emerald-600 dark:text-emerald-400'
+  if (s >= 65) return 'text-amber-600 dark:text-amber-400'
+  return 'text-red-500 dark:text-red-400'
 }
 
 function getRecommendedRecruiters(job: WQJob): (WQRecruiter & { match: number; reasons: string[] })[] {
@@ -141,13 +141,13 @@ function JobRow({
       <div className="hidden lg:flex items-center gap-1.5 shrink-0 w-28">
         {job.assignedTo ? (
           <>
-            <div className="size-5 rounded-full bg-violet-100 flex items-center justify-center text-[9px] font-bold text-violet-700 shrink-0">
+            <div className="size-5 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center text-[9px] font-bold text-violet-700 dark:text-violet-400 shrink-0">
               {job.assignedTo.split(' ').map(n => n[0]).join('').slice(0, 2)}
             </div>
             <span className="text-[10px] text-muted-foreground truncate">{job.assignedTo.split(' ')[0]}</span>
           </>
         ) : (
-          <span className="text-[10px] text-amber-600 font-medium">Unassigned</span>
+          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Unassigned</span>
         )}
       </div>
 
@@ -215,7 +215,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
           <div className="grid grid-cols-2 gap-y-1.5 mt-3 text-[11px]">
             <span className="text-muted-foreground">Location</span><span className="font-medium">{job.location}</span>
             <span className="text-muted-foreground">Type</span><span className="font-medium">{job.type}</span>
-            <span className="text-muted-foreground">Bill Rate</span><span className="font-medium text-emerald-600">{job.billRate}</span>
+            <span className="text-muted-foreground">Bill Rate</span><span className="font-medium text-emerald-600 dark:text-emerald-400">{job.billRate}</span>
             <span className="text-muted-foreground">VMS</span><span className="font-medium">{job.vmsSource}</span>
             <span className="text-muted-foreground">Received</span><span className="font-medium">{job.receivedAt}</span>
           </div>
@@ -242,7 +242,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
             <Sparkles className={cn('size-4 mx-auto mb-1', scoreColor(job.aiScore))} />
             <p className={cn('text-lg font-bold tabular-nums', scoreColor(job.aiScore))}>{job.aiScore}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">AI Job Score</p>
-            <p className={cn('text-[10px] font-medium', job.aiScore >= 80 ? 'text-emerald-600' : job.aiScore >= 60 ? 'text-amber-600' : 'text-red-500')}>
+            <p className={cn('text-[10px] font-medium', job.aiScore >= 80 ? 'text-emerald-600 dark:text-emerald-400' : job.aiScore >= 60 ? 'text-amber-600 dark:text-amber-400' : 'text-red-500 dark:text-red-400')}>
               {job.aiScore >= 80 ? 'High Fill Prob.' : job.aiScore >= 60 ? 'Moderate' : 'Hard to Fill'}
             </p>
           </div>
@@ -254,16 +254,16 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
           <div className="space-y-1.5">
             {job.aiScore >= 80 ? (
               <>
-                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700"><TrendingUp className="size-3 shrink-0" />Strong existing talent pool</div>
-                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700"><TrendingUp className="size-3 shrink-0" />Preferred client relationship</div>
-                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700"><TrendingUp className="size-3 shrink-0" />High bill rate, competitive offer</div>
-                {job.priority === 'Urgent' && <div className="flex items-center gap-1.5 text-[11px] text-orange-600"><Zap className="size-3 shrink-0" />Urgent requirement — act fast</div>}
+                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400"><TrendingUp className="size-3 shrink-0" />Strong existing talent pool</div>
+                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400"><TrendingUp className="size-3 shrink-0" />Preferred client relationship</div>
+                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400"><TrendingUp className="size-3 shrink-0" />High bill rate, competitive offer</div>
+                {job.priority === 'Urgent' && <div className="flex items-center gap-1.5 text-[11px] text-orange-600 dark:text-orange-400"><Zap className="size-3 shrink-0" />Urgent requirement — act fast</div>}
               </>
             ) : (
               <>
-                <div className="flex items-center gap-1.5 text-[11px] text-red-600"><TrendingDown className="size-3 shrink-0" />Rare skill set required</div>
-                <div className="flex items-center gap-1.5 text-[11px] text-red-600"><TrendingDown className="size-3 shrink-0" />Restrictive client requirements</div>
-                {job.billRate < '$80' && <div className="flex items-center gap-1.5 text-[11px] text-amber-600"><AlertTriangle className="size-3 shrink-0" />Below-market bill rate</div>}
+                <div className="flex items-center gap-1.5 text-[11px] text-red-600 dark:text-red-400"><TrendingDown className="size-3 shrink-0" />Rare skill set required</div>
+                <div className="flex items-center gap-1.5 text-[11px] text-red-600 dark:text-red-400"><TrendingDown className="size-3 shrink-0" />Restrictive client requirements</div>
+                {job.billRate < '$80' && <div className="flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400"><AlertTriangle className="size-3 shrink-0" />Below-market bill rate</div>}
               </>
             )}
           </div>
@@ -274,7 +274,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
           <div className="p-4 border-b">
             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Currently Assigned</p>
             <div className="flex items-center gap-2">
-              <div className="size-7 rounded-full bg-violet-100 flex items-center justify-center text-[10px] font-bold text-violet-700">
+              <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center text-[10px] font-bold text-violet-700 dark:text-violet-400">
                 {assignedLocal.split(' ').map(n => n[0]).join('').slice(0, 2)}
               </div>
               <span className="text-xs font-medium">{assignedLocal}</span>
@@ -303,7 +303,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold">{r.name}</span>
-                      <span className="text-[11px] font-bold text-emerald-600">{r.match}%</span>
+                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{r.match}%</span>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {r.reasons.map(reason => (
@@ -417,7 +417,7 @@ export default function QueuePage() {
               )}>
               <span>{q.label}</span>
               {count > 0 && (
-                <span className={cn('text-[10px] px-1.5 rounded-full font-medium', isUrgent && count > 0 ? 'bg-red-100 text-red-700' : 'bg-muted text-muted-foreground')}>
+                <span className={cn('text-[10px] px-1.5 rounded-full font-medium', isUrgent && count > 0 ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400' : 'bg-muted text-muted-foreground')}>
                   {count}
                 </span>
               )}

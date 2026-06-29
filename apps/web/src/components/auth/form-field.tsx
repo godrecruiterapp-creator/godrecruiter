@@ -17,33 +17,23 @@ export function FormField({
   autoComplete, defaultValue, error, hint,
 }: FormFieldProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label htmlFor={name} style={{ fontSize: '13px', fontWeight: '500', color: '#0A0A0A' }}>
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={name} className="text-[13px] font-medium text-foreground">
         {label}
-        {required && <span style={{ color: '#DC2626', marginLeft: '2px' }}>*</span>}
+        {required && <span className="text-red-600 ml-0.5">*</span>}
       </label>
       <input
         id={name} name={name} type={type}
         placeholder={placeholder} required={required}
         autoComplete={autoComplete} defaultValue={defaultValue}
-        style={{
-          width: '100%', height: '40px', padding: '0 12px',
-          fontSize: '14px', color: '#0A0A0A',
-          background: '#FFFFFF',
-          border: `1px solid ${error ? '#DC2626' : '#E0E0E0'}`,
-          borderRadius: '6px', outline: 'none',
-          transition: 'border-color 0.12s',
-          fontFamily: 'inherit',
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.borderColor = error ? '#DC2626' : '#0A0A0A'
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.borderColor = error ? '#DC2626' : '#E0E0E0'
-        }}
+        className={`w-full h-10 px-3 text-sm text-foreground bg-background rounded-md outline-none transition-colors font-[inherit] ${
+          error
+            ? 'border border-red-500 focus:border-red-500'
+            : 'border border-input focus:border-foreground'
+        }`}
       />
-      {error && <p style={{ fontSize: '12px', color: '#DC2626', margin: 0 }}>{error}</p>}
-      {hint && !error && <p style={{ fontSize: '12px', color: '#999999', margin: 0 }}>{hint}</p>}
+      {error && <p className="text-[12px] text-red-600 m-0">{error}</p>}
+      {hint && !error && <p className="text-[12px] text-muted-foreground m-0">{hint}</p>}
     </div>
   )
 }

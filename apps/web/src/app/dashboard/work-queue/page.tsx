@@ -20,17 +20,17 @@ const atCapacity      = RECRUITERS.filter(r => r.availability === 'at_capacity')
 
 const KPI = [
   { label: 'Incoming Today',         value: WQ_JOBS.length, sub: '+8 from yesterday',    icon: Inbox,       color: 'text-foreground',   bg: 'bg-muted/50' },
-  { label: 'Needs Assignment',       value: needsAssignment,sub: 'Waiting for recruiter', icon: AlertCircle, color: 'text-amber-600',    bg: 'bg-amber-50' },
-  { label: 'Assigned',               value: assigned,       sub: 'Pending first activity',icon: UserCheck,   color: 'text-blue-600',     bg: 'bg-blue-50' },
-  { label: 'In Progress',            value: inProgress,     sub: 'Actively being worked', icon: Activity,    color: 'text-violet-600',   bg: 'bg-violet-50' },
-  { label: 'Completed Today',        value: completed,      sub: '5 submissions sent',    icon: CheckCircle2,color: 'text-emerald-600',  bg: 'bg-emerald-50' },
-  { label: 'Overdue',                value: overdue,        sub: 'Missed SLA',            icon: Clock,       color: 'text-red-600',      bg: 'bg-red-50' },
-  { label: 'Urgent Jobs',            value: urgent,         sub: 'Immediate attention',   icon: Zap,         color: 'text-orange-600',   bg: 'bg-orange-50' },
+  { label: 'Needs Assignment',       value: needsAssignment,sub: 'Waiting for recruiter', icon: AlertCircle, color: 'text-amber-600 dark:text-amber-400',    bg: 'bg-amber-50 dark:bg-amber-950' },
+  { label: 'Assigned',               value: assigned,       sub: 'Pending first activity',icon: UserCheck,   color: 'text-blue-600 dark:text-blue-400',     bg: 'bg-blue-50 dark:bg-blue-950' },
+  { label: 'In Progress',            value: inProgress,     sub: 'Actively being worked', icon: Activity,    color: 'text-violet-600 dark:text-violet-400',   bg: 'bg-violet-50 dark:bg-violet-950' },
+  { label: 'Completed Today',        value: completed,      sub: '5 submissions sent',    icon: CheckCircle2,color: 'text-emerald-600 dark:text-emerald-400',  bg: 'bg-emerald-50 dark:bg-emerald-950' },
+  { label: 'Overdue',                value: overdue,        sub: 'Missed SLA',            icon: Clock,       color: 'text-red-600 dark:text-red-400',      bg: 'bg-red-50 dark:bg-red-950' },
+  { label: 'Urgent Jobs',            value: urgent,         sub: 'Immediate attention',   icon: Zap,         color: 'text-orange-600 dark:text-orange-400',   bg: 'bg-orange-50 dark:bg-orange-950' },
   { label: 'Waiting Capacity',       value: atCapacity,     sub: 'Recruiters at limit',   icon: Users,       color: 'text-rose-600',     bg: 'bg-rose-50' },
-  { label: 'No Activity',            value: noActivity,     sub: 'Assigned but idle',     icon: Timer,       color: 'text-slate-600',    bg: 'bg-slate-50' },
-  { label: 'Avg Submit Time',        value: '4.1h',         sub: '↓ 0.3h from last week', icon: TrendingUp,  color: 'text-emerald-600',  bg: 'bg-muted/50' },
+  { label: 'No Activity',            value: noActivity,     sub: 'Assigned but idle',     icon: Timer,       color: 'text-slate-600 dark:text-slate-400',    bg: 'bg-slate-50 dark:bg-slate-800' },
+  { label: 'Avg Submit Time',        value: '4.1h',         sub: '↓ 0.3h from last week', icon: TrendingUp,  color: 'text-emerald-600 dark:text-emerald-400',  bg: 'bg-muted/50' },
   { label: 'Recruiter Utilization',  value: '74%',          sub: '6 recruiters active',   icon: Gauge,       color: 'text-foreground',   bg: 'bg-muted/50' },
-  { label: 'Manager Notes',          value: '3',            sub: 'Unread',                icon: StickyNote,  color: 'text-amber-600',    bg: 'bg-muted/50' },
+  { label: 'Manager Notes',          value: '3',            sub: 'Unread',                icon: StickyNote,  color: 'text-amber-600 dark:text-amber-400',    bg: 'bg-muted/50' },
 ]
 
 const RECENT = [
@@ -111,7 +111,7 @@ export default function WorkQueueOverviewPage() {
             <div className="flex flex-col gap-3">
               {utilization.map(r => {
                 const barColor = r.pct >= 90 ? 'bg-red-500' : r.pct >= 75 ? 'bg-amber-500' : 'bg-emerald-500'
-                const availBadge = r.availability === 'available' ? 'text-emerald-600' : r.availability === 'at_capacity' ? 'text-red-600' : r.availability === 'busy' ? 'text-amber-600' : 'text-muted-foreground'
+                const availBadge = r.availability === 'available' ? 'text-emerald-600 dark:text-emerald-400' : r.availability === 'at_capacity' ? 'text-red-600 dark:text-red-400' : r.availability === 'busy' ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'
                 return (
                   <div key={r.id} className="flex items-center gap-3">
                     <div className="size-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -167,10 +167,10 @@ export default function WorkQueueOverviewPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
               { q: 'New jobs today',          a: String(WQ_JOBS.length),    color: 'text-foreground' },
-              { q: 'Recruiters with capacity',a: String(RECRUITERS.filter(r=>r.availability==='available').length), color: 'text-emerald-600' },
-              { q: 'Overloaded recruiters',   a: String(atCapacity),        color: 'text-red-600' },
-              { q: 'Untouched jobs',          a: String(needsAssignment + noActivity), color: 'text-amber-600' },
-              { q: 'Close to SLA breach',     a: String(WQ_JOBS.filter(j=>j.slaHoursLeft > 0 && j.slaHoursLeft <= 4).length), color: 'text-orange-600' },
+              { q: 'Recruiters with capacity',a: String(RECRUITERS.filter(r=>r.availability==='available').length), color: 'text-emerald-600 dark:text-emerald-400' },
+              { q: 'Overloaded recruiters',   a: String(atCapacity),        color: 'text-red-600 dark:text-red-400' },
+              { q: 'Untouched jobs',          a: String(needsAssignment + noActivity), color: 'text-amber-600 dark:text-amber-400' },
+              { q: 'Close to SLA breach',     a: String(WQ_JOBS.filter(j=>j.slaHoursLeft > 0 && j.slaHoursLeft <= 4).length), color: 'text-orange-600 dark:text-orange-400' },
             ].map(item => (
               <div key={item.q} className="rounded-lg bg-muted/40 p-3">
                 <p className="text-[10px] text-muted-foreground">{item.q}</p>

@@ -73,26 +73,26 @@ const MOCK_INTERVIEWS: Interview[] = [
 ]
 
 const STATUS_BADGE: Record<string, string> = {
-  scheduled:   'bg-blue-50 text-blue-700 border-blue-200',
-  confirmed:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  completed:   'bg-slate-100 text-slate-600 border-slate-200',
-  cancelled:   'bg-red-50 text-red-700 border-red-200',
-  rescheduled: 'bg-amber-50 text-amber-700 border-amber-200',
-  no_show:     'bg-red-50 text-red-700 border-red-200',
+  scheduled:   'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+  confirmed:   'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+  completed:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+  cancelled:   'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+  rescheduled: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  no_show:     'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
 }
 
 const EMAIL_BADGE: Record<string, string> = {
-  sent:      'bg-slate-100 text-slate-600',
-  delivered: 'bg-blue-50 text-blue-700',
-  opened:    'bg-emerald-50 text-emerald-700',
-  replied:   'bg-violet-50 text-violet-700',
-  bounced:   'bg-red-50 text-red-700',
+  sent:      'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+  delivered: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400',
+  opened:    'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400',
+  replied:   'bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-400',
+  bounced:   'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400',
 }
 
 const CONFIRM_BADGE: Record<string, string> = {
-  confirmed: 'bg-emerald-50 text-emerald-700',
-  pending:   'bg-amber-50 text-amber-700',
-  declined:  'bg-red-50 text-red-700',
+  confirmed: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400',
+  pending:   'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400',
+  declined:  'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400',
 }
 
 function Chip({ label, className }: { label: string; className: string }) {
@@ -285,7 +285,7 @@ export default function AllInterviewsPage() {
       case 'status':      return <Chip label={r.status.replace('_', ' ')} className={STATUS_BADGE[r.status] ?? ''} />
       case 'email_status':return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${EMAIL_BADGE[r.email_status] ?? ''}`}>{r.email_status}</span>
       case 'confirmation':return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${CONFIRM_BADGE[r.confirmation] ?? ''}`}>{r.confirmation}</span>
-      case 'feedback':    return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${r.feedback === 'submitted' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{r.feedback}</span>
+      case 'feedback':    return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${r.feedback === 'submitted' ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400'}`}>{r.feedback}</span>
       case 'actions':
         return (
           <DropdownMenu>

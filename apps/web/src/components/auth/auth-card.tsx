@@ -11,38 +11,26 @@ interface AuthCardProps {
 
 export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
-    <div style={{
-      minHeight: '100dvh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#FFFFFF',
-      padding: '24px 16px',
-    }}>
-      <div style={{ width: '100%', maxWidth: '380px' }}>
+    <div className="min-h-dvh flex items-center justify-center bg-background px-4 py-6">
+      <div className="w-full max-w-[380px]">
 
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', marginBottom: '36px' }}>
-          <div style={{
-            width: '26px', height: '26px', borderRadius: '6px',
-            background: '#0A0A0A',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '13px', fontWeight: '700', color: '#fff',
-          }}>G</div>
-          <span style={{ fontSize: '14px', fontWeight: '600', color: '#0A0A0A', letterSpacing: '-0.01em' }}>
+        <Link href="/" className="flex items-center gap-2 no-underline mb-9">
+          <div className="w-[26px] h-[26px] rounded-[6px] bg-foreground flex items-center justify-center text-[13px] font-bold text-white">
+            G
+          </div>
+          <span className="text-[14px] font-semibold text-foreground tracking-tight">
             God Recruiter
           </span>
         </Link>
 
         {/* Heading */}
-        <div style={{ marginBottom: '24px' }}>
-          <h1 style={{
-            fontSize: '20px', fontWeight: '600',
-            color: '#0A0A0A', letterSpacing: '-0.02em', margin: '0 0 6px',
-            lineHeight: 1.25,
-          }}>{title}</h1>
+        <div className="mb-6">
+          <h1 className="text-[20px] font-semibold text-foreground tracking-tight leading-tight m-0 mb-1.5">
+            {title}
+          </h1>
           {subtitle && (
-            <p style={{ fontSize: '14px', color: '#777777', lineHeight: 1.5, margin: 0 }}>{subtitle}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed m-0">{subtitle}</p>
           )}
         </div>
 
@@ -51,7 +39,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
 
         {/* Footer */}
         {footer && (
-          <div style={{ marginTop: '20px', fontSize: '13px', color: '#777777', textAlign: 'center' }}>
+          <div className="mt-5 text-[13px] text-muted-foreground text-center">
             {footer}
           </div>
         )}

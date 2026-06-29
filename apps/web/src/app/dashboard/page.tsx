@@ -21,12 +21,12 @@ const PRIORITIES: Array<{
   id: number; urgency: Urgency; icon: Icon; color: string
   title: string; sub: string; time: string; action: string
 }> = [
-  { id:1, urgency:'high',   icon:Users,         color:'bg-red-50 text-red-600',      title:'Review 8 new applicants',         sub:'Java Developer · Dell Technologies',       time:'Due 2 PM',      action:'Review'  },
-  { id:2, urgency:'high',   icon:Send,           color:'bg-amber-50 text-amber-600',  title:'Submit 3 candidates',             sub:'Travel RN (ICU) · Houston Methodist',      time:'Client waiting',action:'Submit'  },
-  { id:3, urgency:'medium', icon:Phone,          color:'bg-blue-50 text-blue-600',    title:'Follow-up — Maria Gonzalez',      sub:'Re: start date confirmation',              time:'Due noon',      action:'Call'    },
-  { id:4, urgency:'high',   icon:Video,          color:'bg-violet-50 text-violet-600',title:'Interview in 45 min',             sub:'Tom Kowalski · Chevron DevOps',            time:'10:45 AM',      action:'Join'    },
-  { id:5, urgency:'medium', icon:CheckCircle2,   color:'bg-emerald-50 text-emerald-600',title:'Offer approval pending',       sub:'Angela White · QA Engineer · AT&T',        time:'Awaiting you',  action:'Approve' },
-  { id:6, urgency:'high',   icon:AlertTriangle,  color:'bg-red-50 text-red-600',      title:'License expiring — Lisa Chen',   sub:'RN License expires Jul 15',                time:'16 days',       action:'Fix'     },
+  { id:1, urgency:'high',   icon:Users,         color:'bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400',      title:'Review 8 new applicants',         sub:'Java Developer · Dell Technologies',       time:'Due 2 PM',      action:'Review'  },
+  { id:2, urgency:'high',   icon:Send,           color:'bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400',  title:'Submit 3 candidates',             sub:'Travel RN (ICU) · Houston Methodist',      time:'Client waiting',action:'Submit'  },
+  { id:3, urgency:'medium', icon:Phone,          color:'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400',    title:'Follow-up — Maria Gonzalez',      sub:'Re: start date confirmation',              time:'Due noon',      action:'Call'    },
+  { id:4, urgency:'high',   icon:Video,          color:'bg-violet-50 dark:bg-violet-950 text-violet-600 dark:text-violet-400',title:'Interview in 45 min',             sub:'Tom Kowalski · Chevron DevOps',            time:'10:45 AM',      action:'Join'    },
+  { id:5, urgency:'medium', icon:CheckCircle2,   color:'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400',title:'Offer approval pending',       sub:'Angela White · QA Engineer · AT&T',        time:'Awaiting you',  action:'Approve' },
+  { id:6, urgency:'high',   icon:AlertTriangle,  color:'bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400',      title:'License expiring — Lisa Chen',   sub:'RN License expires Jul 15',                time:'16 days',       action:'Fix'     },
 ]
 
 const PIPELINE = [
@@ -116,32 +116,32 @@ const URGENCY_DOT: Record<Urgency, string> = {
 }
 
 const ACT_META: Record<string, { color: string; icon: Icon }> = {
-  submission:{ color:'bg-blue-50    text-blue-600',    icon:Send          },
-  interview: { color:'bg-violet-50  text-violet-600',  icon:CalendarCheck },
-  placement: { color:'bg-emerald-50 text-emerald-600', icon:UserCheck     },
-  ai:        { color:'bg-violet-50  text-violet-600',  icon:Sparkles      },
-  email:     { color:'bg-slate-50   text-slate-500',   icon:Mail          },
-  note:      { color:'bg-slate-50   text-slate-500',   icon:FileText      },
+  submission:{ color:'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400',    icon:Send          },
+  interview: { color:'bg-violet-50 dark:bg-violet-950 text-violet-600 dark:text-violet-400',  icon:CalendarCheck },
+  placement: { color:'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400', icon:UserCheck     },
+  ai:        { color:'bg-violet-50 dark:bg-violet-950 text-violet-600 dark:text-violet-400',  icon:Sparkles      },
+  email:     { color:'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400',   icon:Mail          },
+  note:      { color:'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400',   icon:FileText      },
 }
 
 const CAL_COLOR: Record<string, { bg: string; text: string }> = {
-  interview:{ bg:'bg-violet-50 border-violet-200',  text:'text-violet-700'  },
-  call:     { bg:'bg-sky-50    border-sky-200',      text:'text-sky-700'     },
-  meeting:  { bg:'bg-slate-50  border-slate-200',    text:'text-slate-600'   },
-  task:     { bg:'bg-amber-50  border-amber-200',    text:'text-amber-700'   },
-  placement:{ bg:'bg-emerald-50 border-emerald-200', text:'text-emerald-700' },
+  interview:{ bg:'bg-violet-50 dark:bg-violet-950 border-violet-200 dark:border-violet-800',  text:'text-violet-700 dark:text-violet-400'  },
+  call:     { bg:'bg-sky-50 dark:bg-sky-950 border-sky-200 dark:border-sky-800',      text:'text-sky-700 dark:text-sky-400'     },
+  meeting:  { bg:'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700',    text:'text-slate-600 dark:text-slate-400'   },
+  task:     { bg:'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800',    text:'text-amber-700 dark:text-amber-400'   },
+  placement:{ bg:'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800', text:'text-emerald-700 dark:text-emerald-400' },
 }
 
 const WATCH_STYLE: Record<string, { dot:string; badge:string; label:string }> = {
-  today:  { dot:'bg-emerald-500', badge:'bg-emerald-50 text-emerald-700 border-emerald-200', label:'Starts Today'   },
-  ending: { dot:'bg-amber-400',   badge:'bg-amber-50   text-amber-700   border-amber-200',   label:'Ending Soon'    },
-  action: { dot:'bg-red-500',     badge:'bg-red-50     text-red-700     border-red-200',      label:'Action Needed'  },
+  today:  { dot:'bg-emerald-500', badge:'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', label:'Starts Today'   },
+  ending: { dot:'bg-amber-400',   badge:'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',   label:'Ending Soon'    },
+  action: { dot:'bg-red-500',     badge:'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',      label:'Action Needed'  },
 }
 
 const PRIORITY_BADGE: Record<Urgency, string> = {
-  high:  'bg-red-50 text-red-700 border-red-200',
-  medium:'bg-amber-50 text-amber-700 border-amber-200',
-  low:   'bg-slate-50 text-slate-600 border-slate-200',
+  high:  'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+  medium:'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  low:   'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
 }
 
 // ─── Widget wrapper ───────────────────────────────────────────────────────────
@@ -258,7 +258,7 @@ export default function DashboardPage() {
                 <span className={cn(
                   'text-lg font-bold tabular-nums leading-none',
                   i === 0 ? 'text-foreground'  :
-                  i === 5 ? 'text-emerald-600' :
+                  i === 5 ? 'text-emerald-600 dark:text-emerald-400' :
                             'text-foreground'
                 )}>
                   {stage.count}
@@ -286,8 +286,8 @@ export default function DashboardPage() {
               <span className={cn(
                 'text-xs font-medium px-2 py-0.5 rounded-full border',
                 activePriorities.length === 0
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-amber-50 text-amber-700 border-amber-200'
+                  ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                  : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
               )}>
                 {activePriorities.length === 0 ? 'All done ✓' : `${activePriorities.length} remaining`}
               </span>
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                     </button>
                     <button
                       onClick={() => setDone(s => { const n = new Set(s); n.add(p.id); return n })}
-                      className="size-7 rounded-lg border border-border hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition-colors flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100"
+                      className="size-7 rounded-lg border border-border hover:bg-emerald-50 dark:hover:bg-emerald-950 hover:border-emerald-200 dark:hover:border-emerald-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100"
                       title="Mark complete"
                     >
                       <CheckCircle2 className="size-3.5" />
@@ -355,7 +355,7 @@ export default function DashboardPage() {
                     <span className="font-mono font-semibold shrink-0 tabular-nums">{ev.time}</span>
                     <span className="flex-1 font-medium truncate">{ev.title}</span>
                     {ev.soon && (
-                      <button className="h-6 px-2 rounded-md bg-violet-600 text-white text-[10px] font-semibold hover:bg-violet-700 transition-colors flex items-center gap-1 shrink-0">
+                      <button className="h-6 px-2 rounded-md bg-violet-600 dark:bg-violet-700 text-white text-[10px] font-semibold hover:bg-violet-700 dark:hover:bg-violet-600 transition-colors flex items-center gap-1 shrink-0">
                         <Video className="size-3" />Join
                       </button>
                     )}
@@ -387,7 +387,7 @@ export default function DashboardPage() {
                     <Sparkles className="size-3.5 text-violet-500 shrink-0 mt-0.5" />
                     <p className="text-xs text-foreground leading-relaxed">{s.text}</p>
                   </div>
-                  <button className="h-7 px-2.5 text-xs rounded-lg border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100 transition-colors font-medium">
+                  <button className="h-7 px-2.5 text-xs rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900 transition-colors font-medium">
                     {s.action}
                   </button>
                 </div>
@@ -472,7 +472,7 @@ export default function DashboardPage() {
                     <span>·</span>
                     <span>{job.submitted} submitted</span>
                     <span>·</span>
-                    <span className="text-violet-600 font-semibold">{job.aiMatch} AI matches</span>
+                    <span className="text-violet-600 dark:text-violet-400 font-semibold">{job.aiMatch} AI matches</span>
                   </div>
                   <button className="h-7 px-2.5 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium">
                     Continue →

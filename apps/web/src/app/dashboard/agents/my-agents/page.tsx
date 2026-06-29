@@ -28,15 +28,15 @@ const AGENTS: Agent[] = [
 ]
 
 const STATUS_BADGE: Record<string, string> = {
-  running:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  scheduled: 'bg-blue-50 text-blue-700 border-blue-200',
-  paused:    'bg-amber-50 text-amber-700 border-amber-200',
-  completed: 'bg-slate-100 text-slate-600 border-slate-200',
-  failed:    'bg-red-50 text-red-700 border-red-200',
+  running:   'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+  scheduled: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+  paused:    'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  completed: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+  failed:    'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
 }
 
 function rateColor(r: number) {
-  return r >= 90 ? 'text-emerald-600' : r >= 70 ? 'text-amber-600' : 'text-red-600'
+  return r >= 90 ? 'text-emerald-600 dark:text-emerald-400' : r >= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
 }
 
 type ColKey = 'select' | 'name' | 'category' | 'status' | 'trigger' | 'last_run' | 'next_run' | 'success_rate' | 'owner' | 'actions'

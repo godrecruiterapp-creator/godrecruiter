@@ -43,9 +43,9 @@ const NOTIFICATIONS = [
 ]
 
 const STATUS_BADGE: Record<string, string> = {
-  completed: 'bg-slate-100 text-slate-600 border-slate-200',
-  running:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  failed:    'bg-red-50 text-red-700 border-red-200',
+  completed: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+  running:   'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+  failed:    'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
 }
 
 const NOTIF_DOT: Record<string, string> = {
@@ -88,7 +88,7 @@ export default function AgentsDashboard() {
                     <p className="text-sm font-medium">{t.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{t.desc}</p>
                   </div>
-                  <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700 border-blue-200 w-fit mt-auto">
+                  <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800 w-fit mt-auto">
                     {t.category}
                   </span>
                 </Card>

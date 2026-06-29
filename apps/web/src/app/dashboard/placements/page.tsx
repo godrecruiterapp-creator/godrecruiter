@@ -19,9 +19,9 @@ function HealthBadge({ score }: { score: number }) {
   return (
     <div className={cn(
       'flex flex-col items-center justify-center w-12 h-12 rounded-xl shrink-0',
-      status === 'healthy'   ? 'bg-emerald-50 text-emerald-700' :
-      status === 'attention' ? 'bg-amber-50   text-amber-700'   :
-                               'bg-red-50     text-red-700'
+      status === 'healthy'   ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' :
+      status === 'attention' ? 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400' :
+                               'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400'
     )}>
       <span className="text-base font-bold tabular-nums leading-none">{score}</span>
       <span className="text-[9px] font-medium mt-0.5 leading-none opacity-70">
@@ -41,12 +41,12 @@ const STATUS_LABELS: Record<Placement['status'], string> = {
   needs_attention:'Needs Attention',
 }
 const STATUS_COLORS: Record<Placement['status'], string> = {
-  active:          'bg-emerald-100 text-emerald-700',
-  starting_today:  'bg-violet-100  text-violet-700',
-  starting_soon:   'bg-sky-100     text-sky-700',
-  ending_soon:     'bg-amber-100   text-amber-700',
-  completed:       'bg-muted       text-muted-foreground',
-  needs_attention: 'bg-red-100     text-red-700',
+  active:          'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400',
+  starting_today:  'bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-400',
+  starting_soon:   'bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-400',
+  ending_soon:     'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-400',
+  completed:       'bg-muted text-muted-foreground',
+  needs_attention: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400',
 }
 
 // ─── Placement card ────────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ function PlacementCard({ p, selected, onClick }: { p: Placement; selected: boole
         {p.issues.length > 0 && (
           <div className="space-y-1 mb-3">
             {p.issues.slice(0, 2).map((issue, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-xs text-amber-700">
+              <div key={i} className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
                 <AlertTriangle className="size-3 shrink-0" />
                 <span className="truncate">{issue}</span>
               </div>
@@ -236,7 +236,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
               {STATUS_LABELS[p.status]}
             </span>
             <span className={cn('text-[10px] font-semibold',
-              status === 'healthy' ? 'text-emerald-600' : status === 'attention' ? 'text-amber-600' : 'text-red-600'
+              status === 'healthy' ? 'text-emerald-600 dark:text-emerald-400' : status === 'attention' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
             )}>
               Health: {p.healthScore}
             </span>
@@ -289,12 +289,12 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
             {p.issues.length > 0 && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Issues</p>
-                <div className="rounded-xl border border-amber-200 bg-amber-50 divide-y divide-amber-100">
+                <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 divide-y divide-amber-100 dark:divide-amber-900">
                   {p.issues.map((issue, i) => (
                     <div key={i} className="flex items-center gap-3 px-4 py-3">
-                      <AlertTriangle className="size-3.5 text-amber-600 shrink-0" />
-                      <span className="text-xs text-amber-800 flex-1">{issue}</span>
-                      <button className="text-xs font-medium text-amber-700 hover:text-amber-900 transition-colors">Fix →</button>
+                      <AlertTriangle className="size-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <span className="text-xs text-amber-800 dark:text-amber-300 flex-1">{issue}</span>
+                      <button className="text-xs font-medium text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 transition-colors">Fix →</button>
                     </div>
                   ))}
                 </div>
@@ -355,8 +355,8 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
               {[
                 { label: 'Bill Rate',       value: `$${p.billRate}/hr`,                          color: 'text-foreground' },
                 { label: 'Pay Rate',        value: `$${p.payRate}/hr`,                           color: 'text-foreground' },
-                { label: 'Margin %',        value: `${p.marginPct}%`,                            color: 'text-emerald-600' },
-                { label: 'Weekly Revenue',  value: `$${p.weeklyRevenue.toLocaleString()}`,        color: 'text-emerald-600' },
+                { label: 'Margin %',        value: `${p.marginPct}%`,                            color: 'text-emerald-600 dark:text-emerald-400' },
+                { label: 'Weekly Revenue',  value: `$${p.weeklyRevenue.toLocaleString()}`,        color: 'text-emerald-600 dark:text-emerald-400' },
                 { label: 'Contract Value',  value: `$${p.contractValue.toLocaleString()}`,        color: 'text-foreground' },
                 { label: 'Weekly Spread',   value: `$${(p.billRate - p.payRate) * 40}`,           color: 'text-foreground' },
               ].map(item => (
@@ -488,13 +488,13 @@ export default function PlacementsPage() {
 
             {/* KPI strip */}
             <div className="flex gap-3 overflow-x-auto pb-2 mb-6 -mx-1 px-1">
-              <KPICard label="Active Placements" value={active}       icon={Activity}      color="bg-emerald-100 text-emerald-600" onClick={() => setFilterTab('active')}         active={filterTab === 'active'} />
-              <KPICard label="Starts Today"       value={startToday}  icon={CalendarClock} color="bg-violet-100  text-violet-600"  onClick={() => setFilterTab('starting_today')} active={filterTab === 'starting_today'} />
-              <KPICard label="Starts This Week"   value={startWeek}   icon={Users}         color="bg-sky-100    text-sky-600"      sub="incl. today" />
-              <KPICard label="Needs Attention"    value={attention}   icon={AlertTriangle} color="bg-red-100    text-red-600"      onClick={() => setFilterTab('needs_attention')} active={filterTab === 'needs_attention'} />
-              <KPICard label="Ending Soon"        value={endingSoon}  icon={Clock}         color="bg-amber-100  text-amber-600"    onClick={() => setFilterTab('ending_soon')}    active={filterTab === 'ending_soon'} />
-              <KPICard label="Revenue / Month"    value={`$${(monthRevenue / 1000).toFixed(0)}k`} icon={DollarSign} color="bg-emerald-100 text-emerald-600" sub="active only" />
-              <KPICard label="Avg Margin"         value={`${avgMargin.toFixed(1)}%`} icon={TrendingUp} color="bg-blue-100 text-blue-600" sub="active only" />
+              <KPICard label="Active Placements" value={active}       icon={Activity}      color="bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400" onClick={() => setFilterTab('active')}         active={filterTab === 'active'} />
+              <KPICard label="Starts Today"       value={startToday}  icon={CalendarClock} color="bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-400"  onClick={() => setFilterTab('starting_today')} active={filterTab === 'starting_today'} />
+              <KPICard label="Starts This Week"   value={startWeek}   icon={Users}         color="bg-sky-100 dark:bg-sky-900 text-sky-600 dark:text-sky-400"      sub="incl. today" />
+              <KPICard label="Needs Attention"    value={attention}   icon={AlertTriangle} color="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"      onClick={() => setFilterTab('needs_attention')} active={filterTab === 'needs_attention'} />
+              <KPICard label="Ending Soon"        value={endingSoon}  icon={Clock}         color="bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400"    onClick={() => setFilterTab('ending_soon')}    active={filterTab === 'ending_soon'} />
+              <KPICard label="Revenue / Month"    value={`$${(monthRevenue / 1000).toFixed(0)}k`} icon={DollarSign} color="bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400" sub="active only" />
+              <KPICard label="Avg Margin"         value={`${avgMargin.toFixed(1)}%`} icon={TrendingUp} color="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400" sub="active only" />
               <KPICard label="Total Placements"   value={PLACEMENTS.length} icon={RefreshCw} color="bg-muted text-muted-foreground" onClick={() => setFilterTab('all')} active={filterTab === 'all'} />
             </div>
 
@@ -527,26 +527,26 @@ export default function PlacementsPage() {
 
             {/* Needs Attention banner */}
             {filterTab === 'all' && needsAttentionItems.length > 0 && (
-              <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100">
-                  <AlertTriangle className="size-4 text-amber-600" />
-                  <span className="text-xs font-semibold text-amber-800">Needs Attention ({needsAttentionItems.length})</span>
+              <div className="mb-6 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100 dark:border-amber-900">
+                  <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-300">Needs Attention ({needsAttentionItems.length})</span>
                 </div>
-                <div className="divide-y divide-amber-100">
+                <div className="divide-y divide-amber-100 dark:divide-amber-900">
                   {needsAttentionItems.map(p => (
                     <button
                       key={p.id}
                       onClick={() => setSelectedId(p.id)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-100/50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-100/50 dark:hover:bg-amber-900/50 transition-colors text-left"
                     >
-                      <div className="size-7 rounded-full bg-amber-200 flex items-center justify-center text-[10px] font-bold text-amber-800 shrink-0">
+                      <div className="size-7 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center text-[10px] font-bold text-amber-800 dark:text-amber-200 shrink-0">
                         {p.initials}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-amber-900">{p.candidate}</p>
-                        <p className="text-[10px] text-amber-700 truncate">{p.issues[0] ?? 'Health score below threshold'}</p>
+                        <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">{p.candidate}</p>
+                        <p className="text-[10px] text-amber-700 dark:text-amber-400 truncate">{p.issues[0] ?? 'Health score below threshold'}</p>
                       </div>
-                      <span className="text-xs font-medium text-amber-700 shrink-0">Fix →</span>
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-400 shrink-0">Fix →</span>
                     </button>
                   ))}
                 </div>

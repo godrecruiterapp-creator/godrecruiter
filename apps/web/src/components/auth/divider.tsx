@@ -1,9 +1,9 @@
 export function Divider({ label = 'or' }: { label?: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '4px 0' }}>
-      <div style={{ flex: 1, height: '1px', background: '#EBEBEB' }} />
-      <span style={{ fontSize: '12px', color: '#AAAAAA' }}>{label}</span>
-      <div style={{ flex: 1, height: '1px', background: '#EBEBEB' }} />
+    <div className="flex items-center gap-2.5 my-1">
+      <div className="flex-1 h-px bg-border" />
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <div className="flex-1 h-px bg-border" />
     </div>
   )
 }

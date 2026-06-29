@@ -6,27 +6,21 @@ interface AlertProps {
 }
 
 const config = {
-  error:   { bg: '#FFF1F1', border: '#FECACA', color: '#991B1B', dot: '#DC2626' },
-  success: { bg: '#F0FDF4', border: '#BBF7D0', color: '#166534', dot: '#16A34A' },
-  info:    { bg: '#F9F9F9', border: '#E0E0E0', color: '#333333', dot: '#0A0A0A' },
+  error:   'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400',
+  success: 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400',
+  info:    'bg-muted border-border text-muted-foreground',
+}
+
+const dotColor = {
+  error:   'bg-red-500',
+  success: 'bg-emerald-500',
+  info:    'bg-foreground',
 }
 
 export function Alert({ type, message }: AlertProps) {
-  const c = config[type]
   return (
-    <div role="alert" style={{
-      padding: '11px 14px',
-      borderRadius: '6px',
-      background: c.bg,
-      border: `1px solid ${c.border}`,
-      fontSize: '13px', color: c.color,
-      lineHeight: 1.5,
-      display: 'flex', gap: '8px', alignItems: 'flex-start',
-    }}>
-      <span style={{
-        width: '6px', height: '6px', borderRadius: '50%',
-        background: c.dot, flexShrink: 0, marginTop: '5px',
-      }} />
+    <div role="alert" className={`flex gap-2 items-start px-3.5 py-2.5 rounded-md border text-[13px] leading-relaxed ${config[type]}`}>
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-[5px] ${dotColor[type]}`} />
       <span>{message}</span>
     </div>
   )

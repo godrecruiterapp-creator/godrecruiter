@@ -78,16 +78,16 @@ const WORK_AUTH: Record<string, string> = {
 }
 
 const STAGE_BADGE: Record<string, string> = {
-  sourced:   'bg-slate-100 text-slate-600 border-slate-200',
-  qualified: 'bg-blue-50 text-blue-700 border-blue-200',
-  submitted: 'bg-amber-50 text-amber-700 border-amber-200',
-  interview: 'bg-violet-50 text-violet-700 border-violet-200',
-  offer:     'bg-orange-50 text-orange-700 border-orange-200',
-  start:     'bg-emerald-50 text-emerald-700 border-emerald-200',
+  sourced:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+  qualified: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+  submitted: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  interview: 'bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800',
+  offer:     'bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+  start:     'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  open: 'text-emerald-700', on_hold: 'text-amber-600', closed: 'text-zinc-500', filled: 'text-blue-700',
+  open: 'text-emerald-700 dark:text-emerald-400', on_hold: 'text-amber-600 dark:text-amber-400', closed: 'text-zinc-500 dark:text-zinc-400', filled: 'text-blue-700 dark:text-blue-400',
 }
 
 function relTime(iso: string) {
@@ -463,7 +463,7 @@ function CandidatePreviewSheet({
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {j.stage && (
-                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${STAGE_BADGE[j.stage] ?? 'bg-zinc-100 text-zinc-600 border-zinc-200'}`}>
+                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${STAGE_BADGE[j.stage] ?? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}>
                           {j.stage}
                         </span>
                       )}

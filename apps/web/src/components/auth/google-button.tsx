@@ -26,17 +26,7 @@ export function GoogleButton({ label = 'Continue with Google' }: { label?: strin
       type="button"
       onClick={handleGoogleAuth}
       disabled={loading}
-      style={{
-        width: '100%', height: '40px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-        background: '#FFFFFF', border: '1px solid #E0E0E0',
-        borderRadius: '6px', fontSize: '13px', fontWeight: '500',
-        color: '#0A0A0A', cursor: loading ? 'not-allowed' : 'pointer',
-        opacity: loading ? 0.6 : 1, transition: 'border-color 0.12s',
-        fontFamily: 'inherit',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#AAAAAA' }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E0E0E0' }}
+      className={`w-full h-10 flex items-center justify-center gap-2 bg-background border border-border rounded-md text-[13px] font-medium text-foreground transition-colors font-[inherit] hover:border-foreground/40 disabled:cursor-not-allowed ${loading ? 'opacity-60' : ''}`}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

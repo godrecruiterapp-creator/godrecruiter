@@ -31,7 +31,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
     <div className="flex gap-1">
       {[1,2,3,4,5].map(n => (
         <button key={n} type="button" onClick={() => onChange(n)}
-          className={cn('size-6', n <= value ? 'text-amber-400' : 'text-muted-foreground/30')}>
+          className={cn('size-6', n <= value ? 'text-amber-400 dark:text-amber-300' : 'text-muted-foreground/30')}>
           <Star className="size-full fill-current" />
         </button>
       ))}
@@ -73,7 +73,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
               <span key={s} className={cn(
                 'text-[10px] px-2 py-0.5 rounded-full transition-colors',
                 i === step ? 'bg-brand text-white font-medium' :
-                i < step ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'
+                i < step ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400' : 'bg-muted text-muted-foreground'
               )}>{s}</span>
             ))}
           </div>
@@ -102,8 +102,8 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                     </div>
                     <span className={cn('text-xs px-2 py-0.5 rounded-full border',
                       c.availability === 'Available' || c.availability === 'Immediate'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                        ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                        : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
                     )}>{c.availability}</span>
                     {selectedCandidate === c.id && <Check className="size-4 text-brand shrink-0" />}
                   </button>
@@ -127,11 +127,11 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                       <p className="text-sm font-medium">{j.title}</p>
                       <p className="text-xs text-muted-foreground">{j.client}</p>
                     </div>
-                    <span className="text-xs px-2 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">{j.status}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full border bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">{j.status}</span>
                     <span className={cn('text-xs px-2 py-0.5 rounded-full border',
-                      j.priority === 'Critical' ? 'bg-red-50 text-red-700 border-red-200' :
-                      j.priority === 'High Priority' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                      'bg-slate-100 text-slate-600 border-slate-200'
+                      j.priority === 'Critical' ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' :
+                      j.priority === 'High Priority' ? 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800' :
+                      'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                     )}>{j.priority}</span>
                     {selectedJob === j.id && <Check className="size-4 text-brand shrink-0" />}
                   </button>

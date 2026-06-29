@@ -27,9 +27,9 @@ const RUNS: Run[] = [
 ]
 
 const STATUS_BADGE: Record<string, string> = {
-  completed: 'bg-slate-100 text-slate-600 border-slate-200',
-  running:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  failed:    'bg-red-50 text-red-700 border-red-200',
+  completed: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+  running:   'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+  failed:    'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
 }
 
 type ColKey = 'select' | 'date' | 'agent' | 'status' | 'duration' | 'records' | 'actions_performed' | 'errors' | 'actions'
@@ -126,7 +126,7 @@ export default function HistoryPage() {
       case 'records': return <span className="text-xs text-muted-foreground tabular-nums">{r.records}</span>
       case 'actions_performed': return <span className="text-xs text-muted-foreground tabular-nums">{r.actions_performed}</span>
       case 'errors': return (
-        <span className={cn('text-xs tabular-nums font-medium', r.errors > 0 ? 'text-red-600' : 'text-muted-foreground')}>{r.errors}</span>
+        <span className={cn('text-xs tabular-nums font-medium', r.errors > 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground')}>{r.errors}</span>
       )
       case 'actions': return (
         <DropdownMenu>

@@ -80,8 +80,8 @@ function ScoreBadge({ score }: { score: number }) {
   const cls = score >= 90
     ? 'bg-brand-muted text-brand border-brand/25'
     : score >= 80
-    ? 'bg-blue-50 text-blue-700 border-blue-200'
-    : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+    ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
   return (
     <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${cls}`}>
       {score}%
@@ -474,8 +474,8 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
                   {[
                     { label: 'Bill Rate', value: `$${billRate}/hr`, cls: 'text-foreground'   },
                     { label: 'Pay Rate',  value: `$${payRate}/hr`,  cls: 'text-foreground'   },
-                    { label: 'Margin',    value: `$${margin}/hr`,   cls: 'text-emerald-600'  },
-                    { label: 'Margin %',  value: `${marginPct}%`,   cls: 'text-emerald-600'  },
+                    { label: 'Margin',    value: `$${margin}/hr`,   cls: 'text-emerald-600 dark:text-emerald-400'  },
+                    { label: 'Margin %',  value: `${marginPct}%`,   cls: 'text-emerald-600 dark:text-emerald-400'  },
                   ].map(({ label, value, cls }) => (
                     <div key={label} className="rounded-lg border border-border bg-muted/20 px-3 py-2.5">
                       <p className="text-xs text-muted-foreground mb-1">{label}</p>
@@ -663,8 +663,8 @@ function DocumentsTab({ jobId, docs, setDocs }: {
   }
 
   const iconColor: Record<string, string> = {
-    pdf: 'text-red-500', doc: 'text-blue-500', docx: 'text-blue-500',
-    xls: 'text-emerald-500', xlsx: 'text-emerald-500',
+    pdf: 'text-red-500 dark:text-red-400', doc: 'text-blue-500 dark:text-blue-400', docx: 'text-blue-500 dark:text-blue-400',
+    xls: 'text-emerald-500 dark:text-emerald-400', xlsx: 'text-emerald-500 dark:text-emerald-400',
   }
   const types = [...new Set(docs.map(d => d.type))]
   const visible = typeFilter ? docs.filter(d => d.type === typeFilter) : docs
@@ -773,7 +773,7 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
   const ageDays   = Math.floor((Date.now() - new Date(job.created_at).getTime()) / 86_400_000)
   const sc        = STATUS_CONFIG[job.status] ?? STATUS_CONFIG['open']!
   const prioLabel = { high: 'High', medium: 'Medium', low: 'Low' }[job.priority ?? 'medium'] ?? 'Medium'
-  const prioColor = { high: 'text-red-600', medium: 'text-amber-600', low: 'text-zinc-500' }[job.priority ?? 'medium'] ?? 'text-amber-600'
+  const prioColor = { high: 'text-red-600 dark:text-red-400', medium: 'text-amber-600 dark:text-amber-400', low: 'text-zinc-500 dark:text-zinc-400' }[job.priority ?? 'medium'] ?? 'text-amber-600 dark:text-amber-400'
 
   const filteredCandidates = useMemo(() => {
     let list = candidates.filter(c => {
@@ -798,11 +798,11 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
   }
 
   const statCards = [
-    { label: 'Total',        value: counts.total,        bg: 'bg-blue-50',    border: 'border-blue-200',   num: 'text-blue-700',   sub: 'text-blue-500'   },
-    { label: 'Qualified',    value: counts.qualified,    bg: 'bg-emerald-50', border: 'border-emerald-200',num: 'text-emerald-700',sub: 'text-emerald-500'},
-    { label: 'Submitted',    value: counts.submitted,    bg: 'bg-amber-50',   border: 'border-amber-200',  num: 'text-amber-700',  sub: 'text-amber-500'  },
-    { label: 'Interviewing', value: counts.interviewing, bg: 'bg-violet-50',  border: 'border-violet-200', num: 'text-violet-700', sub: 'text-violet-500' },
-    { label: 'Offers',       value: counts.offers,       bg: 'bg-orange-50',  border: 'border-orange-200', num: 'text-orange-700', sub: 'text-orange-500' },
+    { label: 'Total',        value: counts.total,        bg: 'bg-blue-50 dark:bg-blue-950',    border: 'border-blue-200 dark:border-blue-800',   num: 'text-blue-700 dark:text-blue-400',   sub: 'text-blue-500 dark:text-blue-400'   },
+    { label: 'Qualified',    value: counts.qualified,    bg: 'bg-emerald-50 dark:bg-emerald-950', border: 'border-emerald-200 dark:border-emerald-800',num: 'text-emerald-700 dark:text-emerald-400',sub: 'text-emerald-500 dark:text-emerald-400'},
+    { label: 'Submitted',    value: counts.submitted,    bg: 'bg-amber-50 dark:bg-amber-950',   border: 'border-amber-200 dark:border-amber-800',  num: 'text-amber-700 dark:text-amber-400',  sub: 'text-amber-500 dark:text-amber-400'  },
+    { label: 'Interviewing', value: counts.interviewing, bg: 'bg-violet-50 dark:bg-violet-950',  border: 'border-violet-200 dark:border-violet-800', num: 'text-violet-700 dark:text-violet-400', sub: 'text-violet-500 dark:text-violet-400' },
+    { label: 'Offers',       value: counts.offers,       bg: 'bg-orange-50 dark:bg-orange-950',  border: 'border-orange-200 dark:border-orange-800', num: 'text-orange-700 dark:text-orange-400', sub: 'text-orange-500 dark:text-orange-400' },
     { label: 'Placements',   value: counts.placements,   bg: 'bg-brand-muted',border: 'border-brand/20',   num: 'text-brand',      sub: 'text-brand/60'   },
   ]
 

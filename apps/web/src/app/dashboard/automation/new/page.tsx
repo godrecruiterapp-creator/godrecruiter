@@ -137,10 +137,10 @@ function makeBlock(type: BlockType): Block {
 // ─── Block colours / labels ───────────────────────────────────────────────────
 
 const BLOCK_META: Record<BlockType, { color: string; dot: string; emptyLabel: string; icon: React.ComponentType<{className?: string}> }> = {
-  trigger:   { color: 'border-violet-200 bg-violet-50/60',   dot: 'bg-violet-500',  emptyLabel: 'Choose what starts this',    icon: Zap },
-  condition: { color: 'border-amber-200  bg-amber-50/60',    dot: 'bg-amber-400',   emptyLabel: 'Add a check (Only if…)',      icon: Filter },
-  timing:    { color: 'border-blue-200   bg-blue-50/60',     dot: 'bg-blue-500',    emptyLabel: 'Choose timing',               icon: Clock },
-  action:    { color: 'border-emerald-200 bg-emerald-50/60', dot: 'bg-emerald-500', emptyLabel: 'Choose what should happen',   icon: Zap },
+  trigger:   { color: 'border-violet-200 dark:border-violet-800 bg-violet-50/60 dark:bg-violet-950/60',   dot: 'bg-violet-500',  emptyLabel: 'Choose what starts this',    icon: Zap },
+  condition: { color: 'border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/60',    dot: 'bg-amber-400',   emptyLabel: 'Add a check (Only if…)',      icon: Filter },
+  timing:    { color: 'border-blue-200 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/60',     dot: 'bg-blue-500',    emptyLabel: 'Choose timing',               icon: Clock },
+  action:    { color: 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/60', dot: 'bg-emerald-500', emptyLabel: 'Choose what should happen',   icon: Zap },
 }
 
 // ─── Natural language summary ─────────────────────────────────────────────────
@@ -179,10 +179,10 @@ function TriggerPicker({ value, onChange }: { value: string | null; onChange: (v
             <button key={t.id} onClick={() => onChange(t.id)}
               className={cn(
                 'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left text-xs transition-colors',
-                sel ? 'border-violet-400 bg-violet-100 text-violet-900 font-medium'
+                sel ? 'border-violet-400 dark:border-violet-600 bg-violet-100 dark:bg-violet-900 text-violet-900 dark:text-violet-200 font-medium'
                     : 'border-border hover:bg-muted/60 text-foreground'
               )}>
-              <Icon className={cn('size-3.5 shrink-0', sel ? 'text-violet-600' : 'text-muted-foreground')} />
+              <Icon className={cn('size-3.5 shrink-0', sel ? 'text-violet-600 dark:text-violet-400' : 'text-muted-foreground')} />
               {t.label}
             </button>
           )
@@ -200,7 +200,7 @@ function TimingPicker({ value, onChange }: { value: string; onChange: (v: string
           className={cn(
             'px-3 py-2 rounded-lg border text-xs text-left transition-colors',
             value === opt
-              ? 'border-blue-400 bg-blue-100 text-blue-900 font-medium'
+              ? 'border-blue-400 dark:border-blue-600 bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-200 font-medium'
               : 'border-border hover:bg-muted/60 text-foreground'
           )}>
           {opt}
@@ -233,7 +233,7 @@ function ConditionPicker({ values, input, onChange }: {
       {values.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
           {values.map(v => (
-            <span key={v} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+            <span key={v} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700">
               {v}
               <button onClick={() => onChange({ values: values.filter(x => x !== v) })} className="hover:text-red-600 transition-colors">
                 <X className="size-3" />
@@ -246,7 +246,7 @@ function ConditionPicker({ values, input, onChange }: {
       <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
         {CONDITION_SUGGESTIONS.filter(s => !values.includes(s)).map(s => (
           <button key={s} onClick={() => add(s)}
-            className="px-2.5 py-1 rounded-full text-xs border border-dashed border-border hover:border-amber-400 hover:bg-amber-50 hover:text-amber-800 text-muted-foreground transition-colors">
+            className="px-2.5 py-1 rounded-full text-xs border border-dashed border-border hover:border-amber-400 dark:hover:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 hover:text-amber-800 dark:hover:text-amber-300 text-muted-foreground transition-colors">
             + {s}
           </button>
         ))}
@@ -270,10 +270,10 @@ function ActionPicker({ value, onChange }: { value: string | null; onChange: (v:
             <button key={a.id} onClick={() => onChange(a.id)}
               className={cn(
                 'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left text-xs transition-colors',
-                sel ? 'border-emerald-400 bg-emerald-100 text-emerald-900 font-medium'
+                sel ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-100 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 font-medium'
                     : 'border-border hover:bg-muted/60 text-foreground'
               )}>
-              <Icon className={cn('size-3.5 shrink-0', sel ? 'text-emerald-600' : 'text-muted-foreground')} />
+              <Icon className={cn('size-3.5 shrink-0', sel ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground')} />
               {a.label}
             </button>
           )
@@ -288,10 +288,10 @@ function ActionPicker({ value, onChange }: { value: string | null; onChange: (v:
 function AddStepMenu({ onAdd, hasTrigger }: { onAdd: (t: BlockType) => void; hasTrigger: boolean }) {
   const [open, setOpen] = useState(false)
   const options: { type: BlockType; label: string; icon: React.ComponentType<{className?: string}>; color: string }[] = [
-    ...(!hasTrigger ? [{ type: 'trigger' as BlockType, label: 'Add Trigger',    icon: Zap,    color: 'text-violet-600 hover:bg-violet-50 hover:border-violet-300' }] : []),
-    { type: 'condition', label: 'Add Check (Only if…)', icon: Filter, color: 'text-amber-600  hover:bg-amber-50  hover:border-amber-300'  },
-    { type: 'timing',    label: 'Add Wait / Timing',    icon: Clock,  color: 'text-blue-600   hover:bg-blue-50   hover:border-blue-300'   },
-    { type: 'action',    label: 'Add Action',            icon: Zap,    color: 'text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300' },
+    ...(!hasTrigger ? [{ type: 'trigger' as BlockType, label: 'Add Trigger',    icon: Zap,    color: 'text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950 hover:border-violet-300 dark:hover:border-violet-700' }] : []),
+    { type: 'condition', label: 'Add Check (Only if…)', icon: Filter, color: 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950 hover:border-amber-300 dark:hover:border-amber-700'  },
+    { type: 'timing',    label: 'Add Wait / Timing',    icon: Clock,  color: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 hover:border-blue-300 dark:hover:border-blue-700'   },
+    { type: 'action',    label: 'Add Action',            icon: Zap,    color: 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 hover:border-emerald-300 dark:hover:border-emerald-700' },
   ]
   return (
     <div className="relative flex justify-center">
@@ -366,9 +366,9 @@ function BlockCard({ block, active, onActivate, onUpdate, onDelete }: {
 
         <div className="flex-1 min-w-0">
           <p className={cn('text-[10px] font-semibold uppercase tracking-wider mb-0.5',
-            block.type === 'trigger'   ? 'text-violet-600' :
-            block.type === 'condition' ? 'text-amber-600'  :
-            block.type === 'timing'    ? 'text-blue-600'   : 'text-emerald-600'
+            block.type === 'trigger'   ? 'text-violet-600 dark:text-violet-400' :
+            block.type === 'condition' ? 'text-amber-600 dark:text-amber-400'  :
+            block.type === 'timing'    ? 'text-blue-600 dark:text-blue-400'   : 'text-emerald-600 dark:text-emerald-400'
           )}>
             {block.type === 'trigger'   ? 'When this happens' :
              block.type === 'condition' ? 'Only if…'          :
@@ -574,9 +574,9 @@ export default function NewAutomationPage() {
                       </div>
                       <div className="pb-3 min-w-0">
                         <p className={cn('text-[10px] font-semibold uppercase tracking-wider',
-                          b.type === 'trigger'   ? 'text-violet-600' :
-                          b.type === 'condition' ? 'text-amber-600'  :
-                          b.type === 'timing'    ? 'text-blue-600'   : 'text-emerald-600'
+                          b.type === 'trigger'   ? 'text-violet-600 dark:text-violet-400' :
+                          b.type === 'condition' ? 'text-amber-600 dark:text-amber-400'  :
+                          b.type === 'timing'    ? 'text-blue-600 dark:text-blue-400'   : 'text-emerald-600 dark:text-emerald-400'
                         )}>
                           {b.type === 'trigger'   ? 'Trigger'   :
                            b.type === 'condition' ? 'Only if'   :
