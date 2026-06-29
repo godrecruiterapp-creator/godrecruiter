@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, CheckCircle2, AlertCircle, User, Lock, Building2 } from 'lucide-react'
+import { Loader2, CheckCircle2, AlertCircle, User, Lock, Building2, PanelLeft } from 'lucide-react'
 import { updateProfileAction, updatePasswordAction } from './actions'
+import { useSidebarBehavior, type SidebarBehavior } from '@/hooks/use-sidebar-behavior'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface Props {
   fullName: string
@@ -19,6 +21,7 @@ interface Props {
 
 export function ProfileForm({ fullName, email, tenantName, role, memberSince }: Props) {
   const initials = fullName.split(' ').map(w => w[0] ?? '').join('').slice(0, 2).toUpperCase() || '?'
+  const { behavior, setBehavior } = useSidebarBehavior()
 
   const [nameValue, setNameValue]     = useState(fullName)
   const [nameStatus, setNameStatus]   = useState<{ ok?: boolean; msg?: string } | null>(null)
@@ -111,6 +114,30 @@ export function ProfileForm({ fullName, email, tenantName, role, memberSince }: 
                 </Button>
               </div>
             </form>
+          </div>
+        </section>
+
+        {/* ── Sidebar behavior ────────────────────────────────────────── */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <PanelLeft className="size-4 text-muted-foreground" />
+            <h3 className="text-sm font-semibold">Sidebar behavior</h3>
+          </div>
+          <div className="bg-background border border-border rounded-xl p-6 space-y-4">
+            <p className="text-sm text-muted-foreground">Choose your preferred sidebar behavior: open, closed, or expand on hover.</p>
+            <div className="space-y-1.5">
+              <Label>Behavior</Label>
+              <Select value={behavior} onValueChange={v => setBehavior(v as SidebarBehavior)}>
+                <SelectTrigger className="w-56">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="expanded">Expanded</SelectItem>
+                  <SelectItem value="collapsed">Collapsed</SelectItem>
+                  <SelectItem value="hover">Expand on hover</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </section>
 

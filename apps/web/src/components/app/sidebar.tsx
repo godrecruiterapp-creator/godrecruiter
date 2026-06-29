@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useSidebarBehavior } from '@/hooks/use-sidebar-behavior'
 
 type NavItem = { label: string; href: string; icon: React.ComponentType<{ className?: string }> } | 'divider'
 
@@ -30,14 +31,29 @@ const NAV: NavItem[] = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
+  const { behavior } = useSidebarBehavior()
+  const [manualCollapsed, setManualCollapsed] = useState(false)
+  const [hovered, setHovered] = useState(false)
+
+  // Derive collapsed state from behavior
+  const collapsed =
+    behavior === 'expanded' ? false :
+    behavior === 'collapsed' ? true :
+    // hover mode: collapsed unless hovered
+    !hovered
+
+  const showToggle = behavior === 'expanded' || behavior === 'collapsed'
 
   return (
     <TooltipProvider delayDuration={0}>
-      <aside className={cn(
-        'flex flex-col flex-shrink-0 h-screen border-r bg-sidebar transition-[width] duration-200 ease-linear overflow-hidden',
-        collapsed ? 'w-14' : 'w-56'
-      )}>
+      <aside
+        className={cn(
+          'flex flex-col flex-shrink-0 h-screen border-r bg-sidebar transition-[width] duration-200 ease-linear overflow-hidden',
+          collapsed ? 'w-14' : 'w-56'
+        )}
+        onMouseEnter={() => behavior === 'hover' && setHovered(true)}
+        onMouseLeave={() => behavior === 'hover' && setHovered(false)}
+      >
         {/* Logo */}
         <div className="flex items-center justify-between h-12 border-b px-3 flex-shrink-0">
           {!collapsed && (
@@ -49,9 +65,9 @@ export function AppSidebar() {
           {collapsed && (
             <div className="size-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-xs mx-auto">G</div>
           )}
-          {!collapsed && (
+          {!collapsed && showToggle && (
             <button
-              onClick={() => setCollapsed(true)}
+              onClick={() => setManualCollapsed(true)}
               className="flex items-center justify-center size-6 rounded-md text-[#636f7a] hover:text-foreground hover:bg-accent transition-colors flex-shrink-0"
               aria-label="Collapse sidebar"
             >
@@ -64,7 +80,7 @@ export function AppSidebar() {
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
           {NAV.map((entry, i) => {
             if (entry === 'divider') {
-              return <div key={`divider-${i}`} className={cn('border-t border-border/60', collapsed ? 'mx-1 my-1' : 'mx-1 my-1')} />
+              return <div key={`divider-${i}`} className="border-t border-border/60 mx-1 my-1" />
             }
             const { label, href, icon: Icon } = entry
             const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
@@ -96,13 +112,13 @@ export function AppSidebar() {
           })}
         </nav>
 
-        {/* Footer — collapse toggle only */}
-        {collapsed && (
+        {/* Footer — expand toggle (only in collapsed + manual mode) */}
+        {collapsed && showToggle && (
           <div className="border-t px-2 py-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => setCollapsed(false)}
+                  onClick={() => setManualCollapsed(false)}
                   className="flex items-center justify-center w-full py-2 rounded-md text-[#636f7a] hover:bg-accent hover:text-foreground transition-colors"
                   aria-label="Expand sidebar"
                 >
