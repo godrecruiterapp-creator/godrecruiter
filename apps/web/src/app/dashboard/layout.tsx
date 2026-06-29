@@ -16,9 +16,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     user.email?.split('@')[0] ??
     'User'
 
+  const sidebarBehavior = (user.user_metadata?.sidebar_behavior ?? 'expanded') as 'expanded' | 'collapsed' | 'hover'
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <AppSidebar />
+      <AppSidebar serverBehavior={sidebarBehavior} />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header userName={fullName} userEmail={user.email ?? ''} />
         <main className="flex-1 overflow-hidden bg-muted/30 flex flex-col">

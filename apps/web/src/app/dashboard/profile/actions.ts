@@ -25,6 +25,16 @@ export async function updateProfileAction(formData: FormData) {
   return { success: true }
 }
 
+export async function updateSidebarBehaviorAction(behavior: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+
+  const { error } = await supabase.auth.updateUser({ data: { sidebar_behavior: behavior } })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
 export async function updatePasswordAction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

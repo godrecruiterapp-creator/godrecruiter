@@ -29,9 +29,9 @@ const NAV: NavItem[] = [
   { label: 'Settings',    href: '/dashboard/settings',     icon: Settings },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | 'collapsed' | 'hover' }) {
   const pathname = usePathname()
-  const { behavior } = useSidebarBehavior()
+  const { behavior } = useSidebarBehavior(serverBehavior)
   const [manualCollapsed, setManualCollapsed] = useState(false)
   const [hovered, setHovered] = useState(false)
 

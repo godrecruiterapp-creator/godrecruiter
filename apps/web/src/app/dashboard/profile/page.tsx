@@ -30,6 +30,8 @@ export default async function ProfilePage() {
   const role       = (membershipRes.data as any)?.role ?? null
   const memberSince = new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
+  const sidebarBehavior = (user.user_metadata?.sidebar_behavior ?? 'expanded') as 'expanded' | 'collapsed' | 'hover'
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Page header */}
@@ -44,6 +46,7 @@ export default async function ProfilePage() {
         tenantName={tenantName}
         role={role}
         memberSince={memberSince}
+        sidebarBehavior={sidebarBehavior}
       />
     </div>
   )

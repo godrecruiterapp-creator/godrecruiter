@@ -17,11 +17,12 @@ interface Props {
   tenantName: string | null
   role: string | null
   memberSince: string
+  sidebarBehavior: 'expanded' | 'collapsed' | 'hover'
 }
 
-export function ProfileForm({ fullName, email, tenantName, role, memberSince }: Props) {
+export function ProfileForm({ fullName, email, tenantName, role, memberSince, sidebarBehavior }: Props) {
   const initials = fullName.split(' ').map(w => w[0] ?? '').join('').slice(0, 2).toUpperCase() || '?'
-  const { behavior, setBehavior } = useSidebarBehavior()
+  const { behavior, setBehavior } = useSidebarBehavior(sidebarBehavior)
 
   const [nameValue, setNameValue]     = useState(fullName)
   const [nameStatus, setNameStatus]   = useState<{ ok?: boolean; msg?: string } | null>(null)
