@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon } from 'lucide-react'
+import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -53,21 +53,26 @@ export function Header({ userName, userEmail }: Props) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult | null>(null)
   const [open, setOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [activeIdx, setActiveIdx] = useState(-1)
   const [, startTransition] = useTransition()
   const inputRef = useRef<HTMLInputElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Focus input when search opens
+  useEffect(() => {
+    if (searchOpen) setTimeout(() => inputRef.current?.focus(), 50)
+  }, [searchOpen])
+
   // Cmd/Ctrl+K shortcut
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        inputRef.current?.focus()
-        inputRef.current?.select()
+        setSearchOpen(true)
       }
-      if (e.key === 'Escape') { setOpen(false); inputRef.current?.blur() }
+      if (e.key === 'Escape') { setOpen(false); setSearchOpen(false); inputRef.current?.blur() }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -76,7 +81,10 @@ export function Header({ userName, userEmail }: Props) {
   // Click outside to close
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false)
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+        setOpen(false)
+        setSearchOpen(false)
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -107,13 +115,14 @@ export function Header({ userName, userEmail }: Props) {
     if (e.key === 'ArrowUp')   { e.preventDefault(); setActiveIdx(i => Math.max(i - 1, 0)) }
     if (e.key === 'Enter' && activeIdx >= 0) {
       const item = allItems[activeIdx]
-      if (item) { router.push(item.href); setOpen(false); setQuery(''); setResults(null) }
+      if (item) { router.push(item.href); setOpen(false); setSearchOpen(false); setQuery(''); setResults(null) }
     }
   }
 
   function navigate(href: string) {
     router.push(href)
     setOpen(false)
+    setSearchOpen(false)
     setQuery('')
     setResults(null)
   }
@@ -121,10 +130,10 @@ export function Header({ userName, userEmail }: Props) {
   const hasResults = (results?.candidates.length ?? 0) + (results?.jobs.length ?? 0) > 0
 
   return (
-    <header className="flex h-11 shrink-0 items-center border-b bg-background px-4 gap-3">
+    <header className="flex h-12 shrink-0 items-center border-b bg-background px-4 gap-3">
 
       {/* Breadcrumbs — left */}
-      <nav className="flex items-center gap-1 w-[220px] shrink-0 min-w-0">
+      <nav className="flex items-center gap-1 flex-1 min-w-0">
         {crumbs.map((crumb, i) => {
           const isLast = i === crumbs.length - 1
           return (
@@ -142,100 +151,112 @@ export function Header({ userName, userEmail }: Props) {
         })}
       </nav>
 
-      {/* Search — center */}
-      <div className="flex-1 flex justify-center">
-        <div className="relative w-full max-w-md" ref={boxRef}>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={e => handleChange(e.target.value)}
-            onFocus={() => { if (hasResults) setOpen(true) }}
-            onKeyDown={handleKeyDown}
-            placeholder="Search candidates, jobs… ⌘K"
-            className="w-full h-7 pl-8 pr-8 text-sm bg-muted/60 border border-border rounded-md placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand focus:bg-background transition-colors"
-          />
-          {query && (
-            <button onClick={() => { setQuery(''); setResults(null); setOpen(false) }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-              <X className="size-3.5" />
-            </button>
-          )}
+      {/* Right actions */}
+      <div className="flex items-center gap-1 shrink-0">
 
-          {/* Dropdown */}
-          {open && (
-            <div className="absolute top-full mt-1.5 left-0 right-0 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-              {!hasResults ? (
-                <p className="text-sm text-muted-foreground text-center py-6">No results for "{query}"</p>
-              ) : (
-                <>
-                  {(results?.candidates.length ?? 0) > 0 && (
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-4 pt-3 pb-1.5">Candidates</p>
-                      {results!.candidates.map((c, i) => {
-                        const idx = i
-                        return (
-                          <button key={c.id} onClick={() => navigate(`/dashboard/candidates/${c.id}`)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${activeIdx === idx ? 'bg-brand-muted' : 'hover:bg-muted/60'}`}>
-                            <div className="size-6 rounded-full bg-brand-muted flex items-center justify-center shrink-0">
-                              <User className="size-3 text-brand" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
-                                <span className="text-xs text-muted-foreground shrink-0">{c.candidateId}</span>
+        {/* Search icon + inline panel */}
+        <div className="relative" ref={boxRef}>
+          <button
+            onClick={() => setSearchOpen(v => !v)}
+            className="size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Search"
+          >
+            <Search className="size-4" />
+          </button>
+
+          {/* Expanded search overlay */}
+          {searchOpen && (
+            <div className="absolute right-0 top-full mt-1.5 w-80 z-50">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={e => handleChange(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search candidates, jobs… ⌘K"
+                  className="w-full h-8 pl-8 pr-8 text-sm bg-background border border-border rounded-md shadow-lg placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand transition-colors"
+                />
+                {query && (
+                  <button onClick={() => { setQuery(''); setResults(null); setOpen(false) }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {open && (
+                <div className="mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+                  {!hasResults ? (
+                    <p className="text-sm text-muted-foreground text-center py-6">No results for "{query}"</p>
+                  ) : (
+                    <>
+                      {(results?.candidates.length ?? 0) > 0 && (
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-4 pt-3 pb-1.5">Candidates</p>
+                          {results!.candidates.map((c, i) => (
+                            <button key={c.id} onClick={() => navigate(`/dashboard/candidates/${c.id}`)}
+                              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${activeIdx === i ? 'bg-brand-muted' : 'hover:bg-muted/60'}`}>
+                              <div className="size-6 rounded-full bg-brand-muted flex items-center justify-center shrink-0">
+                                <User className="size-3 text-brand" />
                               </div>
-                              {c.title && <p className="text-xs text-muted-foreground truncate">{c.title}</p>}
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                  {(results?.jobs.length ?? 0) > 0 && (
-                    <div className={(results?.candidates.length ?? 0) > 0 ? 'border-t border-border' : ''}>
-                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-4 pt-3 pb-1.5">Jobs</p>
-                      {results!.jobs.map((j, i) => {
-                        const idx = (results?.candidates.length ?? 0) + i
-                        return (
-                          <button key={j.id} onClick={() => navigate(`/dashboard/jobs/${j.id}`)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${activeIdx === idx ? 'bg-brand-muted' : 'hover:bg-muted/60'}`}>
-                            <div className="size-6 rounded-full bg-muted flex items-center justify-center shrink-0">
-                              <Briefcase className="size-3 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <p className="text-sm font-medium text-foreground truncate">{j.title}</p>
-                                {j.display_id && <span className="text-xs text-muted-foreground shrink-0">{j.display_id}</span>}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                                  <span className="text-xs text-muted-foreground shrink-0">{c.candidateId}</span>
+                                </div>
+                                {c.title && <p className="text-xs text-muted-foreground truncate">{c.title}</p>}
                               </div>
-                              {j.client && <p className="text-xs text-muted-foreground truncate">{j.client}</p>}
-                            </div>
-                            <span className={`size-1.5 rounded-full shrink-0 ${STATUS_DOT[j.status] ?? 'bg-zinc-400'}`} />
-                          </button>
-                        )
-                      })}
-                    </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {(results?.jobs.length ?? 0) > 0 && (
+                        <div className={(results?.candidates.length ?? 0) > 0 ? 'border-t border-border' : ''}>
+                          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-4 pt-3 pb-1.5">Jobs</p>
+                          {results!.jobs.map((j, i) => {
+                            const idx = (results?.candidates.length ?? 0) + i
+                            return (
+                              <button key={j.id} onClick={() => navigate(`/dashboard/jobs/${j.id}`)}
+                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${activeIdx === idx ? 'bg-brand-muted' : 'hover:bg-muted/60'}`}>
+                                <div className="size-6 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                  <Briefcase className="size-3 text-muted-foreground" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm font-medium text-foreground truncate">{j.title}</p>
+                                    {j.display_id && <span className="text-xs text-muted-foreground shrink-0">{j.display_id}</span>}
+                                  </div>
+                                  {j.client && <p className="text-xs text-muted-foreground truncate">{j.client}</p>}
+                                </div>
+                                <span className={`size-1.5 rounded-full shrink-0 ${STATUS_DOT[j.status] ?? 'bg-zinc-400'}`} />
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                      <div className="border-t border-border px-4 py-2">
+                        <p className="text-xs text-muted-foreground">↑↓ navigate · Enter to open · Esc to close</p>
+                      </div>
+                    </>
                   )}
-                  <div className="border-t border-border px-4 py-2">
-                    <p className="text-xs text-muted-foreground">↑↓ navigate · Enter to open · Esc to close</p>
-                  </div>
-                </>
+                </div>
               )}
             </div>
           )}
         </div>
-      </div>
 
-      {/* User — right */}
-      <div className="flex items-center gap-3 shrink-0 w-[220px] justify-end">
+        {/* Bell */}
         <button
-          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-          className="size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label="Toggle dark mode"
+          className="size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Notifications"
         >
-          {resolvedTheme === 'dark' ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+          <Bell className="size-4" />
         </button>
-        <Separator orientation="vertical" className="h-4" />
+
+        <Separator orientation="vertical" className="h-4 mx-1" />
+
+        {/* Avatar dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2.5 rounded-md hover:bg-muted px-1.5 py-1 transition-colors outline-none">
@@ -256,6 +277,14 @@ export function Header({ userName, userEmail }: Props) {
               <Link href="/dashboard/profile" className="cursor-pointer">
                 <User className="size-3.5 mr-2" />My Profile
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+              className="cursor-pointer"
+            >
+              {resolvedTheme === 'dark'
+                ? <><Sun className="size-3.5 mr-2" />Light mode</>
+                : <><Moon className="size-3.5 mr-2" />Dark mode</>}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
