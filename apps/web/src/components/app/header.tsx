@@ -102,7 +102,7 @@ function useBreadcrumbs() {
     const href = '/' + segments.slice(0, i + 1).join('/')
     const isLast = i === segments.length - 1
 
-    if (IS_ID.test(seg)) {
+    if (IS_ID.test(seg ?? '')) {
       // Dynamic segment — use context title if available
       if (dynamicTitle) crumbs.push({ label: dynamicTitle, href })
       continue
