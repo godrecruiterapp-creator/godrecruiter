@@ -154,41 +154,58 @@ export function Header({ userName, userEmail }: Props) {
       {/* Right actions */}
       <div className="flex items-center gap-1 shrink-0">
 
-        {/* Search icon + inline panel */}
-        <div className="relative" ref={boxRef}>
-          <button
-            onClick={() => setSearchOpen(v => !v)}
-            className="size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label="Search"
-          >
-            <Search className="size-4" />
-          </button>
+        {/* Search icon */}
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Search"
+        >
+          <Search className="size-4" />
+        </button>
 
-          {/* Expanded search overlay */}
-          {searchOpen && (
-            <div className="absolute right-0 top-full mt-1.5 w-80 z-50">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+        {/* Search modal */}
+        {searchOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]"
+            style={{ animation: 'fadeIn 150ms ease' }}
+          >
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+              onClick={() => { setSearchOpen(false); setOpen(false); setQuery(''); setResults(null) }}
+            />
+            {/* Panel */}
+            <div
+              ref={boxRef}
+              className="relative w-full max-w-lg mx-4 bg-popover border border-border rounded-xl shadow-2xl overflow-hidden"
+              style={{ animation: 'slideDown 150ms ease' }}
+            >
+              {/* Input */}
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+                <Search className="size-4 text-muted-foreground shrink-0" />
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={e => handleChange(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Search candidates, jobs… ⌘K"
-                  className="w-full h-8 pl-8 pr-8 text-sm bg-background border border-border rounded-md shadow-lg placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand transition-colors"
+                  placeholder="Search candidates, jobs…"
+                  className="flex-1 text-sm bg-transparent placeholder:text-muted-foreground focus:outline-none"
                 />
-                {query && (
+                {query ? (
                   <button onClick={() => { setQuery(''); setResults(null); setOpen(false) }}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    <X className="size-3.5" />
+                    className="text-muted-foreground hover:text-foreground transition-colors">
+                    <X className="size-4" />
                   </button>
+                ) : (
+                  <kbd className="text-xs text-muted-foreground border border-border rounded px-1.5 py-0.5">Esc</kbd>
                 )}
               </div>
 
+              {/* Results */}
               {open && (
-                <div className="mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+                <div className="max-h-80 overflow-y-auto">
                   {!hasResults ? (
-                    <p className="text-sm text-muted-foreground text-center py-6">No results for "{query}"</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">No results for &ldquo;{query}&rdquo;</p>
                   ) : (
                     <>
                       {(results?.candidates.length ?? 0) > 0 && (
@@ -242,9 +259,18 @@ export function Header({ userName, userEmail }: Props) {
                   )}
                 </div>
               )}
+
+              {!query && (
+                <p className="text-xs text-muted-foreground text-center py-6">Type to search candidates or jobs</p>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        <style>{`
+          @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+          @keyframes slideDown { from { opacity: 0; transform: translateY(-8px) scale(0.98) } to { opacity: 1; transform: translateY(0) scale(1) } }
+        `}</style>
 
         {/* Bell */}
         <button
