@@ -52,7 +52,7 @@ export function AppSidebar() {
           {!collapsed && (
             <button
               onClick={() => setCollapsed(true)}
-              className="flex items-center justify-center size-6 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors flex-shrink-0"
+              className="flex items-center justify-center size-6 rounded-md text-[#636f7a] hover:text-foreground hover:bg-accent transition-colors flex-shrink-0"
               aria-label="Collapse sidebar"
             >
               <ChevronLeft className="size-3.5" />
@@ -77,7 +77,7 @@ export function AppSidebar() {
                   collapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-2',
                   active
                     ? 'bg-[#ededed] text-[#181818] font-medium'
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    : 'text-[#636f7a] hover:bg-accent hover:text-accent-foreground'
                 )}
               >
                 <Icon className="size-4 flex-shrink-0" />
@@ -103,7 +103,7 @@ export function AppSidebar() {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setCollapsed(false)}
-                  className="flex items-center justify-center w-full py-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  className="flex items-center justify-center w-full py-2 rounded-md text-[#636f7a] hover:bg-accent hover:text-foreground transition-colors"
                   aria-label="Expand sidebar"
                 >
                   <ChevronRight className="size-4" />
