@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { JobDetailClient } from './job-detail-client'
+import { BreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 
 function toInitials(name: string) {
   return name.split(' ').map(w => w[0] ?? '').join('').toUpperCase().slice(0, 2) || '??'
@@ -75,11 +76,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   }))
 
   return (
+    <>
+    <BreadcrumbTitle title={`${job.display_id} · ${job.title}`} />
     <JobDetailClient
       job={job}
       initialNotes={initialNotes}
       initialDocs={initialDocs}
       initialActivity={initialActivity}
     />
+    </>
   )
 }

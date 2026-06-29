@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { AppSidebar } from '@/components/app/sidebar'
 import { Header } from '@/components/app/header'
 import { Skeleton } from '@/components/ui/skeleton'
+import { BreadcrumbProvider } from '@/components/app/breadcrumb-provider'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -19,17 +20,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const sidebarBehavior = (user.user_metadata?.sidebar_behavior ?? 'expanded') as 'expanded' | 'collapsed' | 'hover'
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <AppSidebar serverBehavior={sidebarBehavior} />
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <Header userName={fullName} userEmail={user.email ?? ''} />
-        <main className="flex-1 overflow-hidden bg-muted/30 flex flex-col">
-          <Suspense fallback={<div className="p-6"><PageSkeleton /></div>}>
-            {children}
-          </Suspense>
-        </main>
+    <BreadcrumbProvider>
+      <div className="flex h-screen overflow-hidden bg-background">
+        <AppSidebar serverBehavior={sidebarBehavior} />
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+          <Header userName={fullName} userEmail={user.email ?? ''} />
+          <main className="flex-1 overflow-hidden bg-muted/30 flex flex-col">
+            <Suspense fallback={<div className="p-6"><PageSkeleton /></div>}>
+              {children}
+            </Suspense>
+          </main>
+        </div>
       </div>
-    </div>
+    </BreadcrumbProvider>
   )
 }
 

@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { Users, Briefcase, Send, CalendarCheck, Trophy, XCircle, UserCheck, Clock, CheckSquare, TrendingUp, Sparkles } from 'lucide-react'
+import { BreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 import { Button } from '@/components/ui/button'
 import { PROJECTS, PROJECT_FALLBACK } from '../_data'
 import { cn } from '@/lib/utils'
@@ -55,6 +56,7 @@ export default function ProjectOverviewPage() {
 
   return (
     <div className="h-full overflow-y-auto p-6">
+      <BreadcrumbTitle title={project.name} />
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* KPI grid */}

@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell } from 'lucide-react'
+import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell, Home } from 'lucide-react'
+import { useBreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -18,24 +19,100 @@ interface Props {
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
-  dashboard:  'Dashboard',
-  jobs:       'Jobs',
-  candidates: 'Candidates',
-  settings:   'Settings',
-  new:        'New',
-  edit:       'Edit',
-  pipeline:   'Pipeline',
+  dashboard:        'Dashboard',
+  jobs:             'Jobs',
+  candidates:       'Candidates',
+  interviews:       'Interviews',
+  placements:       'Placements',
+  projects:         'Projects',
+  reports:          'Reports',
+  settings:         'Settings',
+  automation:       'Automation',
+  agents:           'AI Agent Hub',
+  profile:          'My Profile',
+  'work-queue':     'Work Queue',
+  // sub-sections
+  new:              'New',
+  edit:             'Edit',
+  pipeline:         'Pipeline',
+  all:              'All',
+  calendar:         'Calendar',
+  mine:             'Mine',
+  feedback:         'Feedback',
+  templates:        'Templates',
+  schedule:         'Schedule',
+  ai:               'AI',
+  'my-agents':      'My Agents',
+  marketplace:      'Marketplace',
+  analytics:        'Analytics',
+  history:          'History',
+  'my-automations': 'My Automations',
+  activity:         'Activity',
+  'my-projects':    'My Projects',
+  archived:         'Archived',
+  shared:           'Shared',
+  builder:          'Builder',
+  candidate:        'Candidate',
+  client:           'Client',
+  executive:        'Executive',
+  financial:        'Financial',
+  recruiter:        'Recruiter',
+  team:             'Team',
+  compliance:       'Compliance',
+  submission:       'Submission',
+  saved:            'Saved',
+  scheduled:        'Scheduled',
+  exports:          'Exports',
+  custom:           'Custom',
+  queue:            'Queue',
+  board:            'Board',
+  organization:     'Organization',
+  users:            'Users',
+  roles:            'Roles',
+  billing:          'Billing',
+  integrations:     'Integrations',
+  notifications:    'Notifications',
+  security:         'Security',
+  branding:         'Branding',
+  'career-portal':  'Career Portal',
+  communication:    'Communication',
+  recruitment:      'Recruitment',
+  system:           'System',
+  files:            'Files',
+  tasks:            'Tasks',
+  notes:            'Notes',
+  documents:        'Documents',
+  emails:           'Emails',
+  job:              'Job',
+  report:           'Reports',
+  'job-reports':    'Job Reports',
 }
+
+// UUID / numeric id pattern
+const IS_ID = /^[0-9a-f-]{8,}$|^\d+$/i
 
 function useBreadcrumbs() {
   const pathname = usePathname()
+  const { title: dynamicTitle } = useBreadcrumbTitle()
   const segments = pathname.split('/').filter(Boolean)
+
   const crumbs: { label: string; href: string }[] = []
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i]
-    const label = SEGMENT_LABELS[seg as keyof typeof SEGMENT_LABELS]
+    const href = '/' + segments.slice(0, i + 1).join('/')
+    const isLast = i === segments.length - 1
+
+    if (IS_ID.test(seg)) {
+      // Dynamic segment — use context title if available
+      if (dynamicTitle) crumbs.push({ label: dynamicTitle, href })
+      continue
+    }
+
+    const label = SEGMENT_LABELS[seg]
     if (!label) continue
-    crumbs.push({ label, href: '/' + segments.slice(0, i + 1).join('/') })
+
+    // Skip 'Dashboard' if it's not the only crumb (keeps it as home anchor)
+    crumbs.push({ label, href })
   }
   return crumbs
 }

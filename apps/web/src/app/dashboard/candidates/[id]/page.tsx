@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { CandidateDetailClient } from './candidate-detail-client'
+import { BreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 import type { CandidateDetailData, NoteRow, DocRow, ActivityRow, JobRow } from './candidate-detail-client'
 
 function relTime(iso: string) {
@@ -85,12 +86,15 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   }))
 
   return (
-    <CandidateDetailClient
-      candidate={candidate as CandidateDetailData}
-      initialNotes={notes}
-      initialDocs={docs}
-      initialActivity={activity}
-      initialJobs={jobs}
-    />
+    <>
+      <BreadcrumbTitle title={`${candidate.first_name} ${candidate.last_name}`} />
+      <CandidateDetailClient
+        candidate={candidate as CandidateDetailData}
+        initialNotes={notes}
+        initialDocs={docs}
+        initialActivity={activity}
+        initialJobs={jobs}
+      />
+    </>
   )
 }

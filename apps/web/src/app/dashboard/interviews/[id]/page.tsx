@@ -9,6 +9,7 @@ import {
   Mail, CheckCircle, Eye, ExternalLink, TrendingUp, AlertTriangle,
   FileText, User, ClipboardList, Calendar,
 } from 'lucide-react'
+import { BreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 
 // Mock data for INT-0001 / Sarah Johnson
 const INTERVIEW = {
@@ -79,6 +80,7 @@ export default function InterviewDetailPage() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
+      <BreadcrumbTitle title={`${INTERVIEW.interview_id} · ${INTERVIEW.candidate}`} />
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-4 border-b shrink-0">
         <Link href="/dashboard/interviews/all"
