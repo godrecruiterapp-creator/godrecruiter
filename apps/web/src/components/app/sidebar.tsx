@@ -44,15 +44,25 @@ export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | '
 
   const showToggle = behavior === 'expanded' || behavior === 'collapsed'
 
+  // In hover mode, sidebar is always w-14 in the layout (no page shift).
+  // The visual expansion is absolutely positioned on top.
+  const isHoverMode = behavior === 'hover'
+
   return (
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          'flex flex-col flex-shrink-0 h-screen border-r bg-sidebar transition-[width] duration-200 ease-linear overflow-hidden',
-          collapsed ? 'w-14' : 'w-56'
+          'relative flex-shrink-0 h-screen',
+          isHoverMode ? 'w-14' : collapsed ? 'w-14' : 'w-56'
         )}
-        onMouseEnter={() => behavior === 'hover' && setHovered(true)}
-        onMouseLeave={() => behavior === 'hover' && setHovered(false)}
+        onMouseEnter={() => isHoverMode && setHovered(true)}
+        onMouseLeave={() => isHoverMode && setHovered(false)}
+      >
+      <div
+        className={cn(
+          'flex flex-col h-full border-r bg-sidebar overflow-hidden transition-[width] duration-200 ease-linear',
+          isHoverMode ? (hovered ? 'w-56 absolute inset-y-0 left-0 z-40 shadow-xl' : 'w-14') : collapsed ? 'w-14' : 'w-56'
+        )}
       >
         {/* Logo */}
         <div className="flex items-center justify-between h-12 border-b px-3 flex-shrink-0">
@@ -129,6 +139,7 @@ export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | '
             </Tooltip>
           </div>
         )}
+      </div>
       </aside>
     </TooltipProvider>
   )
