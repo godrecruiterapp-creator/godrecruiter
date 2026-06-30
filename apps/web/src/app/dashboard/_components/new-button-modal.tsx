@@ -147,7 +147,8 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
   const steps = ['Details', 'Template', 'Settings']
 
   function create() {
-    const tmpl = DASHBOARD_TEMPLATES[template] ?? DASHBOARD_TEMPLATES.recruiter
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const tmpl = (DASHBOARD_TEMPLATES[template] ?? DASHBOARD_TEMPLATES.recruiter)!
     store.createDashboard({
       name:        name || tmpl.label,
       description: desc,
