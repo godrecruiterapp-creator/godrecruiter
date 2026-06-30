@@ -372,7 +372,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
       const j   = i + dir
       if (j < 0 || j >= ws.length) return ws
       const next = [...ws]
-      ;[next[i], next[j]] = [next[j], next[i]]
+      const tmp = next[i]!; next[i] = next[j]!; next[j] = tmp
       return next.map((w, idx) => ({ ...w, order: idx }))
     })
   }
