@@ -354,7 +354,8 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
       setDragIndex(null); dragOver.current = null; return
     }
     const next = [...widgets]
-    const [moved] = next.splice(dragIndex, 1)
+    const moved = next.splice(dragIndex, 1)[0]
+    if (!moved) { setDragIndex(null); dragOver.current = null; return }
     next.splice(dragOver.current, 0, moved)
     const reindexed = next.map((w, i) => ({ ...w, order: i }))
     setWidgets(reindexed)
