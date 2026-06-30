@@ -260,7 +260,7 @@ function Ring({ value, max, size = 72, label, sub, color = 'stroke-[#dd7456]' }:
 
 // ─── SECTION: Today's Focus ───────────────────────────────────────────────────
 
-function TodayFocus({ greetStr, date, onStart }: { greetStr:string; date:string; onStart:()=>void }) {
+function TodayFocus({ greetStr, firstName, date, onStart }: { greetStr:string; firstName:string; date:string; onStart:()=>void }) {
   return (
     <div className={cn(
       'rounded-2xl border border-[#dd7456]/20 overflow-hidden',
@@ -271,7 +271,7 @@ function TodayFocus({ greetStr, date, onStart }: { greetStr:string; date:string;
         {/* Left: greeting + bullets */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-1">
-            <h1 className="text-2xl font-bold tracking-tight">{greetStr}, Arun 👋</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{greetStr}, {firstName} 👋</h1>
           </div>
           <p className="text-xs text-muted-foreground mb-5">{date}</p>
 
@@ -916,12 +916,23 @@ function RecentUpdates() {
 
 export default function DashboardPage() {
   const [now, setNow] = useState<Date | null>(null)
+  const [firstName, setFirstName] = useState('')
   const todoRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     setNow(new Date())
     const id = setInterval(() => setNow(new Date()), 60_000)
     return () => clearInterval(id)
+  }, [])
+
+  useEffect(() => {
+    import('@/lib/supabase/client').then(({ createClient }) => {
+      createClient().auth.getUser().then(({ data: { user } }) => {
+        if (!user) return
+        const full = user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.email?.split('@')[0] ?? ''
+        setFirstName(full.split(' ')[0])
+      })
+    })
   }, [])
 
   const h = now?.getHours() ?? 9
@@ -969,6 +980,7 @@ export default function DashboardPage() {
         {/* ── Today's Focus ─────────────────────────────────────────────── */}
         <TodayFocus
           greetStr={greet(h)}
+          firstName={firstName}
           date={now ? `${fmtDate(now)} · ${fmtTime(now)}` : 'Loading…'}
           onStart={startMyDay}
         />
