@@ -147,7 +147,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
   const steps = ['Details', 'Template', 'Settings']
 
   function create() {
-    const tmpl = DASHBOARD_TEMPLATES[template]
+    const tmpl = DASHBOARD_TEMPLATES[template] ?? DASHBOARD_TEMPLATES.recruiter
     store.createDashboard({
       name:        name || tmpl.label,
       description: desc,
