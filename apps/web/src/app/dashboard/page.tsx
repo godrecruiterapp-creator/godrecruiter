@@ -912,11 +912,110 @@ function RecentUpdates() {
   )
 }
 
+// ─── Dashboard Setup Modal ────────────────────────────────────────────────────
+
+const WIDGET_OPTIONS = [
+  { id:'pipeline',    label:'Pipeline Funnel',    desc:'Visual hiring funnel by stage' },
+  { id:'todo',        label:'Things To Do',       desc:'Your task queue and priorities' },
+  { id:'attention',   label:'Needs Attention',    desc:'Stalled candidates and overdue tasks' },
+  { id:'progress',    label:"Today's Progress",   desc:'Daily metrics and goal tracking' },
+  { id:'placements',  label:'Placement Watch',    desc:'Offer and placement status' },
+  { id:'updates',     label:'Recent Updates',     desc:'Activity feed across the team' },
+]
+
+function DashboardSetupModal({ onClose }: { onClose: () => void }) {
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(WIDGET_OPTIONS.map(w => w.id))
+  )
+  const [layout, setLayout] = useState<'comfortable' | 'compact'>('comfortable')
+
+  function toggle(id: string) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl border border-border bg-background shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div>
+            <h2 className="text-base font-semibold">Customize Dashboard</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Choose widgets and layout</p>
+          </div>
+          <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-muted transition-colors">
+            <X className="size-4" />
+          </button>
+        </div>
+
+        {/* Layout toggle */}
+        <div className="px-6 py-4 border-b border-border">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Layout density</p>
+          <div className="flex gap-2">
+            {(['comfortable', 'compact'] as const).map(opt => (
+              <button key={opt} onClick={() => setLayout(opt)}
+                className={cn(
+                  'flex-1 h-9 rounded-lg border text-xs font-medium capitalize transition-colors',
+                  layout === opt
+                    ? 'border-foreground bg-foreground text-background'
+                    : 'border-border bg-background text-muted-foreground hover:bg-muted/60'
+                )}>
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Widget toggles */}
+        <div className="px-6 py-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Visible widgets</p>
+          <div className="space-y-2">
+            {WIDGET_OPTIONS.map(({ id, label, desc }) => (
+              <button key={id} onClick={() => toggle(id)}
+                className={cn(
+                  'w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-left transition-colors',
+                  selected.has(id)
+                    ? 'border-[#dd7456]/40 bg-[#fdf0ec] dark:bg-[#2a1a15]'
+                    : 'border-border bg-background hover:bg-muted/40'
+                )}>
+                <div>
+                  <p className="text-sm font-medium leading-none mb-0.5">{label}</p>
+                  <p className="text-xs text-muted-foreground">{desc}</p>
+                </div>
+                <div className={cn(
+                  'size-4 rounded-full border-2 shrink-0 ml-4 transition-colors',
+                  selected.has(id) ? 'border-[#dd7456] bg-[#dd7456]' : 'border-border'
+                )} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border">
+          <button onClick={onClose}
+            className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">
+            Cancel
+          </button>
+          <button onClick={onClose}
+            className="h-9 px-4 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors font-medium">
+            Save layout
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [now, setNow] = useState<Date | null>(null)
   const [firstName, setFirstName] = useState('')
+  const [showDashboardSetup, setShowDashboardSetup] = useState(false)
   const todoRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
@@ -955,8 +1054,9 @@ export default function DashboardPage() {
               { label:'Post Job',       icon:Briefcase,    href:'/dashboard/jobs/new'       },
               { label:'Add Candidate',  icon:UserPlus,     href:'/dashboard/candidates/new' },
               { label:'New Interview',  icon:CalendarCheck,href:'/dashboard/interviews'     },
-              { label:'Import Resume',  icon:Upload,       href:'/dashboard/candidates'     },
-              { label:'AI Generate',    icon:Sparkles,     href:'/dashboard/agents'         },
+              { label:'Import Resume',  icon:Upload,       href:'/dashboard/candidates/new' },
+              { label:'AI Agents',      icon:Sparkles,     href:'/dashboard/agents'         },
+              { label:'Automations',    icon:Zap,          href:'/dashboard/automation'     },
             ] as const).map(({ label, icon: Icon, href }) => (
               <Link key={label} href={href}
                 className="h-8 px-3 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors flex items-center gap-1.5 font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
@@ -965,15 +1065,10 @@ export default function DashboardPage() {
             ))}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button className="h-8 px-3 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors flex items-center gap-2 text-muted-foreground">
-              <Search className="size-3.5" />
-              Search everything
-              <kbd className="text-[10px] px-1.5 py-0.5 rounded border border-border bg-muted font-mono leading-none">⌘K</kbd>
-            </button>
-            <Link href="/dashboard/jobs/new"
+            <button onClick={() => setShowDashboardSetup(true)}
               className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors flex items-center gap-1.5 font-medium">
               <Plus className="size-3.5" />New
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -1031,5 +1126,8 @@ export default function DashboardPage() {
 
       </div>
     </div>
+
+    {/* ── Dashboard Setup Modal ─────────────────────────────────────── */}
+    {showDashboardSetup && <DashboardSetupModal onClose={() => setShowDashboardSetup(false)} />}
   )
 }
