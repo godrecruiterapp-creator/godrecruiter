@@ -464,7 +464,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
                   onClick={e => e.stopPropagation()}
                   className="h-6 px-1.5 text-[10px] rounded border border-border bg-background text-muted-foreground focus:outline-none">
                   {(['small','medium','large','full'] as const).map(s => (
-                    <option key={s} value={s}>{s[0].toUpperCase() + s.slice(1)}</option>
+                    <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
                   ))}
                 </select>
 
@@ -567,8 +567,8 @@ function AIBuilderView({ onClose, onBack }: { onClose: () => void; onBack: () =>
   function build() {
     if (!role) return
     setLoading(true)
-    const templateKey = AI_ROLE_TEMPLATE[role] ?? 'recruiter'
-    const tmpl        = DASHBOARD_TEMPLATES[templateKey]
+    const templateKey = (AI_ROLE_TEMPLATE[role] ?? 'recruiter') as string
+    const tmpl        = DASHBOARD_TEMPLATES[templateKey] ?? DASHBOARD_TEMPLATES.recruiter
     setTimeout(() => {
       store.createDashboard({
         name:        name || `${role} Dashboard`,
@@ -615,8 +615,8 @@ function AIBuilderView({ onClose, onBack }: { onClose: () => void; onBack: () =>
           <div className="px-4 py-3 rounded-xl bg-muted/40 border border-border">
             <p className="text-xs font-semibold mb-1">AI will include:</p>
             <p className="text-xs text-muted-foreground">
-              {DASHBOARD_TEMPLATES[AI_ROLE_TEMPLATE[role]]?.widgets
-                .map(t => WIDGET_CATALOG.find(w => w.type === t)?.label)
+              {(DASHBOARD_TEMPLATES[AI_ROLE_TEMPLATE[role] ?? 'recruiter'] ?? DASHBOARD_TEMPLATES.recruiter).widgets
+                .map((t: string) => WIDGET_CATALOG.find(w => w.type === t)?.label)
                 .filter(Boolean)
                 .join(' · ')}
             </p>
@@ -689,7 +689,7 @@ function ResetView({ onClose, onBack }: { onClose: () => void; onBack: () => voi
   function reset() {
     if (!activeDash) return
     const tmpl = DASHBOARD_TEMPLATES[activeDash.template] ?? DASHBOARD_TEMPLATES.recruiter
-    store.updateWidgets(activeDash.id, buildWidgets(tmpl.widgets))
+    store.updateWidgets(activeDash.id, buildWidgets((tmpl).widgets))
     onClose()
     router.refresh()
   }

@@ -32,7 +32,7 @@ export interface DashboardConfig {
   widgets:     DashboardWidget[]
   createdAt:   number
   updatedAt:   number
-  deletedAt?:  number   // soft delete
+  deletedAt?: number | undefined   // soft delete
 }
 
 // ─── Widget catalog ───────────────────────────────────────────────────────────
@@ -109,7 +109,8 @@ export interface TemplateConfig {
   widgets: string[]
 }
 
-export const DASHBOARD_TEMPLATES: Record<string, TemplateConfig> = {
+// Typed as a concrete object so every key lookup is non-optional
+export const DASHBOARD_TEMPLATES: { [key: string]: TemplateConfig; recruiter: TemplateConfig } = {
   blank: {
     label:'Blank Dashboard',        desc:'Start from scratch — you choose every section',
     icon:'⬜', color:'#6b7280',
