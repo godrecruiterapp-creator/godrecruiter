@@ -51,7 +51,7 @@ export function NewButtonModal({ onClose }: { onClose: () => void }) {
 
 function ModalHeader({
   title, subtitle, onClose, onBack,
-}: { title: string; subtitle?: string; onClose: () => void; onBack?: () => void }) {
+}: { title: string; subtitle?: string | undefined; onClose: () => void; onBack?: () => void }) {
   return (
     <div className="flex items-center gap-3 px-6 py-4 border-b border-border">
       {onBack && (
