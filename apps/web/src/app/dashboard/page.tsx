@@ -1044,6 +1044,7 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
     <div className="h-full overflow-y-auto">
       <div className="px-6 py-6 space-y-5 pb-12 max-w-[1600px] mx-auto">
 
@@ -1129,5 +1130,6 @@ export default function DashboardPage() {
 
     {/* ── Dashboard Setup Modal ─────────────────────────────────────── */}
     {showDashboardSetup && <DashboardSetupModal onClose={() => setShowDashboardSetup(false)} />}
+    </>
   )
 }
