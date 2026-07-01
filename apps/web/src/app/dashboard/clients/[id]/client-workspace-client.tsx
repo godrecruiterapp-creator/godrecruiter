@@ -2,13 +2,16 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
-  Building2, MapPin, Globe, Tag, Plus, FileText, Upload, Hospital, X,
+  Building2, Plus, FileText, Upload, Hospital, X, Pencil,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
 import { MOCK_INTERVIEWS } from '../../interviews/_data'
@@ -62,7 +65,7 @@ const CLIENT_STATUS_LABEL: Record<Client['status'], string> = { active: 'Active'
 // other client renders the tab's real empty state instead of fake data.
 
 type Doc = { id: string; name: string; category: string; size: string; uploadedAt: string }
-type Task = { id: string; title: string; type: string; assignee: string; due: string; priority: 'High' | 'Medium' | 'Low'; status: 'Open' | 'Done' }
+type TaskItem = { id: string; title: string; type: string; assignee: string; due: string; priority: 'High' | 'Medium' | 'Low'; status: 'Open' | 'Done' }
 type ActivityItem = { id: string; actor: string; action: string; time: string }
 type NoteItem = { id: string; author: string; text: string; time: string; visibility: 'shared' | 'private'; pinned: boolean }
 
@@ -77,7 +80,7 @@ const DOCS: Record<string, Doc[]> = {
   ],
 }
 
-const TASKS: Record<string, Task[]> = {
+const TASKS: Record<string, TaskItem[]> = {
   cl1: [
     { id: 't1', title: 'Follow up on ICU submission feedback', type: 'Follow-up', assignee: 'Sarah M.', due: 'Jul 5, 2026', priority: 'High', status: 'Open' },
     { id: 't2', title: 'Renew credentialing packet for new hires', type: 'Credentialing', assignee: 'Sarah M.', due: 'Jul 20, 2026', priority: 'Medium', status: 'Open' },
@@ -104,6 +107,9 @@ const NOTES: Record<string, NoteItem[]> = {
     { id: 'n1', author: 'Sarah M.', text: 'Client prefers candidates with Epic EMR experience — flagged for all future ICU submissions.', time: '2 days ago', visibility: 'shared', pinned: true },
   ],
 }
+
+const FACILITY_TYPES: ClientFacility['type'][] = ['Hospital', 'Clinic', 'Laboratory', 'Rehabilitation', 'Urgent Care', 'Skilled Nursing', 'Home Health']
+const TASK_TYPES = ['Follow-up', 'Meeting', 'Document Request', 'Contract Renewal', 'Client Visit', 'Credentialing']
 
 // ── Small pieces ───────────────────────────────────────────────────────────────
 
@@ -138,11 +144,36 @@ function EmptyTab({ icon: Icon, title, description, actionLabel, onAction }: {
         <p className="text-sm text-muted-foreground mt-1 max-w-[360px]">{description}</p>
       </div>
       {actionLabel && (
-        <button onClick={onAction} className="mt-1 h-9 px-4 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white">
+        <button type="button" onClick={onAction} className="mt-1 h-9 px-4 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white">
           {actionLabel}
         </button>
       )}
     </div>
+  )
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <label className="block text-sm font-medium text-foreground mb-1.5">{children}</label>
+}
+function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input {...props} className={cn(
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
+      'focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand',
+      'placeholder:text-muted-foreground transition-colors',
+      className,
+    )} />
+  )
+}
+function FieldSelect({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select {...props} className={cn(
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background cursor-pointer',
+      'focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors',
+      className,
+    )}>
+      {children}
+    </select>
   )
 }
 
@@ -167,19 +198,32 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   client: Client; contacts: ClientContact[]; facilities: ClientFacility[]
   jobs: WorkspaceJob[]; candidates: WorkspaceCandidate[]
 }) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
-  const [contactDrawerOpen, setContactDrawerOpen] = useState(false)
-  const [noteText, setNoteText] = useState('')
-  const [notes, setNotes] = useState<NoteItem[]>(NOTES[client.id] ?? [])
 
-  const isHealthcare = client.industry === 'Healthcare'
+  // Editable client info (name/id stay fixed — they key filtering/routing elsewhere)
+  const [clientInfo, setClientInfo] = useState<Client>(client)
+  const [editingInfo, setEditingInfo] = useState(false)
+  const [draftInfo, setDraftInfo] = useState<Client>(client)
+
+  const [contactList, setContactList]   = useState<ClientContact[]>(contacts)
+  const [facilityList, setFacilityList] = useState<ClientFacility[]>(facilities)
+  const [docList, setDocList]           = useState<Doc[]>(() => DOCS[client.id] ?? [])
+  const [taskList, setTaskList]         = useState<TaskItem[]>(() => TASKS[client.id] ?? [])
+  const [activityList, setActivityList] = useState<ActivityItem[]>(() => ACTIVITY[client.id] ?? [])
+  const [noteText, setNoteText] = useState('')
+  const [notes, setNotes] = useState<NoteItem[]>(() => NOTES[client.id] ?? [])
+
+  const [contactDrawerOpen, setContactDrawerOpen] = useState(false)
+  const [facilityDrawerOpen, setFacilityDrawerOpen] = useState(false)
+  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false)
+  const [selectedContact, setSelectedContact] = useState<ClientContact | null>(null)
+
+  const isHealthcare = clientInfo.industry === 'Healthcare'
   const tabs = TABS.filter(t => t.id !== 'facilities' || isHealthcare)
 
-  const interviews = useMemo(() => MOCK_INTERVIEWS.filter(i => i.client === client.name), [client.name])
-  const placements = useMemo(() => PLACEMENTS.filter(p => p.client === client.name), [client.name])
-  const docs = DOCS[client.id] ?? []
-  const tasks = TASKS[client.id] ?? []
-  const activity = ACTIVITY[client.id] ?? []
+  const interviews = useMemo(() => MOCK_INTERVIEWS.filter(i => i.client === clientInfo.name), [clientInfo.name])
+  const placements = useMemo(() => PLACEMENTS.filter(p => p.client === clientInfo.name), [clientInfo.name])
 
   // Distinct candidates (Candidates tab), vs one row per submission event (Submissions tab)
   const distinctCandidates = useMemo(() => {
@@ -196,6 +240,110 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     if (!noteText.trim()) return
     setNotes(prev => [{ id: `n${Date.now()}`, author: 'You', text: noteText, time: 'Just now', visibility: 'shared', pinned: false }, ...prev])
     setNoteText('')
+    toast('Note added.')
+  }
+
+  function logActivity(action: string) {
+    setActivityList(prev => [{ id: `a${Date.now()}`, actor: 'You', action, time: 'Just now' }, ...prev])
+  }
+
+  function startEditInfo() {
+    setDraftInfo(clientInfo)
+    setEditingInfo(true)
+  }
+  function saveInfo() {
+    setClientInfo(draftInfo)
+    setEditingInfo(false)
+    logActivity('updated client info')
+    toast('Client info saved.')
+  }
+  function cancelEditInfo() {
+    setEditingInfo(false)
+  }
+
+  // ── Add contact form ──────────────────────────────────────────────────────
+  const [ncName, setNcName] = useState('')
+  const [ncTitle, setNcTitle] = useState('')
+  const [ncDept, setNcDept] = useState('')
+  const [ncEmail, setNcEmail] = useState('')
+  const [ncPhone, setNcPhone] = useState('')
+  const [ncDecisionMaker, setNcDecisionMaker] = useState(false)
+
+  function resetContactForm() {
+    setNcName(''); setNcTitle(''); setNcDept(''); setNcEmail(''); setNcPhone(''); setNcDecisionMaker(false)
+  }
+  function submitContact(e: React.FormEvent) {
+    e.preventDefault()
+    if (!ncName.trim()) return
+    const contact: ClientContact = {
+      id: `cc${Date.now()}`, clientId: clientInfo.id, name: ncName, title: ncTitle, department: ncDept,
+      email: ncEmail, phone: ncPhone, mobile: '', linkedin: '', preferredContactMethod: 'Email',
+      decisionMaker: ncDecisionMaker, primary: contactList.length === 0, status: 'active', notes: '',
+    }
+    setContactList(prev => [...prev, contact])
+    logActivity(`added contact ${ncName}`)
+    toast(`${ncName} added as a contact.`)
+    resetContactForm()
+    setContactDrawerOpen(false)
+  }
+
+  // ── Add facility form ─────────────────────────────────────────────────────
+  const [nfName, setNfName] = useState('')
+  const [nfType, setNfType] = useState<ClientFacility['type']>('Hospital')
+  const [nfCity, setNfCity] = useState('')
+  const [nfState, setNfState] = useState('')
+  const [nfManager, setNfManager] = useState('')
+
+  function resetFacilityForm() {
+    setNfName(''); setNfType('Hospital'); setNfCity(''); setNfState(''); setNfManager('')
+  }
+  function submitFacility(e: React.FormEvent) {
+    e.preventDefault()
+    if (!nfName.trim()) return
+    const facility: ClientFacility = {
+      id: `cf${Date.now()}`, clientId: clientInfo.id, name: nfName, type: nfType,
+      city: nfCity, state: nfState, departments: [], specialties: [],
+      facilityManager: nfManager, primaryContact: '', timezone: clientInfo.timezone, notes: '',
+    }
+    setFacilityList(prev => [...prev, facility])
+    logActivity(`added facility ${nfName}`)
+    toast(`${nfName} added.`)
+    resetFacilityForm()
+    setFacilityDrawerOpen(false)
+  }
+
+  // ── Create task form ──────────────────────────────────────────────────────
+  const [ntTitle, setNtTitle] = useState('')
+  const [ntType, setNtType] = useState(TASK_TYPES[0]!)
+  const [ntAssignee, setNtAssignee] = useState('')
+  const [ntDue, setNtDue] = useState('')
+  const [ntPriority, setNtPriority] = useState<TaskItem['priority']>('Medium')
+
+  function resetTaskForm() {
+    setNtTitle(''); setNtType(TASK_TYPES[0]!); setNtAssignee(''); setNtDue(''); setNtPriority('Medium')
+  }
+  function submitTask(e: React.FormEvent) {
+    e.preventDefault()
+    if (!ntTitle.trim()) return
+    const task: TaskItem = {
+      id: `t${Date.now()}`, title: ntTitle, type: ntType,
+      assignee: ntAssignee || 'Unassigned', due: ntDue || 'No due date', priority: ntPriority, status: 'Open',
+    }
+    setTaskList(prev => [task, ...prev])
+    logActivity(`created task "${ntTitle}"`)
+    toast('Task created.')
+    resetTaskForm()
+    setTaskDrawerOpen(false)
+  }
+
+  function uploadDocument() {
+    const doc: Doc = {
+      id: `d${Date.now()}`, name: 'New Document.pdf', category: 'Other',
+      size: '—', uploadedAt: 'Just now',
+    }
+    setDocList(prev => [doc, ...prev])
+    logActivity('uploaded New Document.pdf')
+    toast('Document uploaded.')
   }
 
   return (
@@ -208,29 +356,35 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <ArrowLeft className="size-4" />
             </Link>
             <div className="size-12 rounded-xl bg-brand-muted text-brand flex items-center justify-center text-base font-bold shrink-0">
-              {toInitials(client.name)}
+              {toInitials(clientInfo.name)}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg font-bold tracking-tight truncate">{client.name}</h1>
-                <Chip label={CLIENT_STATUS_LABEL[client.status]} className={CLIENT_STATUS_BADGE[client.status]} />
-                <Chip label={client.industry} className="bg-muted text-muted-foreground border-border" />
+                <h1 className="text-lg font-bold tracking-tight truncate">{clientInfo.name}</h1>
+                <Chip label={CLIENT_STATUS_LABEL[clientInfo.status]} className={CLIENT_STATUS_BADGE[clientInfo.status]} />
+                <Chip label={clientInfo.industry} className="bg-muted text-muted-foreground border-border" />
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Account owner {client.accountOwner} · Recruitment manager {client.recruitmentManager} · Primary recruiter {client.primaryRecruiter}
+                Account owner {clientInfo.accountOwner} · Recruitment manager {clientInfo.recruitmentManager} · Primary recruiter {clientInfo.primaryRecruiter}
               </p>
-              <p className="text-sm text-muted-foreground mt-0.5">Client since {client.clientSince} · Last activity {client.lastActivity}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">Client since {clientInfo.clientSince} · Last activity {clientInfo.lastActivity}</p>
             </div>
           </div>
 
           {/* Quick actions */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-            <button className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Phone className="size-3.5" />Call</button>
-            <button className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Mail className="size-3.5" />Email</button>
-            <Link href={`/dashboard/jobs/new?client=${encodeURIComponent(client.name)}`} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Briefcase className="size-3.5" />Post job</Link>
-            <button onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
-            <button className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><CalendarPlus className="size-3.5" />Schedule meeting</button>
-            <button className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5"><CheckSquare className="size-3.5" />Create task</button>
+            <button type="button"
+              onClick={() => { toast(`Calling ${clientInfo.name}…`); logActivity(`called ${clientInfo.name}`) }}
+              className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Phone className="size-3.5" />Call</button>
+            <button type="button"
+              onClick={() => { toast(`Email opened for ${clientInfo.name}.`); logActivity(`emailed ${clientInfo.name}`) }}
+              className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Mail className="size-3.5" />Email</button>
+            <Link href={`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Briefcase className="size-3.5" />Post job</Link>
+            <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
+            <button type="button"
+              onClick={() => { toast(`Meeting scheduling opened for ${clientInfo.name}.`); router.push('/dashboard/interviews') }}
+              className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><CalendarPlus className="size-3.5" />Schedule meeting</button>
+            <button type="button" onClick={() => setTaskDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5"><CheckSquare className="size-3.5" />Create task</button>
           </div>
         </div>
 
@@ -250,7 +404,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
       {/* Tab bar */}
       <div className="border-b shrink-0 px-6 flex overflow-x-auto">
         {tabs.map(({ id, label }) => (
-          <button key={id} onClick={() => setActiveTab(id)}
+          <button type="button" key={id} onClick={() => setActiveTab(id)}
             className={`h-11 px-4 text-sm font-medium -mb-px border-b-2 transition-colors whitespace-nowrap ${
               activeTab === id ? 'border-brand text-brand' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}>
@@ -282,11 +436,11 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <Separator />
               <section>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Recent activity</p>
-                {activity.length === 0 ? (
+                {activityList.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No recent activity yet.</p>
                 ) : (
                   <div className="space-y-3">
-                    {activity.slice(0, 5).map(a => (
+                    {activityList.slice(0, 5).map(a => (
                       <div key={a.id} className="flex items-start gap-2.5 text-sm">
                         <span className="font-medium">{a.actor}</span>
                         <span className="text-muted-foreground">{a.action}</span>
@@ -301,18 +455,18 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <section>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Preferences</p>
                 <div className="space-y-2.5 text-sm">
-                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Communication</span><span className="font-medium">{client.preferredCommunication}</span></div>
-                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Submission method</span><span className="font-medium">{client.preferredSubmissionMethod}</span></div>
-                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Resume format</span><span className="font-medium">{client.preferredResumeFormat}</span></div>
-                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Interview process</span><span className="font-medium text-right">{client.preferredInterviewProcess || '—'}</span></div>
+                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Communication</span><span className="font-medium">{clientInfo.preferredCommunication}</span></div>
+                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Submission method</span><span className="font-medium">{clientInfo.preferredSubmissionMethod}</span></div>
+                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Resume format</span><span className="font-medium">{clientInfo.preferredResumeFormat}</span></div>
+                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Interview process</span><span className="font-medium text-right">{clientInfo.preferredInterviewProcess || '—'}</span></div>
                 </div>
               </section>
-              {client.specialInstructions && (
+              {clientInfo.specialInstructions && (
                 <>
                   <Separator />
                   <section>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Special instructions</p>
-                    <p className="text-sm text-foreground leading-relaxed">{client.specialInstructions}</p>
+                    <p className="text-sm text-foreground leading-relaxed">{clientInfo.specialInstructions}</p>
                   </section>
                 </>
               )}
@@ -321,36 +475,92 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
         )}
 
         {activeTab === 'info' && (
-          <div className="max-w-2xl px-6 py-6 space-y-5">
-            {[
-              { label: 'Company name', value: client.name },
-              { label: 'Display name', value: client.displayName },
-              { label: 'Legal name', value: client.legalName },
-              { label: 'Industry', value: client.industry },
-              { label: 'Company type', value: client.companyType === 'vms' ? 'VMS' : 'Direct client' },
-              { label: 'Website', value: client.website },
-              { label: 'Tax ID', value: client.taxId },
-              { label: 'Company size', value: `${client.companySize} employees` },
-              { label: 'Address', value: `${client.city}, ${client.state} ${client.zip}, ${client.country}` },
-              { label: 'Time zone', value: client.timezone },
-              { label: 'Tags', value: client.tags.length ? client.tags.join(', ') : '—' },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex items-start gap-6 border-b border-border/60 pb-3">
-                <span className="text-sm text-muted-foreground w-40 shrink-0">{label}</span>
-                <span className="text-sm font-medium">{value}</span>
-              </div>
-            ))}
+          <div className="max-w-2xl px-6 py-6">
+            {!editingInfo ? (
+              <>
+                <div className="flex justify-end mb-3">
+                  <button type="button" onClick={startEditInfo} className="h-8 px-3 text-sm font-medium rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5">
+                    <Pencil className="size-3.5" />Edit
+                  </button>
+                </div>
+                <div className="space-y-5">
+                  {[
+                    { label: 'Company name', value: clientInfo.name },
+                    { label: 'Display name', value: clientInfo.displayName },
+                    { label: 'Legal name', value: clientInfo.legalName },
+                    { label: 'Industry', value: clientInfo.industry },
+                    { label: 'Company type', value: clientInfo.companyType === 'vms' ? 'VMS' : 'Direct client' },
+                    { label: 'Website', value: clientInfo.website },
+                    { label: 'Tax ID', value: clientInfo.taxId },
+                    { label: 'Company size', value: `${clientInfo.companySize} employees` },
+                    { label: 'Address', value: `${clientInfo.city}, ${clientInfo.state} ${clientInfo.zip}, ${clientInfo.country}` },
+                    { label: 'Time zone', value: clientInfo.timezone },
+                    { label: 'Tags', value: clientInfo.tags.length ? clientInfo.tags.join(', ') : '—' },
+                    { label: 'Special instructions', value: clientInfo.specialInstructions || '—' },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-start gap-6 border-b border-border/60 pb-3">
+                      <span className="text-sm text-muted-foreground w-40 shrink-0">{label}</span>
+                      <span className="text-sm font-medium">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <form onSubmit={e => { e.preventDefault(); saveInfo() }} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <FieldLabel>Display name</FieldLabel>
+                    <FieldInput value={draftInfo.displayName} onChange={e => setDraftInfo(d => ({ ...d, displayName: e.target.value }))} />
+                  </div>
+                  <div>
+                    <FieldLabel>Legal name</FieldLabel>
+                    <FieldInput value={draftInfo.legalName} onChange={e => setDraftInfo(d => ({ ...d, legalName: e.target.value }))} />
+                  </div>
+                  <div>
+                    <FieldLabel>Website</FieldLabel>
+                    <FieldInput value={draftInfo.website} onChange={e => setDraftInfo(d => ({ ...d, website: e.target.value }))} />
+                  </div>
+                  <div>
+                    <FieldLabel>Tax ID</FieldLabel>
+                    <FieldInput value={draftInfo.taxId} onChange={e => setDraftInfo(d => ({ ...d, taxId: e.target.value }))} />
+                  </div>
+                  <div>
+                    <FieldLabel>City</FieldLabel>
+                    <FieldInput value={draftInfo.city} onChange={e => setDraftInfo(d => ({ ...d, city: e.target.value }))} />
+                  </div>
+                  <div>
+                    <FieldLabel>State</FieldLabel>
+                    <FieldInput value={draftInfo.state} onChange={e => setDraftInfo(d => ({ ...d, state: e.target.value }))} />
+                  </div>
+                  <div className="col-span-2">
+                    <FieldLabel>Special instructions</FieldLabel>
+                    <Textarea value={draftInfo.specialInstructions} onChange={e => setDraftInfo(d => ({ ...d, specialInstructions: e.target.value }))} className="text-sm" rows={3} />
+                  </div>
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button type="button" onClick={cancelEditInfo} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+                  <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Save</button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
         {activeTab === 'contacts' && (
           <div className="px-6 py-6">
-            {contacts.length === 0 ? (
+            <div className="flex justify-end mb-3">
+              {contactList.length > 0 && (
+                <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                  <Plus className="size-3.5" />Add contact
+                </button>
+              )}
+            </div>
+            {contactList.length === 0 ? (
               <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." actionLabel="Add contact" onAction={() => setContactDrawerOpen(true)} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {contacts.map(c => (
-                  <div key={c.id} className="rounded-xl border border-border p-4">
+                {contactList.map(c => (
+                  <button type="button" key={c.id} onClick={() => setSelectedContact(c)} className="text-left rounded-xl border border-border p-4 hover:bg-muted/30 hover:border-brand/40 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <Avatar className="size-9"><AvatarFallback className="text-sm font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
                       <div className="min-w-0">
@@ -364,7 +574,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                       <p>{c.phone}</p>
                     </div>
                     {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border mt-2" />}
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -373,11 +583,18 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'facilities' && isHealthcare && (
           <div className="px-6 py-6">
-            {facilities.length === 0 ? (
-              <EmptyTab icon={Hospital} title="No facilities yet" description="Add the hospitals, clinics, or labs this client operates so jobs can reference the right location." />
+            <div className="flex justify-end mb-3">
+              {facilityList.length > 0 && (
+                <button type="button" onClick={() => setFacilityDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                  <Plus className="size-3.5" />Add facility
+                </button>
+              )}
+            </div>
+            {facilityList.length === 0 ? (
+              <EmptyTab icon={Hospital} title="No facilities yet" description="Add the hospitals, clinics, or labs this client operates so jobs can reference the right location." actionLabel="Add facility" onAction={() => setFacilityDrawerOpen(true)} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {facilities.map(f => (
+                {facilityList.map(f => (
                   <div key={f.id} className="rounded-xl border border-border p-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-medium">{f.name}</p>
@@ -386,7 +603,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     <p className="text-sm text-muted-foreground mb-2">{f.city}, {f.state}</p>
                     {f.departments.length > 0 && <p className="text-sm"><span className="text-muted-foreground">Departments: </span>{f.departments.join(', ')}</p>}
                     {f.specialties.length > 0 && <p className="text-sm"><span className="text-muted-foreground">Specialties: </span>{f.specialties.join(', ')}</p>}
-                    <p className="text-sm mt-2"><span className="text-muted-foreground">Manager: </span>{f.facilityManager}</p>
+                    <p className="text-sm mt-2"><span className="text-muted-foreground">Manager: </span>{f.facilityManager || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -397,7 +614,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
         {activeTab === 'jobs' && (
           <div className="px-6 py-6">
             {jobs.length === 0 ? (
-              <EmptyTab icon={Briefcase} title="No jobs yet" description="Jobs posted for this client will show up here." actionLabel="Post job" />
+              <EmptyTab icon={Briefcase} title="No jobs yet" description="Jobs posted for this client will show up here." actionLabel="Post job" onAction={() => router.push(`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`)} />
             ) : (
               <>
                 <SimpleTable
@@ -409,7 +626,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     j.recruiter_name ?? 'Unassigned',
                   ])}
                 />
-                <Link href={`/dashboard/jobs?client=${encodeURIComponent(client.name)}`} className="inline-block mt-4 text-sm font-medium text-brand hover:underline">View all in Jobs →</Link>
+                <Link href={`/dashboard/jobs?client=${encodeURIComponent(clientInfo.name)}`} className="inline-block mt-4 text-sm font-medium text-brand hover:underline">View all in Jobs →</Link>
               </>
             )}
           </div>
@@ -423,7 +640,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <SimpleTable
                 headers={['Candidate', 'Latest job', 'Stage']}
                 rows={distinctCandidates.map(c => [
-                  c.name,
+                  <Link key="n" href={`/dashboard/candidates/${c.candidateId}`} className="font-medium hover:text-brand">{c.name}</Link>,
                   c.jobTitle,
                   <Chip key="s" label={STAGE_LABEL[c.stage] ?? c.stage} className={STAGE_BADGE[c.stage] ?? ''} />,
                 ])}
@@ -440,7 +657,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <SimpleTable
                 headers={['Candidate', 'Job', 'Stage', 'Submitted']}
                 rows={candidates.map(c => [
-                  c.name,
+                  <Link key="n" href={`/dashboard/candidates/${c.candidateId}`} className="font-medium hover:text-brand">{c.name}</Link>,
                   c.jobTitle,
                   <Chip key="s" label={STAGE_LABEL[c.stage] ?? c.stage} className={STAGE_BADGE[c.stage] ?? ''} />,
                   new Date(c.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -459,7 +676,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <SimpleTable
                   headers={['Candidate', 'Job', 'Date', 'Status']}
                   rows={interviews.map(i => [
-                    i.candidate,
+                    <Link key="c" href={`/dashboard/interviews/${i.id}`} className="font-medium hover:text-brand">{i.candidate}</Link>,
                     i.job,
                     `${i.date} · ${i.time}`,
                     <Chip key="s" label={i.status.replace('_', ' ')} className={INTERVIEW_STATUS_BADGE[i.status] ?? ''} />,
@@ -495,11 +712,18 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'documents' && (
           <div className="px-6 py-6">
-            {docs.length === 0 ? (
-              <EmptyTab icon={Upload} title="No documents yet" description="Contracts, insurance, invoices, and other files for this client will show up here." actionLabel="Upload document" />
+            <div className="flex justify-end mb-3">
+              {docList.length > 0 && (
+                <button type="button" onClick={uploadDocument} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                  <Upload className="size-3.5" />Upload document
+                </button>
+              )}
+            </div>
+            {docList.length === 0 ? (
+              <EmptyTab icon={Upload} title="No documents yet" description="Contracts, insurance, invoices, and other files for this client will show up here." actionLabel="Upload document" onAction={uploadDocument} />
             ) : (
               <div className="space-y-2">
-                {docs.map(d => (
+                {docList.map(d => (
                   <div key={d.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
                     <FileText className="size-4 text-muted-foreground shrink-0" />
                     <span className="text-sm font-medium truncate">{d.name}</span>
@@ -514,12 +738,19 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'tasks' && (
           <div className="px-6 py-6">
-            {tasks.length === 0 ? (
-              <EmptyTab icon={CheckSquare} title="No tasks yet" description="Follow-ups, meetings, and reminders for this client will show up here." actionLabel="Create task" />
+            <div className="flex justify-end mb-3">
+              {taskList.length > 0 && (
+                <button type="button" onClick={() => setTaskDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                  <Plus className="size-3.5" />Create task
+                </button>
+              )}
+            </div>
+            {taskList.length === 0 ? (
+              <EmptyTab icon={CheckSquare} title="No tasks yet" description="Follow-ups, meetings, and reminders for this client will show up here." actionLabel="Create task" onAction={() => setTaskDrawerOpen(true)} />
             ) : (
               <SimpleTable
                 headers={['Task', 'Type', 'Assignee', 'Due', 'Priority', 'Status']}
-                rows={tasks.map(t => [
+                rows={taskList.map(t => [
                   t.title, t.type, t.assignee, t.due,
                   <Chip key="p" label={t.priority} className={t.priority === 'High' ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' : t.priority === 'Medium' ? 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'} />,
                   <Chip key="st" label={t.status} className={t.status === 'Done' ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' : 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'} />,
@@ -531,11 +762,11 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'activity' && (
           <div className="px-6 py-6 max-w-2xl">
-            {activity.length === 0 ? (
+            {activityList.length === 0 ? (
               <EmptyTab icon={Briefcase} title="No activity yet" description="Calls, emails, meetings, and updates for this client will show up here." />
             ) : (
               <div className="space-y-4">
-                {activity.map(a => (
+                {activityList.map(a => (
                   <div key={a.id} className="flex items-start gap-3 border-b border-border/60 pb-4 last:border-0">
                     <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(a.actor)}</AvatarFallback></Avatar>
                     <div className="min-w-0">
@@ -554,8 +785,8 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             <div className="border border-border rounded-lg p-4 bg-muted/20">
               <Textarea value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Write a note about this client…" className="h-24 resize-none mb-3 text-sm" />
               <div className="flex items-center justify-end gap-2">
-                <button onClick={() => setNoteText('')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Clear</button>
-                <button onClick={addNote} disabled={!noteText.trim()} className="h-8 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white disabled:opacity-40">Add note</button>
+                <button type="button" onClick={() => setNoteText('')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Clear</button>
+                <button type="button" onClick={addNote} disabled={!noteText.trim()} className="h-8 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white disabled:opacity-40">Add note</button>
               </div>
             </div>
             {notes.length === 0 ? (
@@ -582,10 +813,160 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
       <Sheet open={contactDrawerOpen} onOpenChange={setContactDrawerOpen}>
         <SheetContent className="w-[420px] sm:max-w-[420px]">
           <SheetHeader><SheetTitle>Add contact</SheetTitle></SheetHeader>
-          <div className="px-4 py-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Contact form fields would go here (name, title, department, email, phone, LinkedIn, decision maker).</p>
-            <button onClick={() => setContactDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Done</button>
-          </div>
+          <form onSubmit={submitContact} className="px-4 py-4 space-y-4 overflow-y-auto">
+            <div>
+              <FieldLabel>Name</FieldLabel>
+              <FieldInput value={ncName} onChange={e => setNcName(e.target.value)} placeholder="e.g. Dr. Sarah Kim" required />
+            </div>
+            <div>
+              <FieldLabel>Job title</FieldLabel>
+              <FieldInput value={ncTitle} onChange={e => setNcTitle(e.target.value)} placeholder="e.g. Director of Nursing" />
+            </div>
+            <div>
+              <FieldLabel>Department</FieldLabel>
+              <FieldInput value={ncDept} onChange={e => setNcDept(e.target.value)} placeholder="e.g. ICU" />
+            </div>
+            <div>
+              <FieldLabel>Email</FieldLabel>
+              <FieldInput type="email" value={ncEmail} onChange={e => setNcEmail(e.target.value)} placeholder="name@company.com" />
+            </div>
+            <div>
+              <FieldLabel>Phone</FieldLabel>
+              <FieldInput value={ncPhone} onChange={e => setNcPhone(e.target.value)} placeholder="(555) 555-0100" />
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={ncDecisionMaker} onChange={e => setNcDecisionMaker(e.target.checked)} className="size-4" />
+              Decision maker
+            </label>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setContactDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Add contact</button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Add facility drawer */}
+      <Sheet open={facilityDrawerOpen} onOpenChange={setFacilityDrawerOpen}>
+        <SheetContent className="w-[420px] sm:max-w-[420px]">
+          <SheetHeader><SheetTitle>Add facility</SheetTitle></SheetHeader>
+          <form onSubmit={submitFacility} className="px-4 py-4 space-y-4 overflow-y-auto">
+            <div>
+              <FieldLabel>Facility name</FieldLabel>
+              <FieldInput value={nfName} onChange={e => setNfName(e.target.value)} placeholder="e.g. Memorial Hospital — Main Campus" required />
+            </div>
+            <div>
+              <FieldLabel>Facility type</FieldLabel>
+              <FieldSelect value={nfType} onChange={e => setNfType(e.target.value as ClientFacility['type'])}>
+                {FACILITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </FieldSelect>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <FieldLabel>City</FieldLabel>
+                <FieldInput value={nfCity} onChange={e => setNfCity(e.target.value)} />
+              </div>
+              <div>
+                <FieldLabel>State</FieldLabel>
+                <FieldInput value={nfState} onChange={e => setNfState(e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <FieldLabel>Facility manager</FieldLabel>
+              <FieldInput value={nfManager} onChange={e => setNfManager(e.target.value)} />
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setFacilityDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Add facility</button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Create task drawer */}
+      <Sheet open={taskDrawerOpen} onOpenChange={setTaskDrawerOpen}>
+        <SheetContent className="w-[420px] sm:max-w-[420px]">
+          <SheetHeader><SheetTitle>Create task</SheetTitle></SheetHeader>
+          <form onSubmit={submitTask} className="px-4 py-4 space-y-4 overflow-y-auto">
+            <div>
+              <FieldLabel>Task</FieldLabel>
+              <FieldInput value={ntTitle} onChange={e => setNtTitle(e.target.value)} placeholder="e.g. Follow up on submission feedback" required />
+            </div>
+            <div>
+              <FieldLabel>Type</FieldLabel>
+              <FieldSelect value={ntType} onChange={e => setNtType(e.target.value)}>
+                {TASK_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </FieldSelect>
+            </div>
+            <div>
+              <FieldLabel>Assignee</FieldLabel>
+              <FieldInput value={ntAssignee} onChange={e => setNtAssignee(e.target.value)} placeholder="e.g. Sarah M." />
+            </div>
+            <div>
+              <FieldLabel>Due date</FieldLabel>
+              <FieldInput type="date" value={ntDue} onChange={e => setNtDue(e.target.value)} />
+            </div>
+            <div>
+              <FieldLabel>Priority</FieldLabel>
+              <FieldSelect value={ntPriority} onChange={e => setNtPriority(e.target.value as TaskItem['priority'])}>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </FieldSelect>
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setTaskDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Create task</button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Contact detail drawer */}
+      <Sheet open={!!selectedContact} onOpenChange={open => !open && setSelectedContact(null)}>
+        <SheetContent className="w-[420px] sm:max-w-[420px]">
+          <SheetHeader><SheetTitle>{selectedContact?.name}</SheetTitle></SheetHeader>
+          {selectedContact && (
+            <div className="px-4 py-4 space-y-5">
+              <div className="flex items-center gap-3">
+                <Avatar className="size-10"><AvatarFallback className="text-sm font-bold bg-brand-muted text-brand">{toInitials(selectedContact.name)}</AvatarFallback></Avatar>
+                <div>
+                  <p className="text-sm font-medium">{selectedContact.title || '—'}</p>
+                  <p className="text-sm text-muted-foreground">{selectedContact.department || '—'}</p>
+                </div>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span className="font-medium">{selectedContact.email || '—'}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span className="font-medium">{selectedContact.phone || '—'}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Preferred contact</span><span className="font-medium">{selectedContact.preferredContactMethod}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Decision maker</span><span className="font-medium">{selectedContact.decisionMaker ? 'Yes' : 'No'}</span></div>
+              </div>
+              <Separator />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Recent activity</p>
+                <div className="space-y-3">
+                  {activityList.filter(a => a.action.includes(selectedContact.name)).length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No activity with this contact yet.</p>
+                  ) : (
+                    activityList.filter(a => a.action.includes(selectedContact.name)).map(a => (
+                      <div key={a.id} className="text-sm">
+                        <span className="font-medium">{a.actor}</span> <span className="text-muted-foreground">{a.action}</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">{a.time}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button type="button"
+                  onClick={() => { toast(`Calling ${selectedContact.name}…`); logActivity(`called ${selectedContact.name}`) }}
+                  className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5"><Phone className="size-3.5" />Call</button>
+                <button type="button"
+                  onClick={() => { toast(`Email opened for ${selectedContact.name}.`); logActivity(`emailed ${selectedContact.name}`) }}
+                  className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5"><Mail className="size-3.5" />Email</button>
+              </div>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>
