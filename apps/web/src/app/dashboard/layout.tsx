@@ -5,6 +5,7 @@ import { AppSidebar } from '@/components/app/sidebar'
 import { Header } from '@/components/app/header'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BreadcrumbProvider } from '@/components/app/breadcrumb-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -32,6 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </main>
         </div>
       </div>
+      <Toaster position="bottom-right" />
     </BreadcrumbProvider>
   )
 }

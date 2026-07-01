@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import {
   CheckCircle2, AlertTriangle, Sparkles, UserPlus, Video,
   Upload, Mail, Phone, X, Plus, UserCheck,
@@ -319,6 +321,7 @@ function TodayFocus({ greetStr, firstName, date, onStart }: { greetStr:string; f
 // ─── SECTION: Pipeline Funnel ─────────────────────────────────────────────────
 
 function PipelineFunnel() {
+  const router = useRouter()
   const max = PIPELINE[0]!.count
   return (
     <div className="rounded-2xl bg-background border border-border/60 shadow-sm overflow-hidden">
@@ -340,6 +343,7 @@ function PipelineFunnel() {
 
           return (
             <button key={stage.label}
+              onClick={() => router.push('/dashboard/candidates')}
               className="flex-1 flex flex-col items-center gap-2 py-4 hover:bg-muted/20 transition-colors group relative">
 
               {/* Visual bar */}
@@ -404,10 +408,45 @@ const TASK_TAB_LABELS: Record<TaskTab, string> = {
   all:'All', review:'Review', submit:'Submit', followup:'Follow-up', schedule:'Other',
 }
 
+const NAVIGATE_ACTIONS = new Set(['Review', 'Submit', 'Candidate'])
+
 function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
+  const router = useRouter()
   const [tab, setTab]   = useState<TaskTab>('all')
   const [done, setDone] = useState<Set<number>>(new Set())
   const [flash, setFlash] = useState(false)
+
+  function handleTaskAction(action: string, task: Task) {
+    if (NAVIGATE_ACTIONS.has(action)) {
+      router.push('/dashboard/candidates')
+      return
+    }
+    if (action === 'Notes') {
+      router.push('/dashboard/interviews')
+      return
+    }
+    if (action === 'Join') {
+      toast(`Joining meeting with ${task.candidate}…`)
+      return
+    }
+    if (action === 'Call') {
+      toast(`Calling ${task.candidate}…`)
+      return
+    }
+    if (action === 'Email') {
+      toast(`Email sent to ${task.candidate}.`)
+      return
+    }
+    if (action === 'Approve') {
+      toast(`Offer approved for ${task.candidate}.`)
+      setDone(s => { const n = new Set(s); n.add(task.id); return n })
+      return
+    }
+    if (action === 'Renew') {
+      toast(`Renewal reminder sent for ${task.candidate}.`)
+      return
+    }
+  }
 
   // ponytail: flash triggered by parent via data attr change
   useEffect(() => {
@@ -532,7 +571,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
               {/* Action buttons */}
               <div className="flex items-center gap-1.5 shrink-0">
                 {task.actions.map((a, i) => (
-                  <Btn key={a} label={a} variant={i === 0 ? 'solid' : 'ghost'} />
+                  <Btn key={a} label={a} variant={i === 0 ? 'solid' : 'ghost'} onClick={() => handleTaskAction(a, task)} />
                 ))}
                 {/* Complete */}
                 <button
@@ -558,6 +597,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
 // ─── SECTION: Today's Schedule ────────────────────────────────────────────────
 
 function TodaySchedule() {
+  const router = useRouter()
   return (
     <Widget title="Today's Schedule" icon={CalendarDays}
       action={<Link href="/dashboard/interviews" className="hover:text-foreground transition-colors">View all →</Link>}
@@ -588,13 +628,19 @@ function TodaySchedule() {
               </div>
               {ev.isNext && (
                 <div className="flex items-center gap-1.5 mt-2">
-                  <button className="h-6 px-2 text-[10px] font-semibold rounded-md bg-[#dd7456] text-white hover:bg-[#c45e3e] transition-colors flex items-center gap-1">
+                  <button
+                    onClick={() => toast(`Joining meeting with ${ev.candidate}…`)}
+                    className="h-6 px-2 text-[10px] font-semibold rounded-md bg-[#dd7456] text-white hover:bg-[#c45e3e] transition-colors flex items-center gap-1">
                     <Video className="size-2.5" />Join
                   </button>
-                  <button className="h-6 px-2 text-[10px] font-medium rounded-md border border-border hover:bg-muted/60 transition-colors">
+                  <button
+                    onClick={() => router.push('/dashboard/candidates')}
+                    className="h-6 px-2 text-[10px] font-medium rounded-md border border-border hover:bg-muted/60 transition-colors">
                     Candidate
                   </button>
-                  <button className="h-6 px-2 text-[10px] font-medium rounded-md border border-border hover:bg-muted/60 transition-colors">
+                  <button
+                    onClick={() => router.push('/dashboard/interviews')}
+                    className="h-6 px-2 text-[10px] font-medium rounded-md border border-border hover:bg-muted/60 transition-colors">
                     Notes
                   </button>
                 </div>
@@ -609,9 +655,25 @@ function TodaySchedule() {
 
 // ─── SECTION: AI Suggestions ──────────────────────────────────────────────────
 
+const AI_HINT_NAVIGATE = new Set(['Review', 'Find Candidates'])
+
 function AIAssistant() {
+  const router = useRouter()
   const [dismissed, setDismissed] = useState<Set<number>>(new Set())
   const visible = AI_HINTS.filter(h => !dismissed.has(h.id))
+
+  function handleHintAction(hint: typeof AI_HINTS[number]) {
+    if (AI_HINT_NAVIGATE.has(hint.action)) {
+      router.push('/dashboard/candidates')
+      return
+    }
+    if (hint.action === 'Call Now') {
+      toast('Calling Maria Gonzalez…')
+    } else if (hint.action === 'Send Emails') {
+      toast('Follow-up emails sent to 3 candidates.')
+    }
+    setDismissed(s => { const n = new Set(s); n.add(hint.id); return n })
+  }
 
   return (
     <Widget title="AI Suggestions" icon={Sparkles}
@@ -639,7 +701,9 @@ function AIAssistant() {
                     <X className="size-3" />
                   </button>
                 </div>
-                <button className={cn(
+                <button
+                  onClick={() => handleHintAction(hint)}
+                  className={cn(
                   'h-6 px-2.5 text-[10px] font-semibold rounded-lg border transition-colors',
                   AI_BTN_COLOR[hint.color]
                 )}>
@@ -657,6 +721,7 @@ function AIAssistant() {
 // ─── SECTION: My Jobs ─────────────────────────────────────────────────────────
 
 function MyJobs() {
+  const router = useRouter()
   return (
     <Widget title="My Jobs" icon={Briefcase}
       action={<Link href="/dashboard/jobs" className="hover:text-foreground transition-colors">View all →</Link>}
@@ -711,7 +776,9 @@ function MyJobs() {
                 <p className="text-[11px] text-muted-foreground truncate">
                   <span className="font-medium">Next:</span> {job.nextStep}
                 </p>
-                <button className="h-7 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors font-medium shrink-0 opacity-0 group-hover:opacity-100">
+                <button
+                  onClick={() => router.push('/dashboard/jobs')}
+                  className="h-7 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors font-medium shrink-0 opacity-0 group-hover:opacity-100">
                   Continue →
                 </button>
               </div>
@@ -770,7 +837,14 @@ function NeedsAttention() {
                     <p className="text-[11px] text-muted-foreground truncate mt-0.5">{item.issue}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Btn label={item.action} variant="ghost" />
+                    <Btn
+                      label={item.action}
+                      variant="ghost"
+                      onClick={() => {
+                        toast(`${item.action} — ${item.name}: ${item.issue}`)
+                        setDismissed(s => { const n = new Set(s); n.add(item.id); return n })
+                      }}
+                    />
                     <button
                       onClick={() => setDismissed(s => { const n = new Set(s); n.add(item.id); return n })}
                       className="size-7 rounded-lg border border-border flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted/60 transition-all"
@@ -852,7 +926,9 @@ function PlacementWatch() {
                 <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap hidden sm:inline', s.badge)}>
                   {s.label}
                 </span>
-                <button className="h-7 px-2.5 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors font-medium opacity-0 group-hover:opacity-100">
+                <button
+                  onClick={() => toast(`${p.action} — ${p.name} (${p.company})`)}
+                  className="h-7 px-2.5 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors font-medium opacity-0 group-hover:opacity-100">
                   {p.action}
                 </button>
               </div>
