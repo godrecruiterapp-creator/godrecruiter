@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell, Home } from 'lucide-react'
+import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell, Home, Settings } from 'lucide-react'
 import { useBreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -379,6 +379,11 @@ export function Header({ userName, userEmail }: Props) {
             <DropdownMenuItem asChild>
               <Link href="/dashboard/profile" className="cursor-pointer">
                 <User className="size-3.5 mr-2" />My Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings" className="cursor-pointer">
+                <Settings className="size-3.5 mr-2" />Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem

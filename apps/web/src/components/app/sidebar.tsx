@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutDashboard, Briefcase, Users,
-  CalendarCheck, BarChart3, Settings, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban, ListTodo, UserCheck, Building2,
+  CalendarCheck, BarChart3, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban, ListTodo, UserCheck, Building2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -26,8 +26,6 @@ const NAV: NavItem[] = [
   'divider',
   { label: 'AI Agent Hub',href: '/dashboard/agents',       icon: Bot },
   { label: 'Automation',  href: '/dashboard/automation',   icon: Zap },
-  'divider',
-  { label: 'Settings',    href: '/dashboard/settings',     icon: Settings },
 ]
 
 export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | 'collapsed' | 'hover' }) {
