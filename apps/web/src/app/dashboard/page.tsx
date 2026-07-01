@@ -101,7 +101,7 @@ const PROGRESS = [
 const PLACEMENTS = [
   { id:1, status:'today'  as const, name:'Maria Gonzalez', company:'Houston Methodist',  detail:'Starting today',   action:'Send Welcome' },
   { id:2, status:'ending' as const, name:'David Park',      company:'Dell Technologies', detail:'Ends in 14 days',  action:'Discuss Ext.' },
-  { id:3, status:'ending' as const, name:'Sandra Kim',      company:"Children's Medical",detail:'Ends Aug 30',      action:'Track'        },
+  { id:3, status:'ending' as const, name:'Sandra Kim',      company:"Children's Medical Center",detail:'Ends Aug 30',      action:'Track'        },
   { id:4, status:'action' as const, name:'Tom Kowalski',    company:'HCA Houston',       detail:'BG check pending', action:'Follow Up'    },
 ]
 

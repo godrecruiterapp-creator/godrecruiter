@@ -59,7 +59,7 @@ function mockExtract(fileName: string) {
     email:           isNurse ? 'sarah.johnson@email.com' : 'michael.chen@email.com',
     phone:           '(713) 555-0192',
     current_title:   isNurse ? 'Staff RN — ICU'         : 'Senior Java Developer',
-    current_company: isNurse ? 'Houston Methodist'       : 'TechCorp Inc.',
+    current_company: isNurse ? 'Houston Methodist'       : 'TechCorp Inc',
     location:        isNurse ? 'Houston, TX'             : 'Austin, TX',
     experience:      isNurse ? '6'                       : '8',
     work_auth:       isNurse ? 'US Citizen'              : 'H1B',

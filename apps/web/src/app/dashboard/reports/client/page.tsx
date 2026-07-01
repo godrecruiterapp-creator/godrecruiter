@@ -17,8 +17,8 @@ const REPORT_CARDS = [
 
 const TOP_CLIENTS = [
   { client: 'Memorial Health', jobs: 14, submissions: 42, placements: 6, revenue: '$84K', status: 'Active' },
-  { client: 'TechCorp Inc.', jobs: 9, submissions: 28, placements: 4, revenue: '$62K', status: 'Active' },
-  { client: 'City General Hosp.', jobs: 8, submissions: 24, placements: 3, revenue: '$48K', status: 'Active' },
+  { client: 'TechCorp Inc', jobs: 9, submissions: 28, placements: 4, revenue: '$62K', status: 'Active' },
+  { client: 'City General Hospital', jobs: 8, submissions: 24, placements: 3, revenue: '$48K', status: 'Active' },
   { client: 'FinServ LLC', jobs: 6, submissions: 18, placements: 2, revenue: '$31K', status: 'Active' },
   { client: 'Sunrise Care', jobs: 5, submissions: 14, placements: 2, revenue: '$28K', status: 'Active' },
   { client: 'BuildRight Co.', jobs: 3, submissions: 9, placements: 1, revenue: '$14K', status: 'Inactive' },

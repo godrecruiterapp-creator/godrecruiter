@@ -21,7 +21,7 @@ const REPORT_CARDS = [
 const AGING = [
   { id: 'JO-1042', title: 'RN – ICU', client: 'Memorial Health', days: 47, status: 'Open', priority: 'High', recruiter: 'Sarah Mitchell' },
   { id: 'JO-1038', title: 'LPN – Med/Surg', client: 'City General', days: 34, status: 'Open', priority: 'High', recruiter: 'James Patel' },
-  { id: 'JO-1051', title: 'Software Engineer', client: 'TechCorp Inc.', days: 28, status: 'Open', priority: 'Medium', recruiter: 'Linda Choi' },
+  { id: 'JO-1051', title: 'Software Engineer', client: 'TechCorp Inc', days: 28, status: 'Open', priority: 'Medium', recruiter: 'Linda Choi' },
   { id: 'JO-1029', title: 'CNA – Night Shift', client: 'Sunrise Care', days: 22, status: 'Open', priority: 'Medium', recruiter: 'Marcus Webb' },
   { id: 'JO-1056', title: 'Data Analyst', client: 'FinServ LLC', days: 18, status: 'Open', priority: 'Low', recruiter: 'Priya Nair' },
   { id: 'JO-1061', title: 'OR Technician', client: 'Regional Hosp.', days: 14, status: 'Open', priority: 'High', recruiter: 'Sarah Mitchell' },

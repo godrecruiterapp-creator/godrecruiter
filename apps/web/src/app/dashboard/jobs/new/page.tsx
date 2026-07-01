@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useTransition, useMemo, useRef } from 'react'
+import { useState, useTransition, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createJobAction } from '../actions'
+import { CLIENTS, getClientByName, getContactsForClient } from '../../clients/_data'
 import {
   ArrowLeft, Sparkles, Users, Building2, MapPin,
   DollarSign, FileText, User, Plus, X, CheckCircle2,
@@ -13,7 +15,7 @@ import { cn } from '@/lib/utils'
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
-const RECENT_CLIENTS  = ['JPMorgan Chase', 'Houston Methodist', 'Shell', 'Chevron', 'AT&T', 'Dell Technologies', 'Amazon Logistics', 'Memorial Hermann']
+const RECENT_CLIENTS  = CLIENTS.map(c => c.name)
 const RECENT_TITLES   = ['Travel RN (ICU)', 'Senior Java Developer', 'Cloud Architect', 'DevOps Engineer', 'Staff RN', 'Project Manager', 'Data Engineer', 'SAP Consultant']
 const RECENT_RECRUITERS = ['Arun Kumar', 'Priya Sharma', 'James Wilson', 'Sarah Chen']
 const DURATIONS       = ['1 month', '3 months', '6 months', '12 months', '18 months', '24 months', 'Ongoing']
@@ -31,15 +33,16 @@ const SKILL_SUGGESTIONS: Record<string, string[]> = {
 
 const VISA_OPTIONS = ['US Citizen', 'Green Card', 'H1B Transfer', 'OPT / CPT', 'TN Visa', 'EAD', 'Any']
 
-const CLIENT_AUTOFILL: Record<string, { city: string; state: string; hiringManager: string; clientType: string }> = {
-  'Houston Methodist':  { city:'Houston',    state:'TX', hiringManager:'Dr. Sarah Kim',   clientType:'direct' },
-  'JPMorgan Chase':     { city:'New York',   state:'NY', hiringManager:'Mike Torres',      clientType:'vms'    },
-  'Shell':              { city:'Houston',    state:'TX', hiringManager:'Linda Park',        clientType:'direct' },
-  'Chevron':            { city:'Houston',    state:'TX', hiringManager:'Greg Adams',        clientType:'direct' },
-  'AT&T':              { city:'Dallas',     state:'TX', hiringManager:'Rachel Brown',       clientType:'vms'    },
-  'Dell Technologies':  { city:'Austin',     state:'TX', hiringManager:'James O\'Brien',   clientType:'direct' },
-  'Amazon Logistics':   { city:'Seattle',    state:'WA', hiringManager:'Priya Nair',        clientType:'vms'    },
-  'Memorial Hermann':   { city:'Houston',    state:'TX', hiringManager:'Dr. Kevin Walsh',   clientType:'direct' },
+function clientAutofill(name: string) {
+  const client = getClientByName(name)
+  if (!client) return null
+  const primaryContact = getContactsForClient(client.id).find(c => c.primary)
+  return {
+    city: client.city,
+    state: client.state,
+    hiringManager: primaryContact?.name ?? '',
+    clientType: client.companyType,
+  }
 }
 
 const SIMILAR_JOBS_MOCK = [
@@ -431,14 +434,22 @@ export default function NewJobPage() {
 
   // Auto-fill from client selection
   const handleClientSelect = (c: string) => {
-    const fill = CLIENT_AUTOFILL[c]
+    const fill = clientAutofill(c)
     if (fill) {
       setCity(fill.city)
       setStateVal(fill.state)
-      setHiringManager(fill.hiringManager)
+      if (fill.hiringManager) setHiringManager(fill.hiringManager)
       setClientType(fill.clientType)
     }
   }
+
+  // Pre-fill client from the Client Workspace's "Post job" quick action
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    const c = searchParams.get('client')
+    if (c) { setClient(c); handleClientSelect(c) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // AI description generation (mock)
   const generateDescription = async () => {
@@ -631,9 +642,9 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       onChange={e => setHiringManager(e.target.value)}
                       placeholder={client ? 'Auto-filled from client' : 'e.g. Dr. Sarah Kim'}
                     />
-                    {client && !hiringManager && CLIENT_AUTOFILL[client] && (
+                    {client && !hiringManager && clientAutofill(client)?.hiringManager && (
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        Auto-filled: {CLIENT_AUTOFILL[client]!.hiringManager}
+                        Auto-filled: {clientAutofill(client)!.hiringManager}
                       </p>
                     )}
                   </div>
