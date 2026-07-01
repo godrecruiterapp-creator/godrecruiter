@@ -280,7 +280,7 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
         <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
           <div className="flex items-center gap-2">
             <Zap className="size-4 text-muted-foreground" />
-            <span className="font-semibold text-sm">New Automation</span>
+            <span className="font-semibold text-sm">Create Automation</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" className="gap-1.5 text-sm h-8" onClick={() => setShowAI(v => !v)}>

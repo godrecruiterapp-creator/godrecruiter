@@ -63,10 +63,9 @@ function TagEditor({ tags, setTags }: { tags: Tag[]; setTags: (t: Tag[]) => void
 
 export default function RecruitmentPage() {
   const [candidateStages, setCandidateStages] = useState<Stage[]>([
-    { id: '1', name: 'New' }, { id: '2', name: 'Screening' }, { id: '3', name: 'Shortlisted' },
-    { id: '4', name: 'Submitted to Client' }, { id: '5', name: 'Interview Scheduled' },
-    { id: '6', name: 'Interviewed' }, { id: '7', name: 'Offered' }, { id: '8', name: 'Placed' },
-    { id: '9', name: 'Rejected' }, { id: '10', name: 'Withdrawn' },
+    { id: '1', name: 'New' }, { id: '2', name: 'Reviewing' }, { id: '3', name: 'Submitted' },
+    { id: '4', name: 'Interview Scheduled' }, { id: '5', name: 'Offer Sent' },
+    { id: '6', name: 'Placed' }, { id: '7', name: 'Rejected' },
   ])
 
   const [jobStatuses, setJobStatuses] = useState<Stage[]>([

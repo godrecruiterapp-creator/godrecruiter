@@ -73,7 +73,7 @@ function ModalHeader({
 // ─── Home view ────────────────────────────────────────────────────────────────
 
 const HOME_OPTIONS = [
-  { id:'create'    as View, icon: Plus,            label:'Create New Dashboard',     desc:'Start from a template or blank canvas' },
+  { id:'create'    as View, icon: Plus,            label:'Create Dashboard',         desc:'Start from a template or blank canvas' },
   { id:'customize' as View, icon: Pencil,          label:'Customize This Dashboard', desc:'Move, resize, add or hide sections'    },
   { id:'duplicate' as View, icon: Copy,            label:'Duplicate This Dashboard', desc:'Make a copy and edit it separately'    },
   { id:'manage'           , icon: Settings2,       label:'Manage Dashboards',        desc:'View, organize and share all dashboards'},
@@ -166,7 +166,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
 
   return (
     <>
-      <ModalHeader title="Create New Dashboard" subtitle={`Step ${step + 1} of 3 — ${steps[step]}`} onClose={onClose} onBack={step === 0 ? onBack : () => setStep(s => s - 1)} />
+      <ModalHeader title="Create Dashboard" subtitle={`Step ${step + 1} of 3 — ${steps[step]}`} onClose={onClose} onBack={step === 0 ? onBack : () => setStep(s => s - 1)} />
 
       {/* Step indicator */}
       <div className="px-6 pt-4 flex gap-1.5">
@@ -631,7 +631,7 @@ function AIBuilderView({ onClose, onBack }: { onClose: () => void; onBack: () =>
           {loading ? (
             <><span className="size-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" /> Building…</>
           ) : (
-            <><Sparkles className="size-3.5" /> Build My Dashboard</>
+            <><Sparkles className="size-3.5" /> Create Dashboard</>
           )}
         </button>
       </div>

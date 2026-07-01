@@ -394,7 +394,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
         </div>
         <p className="text-sm font-medium">No jobs yet</p>
         <p className="text-sm text-muted-foreground">Post your first job to start receiving applications.</p>
-        <Button asChild size="sm" className="mt-1"><Link href="/dashboard/jobs/new">Post a job</Link></Button>
+        <Button asChild size="sm" className="mt-1"><Link href="/dashboard/jobs/new">Post Job</Link></Button>
       </div>
     )
   }
@@ -428,7 +428,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
             </Button>
             <ColPicker cols={cols} onChange={setCols} />
             <Button asChild size="sm" className="h-8">
-              <Link href="/dashboard/jobs/new"><Plus className="size-3.5 mr-1.5" />Post a job</Link>
+              <Link href="/dashboard/jobs/new"><Plus className="size-3.5 mr-1.5" />Post Job</Link>
             </Button>
           </div>
         </div>

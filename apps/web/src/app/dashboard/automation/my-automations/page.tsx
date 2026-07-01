@@ -85,7 +85,7 @@ export default function MyAutomationsPage() {
             </Select>
           </div>
           <Button size="sm" className="h-8 shrink-0" onClick={() => router.push('/dashboard/automation/new')}>
-            <Plus className="size-3.5 mr-1.5" />New Automation
+            <Plus className="size-3.5 mr-1.5" />Create Automation
           </Button>
         </div>
 
@@ -97,7 +97,7 @@ export default function MyAutomationsPage() {
               <p className="text-sm font-medium text-muted-foreground">No automations found</p>
               <p className="text-sm text-muted-foreground mt-1 mb-4">Create your first automation to get started.</p>
               <Button size="sm" className="h-8 text-sm" onClick={() => router.push('/dashboard/automation/new')}>
-                <Plus className="size-3.5 mr-1.5" />New Automation
+                <Plus className="size-3.5 mr-1.5" />Create Automation
               </Button>
             </div>
           ) : (

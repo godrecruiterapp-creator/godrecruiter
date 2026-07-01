@@ -186,7 +186,7 @@ export default function ManageDashboardsPage() {
           </div>
           <button onClick={() => setShowNew(true)}
             className="h-9 px-4 text-sm rounded-lg bg-[#dd7456] text-white hover:bg-[#c9603d] transition-colors font-medium flex items-center gap-1.5 shrink-0">
-            <Plus className="size-3.5" /> New Dashboard
+            <Plus className="size-3.5" /> Create Dashboard
           </button>
         </div>
 

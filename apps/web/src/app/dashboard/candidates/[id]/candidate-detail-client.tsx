@@ -55,8 +55,8 @@ const SOURCE_LABEL: Record<string, string> = {
   naukri: 'Naukri', indeed: 'Indeed', import: 'Import', other: 'Other',
 }
 const STAGE_LABEL: Record<string, string> = {
-  sourced: 'Sourced', qualified: 'Qualified', submitted: 'Submitted',
-  interview: 'Interview', offer: 'Offer', start: 'Started',
+  sourced: 'New', qualified: 'Reviewing', submitted: 'Submitted',
+  interview: 'Interview Scheduled', offer: 'Offer Sent', start: 'Placed',
 }
 const STATUS_DOT: Record<string, string> = {
   open: 'bg-emerald-500', on_hold: 'bg-amber-500', filled: 'bg-blue-500', closed: 'bg-zinc-400',
@@ -293,7 +293,7 @@ function JobsTab({ jobs }: { jobs: JobRow[] }) {
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2.5 px-5 py-2.5 border-b shrink-0 bg-muted/10">
         <Button size="sm" className="h-9 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0">
-          <Sparkles className="size-3.5" />AI Candidate Match
+          <Sparkles className="size-3.5" />AI Match
         </Button>
         <div className="w-px h-5 bg-border mx-1" />
         <Select value={stageFilter || '__all__'} onValueChange={v => setStageFilter(v === '__all__' ? '' : v)}>

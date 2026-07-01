@@ -545,7 +545,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
               <ArrowLeft className="size-4" />
             </Link>
             <div>
-              <h1 className="text-lg font-bold tracking-tight">Post a Job</h1>
+              <h1 className="text-lg font-bold tracking-tight">Post Job</h1>
               <p className="text-sm text-muted-foreground">Fill in the details below to post a new job</p>
             </div>
           </div>

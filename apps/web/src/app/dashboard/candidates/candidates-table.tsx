@@ -77,6 +77,11 @@ const WORK_AUTH: Record<string, string> = {
   permanent: 'Citizen / PR', contract: 'Work Visa', temp: 'Temp / OPT', unknown: 'Unknown',
 }
 
+const STAGE_LABEL: Record<string, string> = {
+  sourced: 'New', qualified: 'Reviewing', submitted: 'Submitted',
+  interview: 'Interview Scheduled', offer: 'Offer Sent', start: 'Placed',
+}
+
 const STAGE_BADGE: Record<string, string> = {
   sourced:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
   qualified: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
@@ -463,8 +468,8 @@ function CandidatePreviewSheet({
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {j.stage && (
-                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${STAGE_BADGE[j.stage] ?? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}>
-                          {j.stage}
+                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${STAGE_BADGE[j.stage] ?? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}>
+                          {STAGE_LABEL[j.stage] ?? j.stage}
                         </span>
                       )}
                       <span className={`text-sm font-medium ${STATUS_BADGE[j.status] ?? 'text-muted-foreground'}`}>
@@ -882,9 +887,9 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
             <DrawerSelect id="f-stage" label="Stage" value={draft.stage} onChange={v => setDraftField('stage', v)} options={[
-              { value: 'sourced', label: 'Sourced' }, { value: 'qualified', label: 'Qualified' },
-              { value: 'submitted', label: 'Submitted' }, { value: 'interview', label: 'Interview' },
-              { value: 'offer', label: 'Offer' }, { value: 'start', label: 'Start' },
+              { value: 'sourced', label: 'New' }, { value: 'qualified', label: 'Reviewing' },
+              { value: 'submitted', label: 'Submitted' }, { value: 'interview', label: 'Interview Scheduled' },
+              { value: 'offer', label: 'Offer Sent' }, { value: 'start', label: 'Placed' },
             ]} />
             <DrawerSelect id="f-work-auth" label="Work Authorization" value={draft.work_auth} onChange={v => setDraftField('work_auth', v)}
               options={Object.entries(WORK_AUTH).map(([k, v]) => ({ value: k, label: v }))} />

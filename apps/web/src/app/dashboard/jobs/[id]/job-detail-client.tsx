@@ -55,12 +55,12 @@ const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
 }
 
 const STAGES = [
-  { id: 'sourced',   label: 'Sourced'   },
-  { id: 'qualified', label: 'Qualified' },
-  { id: 'submitted', label: 'Submitted' },
-  { id: 'interview', label: 'Interview' },
-  { id: 'offer',     label: 'Offer'     },
-  { id: 'start',     label: 'Started'   },
+  { id: 'sourced',   label: 'New'                  },
+  { id: 'qualified', label: 'Reviewing'            },
+  { id: 'submitted', label: 'Submitted'            },
+  { id: 'interview', label: 'Interview Scheduled'   },
+  { id: 'offer',     label: 'Offer Sent'           },
+  { id: 'start',     label: 'Placed'                },
 ]
 
 type Candidate = {

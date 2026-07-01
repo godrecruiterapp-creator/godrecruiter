@@ -37,10 +37,10 @@ const TEMPLATES: Template[] = [
   { id: '18', name: 'Hot Lead Follow-up',            category: 'Communication',                 description: 'Create a follow-up task the moment a hot lead is marked.' },
   { id: '19', name: 'Reference Reminder',            category: 'Compliance',                    description: 'Remind the recruiter to collect references before an offer is made.' },
   { id: '20', name: 'Manager Approval',              category: 'Operations',                    description: 'Notify the manager and wait for approval before moving forward.' },
-  { id: '21', name: 'Auto AI Candidate Summary',     category: 'AI',            ai: true, popular: true, description: 'Generate an AI summary the moment a new candidate is added.' },
+  { id: '21', name: 'AI Candidate Summary',          category: 'AI',            ai: true, popular: true, description: 'Generate an AI summary the moment a new candidate is added.' },
   { id: '22', name: 'Resume Screening',              category: 'AI',            ai: true,       description: 'Use AI to screen and score resumes against the job requirements.' },
   { id: '23', name: 'AI Submission Notes',           category: 'AI',            ai: true,       description: 'Auto-generate submission notes before sending a candidate to a client.' },
-  { id: '24', name: 'AI Candidate Matching',         category: 'AI',            ai: true, popular: true, description: 'Automatically match new candidates to open jobs using AI.' },
+  { id: '24', name: 'AI Match',                      category: 'AI',            ai: true, popular: true, description: 'Automatically match new candidates to open jobs using AI.' },
 ]
 
 const CATS = ['All', 'Communication', 'Interviews', 'Compliance', 'Recruiting', 'Placements', 'Operations', 'Vendors', 'AI']
