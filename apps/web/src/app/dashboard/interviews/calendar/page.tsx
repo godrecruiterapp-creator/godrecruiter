@@ -82,7 +82,7 @@ export default function CalendarPage() {
           <div className="flex items-center border rounded-md overflow-hidden">
             {VIEW_LABELS.map(v => (
               <button key={v} onClick={() => setView(v as typeof view)}
-                className={`h-8 px-3 text-xs transition-colors ${view === v ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}>
+                className={`h-8 px-3 text-sm transition-colors ${view === v ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}>
                 {v}
               </button>
             ))}
@@ -157,7 +157,7 @@ export default function CalendarPage() {
           {LEGEND.map(l => (
             <div key={l.label} className="flex items-center gap-1.5">
               <div className={`size-3 rounded border ${l.color}`} />
-              <span className="text-xs text-muted-foreground">{l.label}</span>
+              <span className="text-sm text-muted-foreground">{l.label}</span>
             </div>
           ))}
         </div>

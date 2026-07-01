@@ -98,22 +98,22 @@ export default function FeedbackPage() {
                       <span className="text-sm font-medium">{row.candidate}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{row.job}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{row.client}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{row.job}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{row.client}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">{row.date}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{row.interviewer}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{row.interviewer}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-medium ${dayColor(row.daysSince)}`}>
+                    <span className={`text-sm font-medium ${dayColor(row.daysSince)}`}>
                       {row.daysSince === 0 ? 'Today' : `${row.daysSince}d ago`}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" className="h-7 text-xs"
+                      <Button size="sm" variant="outline" className="h-7 text-sm"
                         onClick={() => openFeedback(row)}>
                         <MessageSquare className="size-3 mr-1" />Submit Feedback
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground">
+                      <Button size="sm" variant="ghost" className="h-7 text-sm text-muted-foreground">
                         Send Reminder
                       </Button>
                     </div>

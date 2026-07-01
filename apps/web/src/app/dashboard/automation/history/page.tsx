@@ -90,12 +90,12 @@ export default function HistoryPage() {
       <div className="flex items-center justify-between pb-4 shrink-0 flex-wrap gap-3">
         <div>
           <h1 className="text-base font-semibold">History</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Step-by-step timeline of every automation run.</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Step-by-step timeline of every automation run.</p>
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
           <Input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search history…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+            placeholder="Search history…" className="h-8 w-52 pl-8 pr-7 text-sm" />
           {search && (
             <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               <X className="size-3.5" />
@@ -111,7 +111,7 @@ export default function HistoryPage() {
             <div className="flex items-center justify-between px-4 py-3 bg-muted/40 border-b border-border">
               <div>
                 <p className="text-sm font-semibold">{run.automation}</p>
-                {run.candidate && <p className="text-xs text-muted-foreground mt-0.5">Candidate: {run.candidate}</p>}
+                {run.candidate && <p className="text-sm text-muted-foreground mt-0.5">Candidate: {run.candidate}</p>}
               </div>
               <span className="text-xs text-muted-foreground">{run.date}</span>
             </div>
@@ -138,7 +138,7 @@ export default function HistoryPage() {
                         <span className="text-[10px] text-muted-foreground tabular-nums">{ev.time}</span>
                       </div>
                       {ev.detail && (
-                        <p className={cn('text-xs mt-0.5', ev.type === 'error' ? 'text-red-600' : 'text-muted-foreground')}>
+                        <p className={cn('text-sm mt-0.5', ev.type === 'error' ? 'text-red-600' : 'text-muted-foreground')}>
                           {ev.detail}
                         </p>
                       )}

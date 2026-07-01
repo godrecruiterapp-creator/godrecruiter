@@ -54,12 +54,12 @@ export default function OrganizationPage() {
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Company name</label>
+              <label className="text-sm font-medium text-muted-foreground">Company name</label>
               <input value={name} onChange={e => setName(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Industry</label>
+              <label className="text-sm font-medium text-muted-foreground">Industry</label>
               <select value={industry} onChange={e => setIndustry(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>Staffing & Recruiting</option>
@@ -69,7 +69,7 @@ export default function OrganizationPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Company size</label>
+              <label className="text-sm font-medium text-muted-foreground">Company size</label>
               <select value={size} onChange={e => setSize(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>1–10 employees</option>
@@ -79,12 +79,12 @@ export default function OrganizationPage() {
               </select>
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Website</label>
+              <label className="text-sm font-medium text-muted-foreground">Website</label>
               <input value={website} onChange={e => setWebsite(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Timezone</label>
+              <label className="text-sm font-medium text-muted-foreground">Timezone</label>
               <select value={timezone} onChange={e => setTimezone(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>America/Chicago (CST)</option>
@@ -94,7 +94,7 @@ export default function OrganizationPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Language</label>
+              <label className="text-sm font-medium text-muted-foreground">Language</label>
               <select value={language} onChange={e => setLanguage(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>English (US)</option>
@@ -119,33 +119,33 @@ export default function OrganizationPage() {
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Phone</label>
+              <label className="text-sm font-medium text-muted-foreground">Phone</label>
               <input value={phone} onChange={e => setPhone(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
+              <label className="text-sm font-medium text-muted-foreground">Email</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Street address</label>
+              <label className="text-sm font-medium text-muted-foreground">Street address</label>
               <input value={address} onChange={e => setAddress(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">City</label>
+              <label className="text-sm font-medium text-muted-foreground">City</label>
               <input value={city} onChange={e => setCity(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">State</label>
+                <label className="text-sm font-medium text-muted-foreground">State</label>
                 <input value={state} onChange={e => setState(e.target.value)}
                   className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">ZIP</label>
+                <label className="text-sm font-medium text-muted-foreground">ZIP</label>
                 <input value={zip} onChange={e => setZip(e.target.value)}
                   className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
@@ -164,7 +164,7 @@ export default function OrganizationPage() {
                   <MapPin className="size-3.5 text-muted-foreground shrink-0" />
                   <span className="font-medium">{l.name}</span>
                   <span className="text-muted-foreground">·</span>
-                  <span className="text-muted-foreground text-xs">{l.address}</span>
+                  <span className="text-muted-foreground text-sm">{l.address}</span>
                 </div>
               ))}
             </div>
@@ -172,7 +172,7 @@ export default function OrganizationPage() {
           action={
             <button
               onClick={() => setLocations(p => [...p, { id: Date.now().toString(), name: 'New Office', address: '' }])}
-              className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+              className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
               <Plus className="size-3.5" />Add
             </button>
           }
@@ -202,13 +202,13 @@ export default function OrganizationPage() {
           summary={
             <div className="flex flex-wrap gap-x-6 gap-y-1.5">
               {hours.filter(h => h.open).map(h => (
-                <div key={h.day} className="flex items-center gap-1.5 text-xs">
+                <div key={h.day} className="flex items-center gap-1.5 text-sm">
                   <span className="font-medium w-8">{h.day.slice(0, 3)}</span>
                   <span className="text-muted-foreground">{h.start} – {h.end}</span>
                 </div>
               ))}
               {hours.filter(h => !h.open).length > 0 && (
-                <div className="text-xs text-muted-foreground">
+                <div className="text-sm text-muted-foreground">
                   Closed: {hours.filter(h => !h.open).map(h => h.day.slice(0, 3)).join(', ')}
                 </div>
               )}
@@ -224,14 +224,14 @@ export default function OrganizationPage() {
                   <div className="flex items-center gap-2 text-sm">
                     <input type="time" value={h.start}
                       onChange={e => setHours(p => p.map((x, j) => j === i ? { ...x, start: e.target.value } : x))}
-                      className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
-                    <span className="text-muted-foreground text-xs">to</span>
+                      className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <span className="text-muted-foreground text-sm">to</span>
                     <input type="time" value={h.end}
                       onChange={e => setHours(p => p.map((x, j) => j === i ? { ...x, end: e.target.value } : x))}
-                      className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                      className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                 ) : (
-                  <span className="text-xs text-muted-foreground">Closed</span>
+                  <span className="text-sm text-muted-foreground">Closed</span>
                 )}
               </div>
             ))}
@@ -253,7 +253,7 @@ export default function OrganizationPage() {
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Currency</label>
+              <label className="text-sm font-medium text-muted-foreground">Currency</label>
               <select defaultValue="USD" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -261,7 +261,7 @@ export default function OrganizationPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Date format</label>
+              <label className="text-sm font-medium text-muted-foreground">Date format</label>
               <select defaultValue="mdy" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="mdy">MM/DD/YYYY</option>
                 <option value="dmy">DD/MM/YYYY</option>
@@ -269,7 +269,7 @@ export default function OrganizationPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Fiscal year starts</label>
+              <label className="text-sm font-medium text-muted-foreground">Fiscal year starts</label>
               <select defaultValue="jan" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m => (
                   <option key={m} value={m.toLowerCase()}>{m}</option>
@@ -277,7 +277,7 @@ export default function OrganizationPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Work week starts</label>
+              <label className="text-sm font-medium text-muted-foreground">Work week starts</label>
               <select defaultValue="mon" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="mon">Monday</option>
                 <option value="sun">Sunday</option>

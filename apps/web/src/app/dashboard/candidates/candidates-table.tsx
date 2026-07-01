@@ -155,7 +155,7 @@ function DrawerSelect({ id, label, value, onChange, options, placeholder = 'All'
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+      <Label htmlFor={id} className="text-sm font-medium">{label}</Label>
       <Select value={value || '__all__'} onValueChange={v => onChange(v === '__all__' ? '' : v)}>
         <SelectTrigger id={id} className="h-9 text-sm"><SelectValue placeholder={placeholder} /></SelectTrigger>
         <SelectContent>
@@ -192,14 +192,14 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm">
           <Settings2 className="size-3.5" />Columns
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-60 p-0">
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
           <span className="text-sm font-semibold">Columns</span>
-          <button onClick={() => onChange(DEFAULT_COLS)} className="text-xs text-brand hover:underline">Reset</button>
+          <button onClick={() => onChange(DEFAULT_COLS)} className="text-sm text-brand hover:underline">Reset</button>
         </div>
         <div className="px-2 py-2 border-b max-h-64 overflow-y-auto">
           <p className="text-xs text-muted-foreground px-2 pb-1.5 font-semibold uppercase tracking-wide">Visible</p>
@@ -212,7 +212,7 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
                 <Check className="size-2.5 text-white" strokeWidth={3} />
               </span>
               <span className="text-sm flex-1">{COL_META[key].label}</span>
-              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
+              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity text-sm">✕</button>
             </div>
           ))}
         </div>
@@ -309,11 +309,11 @@ function CandidatePreviewSheet({
                   <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-md">{cid}</span>
                 </div>
                 {(candidate.current_title || candidate.current_company) && (
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">
                     {[candidate.current_title, candidate.current_company].filter(Boolean).join(' · ')}
                   </p>
                 )}
-                {candidate.location && <p className="text-xs text-muted-foreground truncate">{candidate.location}</p>}
+                {candidate.location && <p className="text-sm text-muted-foreground truncate">{candidate.location}</p>}
               </div>
             </div>
           </div>
@@ -321,35 +321,35 @@ function CandidatePreviewSheet({
           {/* Action buttons */}
           <div className="flex items-center gap-1.5 mt-4 flex-wrap">
             <Link href={`/dashboard/candidates/${candidate.id}/edit`}
-              className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-xs font-medium hover:bg-muted transition-colors">
+              className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
               <Pencil className="size-3" />Edit
             </Link>
-            <button className="h-8 px-3 flex items-center gap-1.5 rounded-md bg-brand text-white text-xs font-medium hover:bg-brand/90 transition-colors">
+            <button className="h-8 px-3 flex items-center gap-1.5 rounded-md bg-brand text-white text-sm font-medium hover:bg-brand/90 transition-colors">
               <Send className="size-3" />Submit
             </button>
             {candidate.email && (
               <a href={`mailto:${candidate.email}`}
-                className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-xs font-medium hover:bg-muted transition-colors">
+                className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
                 <Mail className="size-3" />Email
               </a>
             )}
             {candidate.phone && (
               <a href={`tel:${candidate.phone}`}
-                className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-xs font-medium hover:bg-muted transition-colors">
+                className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
                 <Phone className="size-3" />Call
               </a>
             )}
             <Link href={`/dashboard/candidates/${candidate.id}`}
-              className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-xs font-medium hover:bg-muted transition-colors">
+              className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
               <ExternalLink className="size-3" />Full Profile
             </Link>
             {resumeUrl && (
               <a href={resumeUrl} target="_blank" rel="noreferrer"
-                className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-xs font-medium hover:bg-muted transition-colors">
+                className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
                 <FileText className="size-3" />Resume
               </a>
             )}
-            <button className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-brand/30 text-brand text-xs font-medium hover:bg-brand-muted transition-colors">
+            <button className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-brand/30 text-brand text-sm font-medium hover:bg-brand-muted transition-colors">
               <Sparkles className="size-3" />AI Match
             </button>
           </div>
@@ -358,27 +358,27 @@ function CandidatePreviewSheet({
         {/* ── Info strip ──────────────────────────────────────────────── */}
         <div className="flex items-center gap-4 px-6 py-2.5 bg-muted/40 border-b shrink-0 flex-wrap">
           {candidate.email && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Mail className="size-3 shrink-0" />
               <a href={`mailto:${candidate.email}`} className="hover:text-brand hover:underline truncate max-w-[180px]">{candidate.email}</a>
             </div>
           )}
           {candidate.phone && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Phone className="size-3 shrink-0" />{candidate.phone}
             </div>
           )}
           {candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
-            <span className="text-xs text-muted-foreground">{WORK_AUTH[candidate.candidate_type]}</span>
+            <span className="text-sm text-muted-foreground">{WORK_AUTH[candidate.candidate_type]}</span>
           )}
           {candidate.notice_period && (
-            <span className="text-xs text-muted-foreground">Available: {candidate.notice_period}</span>
+            <span className="text-sm text-muted-foreground">Available: {candidate.notice_period}</span>
           )}
           {candidate.expected_ctc && (
-            <span className="text-xs text-muted-foreground">Pay: {formatCtc(candidate.expected_ctc)}</span>
+            <span className="text-sm text-muted-foreground">Pay: {formatCtc(candidate.expected_ctc)}</span>
           )}
           {candidate.source && (
-            <span className="text-xs text-muted-foreground">Source: {candidate.source}</span>
+            <span className="text-sm text-muted-foreground">Source: {candidate.source}</span>
           )}
         </div>
 
@@ -411,7 +411,7 @@ function CandidatePreviewSheet({
                 className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground"
               />
               <div className="flex justify-end mt-2">
-                <Button size="sm" disabled={!noteText.trim() || saving} onClick={submitNote} className="h-7 text-xs">
+                <Button size="sm" disabled={!noteText.trim() || saving} onClick={submitNote} className="h-7 text-sm">
                   {saving ? <Loader2 className="size-3 animate-spin mr-1.5" /> : null}
                   Add Note
                 </Button>
@@ -431,7 +431,7 @@ function CandidatePreviewSheet({
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold">{note.author}</span>
+                      <span className="text-sm font-semibold">{note.author}</span>
                       <span className="text-xs text-muted-foreground">{note.time}</span>
                       <button onClick={() => deleteNote(note.id)}
                         className="ml-auto opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all">
@@ -459,7 +459,7 @@ function CandidatePreviewSheet({
                     className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/40 transition-colors group">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate group-hover:text-brand transition-colors">{j.title}</p>
-                      {j.client && <p className="text-xs text-muted-foreground truncate">{j.client}</p>}
+                      {j.client && <p className="text-sm text-muted-foreground truncate">{j.client}</p>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {j.stage && (
@@ -467,7 +467,7 @@ function CandidatePreviewSheet({
                           {j.stage}
                         </span>
                       )}
-                      <span className={`text-xs font-medium ${STATUS_BADGE[j.status] ?? 'text-muted-foreground'}`}>
+                      <span className={`text-sm font-medium ${STATUS_BADGE[j.status] ?? 'text-muted-foreground'}`}>
                         {j.status.replace('_', ' ')}
                       </span>
                     </div>
@@ -624,7 +624,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <AvatarFallback className="text-[10px] font-semibold bg-brand-muted text-brand">{ini}</AvatarFallback>
             </Avatar>
             <Link href={`/dashboard/candidates/${c.id}`} onClick={e => e.stopPropagation()}
-              className="text-sm font-medium truncate hover:text-brand transition-colors">
+              className="text-base font-medium truncate hover:text-brand transition-colors">
               {name}
             </Link>
             {/* Eye icon — opens preview sheet */}
@@ -637,18 +637,18 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
             </button>
           </div>
         )
-      case 'job_title':     return <span className="text-xs text-muted-foreground truncate">{c.current_title ?? '—'}</span>
-      case 'stage':         return <span className="text-xs text-muted-foreground">—</span>
-      case 'experience':    return <span className="text-xs text-muted-foreground">—</span>
-      case 'skills':        return <span className="text-xs text-muted-foreground">—</span>
-      case 'email':         return <span className="text-xs text-muted-foreground truncate">{c.email}</span>
-      case 'phone':         return <span className="text-xs text-muted-foreground">{c.phone ?? '—'}</span>
-      case 'city':          return <span className="text-xs text-muted-foreground truncate">{c.location ?? '—'}</span>
-      case 'state':         return <span className="text-xs text-muted-foreground">—</span>
-      case 'work_auth':     return <span className="text-xs text-muted-foreground">{WORK_AUTH[c.candidate_type ?? ''] ?? '—'}</span>
-      case 'availability':  return <span className="text-xs text-muted-foreground">{c.notice_period ?? '—'}</span>
-      case 'pay':           return <span className="text-xs text-muted-foreground tabular-nums">{c.expected_ctc ? formatCtc(c.expected_ctc) : '—'}</span>
-      case 'recruiter':     return <span className="text-xs text-muted-foreground">—</span>
+      case 'job_title':     return <span className="text-sm text-muted-foreground truncate">{c.current_title ?? '—'}</span>
+      case 'stage':         return <span className="text-sm text-muted-foreground">—</span>
+      case 'experience':    return <span className="text-sm text-muted-foreground">—</span>
+      case 'skills':        return <span className="text-sm text-muted-foreground">—</span>
+      case 'email':         return <span className="text-sm text-muted-foreground truncate">{c.email}</span>
+      case 'phone':         return <span className="text-sm text-muted-foreground">{c.phone ?? '—'}</span>
+      case 'city':          return <span className="text-sm text-muted-foreground truncate">{c.location ?? '—'}</span>
+      case 'state':         return <span className="text-sm text-muted-foreground">—</span>
+      case 'work_auth':     return <span className="text-sm text-muted-foreground">{WORK_AUTH[c.candidate_type ?? ''] ?? '—'}</span>
+      case 'availability':  return <span className="text-sm text-muted-foreground">{c.notice_period ?? '—'}</span>
+      case 'pay':           return <span className="text-sm text-muted-foreground tabular-nums">{c.expected_ctc ? formatCtc(c.expected_ctc) : '—'}</span>
+      case 'recruiter':     return <span className="text-sm text-muted-foreground">—</span>
       case 'last_activity': return <span className="text-xs text-muted-foreground">{relTime(c.updated_at)}</span>
       case 'created':       return <span className="text-xs text-muted-foreground">{relTime(c.created_at)}</span>
       case 'actions':       return null
@@ -679,7 +679,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
               <Input value={applied.search}
                 onChange={e => { setApplied(p => ({ ...p, search: e.target.value })); setPage(0) }}
-                placeholder="Search by name, email, ID…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+                placeholder="Search by name, email, ID…" className="h-8 w-52 pl-8 pr-7 text-sm" />
               {applied.search && (
                 <button onClick={() => { setApplied(p => ({ ...p, search: '' })); setPage(0) }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   <X className="size-3.5" />
@@ -689,7 +689,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
             {views.map(v => (
               <div key={v.name} className="flex items-center shrink-0">
                 <button onClick={() => loadView(v)}
-                  className="h-6 px-2.5 text-xs rounded-l-md border border-border hover:bg-muted transition-colors flex items-center gap-1.5">
+                  className="h-6 px-2.5 text-sm rounded-l-md border border-border hover:bg-muted transition-colors flex items-center gap-1.5">
                   <Bookmark className="size-2.5" />{v.name}
                 </button>
                 <button onClick={() => deleteView(v.name)}
@@ -706,13 +706,13 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
                 <input autoFocus value={viewName} onChange={e => setViewName(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') saveView(); if (e.key === 'Escape') setSavingView(false) }}
                   placeholder="View name…"
-                  className="h-8 w-28 px-2.5 text-xs border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-brand" />
-                <button onClick={saveView} disabled={!viewName.trim()} className="h-8 px-2.5 text-xs bg-brand text-white rounded-md hover:bg-brand/90 disabled:opacity-40">Save</button>
-                <button onClick={() => setSavingView(false)} className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground">✕</button>
+                  className="h-8 w-28 px-2.5 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-brand" />
+                <button onClick={saveView} disabled={!viewName.trim()} className="h-8 px-2.5 text-sm bg-brand text-white rounded-md hover:bg-brand/90 disabled:opacity-40">Save</button>
+                <button onClick={() => setSavingView(false)} className="h-8 px-2 text-sm text-muted-foreground hover:text-foreground">✕</button>
               </div>
             ) : (
               <button onClick={() => setSavingView(true)}
-                className="h-8 px-2.5 text-xs border border-border rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">
+                className="h-8 px-2.5 text-sm border border-border rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">
                 <BookmarkPlus className="size-3" />Save view
               </button>
             )}
@@ -745,25 +745,25 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <ActiveChip label={`Created: ${applied.date_from || '…'} – ${applied.date_to || '…'}`}
                 onRemove={() => setApplied(p => ({ ...p, date_from: '', date_to: '' }))} />
             )}
-            <button onClick={clearApplied} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
+            <button onClick={clearApplied} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
           </div>
         )}
 
         {/* ── Bulk action bar ──────────────────────────────────────────── */}
         {selected.size > 0 && (
           <div className="flex items-center gap-2 px-3 py-2 mb-2.5 bg-brand-muted border border-brand/20 rounded-lg shrink-0">
-            <span className="text-xs font-semibold text-brand">{selected.size} selected</span>
+            <span className="text-sm font-semibold text-brand">{selected.size} selected</span>
             <div className="w-px h-4 bg-brand/20 mx-1" />
-            <button className="h-7 px-2.5 text-xs border border-border bg-background rounded-md hover:bg-muted flex items-center gap-1.5 transition-colors">
+            <button className="h-7 px-2.5 text-sm border border-border bg-background rounded-md hover:bg-muted flex items-center gap-1.5 transition-colors">
               <Mail className="size-3" />Email All
             </button>
-            <button className="h-7 px-2.5 text-xs border border-border bg-background rounded-md hover:bg-muted flex items-center gap-1.5 transition-colors">
+            <button className="h-7 px-2.5 text-sm border border-border bg-background rounded-md hover:bg-muted flex items-center gap-1.5 transition-colors">
               <Send className="size-3" />Submit All
             </button>
-            <button className="h-7 px-2.5 text-xs border border-border bg-background rounded-md hover:bg-muted flex items-center gap-1.5 transition-colors">
+            <button className="h-7 px-2.5 text-sm border border-border bg-background rounded-md hover:bg-muted flex items-center gap-1.5 transition-colors">
               <Download className="size-3" />Export
             </button>
-            <button className="h-7 px-2.5 text-xs text-destructive border border-destructive/30 bg-background rounded-md hover:bg-destructive/10 flex items-center gap-1.5 ml-auto transition-colors">
+            <button className="h-7 px-2.5 text-sm text-destructive border border-destructive/30 bg-background rounded-md hover:bg-destructive/10 flex items-center gap-1.5 ml-auto transition-colors">
               <Trash2 className="size-3" />Delete
             </button>
             <button onClick={() => setSelected(new Set())} className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded transition-colors">
@@ -779,7 +779,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <div className="flex flex-col items-center justify-center py-20 gap-2">
                 <Search className="size-6 text-muted-foreground/30" />
                 <p className="text-sm text-muted-foreground">No candidates match your filters</p>
-                <button onClick={clearApplied} className="text-xs text-brand hover:underline">Clear filters</button>
+                <button onClick={clearApplied} className="text-sm text-brand hover:underline">Clear filters</button>
               </div>
             ) : (
               <table className="w-full border-collapse">
@@ -826,16 +826,16 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
         {/* ── Pagination ───────────────────────────────────────────────── */}
         <div className="flex items-center justify-between pt-3 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Rows per page</span>
+            <span className="text-sm text-muted-foreground">Rows per page</span>
             <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v) as 25 | 50 | 100); setPage(0) }}>
-              <SelectTrigger className="h-7 w-16 text-xs"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-7 w-16 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {PAGE_SIZES.map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {sorted.length === 0 ? '0' : `${page * pageSize + 1}–${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}
             </span>
             <div className="flex items-center gap-1">
@@ -847,7 +847,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
                 const pg = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i
                 return (
                   <button key={pg} onClick={() => setPage(pg)}
-                    className={`size-7 flex items-center justify-center rounded-md text-xs border transition-colors ${
+                    className={`size-7 flex items-center justify-center rounded-md text-sm border transition-colors ${
                       pg === page ? 'bg-brand border-brand text-white' : 'border-border text-muted-foreground hover:bg-muted'
                     }`}>
                     {pg + 1}
@@ -876,7 +876,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
             <div className="flex items-center justify-between">
               <SheetTitle className="text-base">Filters</SheetTitle>
               {Object.values(draft).some(v => v !== '') && (
-                <button onClick={clearDraft} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
+                <button onClick={clearDraft} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
               )}
             </div>
           </SheetHeader>
@@ -895,7 +895,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
             <DrawerSelect id="f-source" label="Source" value={draft.source} onChange={v => setDraftField('source', v)}
               options={sources.map(s => ({ value: s, label: s }))} placeholder={sources.length ? 'All sources' : 'No data yet'} />
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Pay Expectation (₹)</Label>
+              <Label className="text-sm font-medium">Pay Expectation (₹)</Label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">Min</span>
@@ -910,7 +910,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Created date range</Label>
+              <Label className="text-sm font-medium">Created date range</Label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">From</span>

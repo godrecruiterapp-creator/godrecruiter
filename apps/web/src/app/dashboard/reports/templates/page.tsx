@@ -47,8 +47,8 @@ export default function ReportTemplates() {
                 <span className={`inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] ${CATEGORY_COLORS[t.category] ?? 'bg-muted text-muted-foreground'}`}>{t.category}</span>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">{t.desc}</p>
-            <Button size="sm" variant="outline" className="w-full text-xs h-7 mt-auto">Use Template</Button>
+            <p className="text-sm text-muted-foreground">{t.desc}</p>
+            <Button size="sm" variant="outline" className="w-full text-sm h-7 mt-auto">Use Template</Button>
           </div>
         ))}
       </div>

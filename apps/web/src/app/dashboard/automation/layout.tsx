@@ -23,7 +23,7 @@ function AutomationSubNav() {
         return (
           <Link key={t.href} href={t.href}
             className={cn(
-              'px-3 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-colors',
+              'px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
               active
                 ? 'border-foreground text-foreground'
                 : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'

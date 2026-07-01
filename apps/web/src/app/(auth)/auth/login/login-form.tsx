@@ -102,7 +102,7 @@ export function LoginForm({ redirectTo, reset }: Props) {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="/auth/forgot-password" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     Forgot password?
                   </Link>
                 </div>
@@ -131,7 +131,7 @@ export function LoginForm({ redirectTo, reset }: Props) {
                   ;(form.elements.namedItem('password') as HTMLInputElement).value = 'Arun@1234'
                   form.requestSubmit()
                 }}
-                className="w-full h-9 rounded-md border border-dashed border-border text-xs text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+                className="w-full h-9 rounded-md border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
               >
                 Quick login (dev)
               </button>

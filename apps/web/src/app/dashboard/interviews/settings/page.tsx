@@ -76,7 +76,7 @@ export default function SettingsPage() {
       {/* Interview Types */}
       <Section title="Interview Types">
         <EditableList items={types} onRemove={i => setTypes(t => t.filter((_, j) => j !== i))} />
-        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setTypes(t => [...t, ''])}>
+        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm" onClick={() => setTypes(t => [...t, ''])}>
           <Plus className="size-3.5" />Add Type
         </Button>
         <div className="flex justify-end"><Button size="sm">Save</Button></div>
@@ -85,7 +85,7 @@ export default function SettingsPage() {
       {/* Interview Rounds */}
       <Section title="Interview Rounds">
         <EditableList items={rounds} onRemove={i => setRounds(r => r.filter((_, j) => j !== i))} />
-        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setRounds(r => [...r, ''])}>
+        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm" onClick={() => setRounds(r => [...r, ''])}>
           <Plus className="size-3.5" />Add Round
         </Button>
         <div className="flex justify-end"><Button size="sm">Save</Button></div>
@@ -95,7 +95,7 @@ export default function SettingsPage() {
       <Section title="Defaults">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium">Default Duration</Label>
+            <Label className="text-sm font-medium">Default Duration</Label>
             <Select defaultValue="60">
               <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -104,7 +104,7 @@ export default function SettingsPage() {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium">Default Time Zone</Label>
+            <Label className="text-sm font-medium">Default Time Zone</Label>
             <Select defaultValue="EST">
               <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -141,7 +141,7 @@ export default function SettingsPage() {
           {EMAIL_TEMPLATES.map(t => (
             <div key={t} className="flex items-center justify-between py-2 border-b last:border-0">
               <span className="text-sm">{t}</span>
-              <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+              <Button variant="outline" size="sm" className="h-7 text-sm gap-1">
                 <PenLine className="size-3" />Edit
               </Button>
             </div>
@@ -166,7 +166,7 @@ export default function SettingsPage() {
       {/* Notification Preferences */}
       <Section title="Notification Preferences">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b">
                 <th className="pb-2 text-left font-medium text-muted-foreground">Event</th>

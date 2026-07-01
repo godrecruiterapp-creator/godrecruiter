@@ -22,7 +22,7 @@ export default function ProjectTemplatesPage() {
     <div className="flex flex-col h-full p-6 overflow-y-auto">
       <div className="mb-4">
         <h1 className="text-base font-semibold">Project Templates</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Start a new project from a pre-built template and be up and running in seconds.</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Start a new project from a pre-built template and be up and running in seconds.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {TEMPLATES.map(t => (
@@ -36,8 +36,8 @@ export default function ProjectTemplatesPage() {
                 <span className="text-[10px] text-muted-foreground">{t.type}</span>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed flex-1">{t.desc}</p>
-            <Button size="sm" variant="outline" className="h-7 text-xs w-full"
+            <p className="text-sm text-muted-foreground leading-relaxed flex-1">{t.desc}</p>
+            <Button size="sm" variant="outline" className="h-7 text-sm w-full"
               onClick={() => router.push('/dashboard/projects/new')}>
               Use Template
             </Button>

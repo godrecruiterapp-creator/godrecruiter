@@ -51,27 +51,27 @@ export default function SecurityPage() {
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Minimum length</label>
+              <label className="text-sm font-medium text-muted-foreground">Minimum length</label>
               <div className="flex items-center gap-2">
                 <input type="number" value={minLen} min={8} max={32} onChange={e => setMinLen(+e.target.value)}
                   className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center" />
-                <span className="text-xs text-muted-foreground">characters</span>
+                <span className="text-sm text-muted-foreground">characters</span>
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Lockout after</label>
+              <label className="text-sm font-medium text-muted-foreground">Lockout after</label>
               <div className="flex items-center gap-2">
                 <input type="number" value={lockout} min={3} max={20} onChange={e => setLockout(+e.target.value)}
                   className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center" />
-                <span className="text-xs text-muted-foreground">failed attempts</span>
+                <span className="text-sm text-muted-foreground">failed attempts</span>
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Password expires every</label>
+              <label className="text-sm font-medium text-muted-foreground">Password expires every</label>
               <div className="flex items-center gap-2">
                 <input type="number" value={expireDays} min={0} max={365} onChange={e => setExpireDays(+e.target.value)}
                   className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center" />
-                <span className="text-xs text-muted-foreground">days (0 = never)</span>
+                <span className="text-sm text-muted-foreground">days (0 = never)</span>
               </div>
             </div>
           </div>
@@ -91,12 +91,12 @@ export default function SecurityPage() {
           description="Require a second factor when users log in"
           summary={
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex items-center gap-1.5 text-sm">
                 <Shield className={`size-3.5 ${require2fa ? 'text-emerald-600' : 'text-muted-foreground'}`} />
                 <span>{require2fa ? 'Required for all users' : 'Optional for users'}</span>
               </div>
               <span className="text-muted-foreground">·</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 Methods: {[authApp && 'Authenticator app', sms2fa && 'SMS', email2fa && 'Email'].filter(Boolean).join(', ') || 'None'}
               </span>
             </div>
@@ -129,7 +129,7 @@ export default function SecurityPage() {
             <div className="flex items-center gap-2 text-sm">
               {ssoEnabled
                 ? <><CheckCircle2 className="size-4 text-emerald-500" /><span>Microsoft Entra ID configured</span></>
-                : <><span className="text-muted-foreground text-xs">SSO is not enabled. Users log in with email and password.</span></>
+                : <><span className="text-muted-foreground text-sm">SSO is not enabled. Users log in with email and password.</span></>
               }
             </div>
           }
@@ -140,12 +140,12 @@ export default function SecurityPage() {
           {ssoEnabled && (
             <div className="border-t border-border/40 pt-4 grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Azure Tenant ID</label>
+                <label className="text-sm font-medium text-muted-foreground">Azure Tenant ID</label>
                 <input value={tenantId} onChange={e => setTenantId(e.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                   className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Client ID</label>
+                <label className="text-sm font-medium text-muted-foreground">Client ID</label>
                 <input value={clientId} onChange={e => setClientId(e.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                   className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
               </div>
@@ -163,7 +163,7 @@ export default function SecurityPage() {
                 <div key={i} className="flex items-center gap-3 text-sm">
                   <Monitor className="size-3.5 text-muted-foreground shrink-0" />
                   <span className="font-medium">{s.device}</span>
-                  <span className="text-muted-foreground text-xs">· {s.location} · {s.time}</span>
+                  <span className="text-muted-foreground text-sm">· {s.location} · {s.time}</span>
                   {s.current && <Badge variant="success">Current</Badge>}
                 </div>
               ))}
@@ -180,11 +180,11 @@ export default function SecurityPage() {
                       <p className="text-sm font-medium">{s.device}</p>
                       {s.current && <Badge variant="success">Current</Badge>}
                     </div>
-                    <p className="text-xs text-muted-foreground">{s.location} · {s.time}</p>
+                    <p className="text-sm text-muted-foreground">{s.location} · {s.time}</p>
                   </div>
                 </div>
                 {!s.current && (
-                  <button className="h-7 px-2.5 text-xs rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                  <button className="h-7 px-2.5 text-sm rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
                     Revoke
                   </button>
                 )}
@@ -200,7 +200,7 @@ export default function SecurityPage() {
           summary={
             <div className="space-y-1.5">
               {ACCESS_LOG.slice(0, 3).map((log, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs">
+                <div key={i} className="flex items-center gap-2.5 text-sm">
                   {log.ok
                     ? <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
                     : <AlertTriangle className="size-3.5 text-red-500 shrink-0" />
@@ -210,7 +210,7 @@ export default function SecurityPage() {
                   <span className="text-muted-foreground ml-auto">{log.time}</span>
                 </div>
               ))}
-              <p className="text-xs text-muted-foreground pt-1">+ {ACCESS_LOG.length - 3} more events</p>
+              <p className="text-sm text-muted-foreground pt-1">+ {ACCESS_LOG.length - 3} more events</p>
             </div>
           }
         >
@@ -223,7 +223,7 @@ export default function SecurityPage() {
                 }
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">{log.event}</p>
-                  <p className="text-xs text-muted-foreground">{log.user} · {log.location}</p>
+                  <p className="text-sm text-muted-foreground">{log.user} · {log.location}</p>
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">{log.time}</span>
               </div>

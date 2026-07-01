@@ -234,7 +234,7 @@ function WorkflowPreview({ state }: { state: WizardState }) {
                 {Icon && <Icon className="size-3.5 text-muted-foreground shrink-0" />}
                 <div className="min-w-0">
                   <div className="truncate">{s.label}</div>
-                  {s.sub && <div className="text-xs text-muted-foreground truncate">{s.sub}</div>}
+                  {s.sub && <div className="text-sm text-muted-foreground truncate">{s.sub}</div>}
                 </div>
               </div>
               {i < steps.length - 1 && (
@@ -283,7 +283,7 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
             <span className="font-semibold text-sm">New Automation</span>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={() => setShowAI(v => !v)}>
+            <Button variant="ghost" size="sm" className="gap-1.5 text-sm h-8" onClick={() => setShowAI(v => !v)}>
               <Sparkles className="size-3.5" />
               Build with AI
             </Button>
@@ -296,15 +296,15 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
         {/* AI bar */}
         {showAI && (
           <div className="px-6 py-3 border-b bg-muted/40 shrink-0">
-            <p className="text-xs text-muted-foreground mb-2">Describe your automation in plain English and we'll build it for you.</p>
+            <p className="text-sm text-muted-foreground mb-2">Describe your automation in plain English and we'll build it for you.</p>
             <div className="flex gap-2">
               <Input
                 value={aiInput}
                 onChange={e => setAiInput(e.target.value)}
                 placeholder='e.g. "When a nurse applies from Indeed, send an email, assign Sarah, create a follow-up tomorrow."'
-                className="h-8 text-xs flex-1"
+                className="h-8 text-sm flex-1"
               />
-              <Button size="sm" className="h-8 text-xs shrink-0">
+              <Button size="sm" className="h-8 text-sm shrink-0">
                 <Sparkles className="size-3 mr-1.5" />Build It
               </Button>
             </div>
@@ -401,7 +401,7 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
                 {state.conditions.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {state.conditions.map(c => (
-                      <span key={c} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-accent border border-border">
+                      <span key={c} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-accent border border-border">
                         {c}
                         <button onClick={() => set({ conditions: state.conditions.filter(x => x !== c) })} className="text-muted-foreground hover:text-destructive transition-colors">
                           <X className="size-3" />
@@ -417,14 +417,14 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
                     value={state.conditionInput}
                     onChange={e => set({ conditionInput: e.target.value })}
                     placeholder="Type a check, e.g. Job is Healthcare…"
-                    className="h-8 text-xs"
+                    className="h-8 text-sm"
                     onKeyDown={e => {
                       if (e.key === 'Enter' && state.conditionInput.trim()) {
                         set({ conditions: [...state.conditions, state.conditionInput.trim()], conditionInput: '' })
                       }
                     }}
                   />
-                  <Button size="sm" variant="outline" className="h-8 text-xs shrink-0"
+                  <Button size="sm" variant="outline" className="h-8 text-sm shrink-0"
                     disabled={!state.conditionInput.trim()}
                     onClick={() => {
                       if (state.conditionInput.trim()) {
@@ -436,13 +436,13 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
                 </div>
 
                 {/* Suggestions */}
-                <p className="text-xs text-muted-foreground mb-2">Or pick from common checks:</p>
+                <p className="text-sm text-muted-foreground mb-2">Or pick from common checks:</p>
                 <div className="flex flex-wrap gap-2">
                   {CONDITION_SUGGESTIONS.filter(s => !state.conditions.includes(s)).map(s => (
                     <button
                       key={s}
                       onClick={() => set({ conditions: [...state.conditions, s] })}
-                      className="px-3 py-1 rounded-full text-xs border border-dashed border-border hover:border-muted-foreground hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground"
+                      className="px-3 py-1 rounded-full text-sm border border-dashed border-border hover:border-muted-foreground hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground"
                     >
                       + {s}
                     </button>
@@ -493,18 +493,18 @@ export function CreateAutomationWizard({ open, onClose }: { open: boolean; onClo
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t shrink-0 bg-background">
-          <Button variant="ghost" size="sm" className="text-xs h-8" onClick={() => step === 0 ? close() : setStep(s => s - 1)}>
+          <Button variant="ghost" size="sm" className="text-sm h-8" onClick={() => step === 0 ? close() : setStep(s => s - 1)}>
             <ChevronLeft className="size-3.5 mr-1" />
             {step === 0 ? 'Cancel' : 'Back'}
           </Button>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Step {step + 1} of 5</span>
+            <span className="text-sm text-muted-foreground">Step {step + 1} of 5</span>
             {step < 4 ? (
-              <Button size="sm" className="h-8 text-xs" disabled={!canNext[step]} onClick={() => setStep(s => s + 1)}>
+              <Button size="sm" className="h-8 text-sm" disabled={!canNext[step]} onClick={() => setStep(s => s + 1)}>
                 Next <ChevronRight className="size-3.5 ml-1" />
               </Button>
             ) : (
-              <Button size="sm" className="h-8 text-xs" disabled={!canNext[4]} onClick={() => { close() }}>
+              <Button size="sm" className="h-8 text-sm" disabled={!canNext[4]} onClick={() => { close() }}>
                 Save Automation <Check className="size-3.5 ml-1" strokeWidth={3} />
               </Button>
             )}

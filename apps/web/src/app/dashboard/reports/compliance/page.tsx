@@ -53,7 +53,7 @@ export default function ComplianceReports() {
           <p className="text-sm text-muted-foreground">Track licenses, credentials, and compliance status across candidates</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>All Candidates</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>All Candidates</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
@@ -67,8 +67,8 @@ export default function ComplianceReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function ComplianceReports() {
 
       <div className="rounded-lg border bg-card p-4">
         <p className="text-sm font-semibold mb-3">License Expiration Alert</p>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="pb-2 text-left font-medium">Candidate</th>
@@ -117,7 +117,7 @@ export default function ComplianceReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

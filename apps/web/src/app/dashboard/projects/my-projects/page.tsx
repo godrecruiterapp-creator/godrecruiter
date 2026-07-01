@@ -63,7 +63,7 @@ export default function MyProjectsPage() {
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search projects…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+              placeholder="Search projects…" className="h-8 w-52 pl-8 pr-7 text-sm" />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 <X className="size-3.5" />
@@ -71,7 +71,7 @@ export default function MyProjectsPage() {
             )}
           </div>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-28 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="active">Active</SelectItem>
@@ -80,7 +80,7 @@ export default function MyProjectsPage() {
             </SelectContent>
           </Select>
           <Select value={type} onValueChange={setType}>
-            <SelectTrigger className="h-8 w-40 text-xs"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-40 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               {types.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -98,8 +98,8 @@ export default function MyProjectsPage() {
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <FolderKanban className="size-10 text-muted-foreground/30 mb-3" />
             <p className="text-sm font-medium text-muted-foreground">No projects found</p>
-            <p className="text-xs text-muted-foreground mt-1 mb-4">Create your first project to start organizing candidates.</p>
-            <Button size="sm" className="h-8 text-xs" onClick={() => router.push('/dashboard/projects/new')}>
+            <p className="text-sm text-muted-foreground mt-1 mb-4">Create your first project to start organizing candidates.</p>
+            <Button size="sm" className="h-8 text-sm" onClick={() => router.push('/dashboard/projects/new')}>
               <Plus className="size-3.5 mr-1.5" />Create Project
             </Button>
           </div>
@@ -151,7 +151,7 @@ function ProjectCard({ project: p }: { project: Project }) {
         </div>
 
         {/* Description */}
-        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{p.description}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{p.description}</p>
 
         {/* Type badge */}
         <span className="inline-flex items-center self-start rounded-full px-2 py-0.5 text-[10px] font-medium bg-muted/80 text-muted-foreground">

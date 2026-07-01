@@ -28,15 +28,15 @@ export default function ProjectEmailsPage() {
       <div className="flex items-center justify-between mb-4 shrink-0 gap-3 flex-wrap">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-          <Input placeholder="Search emails…" className="h-8 w-52 pl-8 text-xs" />
+          <Input placeholder="Search emails…" className="h-8 w-52 pl-8 text-sm" />
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5">
+          <Button size="sm" variant="outline" className="h-8 text-sm gap-1.5">
             <Sparkles className="size-3.5" />AI Write
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="h-8 text-xs gap-1.5">
+              <Button size="sm" className="h-8 text-sm gap-1.5">
                 <Plus className="size-3.5" />Compose <ChevronDown className="size-3" />
               </Button>
             </DropdownMenuTrigger>
@@ -66,26 +66,26 @@ export default function ProjectEmailsPage() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                    <span className="text-xs font-medium">{e.subject}</span>
+                    <span className="text-sm font-medium">{e.subject}</span>
                   </div>
                 </td>
-                <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{e.to} recipients</span></td>
+                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{e.to} recipients</span></td>
                 <td className="px-4 py-3"><span className="text-xs text-muted-foreground whitespace-nowrap">{e.sent}</span></td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5">
                     <Eye className="size-3 text-muted-foreground" />
-                    <span className="text-xs tabular-nums">{e.opens}</span>
+                    <span className="text-sm tabular-nums">{e.opens}</span>
                     {e.to > 0 && <span className="text-[10px] text-muted-foreground">({Math.round(e.opens / e.to * 100)}%)</span>}
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={cn('text-xs font-semibold tabular-nums', e.replies > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>{e.replies}</span>
+                  <span className={cn('text-sm font-semibold tabular-nums', e.replies > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>{e.replies}</span>
                 </td>
                 <td className="px-4 py-3">
                   <span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', STA_CFG[e.status])}>{e.status}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <button className="text-xs text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">View</button>
+                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">View</button>
                 </td>
               </tr>
             ))}

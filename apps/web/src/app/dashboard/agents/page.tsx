@@ -64,7 +64,7 @@ export default function AgentsDashboard() {
           <Card key={label} className="p-4 flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Icon className="size-3.5 shrink-0" />
-              <span className="text-xs truncate">{label}</span>
+              <span className="text-sm truncate">{label}</span>
             </div>
             <span className="text-2xl font-bold">{value}</span>
           </Card>
@@ -86,7 +86,7 @@ export default function AgentsDashboard() {
                   </div>
                   <div>
                     <p className="text-sm font-medium">{t.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{t.desc}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{t.desc}</p>
                   </div>
                   <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800 w-fit mt-auto">
                     {t.category}
@@ -119,7 +119,7 @@ export default function AgentsDashboard() {
                         </span>
                       </td>
                       <td className="px-4 py-2.5 text-xs text-muted-foreground">{r.time}</td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground tabular-nums">{r.records}</td>
+                      <td className="px-4 py-2.5 text-sm text-muted-foreground tabular-nums">{r.records}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -152,7 +152,7 @@ export default function AgentsDashboard() {
               <div key={i} className="flex items-start gap-3 px-4 py-3">
                 <div className={`size-2 rounded-full mt-1.5 shrink-0 ${NOTIF_DOT[n.type]}`} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs leading-snug">{n.text}</p>
+                  <p className="text-sm leading-snug">{n.text}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{n.time}</p>
                 </div>
               </div>

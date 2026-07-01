@@ -52,7 +52,7 @@ export default function ProjectAnalyticsPage() {
             return (
               <div key={k.label} className="rounded-xl border border-border bg-background p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-muted-foreground">{k.label}</p>
+                  <p className="text-sm text-muted-foreground">{k.label}</p>
                   <Icon className={cn('size-4', k.color)} />
                 </div>
                 <p className="text-2xl font-bold tabular-nums">{k.value}</p>
@@ -68,11 +68,11 @@ export default function ProjectAnalyticsPage() {
             <div className="space-y-2">
               {FUNNEL.map(f => (
                 <div key={f.label} className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-28 shrink-0">{f.label}</span>
+                  <span className="text-sm text-muted-foreground w-28 shrink-0">{f.label}</span>
                   <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
                     <div className={cn('h-5 rounded-full transition-all', f.color)} style={{ width: `${f.pct}%` }} />
                   </div>
-                  <span className="text-xs font-semibold tabular-nums w-8 text-right shrink-0">{f.value}</span>
+                  <span className="text-sm font-semibold tabular-nums w-8 text-right shrink-0">{f.value}</span>
                 </div>
               ))}
             </div>
@@ -84,11 +84,11 @@ export default function ProjectAnalyticsPage() {
             <div className="space-y-2">
               {SOURCES.map((s, i) => (
                 <div key={s.source} className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-28 shrink-0">{s.source}</span>
+                  <span className="text-sm text-muted-foreground w-28 shrink-0">{s.source}</span>
                   <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
                     <div className={cn('h-3 rounded-full', SOURCE_COLORS[i] ?? 'bg-muted-foreground')} style={{ width: `${s.pct}%` }} />
                   </div>
-                  <span className="text-xs text-muted-foreground tabular-nums w-8 text-right shrink-0">{s.pct}%</span>
+                  <span className="text-sm text-muted-foreground tabular-nums w-8 text-right shrink-0">{s.pct}%</span>
                 </div>
               ))}
             </div>
@@ -110,11 +110,11 @@ export default function ProjectAnalyticsPage() {
               <tbody>
                 {RECRUITER_PERF.map(r => (
                   <tr key={r.name} className="border-t border-border">
-                    <td className="py-2 text-xs font-medium">{r.name}</td>
-                    <td className="py-2 text-xs tabular-nums">{r.submissions}</td>
-                    <td className="py-2 text-xs tabular-nums">{r.interviews}</td>
-                    <td className="py-2 text-xs font-semibold tabular-nums text-emerald-600">{r.placements}</td>
-                    <td className="py-2 text-xs tabular-nums">{r.responseRate}%</td>
+                    <td className="py-2 text-sm font-medium">{r.name}</td>
+                    <td className="py-2 text-sm tabular-nums">{r.submissions}</td>
+                    <td className="py-2 text-sm tabular-nums">{r.interviews}</td>
+                    <td className="py-2 text-sm font-semibold tabular-nums text-emerald-600">{r.placements}</td>
+                    <td className="py-2 text-sm tabular-nums">{r.responseRate}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -127,7 +127,7 @@ export default function ProjectAnalyticsPage() {
             <div className="flex flex-wrap gap-2">
               {TOP_SKILLS.sort((a, b) => b.count - a.count).map(s => (
                 <div key={s.skill} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/60 border border-border">
-                  <span className="text-xs font-medium">{s.skill}</span>
+                  <span className="text-sm font-medium">{s.skill}</span>
                   <span className="text-[10px] text-muted-foreground">{s.count}</span>
                 </div>
               ))}

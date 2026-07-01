@@ -170,7 +170,7 @@ function TriggerPicker({ value, onChange }: { value: string | null; onChange: (v
   return (
     <div className="pt-3">
       <Input value={search} onChange={e => setSearch(e.target.value)}
-        placeholder="Search triggers…" className="h-7 text-xs mb-3" autoFocus />
+        placeholder="Search triggers…" className="h-7 text-sm mb-3" autoFocus />
       <div className="grid grid-cols-2 gap-1.5 max-h-64 overflow-y-auto pr-1">
         {list.map(t => {
           const Icon = t.icon
@@ -178,7 +178,7 @@ function TriggerPicker({ value, onChange }: { value: string | null; onChange: (v
           return (
             <button key={t.id} onClick={() => onChange(t.id)}
               className={cn(
-                'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left text-xs transition-colors',
+                'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left text-sm transition-colors',
                 sel ? 'border-violet-400 dark:border-violet-600 bg-violet-100 dark:bg-violet-900 text-violet-900 dark:text-violet-200 font-medium'
                     : 'border-border hover:bg-muted/60 text-foreground'
               )}>
@@ -198,7 +198,7 @@ function TimingPicker({ value, onChange }: { value: string; onChange: (v: string
       {TIMING_OPTIONS.map(opt => (
         <button key={opt} onClick={() => onChange(opt)}
           className={cn(
-            'px-3 py-2 rounded-lg border text-xs text-left transition-colors',
+            'px-3 py-2 rounded-lg border text-sm text-left transition-colors',
             value === opt
               ? 'border-blue-400 dark:border-blue-600 bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-200 font-medium'
               : 'border-border hover:bg-muted/60 text-foreground'
@@ -223,17 +223,17 @@ function ConditionPicker({ values, input, onChange }: {
       <div className="flex gap-2 mb-3">
         <Input value={input} onChange={e => onChange({ input: e.target.value })}
           placeholder="Type a check, e.g. Job is Healthcare…"
-          className="h-7 text-xs flex-1"
+          className="h-7 text-sm flex-1"
           onKeyDown={e => { if (e.key === 'Enter') add(input) }}
           autoFocus />
-        <Button size="sm" variant="outline" className="h-7 text-xs shrink-0" onClick={() => add(input)} disabled={!input.trim()}>
+        <Button size="sm" variant="outline" className="h-7 text-sm shrink-0" onClick={() => add(input)} disabled={!input.trim()}>
           <Plus className="size-3 mr-1" />Add
         </Button>
       </div>
       {values.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
           {values.map(v => (
-            <span key={v} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700">
+            <span key={v} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700">
               {v}
               <button onClick={() => onChange({ values: values.filter(x => x !== v) })} className="hover:text-red-600 transition-colors">
                 <X className="size-3" />
@@ -246,7 +246,7 @@ function ConditionPicker({ values, input, onChange }: {
       <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
         {CONDITION_SUGGESTIONS.filter(s => !values.includes(s)).map(s => (
           <button key={s} onClick={() => add(s)}
-            className="px-2.5 py-1 rounded-full text-xs border border-dashed border-border hover:border-amber-400 dark:hover:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 hover:text-amber-800 dark:hover:text-amber-300 text-muted-foreground transition-colors">
+            className="px-2.5 py-1 rounded-full text-sm border border-dashed border-border hover:border-amber-400 dark:hover:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 hover:text-amber-800 dark:hover:text-amber-300 text-muted-foreground transition-colors">
             + {s}
           </button>
         ))}
@@ -261,7 +261,7 @@ function ActionPicker({ value, onChange }: { value: string | null; onChange: (v:
   return (
     <div className="pt-3">
       <Input value={search} onChange={e => setSearch(e.target.value)}
-        placeholder="Search actions…" className="h-7 text-xs mb-3" autoFocus />
+        placeholder="Search actions…" className="h-7 text-sm mb-3" autoFocus />
       <div className="grid grid-cols-2 gap-1.5 max-h-64 overflow-y-auto pr-1">
         {list.map(a => {
           const Icon = a.icon
@@ -269,7 +269,7 @@ function ActionPicker({ value, onChange }: { value: string | null; onChange: (v:
           return (
             <button key={a.id} onClick={() => onChange(a.id)}
               className={cn(
-                'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left text-xs transition-colors',
+                'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left text-sm transition-colors',
                 sel ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-100 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 font-medium'
                     : 'border-border hover:bg-muted/60 text-foreground'
               )}>
@@ -307,7 +307,7 @@ function AddStepMenu({ onAdd, hasTrigger }: { onAdd: (t: BlockType) => void; has
               const Icon = o.icon
               return (
                 <button key={o.type} onClick={() => { onAdd(o.type); setOpen(false) }}
-                  className={cn('flex items-center gap-2.5 w-full px-3 py-2 text-xs font-medium border border-transparent transition-colors text-left mx-0', o.color)}>
+                  className={cn('flex items-center gap-2.5 w-full px-3 py-2 text-sm font-medium border border-transparent transition-colors text-left mx-0', o.color)}>
                   <Icon className="size-3.5 shrink-0" />
                   {o.label}
                 </button>
@@ -463,7 +463,7 @@ export default function NewAutomationPage() {
       {/* ── Header ── */}
       <div className="flex items-center gap-3 px-6 py-3 border-b bg-background shrink-0">
         <Link href="/dashboard/automation/my-automations"
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0">
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0">
           <ChevronLeft className="size-3.5" />My Automations
         </Link>
         <div className="w-px h-4 bg-border" />
@@ -474,10 +474,10 @@ export default function NewAutomationPage() {
           className="h-8 w-64 text-sm font-medium border-0 bg-transparent px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50"
         />
         <div className="flex-1" />
-        <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5" onClick={() => setAiOpen(v => !v)}>
+        <Button variant="ghost" size="sm" className="h-8 text-sm gap-1.5" onClick={() => setAiOpen(v => !v)}>
           <Sparkles className="size-3.5" />Build with AI
         </Button>
-        <Button size="sm" className="h-8 text-xs" disabled={!canSave} onClick={() => router.push('/dashboard/automation/my-automations')}>
+        <Button size="sm" className="h-8 text-sm" disabled={!canSave} onClick={() => router.push('/dashboard/automation/my-automations')}>
           <Check className="size-3.5 mr-1.5" strokeWidth={3} />Save Automation
         </Button>
       </div>
@@ -490,10 +490,10 @@ export default function NewAutomationPage() {
             value={aiInput}
             onChange={e => setAiInput(e.target.value)}
             placeholder='Describe your automation, e.g. "When a nurse applies from Indeed, send an email, assign Sarah, create a follow-up tomorrow"'
-            className="h-7 text-xs flex-1 border-0 bg-transparent px-0 focus-visible:ring-0"
+            className="h-7 text-sm flex-1 border-0 bg-transparent px-0 focus-visible:ring-0"
             autoFocus
           />
-          <Button size="sm" className="h-7 text-xs shrink-0">Build It</Button>
+          <Button size="sm" className="h-7 text-sm shrink-0">Build It</Button>
           <button onClick={() => setAiOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
             <X className="size-3.5" />
           </button>
@@ -582,7 +582,7 @@ export default function NewAutomationPage() {
                            b.type === 'condition' ? 'Only if'   :
                            b.type === 'timing'    ? 'Wait'      : 'Action'}
                         </p>
-                        <p className={cn('text-xs truncate', isConfigured ? 'text-foreground' : 'text-muted-foreground')}>{label}</p>
+                        <p className={cn('text-sm truncate', isConfigured ? 'text-foreground' : 'text-muted-foreground')}>{label}</p>
                       </div>
                     </div>
                   )
@@ -594,7 +594,7 @@ export default function NewAutomationPage() {
           {/* Tips */}
           <div className="rounded-lg bg-muted/60 border border-border p-3 mt-auto">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Tips</p>
-            <ul className="text-xs text-muted-foreground space-y-1.5">
+            <ul className="text-sm text-muted-foreground space-y-1.5">
               <li>• Click any block to configure it</li>
               <li>• Use <strong>+</strong> to add more steps</li>
               <li>• Add "Only if" checks to target specific candidates or jobs</li>

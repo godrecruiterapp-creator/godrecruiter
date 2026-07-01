@@ -67,8 +67,8 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-xs font-medium">{r.name}</span>
-                      <span className="text-xs font-bold text-emerald-600">{r.fillRate}%</span>
+                      <span className="text-sm font-medium">{r.name}</span>
+                      <span className="text-sm font-bold text-emerald-600">{r.fillRate}%</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div className="h-1.5 rounded-full bg-emerald-500" style={{ width: `${r.fillRate}%` }} />
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
           <div className="rounded-xl border border-border bg-background p-5">
             <h3 className="text-sm font-semibold mb-4">Workload Distribution</h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-1.5 text-[10px] font-medium text-muted-foreground">Recruiter</th>
@@ -169,7 +169,7 @@ export default function AnalyticsPage() {
             <Trophy className="size-8 text-amber-600 shrink-0" />
             <div>
               <p className="text-sm font-semibold">Top Performer: {topFiller.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {topFiller.fillRate}% fill rate · {topFiller.avgSubmitTime} avg submission time · {topFiller.submissions} total submissions
               </p>
             </div>

@@ -49,8 +49,8 @@ export default function AiInsightsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold">{f.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 mb-3">{f.desc}</p>
-                <Button size="sm" className="h-7 text-xs">Generate</Button>
+                <p className="text-sm text-muted-foreground mt-0.5 mb-3">{f.desc}</p>
+                <Button size="sm" className="h-7 text-sm">Generate</Button>
               </div>
             </div>
           )
@@ -59,7 +59,7 @@ export default function AiInsightsPage() {
 
       <div className="rounded-lg border bg-card p-4">
         <p className="text-sm font-semibold mb-3">Recent AI Generations</p>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="pb-2 text-left font-medium">Type</th>

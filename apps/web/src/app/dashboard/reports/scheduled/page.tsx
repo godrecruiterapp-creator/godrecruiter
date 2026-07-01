@@ -40,7 +40,7 @@ export default function ScheduledReports() {
       </div>
 
       <div className="rounded-lg border bg-card">
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="py-3 px-4 text-left font-medium">Report</th>
@@ -87,8 +87,8 @@ export default function ScheduledReports() {
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs">Report</Label>
-              <select className="h-8 text-xs border rounded-md px-2 bg-background">
+              <Label className="text-sm">Report</Label>
+              <select className="h-8 text-sm border rounded-md px-2 bg-background">
                 <option>Weekly Submission Dashboard</option>
                 <option>Recruiter Leaderboard</option>
                 <option>Monthly Revenue Summary</option>
@@ -98,8 +98,8 @@ export default function ScheduledReports() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs">Schedule</Label>
-              <select className="h-8 text-xs border rounded-md px-2 bg-background">
+              <Label className="text-sm">Schedule</Label>
+              <select className="h-8 text-sm border rounded-md px-2 bg-background">
                 <option>Hourly</option>
                 <option>Daily</option>
                 <option>Weekly</option>
@@ -111,10 +111,10 @@ export default function ScheduledReports() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs">Recipients</Label>
+              <Label className="text-sm">Recipients</Label>
               <div className="flex gap-2">
                 <input
-                  className="flex-1 h-8 px-2.5 text-xs border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="flex-1 h-8 px-2.5 text-sm border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
                   placeholder="Enter email and press Enter"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -135,10 +135,10 @@ export default function ScheduledReports() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs">Format</Label>
+              <Label className="text-sm">Format</Label>
               <div className="flex items-center gap-4">
                 {['Excel', 'PDF', 'CSV'].map((f) => (
-                  <label key={f} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                  <label key={f} className="flex items-center gap-1.5 text-sm cursor-pointer">
                     <input type="checkbox" defaultChecked={f === 'Excel'} className="size-3" />
                     {f}
                   </label>
@@ -147,9 +147,9 @@ export default function ScheduledReports() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs">Message (optional)</Label>
+              <Label className="text-sm">Message (optional)</Label>
               <textarea
-                className="min-h-[72px] px-2.5 py-2 text-xs border rounded-md bg-background resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                className="min-h-[72px] px-2.5 py-2 text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-1 focus:ring-ring"
                 placeholder="Add a message to include in the report email..."
               />
             </div>

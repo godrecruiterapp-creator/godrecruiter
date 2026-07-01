@@ -37,14 +37,14 @@ export default function CommunicationPage() {
               <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
               <div>
                 <span className="font-medium">{emailProvider}</span>
-                <span className="text-muted-foreground text-xs ml-2">Connected · {senderEmail}</span>
+                <span className="text-muted-foreground text-sm ml-2">Connected · {senderEmail}</span>
               </div>
             </div>
           }
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Email provider</label>
+              <label className="text-sm font-medium text-muted-foreground">Email provider</label>
               <select value={emailProvider} onChange={e => setEmailProvider(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>Microsoft Outlook</option>
@@ -55,12 +55,12 @@ export default function CommunicationPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Sender name</label>
+              <label className="text-sm font-medium text-muted-foreground">Sender name</label>
               <input value={senderName} onChange={e => setSenderName(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Sender email</label>
+              <label className="text-sm font-medium text-muted-foreground">Sender email</label>
               <input type="email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
@@ -94,7 +94,7 @@ export default function CommunicationPage() {
           {smsEnabled && (
             <div className="border-t border-border/40 pt-3 grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">SMS provider</label>
+                <label className="text-sm font-medium text-muted-foreground">SMS provider</label>
                 <select value={smsProvider} onChange={e => setSmsProvider(e.target.value)}
                   className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                   <option>Twilio</option>
@@ -103,7 +103,7 @@ export default function CommunicationPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">API key</label>
+                <label className="text-sm font-medium text-muted-foreground">API key</label>
                 <input type="password" defaultValue="twilio_key_••••••••"
                   className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
@@ -125,7 +125,7 @@ export default function CommunicationPage() {
           }
         >
           <CardRow label="Calendar integration">
-            <select defaultValue="outlook" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+            <select defaultValue="outlook" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
               <option value="outlook">Microsoft Outlook</option>
               <option value="google">Google Calendar</option>
               <option value="none">None</option>
@@ -148,17 +148,17 @@ export default function CommunicationPage() {
           summary={
             <div className="space-y-2">
               {TEMPLATES.slice(0, 3).map(t => (
-                <div key={t.name} className="flex items-center gap-2 text-xs">
+                <div key={t.name} className="flex items-center gap-2 text-sm">
                   <Badge variant={t.status === 'active' ? 'success' : 'default'}>{t.status}</Badge>
                   <span className="font-medium">{t.name}</span>
                   <span className="text-muted-foreground">· {t.trigger}</span>
                 </div>
               ))}
-              <p className="text-xs text-muted-foreground">+ {TEMPLATES.length - 3} more templates</p>
+              <p className="text-sm text-muted-foreground">+ {TEMPLATES.length - 3} more templates</p>
             </div>
           }
           action={
-            <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+            <button className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
               <Plus className="size-3.5" />New template
             </button>
           }
@@ -168,11 +168,11 @@ export default function CommunicationPage() {
               <div key={t.name} className="flex items-center justify-between py-3 border-b border-border/40 last:border-0">
                 <div>
                   <p className="text-sm font-medium">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.trigger}</p>
+                  <p className="text-sm text-muted-foreground">{t.trigger}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={t.status === 'active' ? 'success' : 'default'}>{t.status}</Badge>
-                  <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">Edit</button>
+                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">Edit</button>
                 </div>
               </div>
             ))}

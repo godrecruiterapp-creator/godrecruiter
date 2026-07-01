@@ -62,12 +62,12 @@ export default function TemplatesPage() {
         <div className="flex items-center justify-between mb-4 shrink-0 flex-wrap gap-3">
           <div>
             <h1 className="text-base font-semibold">Automation Templates</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Pick a ready-made automation and start in seconds.</p>
+            <p className="text-sm text-muted-foreground mt-0.5">Pick a ready-made automation and start in seconds.</p>
           </div>
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search templates…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+              placeholder="Search templates…" className="h-8 w-52 pl-8 pr-7 text-sm" />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 <X className="size-3.5" />
@@ -81,7 +81,7 @@ export default function TemplatesPage() {
           {CATS.map(c => (
             <button key={c} onClick={() => setCat(c)}
               className={cn(
-                'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                'px-3 py-1 rounded-full text-sm font-medium border transition-colors',
                 cat === c
                   ? 'bg-foreground text-background border-foreground'
                   : 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'
@@ -115,8 +115,8 @@ export default function TemplatesPage() {
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{t.description}</p>
-                <Button size="sm" variant="outline" className="h-7 text-xs w-full" onClick={() => setWizardOpen(true)}>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t.description}</p>
+                <Button size="sm" variant="outline" className="h-7 text-sm w-full" onClick={() => setWizardOpen(true)}>
                   Use This Template
                 </Button>
               </div>

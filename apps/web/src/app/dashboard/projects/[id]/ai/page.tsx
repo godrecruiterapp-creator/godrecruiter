@@ -93,7 +93,7 @@ export default function ProjectAIPage() {
               )}>
                 <span className="text-lg leading-none shrink-0">{ins.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-foreground leading-snug">{ins.text}</p>
+                  <p className="text-sm text-foreground leading-snug">{ins.text}</p>
                   <button className="text-[10px] font-semibold text-foreground mt-1.5 hover:underline">{ins.action} →</button>
                 </div>
               </div>
@@ -106,25 +106,25 @@ export default function ProjectAIPage() {
           <div className="rounded-xl border border-border bg-background p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold">AI Candidate Ranking</h3>
-              <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5">
+              <Button size="sm" variant="outline" className="h-7 text-sm gap-1.5">
                 <RefreshCw className="size-3" />Re-rank
               </Button>
             </div>
             <div className="space-y-3">
               {RANKED.map((r, i) => (
                 <div key={r.name} className="flex items-start gap-3">
-                  <span className="text-xs font-bold text-muted-foreground w-4 shrink-0 pt-0.5">{i + 1}</span>
+                  <span className="text-sm font-bold text-muted-foreground w-4 shrink-0 pt-0.5">{i + 1}</span>
                   <div className="size-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">
                     {r.name.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs font-semibold">{r.name}</span>
+                      <span className="text-sm font-semibold">{r.name}</span>
                       <span className={cn('text-[9px] font-semibold rounded-full border px-1.5 py-px', TAG_CFG[r.tag] ?? '')}>{r.tag}</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground leading-snug">{r.reason}</p>
                   </div>
-                  <span className={cn('text-xs font-bold tabular-nums shrink-0', r.score >= 90 ? 'text-emerald-600' : r.score >= 75 ? 'text-amber-500' : 'text-red-500')}>
+                  <span className={cn('text-sm font-bold tabular-nums shrink-0', r.score >= 90 ? 'text-emerald-600' : r.score >= 75 ? 'text-amber-500' : 'text-red-500')}>
                     {r.score}
                   </span>
                 </div>
@@ -135,7 +135,7 @@ export default function ProjectAIPage() {
           {/* AI Outreach Generator */}
           <div className="rounded-xl border border-border bg-background p-5">
             <h3 className="text-sm font-semibold mb-4">AI Outreach Generator</h3>
-            <p className="text-xs text-muted-foreground mb-3">Generate personalized outreach for any candidate in seconds.</p>
+            <p className="text-sm text-muted-foreground mb-3">Generate personalized outreach for any candidate in seconds.</p>
             <div className="space-y-2">
               {OUTREACH_TYPES.map(o => {
                 const Icon = o.icon
@@ -146,7 +146,7 @@ export default function ProjectAIPage() {
                       <Sparkles className="size-3.5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold">{o.label}</p>
+                      <p className="text-sm font-semibold">{o.label}</p>
                       <p className="text-[10px] text-muted-foreground">{o.desc}</p>
                     </div>
                     <ChevronRight className="size-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -169,10 +169,10 @@ export default function ProjectAIPage() {
                     <Icon className={cn('size-5 shrink-0', cap.iconColor)} />
                     <div>
                       <p className="text-sm font-semibold">{cap.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{cap.desc}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5 leading-snug">{cap.desc}</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5 w-full bg-background">
+                  <Button size="sm" variant="outline" className="h-7 text-sm gap-1.5 w-full bg-background">
                     <Sparkles className="size-3" />{cap.cta}
                   </Button>
                 </div>

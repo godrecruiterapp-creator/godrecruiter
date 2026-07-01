@@ -49,9 +49,9 @@ export default function IntegrationsPage() {
                           {v.connected ? 'Connected' : 'Not connected'}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{v.desc}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">{v.desc}</p>
                       {v.connected && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           Last sync: {v.lastSync} · {v.jobs} active jobs
                         </p>
                       )}
@@ -63,7 +63,7 @@ export default function IntegrationsPage() {
                         <RefreshCw className="size-3.5" />
                       </button>
                     )}
-                    <button className={cn('h-8 px-3.5 text-xs rounded-lg border transition-colors font-medium',
+                    <button className={cn('h-8 px-3.5 text-sm rounded-lg border transition-colors font-medium',
                       v.connected
                         ? 'border-border hover:bg-muted/60'
                         : 'border-foreground bg-foreground text-background hover:bg-foreground/90')}>
@@ -89,7 +89,7 @@ export default function IntegrationsPage() {
                   }
                   <span className="text-sm font-medium">{b.name}</span>
                 </div>
-                <button className="h-7 px-2.5 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+                <button className="h-7 px-2.5 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
                   {b.connected ? 'Manage' : 'Connect'}
                   <ExternalLink className="size-3" />
                 </button>
@@ -104,7 +104,7 @@ export default function IntegrationsPage() {
           <div className="rounded-xl border border-border bg-background p-5 space-y-4">
             <div>
               <p className="text-sm font-semibold">API Key</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Use this key to authenticate API requests from external systems.</p>
+              <p className="text-sm text-muted-foreground mt-0.5">Use this key to authenticate API requests from external systems.</p>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -113,11 +113,11 @@ export default function IntegrationsPage() {
                 value={apiKey}
                 className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-muted/40 font-mono focus:outline-none" />
               <button onClick={() => setShowApiKey(s => !s)}
-                className="h-9 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+                className="h-9 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
                 {showApiKey ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
                 {showApiKey ? 'Hide' : 'Reveal'}
               </button>
-              <button className="h-9 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">
+              <button className="h-9 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">
                 Regenerate
               </button>
             </div>
@@ -129,7 +129,7 @@ export default function IntegrationsPage() {
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Webhooks</h2>
           <div className="rounded-xl border border-border bg-background p-5">
             <p className="text-sm text-muted-foreground">No webhooks configured. Add one to receive real-time event notifications.</p>
-            <button className="mt-3 h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">
+            <button className="mt-3 h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">
               Add webhook
             </button>
           </div>

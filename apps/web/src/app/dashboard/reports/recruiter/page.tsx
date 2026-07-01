@@ -48,17 +48,17 @@ export default function RecruiterReports() {
           <p className="text-sm text-muted-foreground">Track recruiter activity, performance, and productivity</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background">
+          <select className="h-8 text-sm border rounded-md px-2 bg-background">
             <option>Last 30 Days</option>
             <option>Last 7 Days</option>
             <option>Last 90 Days</option>
           </select>
-          <select className="h-8 text-xs border rounded-md px-2 bg-background">
+          <select className="h-8 text-sm border rounded-md px-2 bg-background">
             <option>All Recruiters</option>
             <option>Sarah Mitchell</option>
             <option>James Patel</option>
           </select>
-          <select className="h-8 text-xs border rounded-md px-2 bg-background">
+          <select className="h-8 text-sm border rounded-md px-2 bg-background">
             <option>All Departments</option>
             <option>Healthcare</option>
             <option>IT</option>
@@ -80,8 +80,8 @@ export default function RecruiterReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function RecruiterReports() {
       {/* Leaderboard Table */}
       <div className="rounded-lg border bg-card p-4">
         <p className="text-sm font-semibold mb-3">Recruiter Leaderboard</p>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="pb-2 text-left font-medium">Rank</th>
@@ -138,7 +138,7 @@ export default function RecruiterReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

@@ -52,7 +52,7 @@ export default function InterviewReportsPage() {
         <div className="flex items-center border rounded-md overflow-hidden">
           {DATE_RANGES.map(r => (
             <button key={r} onClick={() => setRange(r)}
-              className={`h-8 px-3 text-xs transition-colors ${range === r ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}>
+              className={`h-8 px-3 text-sm transition-colors ${range === r ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}>
               {r}
             </button>
           ))}
@@ -67,7 +67,7 @@ export default function InterviewReportsPage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">{c.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{c.desc}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{c.desc}</p>
             </div>
           </div>
         ))}
@@ -75,7 +75,7 @@ export default function InterviewReportsPage() {
 
       <div className="rounded-lg border bg-card p-4">
         <p className="text-sm font-semibold mb-3">Interview Performance</p>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="pb-2 text-left font-medium">Recruiter</th>
@@ -120,7 +120,7 @@ export default function InterviewReportsPage() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize','Explain Trends','Detect Anomalies','Forecast','Recommend Actions'].map(a => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

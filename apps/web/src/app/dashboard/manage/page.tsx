@@ -66,10 +66,10 @@ function DashCard({ dash, isActive, onActivate }: { dash: DashboardConfig; isAct
         <span className="text-2xl">{dash.icon}</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium line-through text-muted-foreground truncate">{dash.name}</p>
-          <p className="text-xs text-muted-foreground">Deleted</p>
+          <p className="text-sm text-muted-foreground">Deleted</p>
         </div>
         <button onClick={() => { store.restoreDashboard(dash.id); setDeleted(false) }}
-          className="h-7 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+          className="h-7 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
           <RotateCcw className="size-3" /> Restore
         </button>
       </div>
@@ -129,16 +129,16 @@ function DashCard({ dash, isActive, onActivate }: { dash: DashboardConfig; isAct
       <div className="flex items-center gap-1.5 pt-1 border-t border-border/60 opacity-0 group-hover:opacity-100 transition-opacity">
         {!dash.isDefault && (
           <button onClick={e => { e.stopPropagation(); store.setDefault(dash.id) }}
-            className="flex-1 h-7 text-xs rounded-lg hover:bg-muted/60 flex items-center justify-center gap-1 transition-colors text-muted-foreground">
+            className="flex-1 h-7 text-sm rounded-lg hover:bg-muted/60 flex items-center justify-center gap-1 transition-colors text-muted-foreground">
             <Star className="size-3" /> Set Default
           </button>
         )}
         <button onClick={e => { e.stopPropagation(); setRenaming(true) }}
-          className="flex-1 h-7 text-xs rounded-lg hover:bg-muted/60 flex items-center justify-center gap-1 transition-colors text-muted-foreground">
+          className="flex-1 h-7 text-sm rounded-lg hover:bg-muted/60 flex items-center justify-center gap-1 transition-colors text-muted-foreground">
           <Pencil className="size-3" /> Rename
         </button>
         <button onClick={e => { e.stopPropagation(); store.duplicateDashboard(dash.id); router.refresh() }}
-          className="flex-1 h-7 text-xs rounded-lg hover:bg-muted/60 flex items-center justify-center gap-1 transition-colors text-muted-foreground">
+          className="flex-1 h-7 text-sm rounded-lg hover:bg-muted/60 flex items-center justify-center gap-1 transition-colors text-muted-foreground">
           <Copy className="size-3" /> Duplicate
         </button>
         {!dash.isDefault && (
@@ -199,7 +199,7 @@ export default function ManageDashboardsPage() {
           ].map(({ label, value, icon }) => (
             <div key={label} className="px-4 py-3 rounded-2xl border border-border bg-background">
               <p className="text-2xl font-bold">{value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
             </div>
           ))}
         </div>
@@ -217,7 +217,7 @@ export default function ManageDashboardsPage() {
           <div className="py-16 text-center">
             <p className="text-muted-foreground text-sm">No dashboards found</p>
             <button onClick={() => setShowNew(true)}
-              className="mt-3 h-8 px-4 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">
+              className="mt-3 h-8 px-4 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">
               Create your first dashboard
             </button>
           </div>
@@ -239,11 +239,11 @@ export default function ManageDashboardsPage() {
             </div>
             <div>
               <p className="text-sm font-semibold">Create with AI</p>
-              <p className="text-xs text-muted-foreground">Tell AI your role — it builds the perfect dashboard</p>
+              <p className="text-sm text-muted-foreground">Tell AI your role — it builds the perfect dashboard</p>
             </div>
           </div>
           <button onClick={() => setShowNew(true)}
-            className="h-8 px-3 text-xs rounded-lg bg-[#dd7456] text-white hover:bg-[#c9603d] transition-colors font-medium flex items-center gap-1.5 shrink-0">
+            className="h-8 px-3 text-sm rounded-lg bg-[#dd7456] text-white hover:bg-[#c9603d] transition-colors font-medium flex items-center gap-1.5 shrink-0">
             Try it <ChevronRight className="size-3" />
           </button>
         </div>

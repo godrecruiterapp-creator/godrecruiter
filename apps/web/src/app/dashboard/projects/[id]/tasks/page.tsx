@@ -37,9 +37,9 @@ export default function ProjectTasksPage() {
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div>
           <h2 className="text-sm font-semibold">Tasks</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">{open.length} open · {done.length} completed</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{open.length} open · {done.length} completed</p>
         </div>
-        <Button size="sm" className="h-8 text-xs gap-1.5"><Plus className="size-3.5" />Add Task</Button>
+        <Button size="sm" className="h-8 text-sm gap-1.5"><Plus className="size-3.5" />Add Task</Button>
       </div>
       <div className="flex-1 overflow-y-auto space-y-1">
         {open.map(t => <TaskRow key={t.id} task={t} onToggle={() => toggle(t.id)} />)}

@@ -51,13 +51,13 @@ export default function ActivityPage() {
       <div className="flex items-center justify-between pb-4 shrink-0 flex-wrap gap-3">
         <div>
           <h1 className="text-base font-semibold">Activity</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Every automation run, who triggered it, and what happened.</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Every automation run, who triggered it, and what happened.</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search…" className="h-8 w-48 pl-8 pr-7 text-xs" />
+              placeholder="Search…" className="h-8 w-48 pl-8 pr-7 text-sm" />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 <X className="size-3.5" />
@@ -65,7 +65,7 @@ export default function ActivityPage() {
             )}
           </div>
           <Select value={result} onValueChange={setResult}>
-            <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-28 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Results</SelectItem>
               <SelectItem value="success">Success</SelectItem>
@@ -73,7 +73,7 @@ export default function ActivityPage() {
               <SelectItem value="failed">Failed</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
+          <Button variant="outline" size="sm" className="h-8 text-sm gap-1.5">
             <Download className="size-3.5" />Export
           </Button>
         </div>
@@ -101,7 +101,7 @@ export default function ActivityPage() {
                       <span className="text-sm font-medium">{r.automation}</span>
                     </td>
                     <td className="px-4 py-3 align-middle">
-                      <span className="text-xs text-muted-foreground">{r.startedBy}</span>
+                      <span className="text-sm text-muted-foreground">{r.startedBy}</span>
                     </td>
                     <td className="px-4 py-3 align-middle">
                       <span className="text-xs text-muted-foreground whitespace-nowrap">{r.date}</span>
@@ -112,12 +112,12 @@ export default function ActivityPage() {
                           <div className={cn('h-full rounded-full', r.result === 'success' ? 'bg-emerald-500' : r.result === 'partial' ? 'bg-amber-400' : 'bg-red-400')}
                             style={{ width: `${(r.steps / r.total) * 100}%` }} />
                         </div>
-                        <span className="text-xs text-muted-foreground tabular-nums">{r.steps}/{r.total}</span>
+                        <span className="text-sm text-muted-foreground tabular-nums">{r.steps}/{r.total}</span>
                       </div>
                       {r.errors && <p className="text-[10px] text-red-600 mt-0.5 max-w-xs">{r.errors}</p>}
                     </td>
                     <td className="px-4 py-3 align-middle">
-                      <span className="text-xs text-muted-foreground tabular-nums">{r.time}</span>
+                      <span className="text-sm text-muted-foreground tabular-nums">{r.time}</span>
                     </td>
                     <td className="px-4 py-3 align-middle">
                       <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', cfg.badge)}>

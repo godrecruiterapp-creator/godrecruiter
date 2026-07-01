@@ -29,7 +29,7 @@ export default function AutomationPage() {
         title="Automation"
         description="Workflow rules, scheduled tasks, and AI-driven actions."
         action={
-          <button className="h-9 px-4 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">
+          <button className="h-9 px-4 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">
             <Plus className="size-3.5" />New rule
           </button>
         }
@@ -43,7 +43,7 @@ export default function AutomationPage() {
           summary={
             <div className="flex items-center gap-2 flex-wrap">
               {rules.filter(r => r.on).map(r => (
-                <div key={r.id} className="flex items-center gap-1.5 text-xs">
+                <div key={r.id} className="flex items-center gap-1.5 text-sm">
                   <Zap className="size-3 text-amber-500" />
                   <span>{r.name}</span>
                 </div>
@@ -61,16 +61,16 @@ export default function AutomationPage() {
                       <p className="text-sm font-medium">{r.name}</p>
                       {!r.on && <Badge>inactive</Badge>}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       When: {r.trigger}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Then: {r.action}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 ml-4 shrink-0">
-                  <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">Edit</button>
+                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">Edit</button>
                   <button onClick={() => setRules(p => p.filter(x => x.id !== r.id))}
                     className="p-1 text-muted-foreground hover:text-red-600 transition-colors">
                     <Trash2 className="size-3.5" />
@@ -86,7 +86,7 @@ export default function AutomationPage() {
           title="Scheduled Tasks"
           description="Recurring system jobs that run on a fixed schedule"
           summary={
-            <p className="text-xs text-muted-foreground">5 scheduled tasks running daily/weekly.</p>
+            <p className="text-sm text-muted-foreground">5 scheduled tasks running daily/weekly.</p>
           }
         >
           <div className="space-y-3">

@@ -22,13 +22,13 @@ export default function WorkQueueLayout({ children }: { children: React.ReactNod
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-xl font-bold tracking-tight">Work Queue</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Distribute, monitor, and rebalance recruiting work</p>
+            <p className="text-sm text-muted-foreground mt-0.5">Distribute, monitor, and rebalance recruiting work</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+            <button className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
               <Users2 className="size-3.5" />Bulk Assign
             </button>
-            <button className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
+            <button className="h-8 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
               <Sparkles className="size-3.5" />Auto-Assign AI
             </button>
           </div>
@@ -41,7 +41,7 @@ export default function WorkQueueLayout({ children }: { children: React.ReactNod
             return (
               <Link key={t.href} href={t.href}
                 className={cn(
-                  'px-3 py-2 text-xs font-medium border-b-2 whitespace-nowrap transition-colors',
+                  'px-3 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
                   active
                     ? 'border-foreground text-foreground'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'

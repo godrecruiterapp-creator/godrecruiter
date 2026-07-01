@@ -81,19 +81,19 @@ export default function WorkQueueOverviewPage() {
         {/* Quick actions */}
         <div className="flex flex-wrap gap-2">
           <Link href="/dashboard/work-queue/queue?filter=needs_assignment"
-            className="inline-flex items-center gap-1.5 h-8 px-3 text-xs rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors">
+            className="inline-flex items-center gap-1.5 h-8 px-3 text-sm rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors">
             <AlertCircle className="size-3.5" />Assign {needsAssignment} Unassigned Jobs
           </Link>
           <Link href="/dashboard/work-queue/queue?filter=overdue"
-            className="inline-flex items-center gap-1.5 h-8 px-3 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors">
+            className="inline-flex items-center gap-1.5 h-8 px-3 text-sm rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors">
             <Clock className="size-3.5" />Review {overdue} Overdue Jobs
           </Link>
           <Link href="/dashboard/work-queue/queue?filter=urgent"
-            className="inline-flex items-center gap-1.5 h-8 px-3 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition-colors">
+            className="inline-flex items-center gap-1.5 h-8 px-3 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition-colors">
             <Zap className="size-3.5" />Triage {urgent} Urgent Jobs
           </Link>
           <Link href="/dashboard/work-queue/analytics"
-            className="inline-flex items-center gap-1.5 h-8 px-3 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors">
+            className="inline-flex items-center gap-1.5 h-8 px-3 text-sm rounded-md border border-border hover:bg-muted/60 transition-colors">
             <TrendingUp className="size-3.5" />View Analytics <ChevronRight className="size-3" />
           </Link>
         </div>
@@ -104,7 +104,7 @@ export default function WorkQueueOverviewPage() {
           <div className="lg:col-span-2 rounded-xl border border-border bg-background p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold">Recruiter Capacity</h3>
-              <Link href="/dashboard/work-queue/analytics" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
+              <Link href="/dashboard/work-queue/analytics" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
                 Full analytics <ArrowRight className="size-3" />
               </Link>
             </div>
@@ -119,7 +119,7 @@ export default function WorkQueueOverviewPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium">{r.name}</span>
+                        <span className="text-sm font-medium">{r.name}</span>
                         <div className="flex items-center gap-2">
                           <span className={cn('text-[10px] font-medium', availBadge)}>
                             {r.availability === 'at_capacity' ? 'At Capacity' : r.availability === 'available' ? 'Available' : r.availability === 'busy' ? 'Busy' : 'On Leave'}
@@ -152,7 +152,7 @@ export default function WorkQueueOverviewPage() {
                     {i < RECENT.length - 1 && <div className="w-px flex-1 bg-border my-1" />}
                   </div>
                   <div className="pb-3 min-w-0">
-                    <p className="text-xs text-foreground leading-snug">{ev.text}</p>
+                    <p className="text-sm text-foreground leading-snug">{ev.text}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{ev.time}</p>
                   </div>
                 </div>

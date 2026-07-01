@@ -100,13 +100,13 @@ export function OnboardingFlow({ userEmail, userFullName }: Props) {
                   placeholder="Acme Staffing"
                   required
                 />
-                <p className="text-xs text-muted-foreground">Usually your company or agency name.</p>
+                <p className="text-sm text-muted-foreground">Usually your company or agency name.</p>
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="slug">Workspace URL <span className="text-destructive">*</span></Label>
                 <div className="flex rounded-md border border-input overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-                  <span className="flex items-center px-3 bg-muted text-muted-foreground text-xs border-r border-input whitespace-nowrap">
+                  <span className="flex items-center px-3 bg-muted text-muted-foreground text-sm border-r border-input whitespace-nowrap">
                     app.godrecruiter.com/
                   </span>
                   <input
@@ -118,7 +118,7 @@ export function OnboardingFlow({ userEmail, userFullName }: Props) {
                     className="flex-1 h-9 px-3 text-sm bg-transparent outline-none"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">Lowercase letters, numbers, and hyphens only.</p>
+                <p className="text-sm text-muted-foreground">Lowercase letters, numbers, and hyphens only.</p>
               </div>
 
               <Button type="submit" className="w-full" disabled={isPending || !name || !slug}>

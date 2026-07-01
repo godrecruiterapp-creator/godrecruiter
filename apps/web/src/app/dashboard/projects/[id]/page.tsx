@@ -66,7 +66,7 @@ export default function ProjectOverviewPage() {
             return (
               <div key={k.label} className="rounded-xl border border-border bg-background p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <p className="text-xs text-muted-foreground">{k.label}</p>
+                  <p className="text-sm text-muted-foreground">{k.label}</p>
                   <Icon className={cn('size-4', k.color)} />
                 </div>
                 <p className="text-2xl font-bold tabular-nums">{k.value}</p>
@@ -88,7 +88,7 @@ export default function ProjectOverviewPage() {
                     {i < ACTIVITY.length - 1 && <div className="w-px flex-1 bg-border my-1" />}
                   </div>
                   <div className="pb-3 min-w-0">
-                    <p className="text-xs text-foreground">{a.text}</p>
+                    <p className="text-sm text-foreground">{a.text}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{a.time}</p>
                   </div>
                 </div>
@@ -108,13 +108,13 @@ export default function ProjectOverviewPage() {
               </div>
               <div className="space-y-2">
                 {AI_INSIGHTS.map((ins, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <span className="shrink-0">{ins.icon}</span>
                     <span>{ins.text}</span>
                   </div>
                 ))}
               </div>
-              <Button size="sm" variant="outline" className="w-full mt-4 h-7 text-xs gap-1.5">
+              <Button size="sm" variant="outline" className="w-full mt-4 h-7 text-sm gap-1.5">
                 <Sparkles className="size-3.5" />View Full AI Report
               </Button>
             </div>
@@ -129,7 +129,7 @@ export default function ProjectOverviewPage() {
                       {u.candidate.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium truncate">{u.candidate}</p>
+                      <p className="text-sm font-medium truncate">{u.candidate}</p>
                       <p className="text-[10px] text-muted-foreground">{u.type}</p>
                       <p className="text-[10px] text-violet-600 font-medium">{u.date}</p>
                     </div>

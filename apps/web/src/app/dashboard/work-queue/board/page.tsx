@@ -48,8 +48,8 @@ export default function BoardPage() {
   return (
     <div className="h-full overflow-hidden flex flex-col">
       <div className="px-4 py-2.5 border-b shrink-0 flex items-center gap-3">
-        <p className="text-xs text-muted-foreground">Drag jobs between columns to assign. System logs all assignment history.</p>
-        <span className="ml-auto text-xs text-muted-foreground">{WQ_JOBS.length} total jobs</span>
+        <p className="text-sm text-muted-foreground">Drag jobs between columns to assign. System logs all assignment history.</p>
+        <span className="ml-auto text-sm text-muted-foreground">{WQ_JOBS.length} total jobs</span>
       </div>
 
       <div className="flex-1 overflow-x-auto overflow-y-hidden">
@@ -73,7 +73,7 @@ export default function BoardPage() {
                 {/* column header */}
                 <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/50">
                   <div className={cn('size-2 rounded-full', col.color)} />
-                  <span className="text-xs font-semibold flex-1 truncate">{col.label}</span>
+                  <span className="text-sm font-semibold flex-1 truncate">{col.label}</span>
                   <span className="text-[10px] text-muted-foreground tabular-nums">{colJobs.length}</span>
                 </div>
 

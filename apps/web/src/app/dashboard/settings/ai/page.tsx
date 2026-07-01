@@ -50,7 +50,7 @@ export default function AISettingsPage() {
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Provider</label>
+              <label className="text-sm font-medium text-muted-foreground">Provider</label>
               <select value={provider} onChange={e => setProvider(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>Anthropic</option>
@@ -59,7 +59,7 @@ export default function AISettingsPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Model</label>
+              <label className="text-sm font-medium text-muted-foreground">Model</label>
               <select value={model} onChange={e => setModel(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
@@ -68,7 +68,7 @@ export default function AISettingsPage() {
               </select>
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">API Key</label>
+              <label className="text-sm font-medium text-muted-foreground">API Key</label>
               <div className="flex gap-2">
                 <input
                   type={showKey ? 'text' : 'password'}
@@ -77,7 +77,7 @@ export default function AISettingsPage() {
                   className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono"
                 />
                 <button onClick={() => setShowKey(s => !s)}
-                  className="h-9 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">
+                  className="h-9 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">
                   {showKey ? 'Hide' : 'Show'}
                 </button>
               </div>
@@ -93,22 +93,22 @@ export default function AISettingsPage() {
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="text-muted-foreground text-xs">Hot ≥</span>
+                <span className="text-muted-foreground text-sm">Hot ≥</span>
                 <span className="font-semibold">{hotScore}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-blue-500 shrink-0" />
-                <span className="text-muted-foreground text-xs">Good ≥</span>
+                <span className="text-muted-foreground text-sm">Good ≥</span>
                 <span className="font-semibold">{goodScore}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-amber-500 shrink-0" />
-                <span className="text-muted-foreground text-xs">Weak ≥</span>
+                <span className="text-muted-foreground text-sm">Weak ≥</span>
                 <span className="font-semibold">{weakScore}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-red-400 shrink-0" />
-                <span className="text-muted-foreground text-xs">Poor &lt;</span>
+                <span className="text-muted-foreground text-sm">Poor &lt;</span>
                 <span className="font-semibold">{weakScore}</span>
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function AISettingsPage() {
             ].map(t => (
               <div key={t.label}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">{t.label}</label>
+                  <label className="text-sm font-medium text-muted-foreground">{t.label}</label>
                   <span className={`text-sm font-bold tabular-nums ${t.color}`}>{t.val}</span>
                 </div>
                 <input type="range" min={0} max={100} value={t.val}
@@ -130,7 +130,7 @@ export default function AISettingsPage() {
                   className="w-full h-1.5 appearance-none rounded-full bg-muted cursor-pointer" />
               </div>
             ))}
-            <p className="text-xs text-muted-foreground">Scores below the weak threshold are classified as Poor.</p>
+            <p className="text-sm text-muted-foreground">Scores below the weak threshold are classified as Poor.</p>
           </div>
         </SettingCard>
 
@@ -141,13 +141,13 @@ export default function AISettingsPage() {
           summary={
             <div className="flex items-center gap-3 flex-wrap">
               {agents.filter(a => a.enabled).map(a => (
-                <div key={a.name} className="flex items-center gap-1.5 text-xs">
+                <div key={a.name} className="flex items-center gap-1.5 text-sm">
                   <Sparkles className="size-3 text-purple-500" />
                   <span>{a.name}</span>
                 </div>
               ))}
               {agents.filter(a => !a.enabled).length > 0 && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-sm text-muted-foreground">
                   + {agents.filter(a => !a.enabled).length} inactive
                 </span>
               )}
@@ -162,7 +162,7 @@ export default function AISettingsPage() {
                     <p className="text-sm font-medium">{a.name}</p>
                     {!a.enabled && <Badge>inactive</Badge>}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{a.desc}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{a.desc}</p>
                 </div>
                 <Toggle checked={a.enabled}
                   onChange={v => setAgents(p => p.map((x, j) => j === i ? { ...x, enabled: v } : x))} />
@@ -177,20 +177,20 @@ export default function AISettingsPage() {
           description="AI token consumption this billing period"
           summary={
             <div>
-              <div className="flex items-center justify-between mb-2 text-xs text-muted-foreground">
+              <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
                 <span>Token usage</span>
                 <span className="font-medium text-foreground">{tokenUsed}%</span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden">
                 <div className="h-2 rounded-full bg-purple-500 transition-all" style={{ width: `${tokenPct}%` }} />
               </div>
-              <p className="text-xs text-muted-foreground mt-2">240K / 1M tokens used · Resets July 1</p>
+              <p className="text-sm text-muted-foreground mt-2">240K / 1M tokens used · Resets July 1</p>
             </div>
           }
         >
           <div className="space-y-3">
             <CardRow label="Monthly token limit" description="Hard cap per billing period">
-              <select defaultValue="1m" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="1m" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="500k">500K tokens</option>
                 <option value="1m">1M tokens</option>
                 <option value="5m">5M tokens</option>

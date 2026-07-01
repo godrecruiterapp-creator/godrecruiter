@@ -37,7 +37,7 @@ export default async function ProfilePage() {
       {/* Page header */}
       <div className="px-6 lg:px-8 py-5 border-b bg-background shrink-0">
         <h1 className="text-lg font-semibold tracking-tight">My Profile</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Manage your personal information and account security</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Manage your personal information and account security</p>
       </div>
 
       <ProfileForm

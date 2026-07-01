@@ -61,7 +61,7 @@ function ModalHeader({
       )}
       <div className="flex-1 min-w-0">
         <h2 className="text-base font-semibold truncate">{title}</h2>
-        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>}
       </div>
       <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-muted transition-colors shrink-0">
         <X className="size-4" />
@@ -102,7 +102,7 @@ function HomeView({ onClose, onNav }: { onClose: () => void; onNav: (v: View) =>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium leading-none mb-0.5">{label}</p>
-              <p className="text-xs text-muted-foreground">{desc}</p>
+              <p className="text-sm text-muted-foreground">{desc}</p>
             </div>
             <ChevronRight className="size-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
           </button>
@@ -116,7 +116,7 @@ function HomeView({ onClose, onNav }: { onClose: () => void; onNav: (v: View) =>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold leading-none mb-0.5 text-[#dd7456]">Create with AI</p>
-            <p className="text-xs text-muted-foreground">Tell AI your role — it builds the dashboard for you</p>
+            <p className="text-sm text-muted-foreground">Tell AI your role — it builds the dashboard for you</p>
           </div>
           <ChevronRight className="size-4 text-[#dd7456]/40 group-hover:text-[#dd7456] transition-colors shrink-0" />
         </button>
@@ -233,7 +233,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
         {/* Step 1 — Template */}
         {step === 1 && (
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground mb-3">Choose a starting point. You can customize everything after.</p>
+            <p className="text-sm text-muted-foreground mb-3">Choose a starting point. You can customize everything after.</p>
             {Object.entries(DASHBOARD_TEMPLATES).map(([key, tmpl]) => (
               <button key={key} onClick={() => { setTemplate(key); if (!name) setIcon(tmpl.icon); if (!name) setColor(tmpl.color) }}
                 className={cn(
@@ -243,7 +243,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
                 <span className="text-2xl shrink-0">{tmpl.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium leading-none mb-0.5">{tmpl.label}</p>
-                  <p className="text-xs text-muted-foreground">{tmpl.desc}</p>
+                  <p className="text-sm text-muted-foreground">{tmpl.desc}</p>
                 </div>
                 <div className={cn('size-4 rounded-full border-2 shrink-0 transition-colors',
                   template === key ? 'border-[#dd7456] bg-[#dd7456]' : 'border-border')} />
@@ -261,7 +261,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
               <div className="grid grid-cols-3 gap-2">
                 {(['comfortable','compact','dense'] as DashboardLayout[]).map(l => (
                   <button key={l} onClick={() => setLayout(l)}
-                    className={cn('h-9 rounded-lg border text-xs font-medium capitalize transition-colors',
+                    className={cn('h-9 rounded-lg border text-sm font-medium capitalize transition-colors',
                       layout === l ? 'border-foreground bg-foreground text-background' : 'border-border hover:bg-muted/60 text-muted-foreground')}>
                     {l}
                   </button>
@@ -283,7 +283,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
                       vis === v ? 'border-[#dd7456]/40 bg-[#fdf0ec] dark:bg-[#2a1a15]' : 'border-border hover:bg-muted/40')}>
                     <div>
                       <p className="text-sm font-medium leading-none mb-0.5">{label}</p>
-                      <p className="text-xs text-muted-foreground">{desc}</p>
+                      <p className="text-sm text-muted-foreground">{desc}</p>
                     </div>
                     <div className={cn('size-4 rounded-full border-2 shrink-0 ml-4 transition-colors',
                       vis === v ? 'border-[#dd7456] bg-[#dd7456]' : 'border-border')} />
@@ -298,7 +298,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
                 isDefault ? 'border-[#dd7456]/40 bg-[#fdf0ec] dark:bg-[#2a1a15]' : 'border-border hover:bg-muted/40')}>
               <div>
                 <p className="text-sm font-medium leading-none mb-0.5">Set as Default Dashboard</p>
-                <p className="text-xs text-muted-foreground">Opens this dashboard when you log in</p>
+                <p className="text-sm text-muted-foreground">Opens this dashboard when you log in</p>
               </div>
               <div className={cn('size-5 rounded border-2 flex items-center justify-center transition-colors shrink-0 ml-4',
                 isDefault ? 'border-[#dd7456] bg-[#dd7456]' : 'border-border')}>
@@ -422,7 +422,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
       <div className="flex gap-1 px-4 pt-3">
         {(['sections','library'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={cn('flex-1 h-8 text-xs font-medium rounded-lg capitalize transition-colors',
+            className={cn('flex-1 h-8 text-sm font-medium rounded-lg capitalize transition-colors',
               tab === t ? 'bg-foreground text-background' : 'hover:bg-muted/60 text-muted-foreground')}>
             {t === 'sections' ? 'Current Sections' : 'Add Section'}
           </button>
@@ -528,7 +528,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
                   className="flex items-start gap-2.5 p-3 rounded-xl border border-border hover:border-[#dd7456]/40 hover:bg-[#fdf0ec] dark:hover:bg-[#2a1a15] transition-colors text-left group">
                   <span className="text-xl shrink-0 mt-0.5">{w.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold leading-none mb-1 group-hover:text-[#dd7456] transition-colors">{w.label}</p>
+                    <p className="text-sm font-semibold leading-none mb-1 group-hover:text-[#dd7456] transition-colors">{w.label}</p>
                     <p className="text-[10px] text-muted-foreground leading-tight">{w.desc}</p>
                   </div>
                 </button>
@@ -540,7 +540,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
 
       {/* Footer */}
       <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           {savedAt ? `Saved just now` : `${widgets.filter(w => !w.hidden).length} visible · ${widgets.filter(w => w.hidden).length} hidden`}
         </p>
         <button onClick={save}
@@ -613,8 +613,8 @@ function AIBuilderView({ onClose, onBack }: { onClose: () => void; onBack: () =>
 
         {role && (
           <div className="px-4 py-3 rounded-xl bg-muted/40 border border-border">
-            <p className="text-xs font-semibold mb-1">AI will include:</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm font-semibold mb-1">AI will include:</p>
+            <p className="text-sm text-muted-foreground">
               {(DASHBOARD_TEMPLATES[AI_ROLE_TEMPLATE[role] ?? 'recruiter'] ?? DASHBOARD_TEMPLATES.recruiter).widgets
                 .map((t: string) => WIDGET_CATALOG.find(w => w.type === t)?.label)
                 .filter(Boolean)
@@ -666,7 +666,7 @@ function DuplicateView({ onClose, onBack }: { onClose: () => void; onBack: () =>
           <input value={name} onChange={e => setName(e.target.value)}
             className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#dd7456]/30" />
         </div>
-        <p className="text-xs text-muted-foreground">All sections and settings will be copied. The original dashboard will not be changed.</p>
+        <p className="text-sm text-muted-foreground">All sections and settings will be copied. The original dashboard will not be changed.</p>
       </div>
       <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border">
         <button onClick={onBack} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">Cancel</button>
@@ -702,7 +702,7 @@ function ResetView({ onClose, onBack }: { onClose: () => void; onBack: () => voi
           <RotateCcw className="size-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
           <div>
             <p className="text-sm font-medium text-amber-800 dark:text-amber-200">This will reset your layout</p>
-            <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
               "{activeDash?.name}" will be restored to its original template ({activeDash?.template}). Your customizations will be lost.
             </p>
           </div>

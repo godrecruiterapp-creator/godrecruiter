@@ -122,14 +122,14 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm">
           <Settings2 className="size-3.5" />Columns
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-60 p-0">
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
           <span className="text-sm font-semibold">Columns</span>
-          <button onClick={() => onChange(DEFAULT_COLS)} className="text-xs text-brand hover:underline">Reset</button>
+          <button onClick={() => onChange(DEFAULT_COLS)} className="text-sm text-brand hover:underline">Reset</button>
         </div>
         <div className="px-2 py-2 max-h-64 overflow-y-auto">
           {cols.filter(k => k !== 'select' && k !== 'actions').map(key => (
@@ -141,7 +141,7 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
                 <Check className="size-2.5 text-white" strokeWidth={3} />
               </span>
               <span className="text-sm flex-1">{COL_META[key].label}</span>
-              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 text-xs">✕</button>
+              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 text-sm">✕</button>
             </div>
           ))}
         </div>
@@ -273,15 +273,15 @@ export default function AllInterviewsPage() {
             {r.candidate}
           </Link>
         )
-      case 'job':         return <span className="text-xs text-muted-foreground truncate block">{r.job}</span>
-      case 'client':      return <span className="text-xs text-muted-foreground truncate">{r.client}</span>
-      case 'recruiter':   return <span className="text-xs text-muted-foreground">{r.recruiter}</span>
-      case 'type':        return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.type}</span>
-      case 'round':       return <span className="text-xs text-muted-foreground">{r.round}</span>
+      case 'job':         return <span className="text-sm text-muted-foreground truncate block">{r.job}</span>
+      case 'client':      return <span className="text-sm text-muted-foreground truncate">{r.client}</span>
+      case 'recruiter':   return <span className="text-sm text-muted-foreground">{r.recruiter}</span>
+      case 'type':        return <span className="text-sm text-muted-foreground whitespace-nowrap">{r.type}</span>
+      case 'round':       return <span className="text-sm text-muted-foreground">{r.round}</span>
       case 'date':        return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.date}</span>
       case 'time':        return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.time}</span>
-      case 'timezone':    return <span className="text-xs text-muted-foreground">{r.timezone}</span>
-      case 'interviewer': return <span className="text-xs text-muted-foreground truncate">{r.interviewer}</span>
+      case 'timezone':    return <span className="text-sm text-muted-foreground">{r.timezone}</span>
+      case 'interviewer': return <span className="text-sm text-muted-foreground truncate">{r.interviewer}</span>
       case 'status':      return <Chip label={r.status.replace('_', ' ')} className={STATUS_BADGE[r.status] ?? ''} />
       case 'email_status':return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${EMAIL_BADGE[r.email_status] ?? ''}`}>{r.email_status}</span>
       case 'confirmation':return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${CONFIRM_BADGE[r.confirmation] ?? ''}`}>{r.confirmation}</span>
@@ -323,7 +323,7 @@ export default function AllInterviewsPage() {
           <div className="relative shrink-0">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input value={search} onChange={e => { setSearch(e.target.value); setPage(0) }}
-              placeholder="Search candidate, ID, job…" className="h-8 w-56 pl-8 text-xs" />
+              placeholder="Search candidate, ID, job…" className="h-8 w-56 pl-8 text-sm" />
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Button variant="outline" size="sm" onClick={() => setDrawerOpen(true)} className="gap-1.5 h-8">
@@ -339,10 +339,10 @@ export default function AllInterviewsPage() {
         {/* Bulk bar */}
         {selected.size > 0 && (
           <div className="flex items-center gap-2 px-3 py-2 mb-2.5 bg-brand-muted border border-brand/20 rounded-lg shrink-0">
-            <span className="text-xs font-semibold text-brand">{selected.size} selected</span>
+            <span className="text-sm font-semibold text-brand">{selected.size} selected</span>
             <div className="w-px h-4 bg-brand/20 mx-1" />
             {['Send Reminder','Send Email','Reschedule','Cancel','Export'].map(a => (
-              <Button key={a} size="sm" variant="outline" className="h-7 text-xs">{a}</Button>
+              <Button key={a} size="sm" variant="outline" className="h-7 text-sm">{a}</Button>
             ))}
             <button onClick={() => setSelected(new Set())} className="ml-auto size-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded">
               <X className="size-3.5" />
@@ -392,14 +392,14 @@ export default function AllInterviewsPage() {
         {/* Pagination */}
         <div className="flex items-center justify-between pt-3 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Rows per page</span>
+            <span className="text-sm text-muted-foreground">Rows per page</span>
             <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v) as 25|50|100); setPage(0) }}>
-              <SelectTrigger className="h-7 w-16 text-xs"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-7 w-16 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>{PAGE_SIZES.map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {sorted.length === 0 ? '0' : `${page * pageSize + 1}–${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}
             </span>
             <div className="flex items-center gap-1">
@@ -411,7 +411,7 @@ export default function AllInterviewsPage() {
                 const pg = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i
                 return (
                   <button key={pg} onClick={() => setPage(pg)}
-                    className={`size-7 flex items-center justify-center rounded-md text-xs border transition-colors ${pg === page ? 'bg-brand border-brand text-white' : 'border-border text-muted-foreground hover:bg-muted'}`}>
+                    className={`size-7 flex items-center justify-center rounded-md text-sm border transition-colors ${pg === page ? 'bg-brand border-brand text-white' : 'border-border text-muted-foreground hover:bg-muted'}`}>
                     {pg + 1}
                   </button>
                 )
@@ -433,17 +433,17 @@ export default function AllInterviewsPage() {
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Date From</Label>
+              <Label className="text-sm font-medium">Date From</Label>
               <input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Date To</Label>
+              <Label className="text-sm font-medium">Date To</Label>
               <input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Status</Label>
+              <Label className="text-sm font-medium">Status</Label>
               <Select value={filterStatus || '__all__'} onValueChange={v => setFilterStatus(v === '__all__' ? '' : v)}>
                 <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>
@@ -455,7 +455,7 @@ export default function AllInterviewsPage() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Interview Type</Label>
+              <Label className="text-sm font-medium">Interview Type</Label>
               <Select value={filterType || '__all__'} onValueChange={v => setFilterType(v === '__all__' ? '' : v)}>
                 <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>
@@ -467,7 +467,7 @@ export default function AllInterviewsPage() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Round</Label>
+              <Label className="text-sm font-medium">Round</Label>
               <Select value={filterRound || '__all__'} onValueChange={v => setFilterRound(v === '__all__' ? '' : v)}>
                 <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>

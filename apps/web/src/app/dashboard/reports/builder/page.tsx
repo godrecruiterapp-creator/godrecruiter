@@ -56,10 +56,10 @@ export default function ReportBuilder() {
       {/* Left Panel */}
       <div className="w-64 shrink-0 border-r bg-background flex flex-col overflow-y-auto">
         <div className="p-3 border-b">
-          <p className="text-xs font-semibold mb-2">Data Source</p>
+          <p className="text-sm font-semibold mb-2">Data Source</p>
           <div className="flex flex-col gap-0.5">
             {Object.keys(DATA_SOURCES).map((s) => (
-              <label key={s} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-xs">
+              <label key={s} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-sm">
                 <input type="radio" name="source" value={s} checked={source === s} onChange={() => { setSource(s); setSelected([]) }} className="size-3" />
                 {s}
               </label>
@@ -67,10 +67,10 @@ export default function ReportBuilder() {
           </div>
         </div>
         <div className="p-3 flex-1">
-          <p className="text-xs font-semibold mb-2">Available Columns</p>
+          <p className="text-sm font-semibold mb-2">Available Columns</p>
           <div className="flex flex-col gap-0.5">
             {cols.map((col) => (
-              <label key={col} className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted cursor-pointer text-xs">
+              <label key={col} className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted cursor-pointer text-sm">
                 <input type="checkbox" checked={selected.includes(col)} onChange={() => toggleCol(col)} className="size-3" />
                 {col}
               </label>
@@ -83,13 +83,13 @@ export default function ReportBuilder() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
         <div className="flex items-center gap-2 px-4 py-2 border-b bg-background shrink-0">
-          <Button size="sm" variant="outline" className="gap-1.5 h-7 text-xs">
+          <Button size="sm" variant="outline" className="gap-1.5 h-7 text-sm">
             <Save className="size-3" />Save
           </Button>
-          <Button size="sm" variant="outline" className="gap-1.5 h-7 text-xs">
+          <Button size="sm" variant="outline" className="gap-1.5 h-7 text-sm">
             <CalendarClock className="size-3" />Schedule
           </Button>
-          <Button size="sm" variant="outline" className="gap-1.5 h-7 text-xs">
+          <Button size="sm" variant="outline" className="gap-1.5 h-7 text-sm">
             <Download className="size-3" />Export
           </Button>
         </div>
@@ -97,13 +97,13 @@ export default function ReportBuilder() {
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
           {/* Selected Columns */}
           <div>
-            <p className="text-xs font-semibold mb-2">Selected Columns</p>
+            <p className="text-sm font-semibold mb-2">Selected Columns</p>
             {selected.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No columns selected — check columns from the left panel</p>
+              <p className="text-sm text-muted-foreground">No columns selected — check columns from the left panel</p>
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {selected.map((col) => (
-                  <span key={col} className="flex items-center gap-1 px-2.5 py-1 text-xs bg-accent rounded-md border cursor-grab">
+                  <span key={col} className="flex items-center gap-1 px-2.5 py-1 text-sm bg-accent rounded-md border cursor-grab">
                     {col}
                     <button onClick={() => toggleCol(col)}><X className="size-2.5 text-muted-foreground hover:text-foreground" /></button>
                   </span>
@@ -115,20 +115,20 @@ export default function ReportBuilder() {
           {/* Filters */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold">Filters</p>
+              <p className="text-sm font-semibold">Filters</p>
               <button onClick={addFilter} className="flex items-center gap-1 h-6 px-2 text-[10px] border rounded hover:bg-muted transition-colors">
                 <Plus className="size-2.5" />Add Filter
               </button>
             </div>
             {filters.map((f, i) => (
               <div key={i} className="flex items-center gap-2 mb-2">
-                <select className="h-7 text-xs border rounded-md px-1.5 bg-background" value={f.field} onChange={(e) => updateFilter(i, { field: e.target.value })}>
+                <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={f.field} onChange={(e) => updateFilter(i, { field: e.target.value })}>
                   {cols.map((c) => <option key={c}>{c}</option>)}
                 </select>
-                <select className="h-7 text-xs border rounded-md px-1.5 bg-background" value={f.operator} onChange={(e) => updateFilter(i, { operator: e.target.value })}>
+                <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={f.operator} onChange={(e) => updateFilter(i, { operator: e.target.value })}>
                   {OPERATORS.map((o) => <option key={o}>{o}</option>)}
                 </select>
-                <input className="flex-1 h-7 px-2 text-xs border rounded-md bg-background" value={f.value} onChange={(e) => updateFilter(i, { value: e.target.value })} placeholder="Value" />
+                <input className="flex-1 h-7 px-2 text-sm border rounded-md bg-background" value={f.value} onChange={(e) => updateFilter(i, { value: e.target.value })} placeholder="Value" />
                 <button onClick={() => setFilters((prev) => prev.filter((_, idx) => idx !== i))}><X className="size-3.5 text-muted-foreground" /></button>
               </div>
             ))}
@@ -137,19 +137,19 @@ export default function ReportBuilder() {
           {/* Group By / Sort By */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <p className="text-xs font-medium whitespace-nowrap">Group By</p>
-              <select className="h-7 text-xs border rounded-md px-1.5 bg-background" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
+              <p className="text-sm font-medium whitespace-nowrap">Group By</p>
+              <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
                 <option value="">None</option>
                 {cols.map((c) => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <p className="text-xs font-medium whitespace-nowrap">Sort By</p>
-              <select className="h-7 text-xs border rounded-md px-1.5 bg-background" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <p className="text-sm font-medium whitespace-nowrap">Sort By</p>
+              <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                 <option value="">None</option>
                 {cols.map((c) => <option key={c}>{c}</option>)}
               </select>
-              <select className="h-7 text-xs border rounded-md px-1.5 bg-background" value={sortDir} onChange={(e) => setSortDir(e.target.value)}>
+              <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={sortDir} onChange={(e) => setSortDir(e.target.value)}>
                 <option>ASC</option>
                 <option>DESC</option>
               </select>
@@ -158,12 +158,12 @@ export default function ReportBuilder() {
 
           {/* Preview Table */}
           <div>
-            <p className="text-xs font-semibold mb-2">Preview (5 rows)</p>
+            <p className="text-sm font-semibold mb-2">Preview (5 rows)</p>
             {selected.length === 0 ? (
-              <div className="h-24 rounded-lg border bg-muted/30 flex items-center justify-center text-xs text-muted-foreground">Select columns to preview data</div>
+              <div className="h-24 rounded-lg border bg-muted/30 flex items-center justify-center text-sm text-muted-foreground">Select columns to preview data</div>
             ) : (
               <div className="rounded-lg border overflow-hidden">
-                <table className="w-full text-xs">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="text-muted-foreground border-b bg-muted/30">
                       {selected.map((col) => (
@@ -192,13 +192,13 @@ export default function ReportBuilder() {
       {/* Right Panel */}
       <div className="w-56 shrink-0 border-l bg-background flex flex-col overflow-y-auto p-3 gap-4">
         <div>
-          <p className="text-xs font-semibold mb-2">Chart Type</p>
+          <p className="text-sm font-semibold mb-2">Chart Type</p>
           <div className="grid grid-cols-2 gap-1">
             {CHART_TYPES.map((t) => (
               <button
                 key={t}
                 onClick={() => setChartType(t)}
-                className={`h-8 text-xs rounded-md border transition-colors ${chartType === t ? 'bg-accent text-accent-foreground border-brand/40 font-medium' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`h-8 text-sm rounded-md border transition-colors ${chartType === t ? 'bg-accent text-accent-foreground border-brand/40 font-medium' : 'hover:bg-muted text-muted-foreground'}`}
               >
                 {t}
               </button>
@@ -208,7 +208,7 @@ export default function ReportBuilder() {
 
         {chartType !== 'None' && (
           <div>
-            <p className="text-xs font-semibold mb-2">Preview</p>
+            <p className="text-sm font-semibold mb-2">Preview</p>
             <div className="h-32 rounded-lg border bg-muted/40 flex items-center justify-center text-[10px] text-muted-foreground text-center px-2">
               {chartType} chart preview coming soon
             </div>

@@ -54,12 +54,12 @@ export default function TemplatesPage() {
       <div className="flex items-center gap-3 shrink-0">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…" className="h-8 w-52 pl-8 text-xs" />
+          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…" className="h-8 w-52 pl-8 text-sm" />
         </div>
         <div className="flex items-center gap-1">
           {CATEGORIES.map(c => (
             <button key={c} onClick={() => setCat(c)}
-              className={cn('h-8 px-3 text-xs font-medium rounded-md transition-colors',
+              className={cn('h-8 px-3 text-sm font-medium rounded-md transition-colors',
                 cat === c ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground')}>
               {c}
             </button>
@@ -81,14 +81,14 @@ export default function TemplatesPage() {
             </div>
             <div>
               <p className="text-sm font-semibold">{t.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{t.desc}</p>
+              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{t.desc}</p>
             </div>
             <div className="flex items-center justify-between mt-auto">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800">{t.category}</span>
-                <span className="text-xs text-muted-foreground">Est. {t.timeSaved}</span>
+                <span className="text-sm text-muted-foreground">Est. {t.timeSaved}</span>
               </div>
-              <Button size="sm" variant="outline" className="h-7 text-xs">Install</Button>
+              <Button size="sm" variant="outline" className="h-7 text-sm">Install</Button>
             </div>
           </Card>
         ))}

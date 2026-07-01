@@ -69,7 +69,7 @@ export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | '
           {!collapsed && (
             <div className="flex items-center gap-2 min-w-0">
               <div className="size-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-xs flex-shrink-0">G</div>
-              <span className="font-semibold text-sm tracking-tight truncate">God Recruiter</span>
+              <span className="font-semibold text-base tracking-tight truncate">God Recruiter</span>
             </div>
           )}
           {collapsed && (
@@ -99,7 +99,7 @@ export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | '
                 key={href}
                 href={href}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-md text-sm transition-colors',
+                  'flex items-center gap-2.5 rounded-md text-base transition-colors',
                   collapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-2',
                   active
                     ? 'bg-[#ededed] text-[#181818] font-semibold'

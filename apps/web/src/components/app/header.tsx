@@ -299,7 +299,7 @@ export function Header({ userName, userEmail }: Props) {
                                   <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
                                   <span className="text-xs text-muted-foreground shrink-0">{c.candidateId}</span>
                                 </div>
-                                {c.title && <p className="text-xs text-muted-foreground truncate">{c.title}</p>}
+                                {c.title && <p className="text-sm text-muted-foreground truncate">{c.title}</p>}
                               </div>
                             </button>
                           ))}
@@ -321,7 +321,7 @@ export function Header({ userName, userEmail }: Props) {
                                     <p className="text-sm font-medium text-foreground truncate">{j.title}</p>
                                     {j.display_id && <span className="text-xs text-muted-foreground shrink-0">{j.display_id}</span>}
                                   </div>
-                                  {j.client && <p className="text-xs text-muted-foreground truncate">{j.client}</p>}
+                                  {j.client && <p className="text-sm text-muted-foreground truncate">{j.client}</p>}
                                 </div>
                                 <span className={`size-1.5 rounded-full shrink-0 ${STATUS_DOT[j.status] ?? 'bg-zinc-400'}`} />
                               </button>
@@ -338,7 +338,7 @@ export function Header({ userName, userEmail }: Props) {
               )}
 
               {!query && (
-                <p className="text-xs text-muted-foreground text-center py-6">Type to search candidates or jobs</p>
+                <p className="text-sm text-muted-foreground text-center py-6">Type to search candidates or jobs</p>
               )}
             </div>
           </div>

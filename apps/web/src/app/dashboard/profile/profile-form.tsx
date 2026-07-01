@@ -70,7 +70,7 @@ export function ProfileForm({ fullName, email, tenantName, role, memberSince, si
             <p className="text-sm text-muted-foreground truncate">{email}</p>
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               {tenantName && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Building2 className="size-3" />{tenantName}
                 </span>
               )}
@@ -79,7 +79,7 @@ export function ProfileForm({ fullName, email, tenantName, role, memberSince, si
                   {role}
                 </span>
               )}
-              <span className="text-xs text-muted-foreground">Member since {memberSince}</span>
+              <span className="text-sm text-muted-foreground">Member since {memberSince}</span>
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function ProfileForm({ fullName, email, tenantName, role, memberSince, si
               <div className="space-y-1.5">
                 <Label>Work email</Label>
                 <Input value={email} disabled className="bg-muted/50 text-muted-foreground cursor-not-allowed" />
-                <p className="text-xs text-muted-foreground">Email cannot be changed here. Contact your admin.</p>
+                <p className="text-sm text-muted-foreground">Email cannot be changed here. Contact your admin.</p>
               </div>
               <div className="flex justify-end">
                 <Button type="submit" size="sm" disabled={namePending || nameValue.trim() === fullName}>

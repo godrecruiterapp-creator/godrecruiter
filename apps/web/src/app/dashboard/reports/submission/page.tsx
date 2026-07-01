@@ -59,7 +59,7 @@ export default function SubmissionReports() {
           <p className="text-sm text-muted-foreground">Track submission volume, quality, and conversion rates</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>Last 30 Days</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>Last 30 Days</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
@@ -73,8 +73,8 @@ export default function SubmissionReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function SubmissionReports() {
           <div className="flex flex-col items-center gap-1.5 flex-1 justify-center">
             {FUNNEL.map((f) => (
               <div key={f.label} className="w-full flex flex-col items-center gap-0.5">
-                <div className={`${f.color} rounded h-7 flex items-center justify-center text-xs font-medium text-white`} style={{ width: `${f.pct}%` }}>
+                <div className={`${f.color} rounded h-7 flex items-center justify-center text-sm font-medium text-white`} style={{ width: `${f.pct}%` }}>
                   {f.count}
                 </div>
                 <span className="text-[10px] text-muted-foreground">{f.label}</span>
@@ -100,7 +100,7 @@ export default function SubmissionReports() {
         {/* Table */}
         <div className="col-span-2 rounded-lg border bg-card p-4">
           <p className="text-sm font-semibold mb-3">Recent Submissions</p>
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="text-muted-foreground border-b">
                 <th className="pb-2 text-left font-medium">Date</th>
@@ -141,7 +141,7 @@ export default function SubmissionReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

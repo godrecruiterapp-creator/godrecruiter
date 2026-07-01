@@ -69,7 +69,7 @@ function PlacementCard({ p, selected, onClick }: { p: Placement; selected: boole
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-sm font-semibold leading-tight">{p.candidate}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 truncate">{p.jobTitle}</p>
+                <p className="text-sm text-muted-foreground mt-0.5 truncate">{p.jobTitle}</p>
               </div>
               <HealthBadge score={p.healthScore} />
             </div>
@@ -78,19 +78,19 @@ function PlacementCard({ p, selected, onClick }: { p: Placement; selected: boole
 
         {/* Client + recruiter */}
         <div className="space-y-1 mb-3">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{p.client}</span>
             <span>·</span>
             <span>{p.location}</span>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             Recruiter: <span className="text-foreground">{p.recruiter}</span>
           </div>
         </div>
 
         {/* Dates + type */}
         <div className="flex items-center gap-2 flex-wrap mb-3">
-          <span className="text-xs text-muted-foreground">
+          <span className="text-sm text-muted-foreground">
             {p.startDate} → {p.endDate}
           </span>
           <span className="text-xs px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground">
@@ -99,7 +99,7 @@ function PlacementCard({ p, selected, onClick }: { p: Placement; selected: boole
         </div>
 
         {/* Rate row */}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
           <span>${p.billRate}/hr bill</span>
           <span>·</span>
           <span>${p.payRate}/hr pay</span>
@@ -111,7 +111,7 @@ function PlacementCard({ p, selected, onClick }: { p: Placement; selected: boole
         {p.issues.length > 0 && (
           <div className="space-y-1 mb-3">
             {p.issues.slice(0, 2).map((issue, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+              <div key={i} className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
                 <AlertTriangle className="size-3 shrink-0" />
                 <span className="truncate">{issue}</span>
               </div>
@@ -162,7 +162,7 @@ function KPICard({
         <Icon className="size-4" />
       </div>
       <p className="text-xl font-bold tabular-nums">{value}</p>
-      <p className="text-xs font-medium mt-0.5">{label}</p>
+      <p className="text-sm font-medium mt-0.5">{label}</p>
       {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
     </button>
   )
@@ -220,7 +220,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
           <div className="flex items-start justify-between gap-2">
             <div>
               <p className="text-sm font-semibold">{p.candidate}</p>
-              <p className="text-xs text-muted-foreground">{p.jobTitle} · {p.client}</p>
+              <p className="text-sm text-muted-foreground">{p.jobTitle} · {p.client}</p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <button className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" title="Open full record">
@@ -251,7 +251,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
             key={t.key}
             onClick={() => setTab(t.key)}
             className={cn(
-              'text-xs font-medium py-2.5 px-1 mr-4 border-b-2 transition-colors whitespace-nowrap',
+              'text-sm font-medium py-2.5 px-1 mr-4 border-b-2 transition-colors whitespace-nowrap',
               tab === t.key
                 ? 'border-foreground text-foreground'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -293,8 +293,8 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
                   {p.issues.map((issue, i) => (
                     <div key={i} className="flex items-center gap-3 px-4 py-3">
                       <AlertTriangle className="size-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                      <span className="text-xs text-amber-800 dark:text-amber-300 flex-1">{issue}</span>
-                      <button className="text-xs font-medium text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 transition-colors">Fix →</button>
+                      <span className="text-sm text-amber-800 dark:text-amber-300 flex-1">{issue}</span>
+                      <button className="text-sm font-medium text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 transition-colors">Fix →</button>
                     </div>
                   ))}
                 </div>
@@ -315,7 +315,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
                 ].filter(Boolean).map((action) => (
                   <button
                     key={action!}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-left hover:bg-muted/50 transition-colors"
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left hover:bg-muted/50 transition-colors"
                   >
                     <Sparkles className="size-3.5 text-violet-500 shrink-0" />
                     <span>{action}</span>
@@ -367,7 +367,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
               ))}
             </div>
             <div className="rounded-xl border border-border p-4 text-center">
-              <p className="text-xs text-muted-foreground">Revenue this month (est.)</p>
+              <p className="text-sm text-muted-foreground">Revenue this month (est.)</p>
               <p className="text-2xl font-bold mt-1">${(p.weeklyRevenue * 4.33).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</p>
             </div>
           </div>
@@ -388,7 +388,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
                   <div className="flex-1 min-w-0">
                     <p className={cn('text-sm font-medium', !event.done && 'text-muted-foreground')}>{event.event}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{event.date} · {event.user}</p>
-                    {event.note && <p className="text-xs text-muted-foreground mt-1 italic">{event.note}</p>}
+                    {event.note && <p className="text-sm text-muted-foreground mt-1 italic">{event.note}</p>}
                   </div>
                 </div>
               ))}
@@ -412,7 +412,7 @@ function SidePanel({ p, onClose }: { p: Placement; onClose: () => void }) {
                 </div>
               )
             })}
-            <button className="w-full mt-3 h-9 rounded-lg border border-dashed border-border text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-colors flex items-center justify-center gap-1.5">
+            <button className="w-full mt-3 h-9 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-colors flex items-center justify-center gap-1.5">
               <Plus className="size-3.5" />Add note or task
             </button>
           </div>
@@ -477,10 +477,10 @@ export default function PlacementsPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Search placements…"
-                    className="h-9 pl-8 pr-3 text-xs w-56 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="h-9 pl-8 pr-3 text-sm w-56 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
-                <button className="h-9 px-4 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">
+                <button className="h-9 px-4 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">
                   <Plus className="size-3.5" />New Placement
                 </button>
               </div>
@@ -507,7 +507,7 @@ export default function PlacementsPage() {
                     key={t.key}
                     onClick={() => setFilterTab(t.key)}
                     className={cn(
-                      'flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
+                      'flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium whitespace-nowrap transition-colors',
                       filterTab === t.key
                         ? 'bg-foreground text-background'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -530,7 +530,7 @@ export default function PlacementsPage() {
               <div className="mb-6 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-amber-100 dark:border-amber-900">
                   <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
-                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-300">Needs Attention ({needsAttentionItems.length})</span>
+                  <span className="text-sm font-semibold text-amber-800 dark:text-amber-300">Needs Attention ({needsAttentionItems.length})</span>
                 </div>
                 <div className="divide-y divide-amber-100 dark:divide-amber-900">
                   {needsAttentionItems.map(p => (
@@ -543,10 +543,10 @@ export default function PlacementsPage() {
                         {p.initials}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">{p.candidate}</p>
+                        <p className="text-sm font-medium text-amber-900 dark:text-amber-200">{p.candidate}</p>
                         <p className="text-[10px] text-amber-700 dark:text-amber-400 truncate">{p.issues[0] ?? 'Health score below threshold'}</p>
                       </div>
-                      <span className="text-xs font-medium text-amber-700 dark:text-amber-400 shrink-0">Fix →</span>
+                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400 shrink-0">Fix →</span>
                     </button>
                   ))}
                 </div>
@@ -558,7 +558,7 @@ export default function PlacementsPage() {
               <div className="text-center py-20 text-muted-foreground">
                 <Activity className="size-10 mx-auto mb-3 opacity-20" />
                 <p className="text-sm font-medium">No placements found</p>
-                <p className="text-xs mt-1">Try a different filter or search term.</p>
+                <p className="text-sm mt-1">Try a different filter or search term.</p>
               </div>
             ) : (
               <div className={cn(

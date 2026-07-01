@@ -59,7 +59,7 @@ export default function NewProjectPage() {
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-3 border-b bg-background shrink-0">
         <Link href="/dashboard/projects/my-projects"
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
           <ChevronLeft className="size-3.5" />Projects
         </Link>
         <div className="w-px h-4 bg-border" />
@@ -101,11 +101,11 @@ export default function NewProjectPage() {
                 <Input value={s.name} onChange={e => set({ name: e.target.value })}
                   placeholder="e.g. Texas ICU Nurses" className="mb-4"
                   onKeyDown={e => e.key === 'Enter' && s.name.trim() && setStep(1)} autoFocus />
-                <p className="text-xs text-muted-foreground mb-2">Need inspiration?</p>
+                <p className="text-sm text-muted-foreground mb-2">Need inspiration?</p>
                 <div className="flex flex-wrap gap-2">
                   {EXAMPLE_NAMES.map(n => (
                     <button key={n} onClick={() => set({ name: n })}
-                      className="px-3 py-1 text-xs rounded-full border border-dashed border-border hover:border-foreground hover:text-foreground text-muted-foreground transition-colors">
+                      className="px-3 py-1 text-sm rounded-full border border-dashed border-border hover:border-foreground hover:text-foreground text-muted-foreground transition-colors">
                       {n}
                     </button>
                   ))}
@@ -137,7 +137,7 @@ export default function NewProjectPage() {
                         s.type === t.id ? 'border-foreground bg-accent' : 'border-border hover:border-muted-foreground hover:bg-muted/40'
                       )}>
                       <span className="text-sm font-semibold">{t.label}</span>
-                      <span className="text-xs text-muted-foreground leading-snug">{t.desc}</span>
+                      <span className="text-sm text-muted-foreground leading-snug">{t.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -165,7 +165,7 @@ export default function NewProjectPage() {
                         </div>
                         <div>
                           <p className="text-sm font-semibold">{v.label}</p>
-                          <p className="text-xs text-muted-foreground">{v.desc}</p>
+                          <p className="text-sm text-muted-foreground">{v.desc}</p>
                         </div>
                         {s.visibility === v.id && <Check className="size-4 ml-auto shrink-0" strokeWidth={3} />}
                       </button>
@@ -215,7 +215,7 @@ export default function NewProjectPage() {
                     { label: 'Team',        value: s.team.length ? s.team.join(', ') : 'Just you' },
                   ].map(row => (
                     <div key={row.label} className="flex items-start gap-4 px-4 py-3">
-                      <span className="text-xs font-semibold text-muted-foreground w-24 shrink-0 pt-0.5">{row.label}</span>
+                      <span className="text-sm font-semibold text-muted-foreground w-24 shrink-0 pt-0.5">{row.label}</span>
                       <span className="text-sm text-foreground">{row.value}</span>
                     </div>
                   ))}
@@ -226,18 +226,18 @@ export default function NewProjectPage() {
 
           {/* Footer nav */}
           <div className="flex items-center justify-between mt-8">
-            <Button variant="ghost" size="sm" className="text-xs h-8"
+            <Button variant="ghost" size="sm" className="text-sm h-8"
               onClick={() => step === 0 ? router.push('/dashboard/projects/my-projects') : setStep(s => s - 1)}>
               <ChevronLeft className="size-3.5 mr-1" />{step === 0 ? 'Cancel' : 'Back'}
             </Button>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground">{step + 1} / {STEPS.length}</span>
+              <span className="text-sm text-muted-foreground">{step + 1} / {STEPS.length}</span>
               {step < STEPS.length - 1 ? (
-                <Button size="sm" className="h-8 text-xs" disabled={!canNext[step]} onClick={() => setStep(s => s + 1)}>
+                <Button size="sm" className="h-8 text-sm" disabled={!canNext[step]} onClick={() => setStep(s => s + 1)}>
                   Next <ChevronRight className="size-3.5 ml-1" />
                 </Button>
               ) : (
-                <Button size="sm" className="h-8 text-xs" onClick={() => router.push('/dashboard/projects/1')}>
+                <Button size="sm" className="h-8 text-sm" onClick={() => router.push('/dashboard/projects/1')}>
                   <FolderKanban className="size-3.5 mr-1.5" />Create Project
                 </Button>
               )}

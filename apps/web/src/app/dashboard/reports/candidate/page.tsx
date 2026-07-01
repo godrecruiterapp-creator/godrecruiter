@@ -44,7 +44,7 @@ export default function CandidateReports() {
           <p className="text-sm text-muted-foreground">Understand your candidate pool, sources, and pipeline health</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>Last 30 Days</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>Last 30 Days</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
@@ -58,8 +58,8 @@ export default function CandidateReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -71,12 +71,12 @@ export default function CandidateReports() {
         <div className="flex flex-col gap-3">
           {SOURCES.map((s) => (
             <div key={s.label} className="flex items-center gap-3">
-              <span className="text-xs w-24 shrink-0">{s.label}</span>
+              <span className="text-sm w-24 shrink-0">{s.label}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: `${s.pct}%` }} />
               </div>
-              <span className="text-xs text-muted-foreground w-10 text-right">{s.count}</span>
-              <span className="text-xs text-muted-foreground w-8 text-right">{s.pct}%</span>
+              <span className="text-sm text-muted-foreground w-10 text-right">{s.count}</span>
+              <span className="text-sm text-muted-foreground w-8 text-right">{s.pct}%</span>
             </div>
           ))}
         </div>
@@ -98,7 +98,7 @@ export default function CandidateReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

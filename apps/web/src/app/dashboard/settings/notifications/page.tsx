@@ -43,7 +43,7 @@ export default function NotificationsPage() {
           summary={
             <div className="flex items-center gap-4">
               {Object.entries(channels).map(([ch, on]) => (
-                <div key={ch} className="flex items-center gap-1.5 text-xs">
+                <div key={ch} className="flex items-center gap-1.5 text-sm">
                   <span className={`size-2 rounded-full ${on ? 'bg-emerald-500' : 'bg-muted-foreground/40'}`} />
                   <span className="capitalize">{ch === 'inApp' ? 'In-app' : ch}</span>
                 </div>
@@ -69,13 +69,13 @@ export default function NotificationsPage() {
           title="Notification Events"
           description="Choose which events trigger notifications per channel"
           summary={
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {events.filter(e => e.inApp).length} in-app · {events.filter(e => e.email).length} email · {events.filter(e => e.sms).length} SMS events active
             </p>
           }
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
                   <th className="text-left py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Event</th>
@@ -119,20 +119,20 @@ export default function NotificationsPage() {
             </CardRow>
             <div className="border-t border-border/40 pt-3">
               <p className="text-sm font-medium mb-3">Quiet hours</p>
-              <div className="flex items-center gap-3 text-xs">
+              <div className="flex items-center gap-3 text-sm">
                 <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground">From</label>
+                  <label className="text-sm text-muted-foreground">From</label>
                   <input type="time" value={quietFrom} onChange={e => setQuietFrom(e.target.value)}
-                    className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                    className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
                 <span className="text-muted-foreground mt-5">to</span>
                 <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground">To</label>
+                  <label className="text-sm text-muted-foreground">To</label>
                   <input type="time" value={quietTo} onChange={e => setQuietTo(e.target.value)}
-                    className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                    className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Notifications are held and delivered after quiet hours end.</p>
+              <p className="text-sm text-muted-foreground mt-2">Notifications are held and delivered after quiet hours end.</p>
             </div>
           </div>
         </SettingCard>

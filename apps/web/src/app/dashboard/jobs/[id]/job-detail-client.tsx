@@ -137,7 +137,7 @@ function FilterPopover({
         <div className="absolute top-11 left-0 z-50 w-52 bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2.5 border-b">
             <span className="text-sm font-semibold">Filters</span>
-            {count > 0 && <button onClick={onClear} className="text-xs text-brand hover:underline">Clear all</button>}
+            {count > 0 && <button onClick={onClear} className="text-sm text-brand hover:underline">Clear all</button>}
           </div>
           <div className="px-4 py-3 border-b">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Stage</p>
@@ -218,7 +218,7 @@ function CandidateTable({ candidates, onSelect }: { candidates: Candidate[]; onS
             <td className="px-5 py-3.5">
               <button
                 onClick={e => { e.stopPropagation(); onSelect(c) }}
-                className="text-xs text-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
+                className="text-sm text-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
               >
                 View
               </button>
@@ -272,7 +272,7 @@ function CandidateDrawer({ c, open, onClose }: { c: Candidate | null; open: bool
             {STAGES.map(s => (
               <span
                 key={s.id}
-                className={`text-xs px-3 py-1 rounded-full border font-medium transition-colors ${
+                className={`text-sm px-3 py-1 rounded-full border font-medium transition-colors ${
                   s.id === c.stage
                     ? 'bg-brand text-white border-brand'
                     : 'bg-background text-muted-foreground border-border'
@@ -459,7 +459,7 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
                 <div className="space-y-3">
                   {details.map(({ label, value }) => (
                     <div key={label} className="flex items-start gap-3">
-                      <span className="text-xs text-muted-foreground w-20 shrink-0 leading-5">{label}</span>
+                      <span className="text-sm text-muted-foreground w-24 shrink-0 leading-5">{label}</span>
                       <span className="text-sm text-foreground font-medium leading-5">{value}</span>
                     </div>
                   ))}
@@ -478,7 +478,7 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
                     { label: 'Margin %',  value: `${marginPct}%`,   cls: 'text-emerald-600 dark:text-emerald-400'  },
                   ].map(({ label, value, cls }) => (
                     <div key={label} className="rounded-lg border border-border bg-muted/20 px-3 py-2.5">
-                      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+                      <p className="text-sm text-muted-foreground mb-1">{label}</p>
                       <p className={`text-sm font-bold tabular-nums ${cls}`}>{value}</p>
                     </div>
                   ))}
@@ -497,7 +497,7 @@ function JobInfoSidebar({ job, billRate, payRate, margin, marginPct, location, e
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{name}</p>
-                        <p className="text-xs text-muted-foreground">{role}</p>
+                        <p className="text-sm text-muted-foreground">{role}</p>
                       </div>
                       {name !== 'Unassigned' && (
                         <button className="size-7 flex items-center justify-center text-muted-foreground hover:text-brand hover:bg-brand-muted rounded-md transition-colors">
@@ -577,7 +577,7 @@ function NotesTab({ jobId, notes, setNotes }: {
               {authors.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
             </SelectContent>
           </Select>
-          {byFilter && <button onClick={() => setByFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
+          {byFilter && <button onClick={() => setByFilter('')} className="text-sm text-brand hover:underline">Clear</button>}
         </div>
         <div className="flex-1 overflow-auto px-5 py-4 space-y-3">
           {visible.length === 0 && (
@@ -613,7 +613,7 @@ function NotesTab({ jobId, notes, setNotes }: {
             className="h-36 resize-none border-0 rounded-none shadow-none focus-visible:ring-0 text-sm px-4 py-3"
           />
           <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20">
-            <span className="text-xs text-muted-foreground">Visible to all team members</span>
+            <span className="text-sm text-muted-foreground">Visible to all team members</span>
             <Button onClick={addNote} disabled={!text.trim()} size="sm"
               className="h-8 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40">
               Post Note
@@ -700,7 +700,7 @@ function DocumentsTab({ jobId, docs, setDocs }: {
             {types.map(t => <SelectItem key={t} value={t}>{t.toUpperCase()}</SelectItem>)}
           </SelectContent>
         </Select>
-        {typeFilter && <button onClick={() => setTypeFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
+        {typeFilter && <button onClick={() => setTypeFilter('')} className="text-sm text-brand hover:underline">Clear</button>}
       </div>
 
       {/* File list */}
@@ -722,7 +722,7 @@ function DocumentsTab({ jobId, docs, setDocs }: {
                   <p className="text-xs text-muted-foreground">{doc.size} · {doc.uploadedAt}</p>
                 </div>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="text-xs text-foreground border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
+                  <button className="text-sm text-foreground border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
                   <button onClick={() => deleteDoc(doc.id)}
                     className="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors">
                     <Trash2 className="size-3.5" />
@@ -946,7 +946,7 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
                   {statCards.map(({ label, value, bg, border, num, sub }) => (
                     <div key={label} className={`flex flex-col items-center flex-1 rounded-lg border px-4 py-2 ${bg} ${border}`}>
                       <span className={`text-xl font-bold tabular-nums leading-none mb-0.5 ${num}`}>{value}</span>
-                      <span className={`text-xs font-medium whitespace-nowrap ${sub}`}>{label}</span>
+                      <span className={`text-sm font-medium whitespace-nowrap ${sub}`}>{label}</span>
                     </div>
                   ))}
                 </div>

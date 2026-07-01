@@ -82,7 +82,7 @@ export default function InterviewsDashboard() {
           <div className="flex items-center border rounded-md overflow-hidden">
             {DATE_RANGES.map(r => (
               <button key={r} onClick={() => setRange(r)}
-                className={`h-8 px-3 text-xs transition-colors ${range === r ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}>
+                className={`h-8 px-3 text-sm transition-colors ${range === r ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}>
                 {r}
               </button>
             ))}
@@ -101,9 +101,9 @@ export default function InterviewsDashboard() {
             return (
               <div key={k.label} className="rounded-lg border bg-card p-4 flex items-start justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">{k.label}</p>
+                  <p className="text-sm text-muted-foreground">{k.label}</p>
                   <p className="text-2xl font-bold mt-1">{k.value}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{k.delta}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{k.delta}</p>
                 </div>
                 <div className={`size-8 rounded-lg flex items-center justify-center ${k.bg}`}>
                   <Icon className={`size-4 ${k.color}`} />
@@ -135,7 +135,7 @@ export default function InterviewsDashboard() {
           <div className="flex flex-col items-center gap-1.5 flex-1 justify-center">
             {FUNNEL.map(f => (
               <div key={f.label} className="w-full flex flex-col items-center gap-0.5">
-                <div className={`${f.color} rounded h-7 flex items-center justify-center text-xs font-medium text-white`}
+                <div className={`${f.color} rounded h-7 flex items-center justify-center text-sm font-medium text-white`}
                   style={{ width: `${f.pct}%` }}>
                   {f.count}
                 </div>
@@ -158,7 +158,7 @@ export default function InterviewsDashboard() {
                   {u.candidate[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{u.candidate}</p>
+                  <p className="text-sm font-medium truncate">{u.candidate}</p>
                   <p className="text-[10px] text-muted-foreground">{u.time} · {u.type}</p>
                 </div>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${STATUS_COLORS[u.status] ?? ''}`}>
@@ -179,7 +179,7 @@ export default function InterviewsDashboard() {
                   {f.candidate[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{f.candidate}</p>
+                  <p className="text-sm font-medium truncate">{f.candidate}</p>
                   <p className="text-[10px] text-muted-foreground">{f.interviewer} · {f.date}</p>
                 </div>
                 <button className="text-[10px] px-2 py-1 rounded border border-border hover:bg-muted transition-colors shrink-0">
@@ -200,7 +200,7 @@ export default function InterviewsDashboard() {
                 <div key={i} className="flex items-start gap-2 py-1.5 border-b last:border-0">
                   <Icon className={`size-3.5 mt-0.5 shrink-0 ${a.color}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs">{a.text}</p>
+                    <p className="text-sm">{a.text}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{a.time}</p>
                   </div>
                 </div>

@@ -58,7 +58,7 @@ type Priority = 'high'     | 'medium'      | 'low'
 
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="block text-xs font-semibold text-foreground mb-1.5">
+    <label className="block text-sm font-semibold text-foreground mb-1.5">
       {children}
       {required && <span className="text-[#dd7456] ml-0.5">*</span>}
     </label>
@@ -110,7 +110,7 @@ function PillToggle({ label, active, onClick }: { label: string; active: boolean
   return (
     <button type="button" onClick={onClick}
       className={cn(
-        'h-8 px-3 text-xs font-medium rounded-lg border transition-all',
+        'h-8 px-3 text-sm font-medium rounded-lg border transition-all',
         active
           ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
@@ -128,7 +128,7 @@ function SectionCard({ n, icon: Icon, title, children, className }: {
     <div className={cn('rounded-2xl border border-border/60 bg-background shadow-sm overflow-hidden', className)}>
       <div className="flex items-center gap-3 px-6 py-4 border-b border-border/40 bg-muted/10">
         <div className="size-6 rounded-full bg-[#dd7456]/10 flex items-center justify-center shrink-0">
-          <span className="text-xs font-bold text-[#dd7456]">{n}</span>
+          <span className="text-sm font-bold text-[#dd7456]">{n}</span>
         </div>
         <Icon className="size-4 text-muted-foreground" />
         <h2 className="text-sm font-semibold">{title}</h2>
@@ -259,7 +259,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
         <div className="h-2 rounded-full bg-muted overflow-hidden mb-2">
           <div className="h-full bg-[#dd7456] rounded-full transition-all duration-500" style={{ width:`${pct}%` }} />
         </div>
-        <p className="text-xs text-muted-foreground">{filled} of 6 sections started</p>
+        <p className="text-sm text-muted-foreground">{filled} of 6 sections started</p>
       </div>
 
       {/* Bill rate margin */}
@@ -267,10 +267,10 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
         <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
           <div className="flex items-center gap-2 mb-1">
             <DollarSign className="size-4 text-emerald-600 dark:text-emerald-400" />
-            <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Margin preview</p>
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Margin preview</p>
           </div>
           <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">${margin}<span className="text-sm font-normal">/hr</span></p>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+          <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-0.5">
             {billRate && payRate ? `${Math.round((parseFloat(margin) / parseFloat(billRate)) * 100)}% gross margin` : ''}
           </p>
         </div>
@@ -282,14 +282,14 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
           <div className="flex items-start gap-2 mb-3">
             <AlertCircle className="size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Similar jobs open</p>
+              <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">Similar jobs open</p>
               <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5">2 active jobs match this title</p>
             </div>
           </div>
           {SIMILAR_JOBS_MOCK.map(j => (
             <div key={j.id} className="flex items-center justify-between py-2 border-b border-amber-200/60 dark:border-amber-800/60 last:border-0 gap-2">
               <div className="min-w-0">
-                <p className="text-xs font-medium truncate">{j.title}</p>
+                <p className="text-sm font-medium truncate">{j.title}</p>
                 <p className="text-[10px] text-muted-foreground">{j.client} · {j.daysOpen}d open</p>
               </div>
               <button type="button"
@@ -308,7 +308,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
           <div className="flex items-start gap-2 mb-3">
             <Users className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">18 candidates match</p>
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">18 candidates match</p>
               <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-0.5">Already in your database</p>
             </div>
           </div>
@@ -329,7 +329,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
       <div className="rounded-2xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="size-4 text-violet-500" />
-          <p className="text-xs font-semibold text-violet-800 dark:text-violet-200">AI Insights</p>
+          <p className="text-sm font-semibold text-violet-800 dark:text-violet-200">AI Insights</p>
         </div>
         {title ? (
           <div className="space-y-2">
@@ -350,7 +350,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-violet-600 dark:text-violet-400">Enter a job title to see AI insights.</p>
+          <p className="text-sm text-violet-600 dark:text-violet-400">Enter a job title to see AI insights.</p>
         )}
       </div>
 
@@ -546,16 +546,16 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
             </Link>
             <div>
               <h1 className="text-lg font-bold tracking-tight">Post a Job</h1>
-              <p className="text-xs text-muted-foreground">Fill in the details below to post a new job</p>
+              <p className="text-sm text-muted-foreground">Fill in the details below to post a new job</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button type="button"
-              className="h-8 px-4 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground">
+              className="h-8 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground">
               Use Template
             </button>
             <button type="button"
-              className="h-8 px-4 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground flex items-center gap-1.5">
+              className="h-8 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground flex items-center gap-1.5">
               <Copy className="size-3.5" />Copy Existing Job
             </button>
           </div>
@@ -689,7 +689,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                   </div>
                 )}
                 {workMode === 'remote' && (
-                  <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                  <p className="text-sm text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
                     Fully remote — candidates from any US location can apply.
                   </p>
                 )}
@@ -777,7 +777,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     {payRate && billRate && (
                       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
                         <DollarSign className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        <p className="text-xs text-emerald-700 dark:text-emerald-300">
+                        <p className="text-sm text-emerald-700 dark:text-emerald-300">
                           Gross margin: <strong>${(parseFloat(billRate) - parseFloat(payRate)).toFixed(2)}/hr</strong>
                           {' '}({Math.round(((parseFloat(billRate) - parseFloat(payRate)) / parseFloat(billRate)) * 100)}%)
                         </p>
@@ -863,18 +863,18 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                 {/* AI generation toolbar */}
                 <div className="flex flex-wrap gap-2 pb-2 border-b border-border/40">
                   <button type="button" onClick={generateDescription} disabled={aiGenerating}
-                    className="h-8 px-3 text-xs rounded-lg bg-violet-50 dark:bg-violet-950 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900 transition-colors font-medium flex items-center gap-1.5 disabled:opacity-50">
+                    className="h-8 px-3 text-sm rounded-lg bg-violet-50 dark:bg-violet-950 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900 transition-colors font-medium flex items-center gap-1.5 disabled:opacity-50">
                     <Sparkles className="size-3.5" />
                     {aiGenerating ? 'Generating…' : 'Generate with AI'}
                   </button>
                   <button type="button" onClick={() => setPasteMode(!pasteMode)}
-                    className="h-8 px-3 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium flex items-center gap-1.5 text-muted-foreground">
+                    className="h-8 px-3 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium flex items-center gap-1.5 text-muted-foreground">
                     <RefreshCw className="size-3.5" />
                     {pasteMode ? 'Cancel paste' : 'Paste & Extract'}
                   </button>
                   {description && (
                     <button type="button"
-                      className="h-8 px-3 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium flex items-center gap-1.5 text-muted-foreground">
+                      className="h-8 px-3 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium flex items-center gap-1.5 text-muted-foreground">
                       <Zap className="size-3.5" />Improve Writing
                     </button>
                   )}
@@ -883,14 +883,14 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                 {/* Paste mode */}
                 {pasteMode && (
                   <div className="rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-950/30 p-4 space-y-3">
-                    <p className="text-xs font-medium text-violet-800 dark:text-violet-200">Paste the client&apos;s job description below — AI will extract skills and fill in the form.</p>
+                    <p className="text-sm font-medium text-violet-800 dark:text-violet-200">Paste the client&apos;s job description below — AI will extract skills and fill in the form.</p>
                     <textarea
                       rows={6} value={pastedJD} onChange={e => setPastedJD(e.target.value)}
                       placeholder="Paste the full job description here…"
                       className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground"
                     />
                     <button type="button" onClick={extractFromPaste} disabled={!pastedJD.trim()}
-                      className="h-8 px-4 text-xs font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
+                      className="h-8 px-4 text-sm font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
                       Extract Skills & Fill Form →
                     </button>
                   </div>
@@ -942,7 +942,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       {(['high', 'medium', 'low'] as Priority[]).map(p => (
                         <button key={p} type="button" onClick={() => setPriority(p)}
                           className={cn(
-                            'flex-1 h-9 text-xs font-semibold rounded-lg border-2 transition-all capitalize',
+                            'flex-1 h-9 text-sm font-semibold rounded-lg border-2 transition-all capitalize',
                             priority === p && p === 'high'   && 'border-red-400 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300',
                             priority === p && p === 'medium' && 'border-amber-400 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300',
                             priority === p && p === 'low'    && 'border-slate-300 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
@@ -982,7 +982,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
           {/* ── Sticky footer ────────────────────────────────────────── */}
           <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-sm px-6 py-3">
             <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
-              <div className="text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {title ? (
                   <span>
                     <span className="font-medium text-foreground">{title}</span>

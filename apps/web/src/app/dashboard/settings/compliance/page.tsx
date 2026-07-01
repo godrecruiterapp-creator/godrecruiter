@@ -57,7 +57,7 @@ export default function CompliancePage() {
           summary={
             <div className="space-y-2">
               {DOCS.map(d => (
-                <div key={d.name} className="flex items-center justify-between text-xs">
+                <div key={d.name} className="flex items-center justify-between text-sm">
                   <span className="font-medium">{d.name}</span>
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1 text-emerald-600"><CheckCircle2 className="size-3" />{d.total}</span>
@@ -76,8 +76,8 @@ export default function CompliancePage() {
             <CardRow label="Alert days before expiry">
               <div className="flex items-center gap-2">
                 <input type="number" defaultValue={30} min={7}
-                  className="w-16 h-8 text-center text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
-                <span className="text-xs text-muted-foreground">days</span>
+                  className="w-16 h-8 text-center text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                <span className="text-sm text-muted-foreground">days</span>
               </div>
             </CardRow>
           </div>
@@ -88,7 +88,7 @@ export default function CompliancePage() {
           title="Background Checks"
           description="Connect a provider for integrated screening"
           summary={
-            <p className="text-xs text-muted-foreground">No background check provider connected.</p>
+            <p className="text-sm text-muted-foreground">No background check provider connected.</p>
           }
         >
           <div className="space-y-3 mb-4">
@@ -96,11 +96,11 @@ export default function CompliancePage() {
               <div key={p.name} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
                 <div>
                   <p className="text-sm font-medium">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{p.desc}</p>
+                  <p className="text-sm text-muted-foreground">{p.desc}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge>{p.connected ? 'Connected' : 'Not connected'}</Badge>
-                  <button className="h-7 px-2.5 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">Connect</button>
+                  <button className="h-7 px-2.5 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">Connect</button>
                 </div>
               </div>
             ))}
@@ -130,7 +130,7 @@ export default function CompliancePage() {
         >
           <div className="space-y-3">
             <CardRow label="Candidate data retention">
-              <select defaultValue="3years" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="3years" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="1year">1 year</option>
                 <option value="2years">2 years</option>
                 <option value="3years">3 years (recommended)</option>
@@ -138,7 +138,7 @@ export default function CompliancePage() {
               </select>
             </CardRow>
             <CardRow label="Audit log retention">
-              <select defaultValue="2years" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="2years" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="1year">1 year</option>
                 <option value="2years">2 years</option>
                 <option value="5years">5 years</option>

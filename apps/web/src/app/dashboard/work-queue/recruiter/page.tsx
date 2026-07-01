@@ -41,7 +41,7 @@ function JobCard({ job }: { job: WQJob }) {
           <div className="flex items-start justify-between gap-2">
             <div>
               <h4 className="text-sm font-semibold leading-tight">{job.title}</h4>
-              <p className="text-xs text-muted-foreground mt-0.5">{job.client} · {job.location}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{job.client} · {job.location}</p>
             </div>
             {job.priority === 'Urgent' && (
               <span className="inline-flex items-center gap-1 text-[10px] bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-400 px-1.5 py-0.5 rounded font-medium shrink-0">
@@ -53,15 +53,15 @@ function JobCard({ job }: { job: WQJob }) {
           <div className="grid grid-cols-3 gap-3 mt-3">
             <div>
               <p className="text-[10px] text-muted-foreground">Bill Rate</p>
-              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{job.billRate}</p>
+              <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{job.billRate}</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Reviewed</p>
-              <p className="text-xs font-semibold">{job.candidatesReviewed} candidates</p>
+              <p className="text-sm font-semibold">{job.candidatesReviewed} candidates</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Submitted</p>
-              <p className="text-xs font-semibold">{job.submitted}</p>
+              <p className="text-sm font-semibold">{job.submitted}</p>
             </div>
           </div>
 
@@ -86,22 +86,22 @@ function JobCard({ job }: { job: WQJob }) {
             {!started ? (
               <button
                 onClick={() => setStarted(true)}
-                className="h-7 px-3 rounded-md bg-foreground text-background text-xs flex items-center gap-1.5 hover:bg-foreground/90 transition-colors"
+                className="h-7 px-3 rounded-md bg-foreground text-background text-sm flex items-center gap-1.5 hover:bg-foreground/90 transition-colors"
               >
                 <Play className="size-3" />Start Working
               </button>
             ) : (
-              <button className="h-7 px-3 rounded-md bg-violet-600 text-white text-xs flex items-center gap-1.5 hover:bg-violet-700 transition-colors">
+              <button className="h-7 px-3 rounded-md bg-violet-600 text-white text-sm flex items-center gap-1.5 hover:bg-violet-700 transition-colors">
                 <ChevronRight className="size-3" />Continue
               </button>
             )}
-            <button className="h-7 px-3 rounded-md border border-border text-xs flex items-center gap-1.5 hover:bg-muted/60 transition-colors">
+            <button className="h-7 px-3 rounded-md border border-border text-sm flex items-center gap-1.5 hover:bg-muted/60 transition-colors">
               <Send className="size-3" />Submit Candidate
             </button>
-            <button className="h-7 px-3 rounded-md border border-border text-xs flex items-center gap-1.5 hover:bg-muted/60 transition-colors">
+            <button className="h-7 px-3 rounded-md border border-border text-sm flex items-center gap-1.5 hover:bg-muted/60 transition-colors">
               <Eye className="size-3" />View Candidates
             </button>
-            <button className="h-7 px-2 rounded-md border border-border text-xs flex items-center gap-1 hover:bg-muted/60 transition-colors text-muted-foreground">
+            <button className="h-7 px-2 rounded-md border border-border text-sm flex items-center gap-1 hover:bg-muted/60 transition-colors text-muted-foreground">
               <MessageSquare className="size-3" />Note
             </button>
           </div>
@@ -130,7 +130,7 @@ export default function RecruiterViewPage() {
           </div>
           <div>
             <h3 className="text-sm font-semibold">{ME?.name} — My Queue</h3>
-            <p className="text-xs text-muted-foreground">{ME?.avgSubmitTime} avg submit time · {ME?.fillRate}% fill rate</p>
+            <p className="text-sm text-muted-foreground">{ME?.avgSubmitTime} avg submit time · {ME?.fillRate}% fill rate</p>
           </div>
           <div className="ml-auto flex items-center gap-4">
             <div className="text-right">
@@ -139,7 +139,7 @@ export default function RecruiterViewPage() {
                 <div className="w-24 h-1.5 rounded-full bg-border overflow-hidden">
                   <div className={cn('h-1.5 rounded-full', capacityPct >= 90 ? 'bg-red-500' : capacityPct >= 75 ? 'bg-amber-500' : 'bg-emerald-500')} style={{ width: `${capacityPct}%` }} />
                 </div>
-                <span className="text-xs font-semibold tabular-nums">{ME?.currentJobs}/{ME?.maxJobs}</span>
+                <span className="text-sm font-semibold tabular-nums">{ME?.currentJobs}/{ME?.maxJobs}</span>
               </div>
             </div>
             <div className="text-right">
@@ -162,7 +162,7 @@ export default function RecruiterViewPage() {
             return (
               <button key={s.id} onClick={() => setActiveSection(s.id)}
                 className={cn(
-                  'w-full flex items-center justify-between px-3 py-2 text-xs transition-colors',
+                  'w-full flex items-center justify-between px-3 py-2 text-sm transition-colors',
                   activeSection === s.id ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
                 )}>
                 <span>{s.label}</span>

@@ -73,12 +73,12 @@ export function SignupForm() {
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" name="password" type="password" placeholder="Min. 8 characters" autoComplete="new-password" required />
-                  <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+                  <p className="text-sm text-muted-foreground">At least 8 characters.</p>
                 </div>
 
                 <SubmitBtn />
 
-                <p className="text-xs text-muted-foreground text-center">
+                <p className="text-sm text-muted-foreground text-center">
                   By creating an account you agree to our{' '}
                   <Link href="/terms" className="underline underline-offset-2 hover:text-foreground">Terms</Link>
                   {' '}and{' '}

@@ -122,11 +122,11 @@ export default function HistoryPage() {
       case 'status': return (
         <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize', STATUS_BADGE[r.status] ?? '')}>{r.status}</span>
       )
-      case 'duration': return <span className="text-xs text-muted-foreground tabular-nums">{r.duration}</span>
-      case 'records': return <span className="text-xs text-muted-foreground tabular-nums">{r.records}</span>
-      case 'actions_performed': return <span className="text-xs text-muted-foreground tabular-nums">{r.actions_performed}</span>
+      case 'duration': return <span className="text-sm text-muted-foreground tabular-nums">{r.duration}</span>
+      case 'records': return <span className="text-sm text-muted-foreground tabular-nums">{r.records}</span>
+      case 'actions_performed': return <span className="text-sm text-muted-foreground tabular-nums">{r.actions_performed}</span>
       case 'errors': return (
-        <span className={cn('text-xs tabular-nums font-medium', r.errors > 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground')}>{r.errors}</span>
+        <span className={cn('text-sm tabular-nums font-medium', r.errors > 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground')}>{r.errors}</span>
       )
       case 'actions': return (
         <DropdownMenu>
@@ -151,7 +151,7 @@ export default function HistoryPage() {
         <div className="relative shrink-0">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
           <Input value={search} onChange={e => { setSearch(e.target.value); setPage(0) }}
-            placeholder="Search history…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+            placeholder="Search history…" className="h-8 w-52 pl-8 pr-7 text-sm" />
           {search && (
             <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               <X className="size-3.5" />
@@ -159,17 +159,17 @@ export default function HistoryPage() {
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs"><SlidersHorizontal className="size-3.5" />Filters</Button>
-          <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs"><Download className="size-3.5" />Download Logs</Button>
+          <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm"><SlidersHorizontal className="size-3.5" />Filters</Button>
+          <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm"><Download className="size-3.5" />Download Logs</Button>
         </div>
       </div>
 
       {/* Bulk bar */}
       {selected.size > 0 && (
         <div className="flex items-center gap-2 px-3 py-2 mb-2.5 bg-brand-muted border border-brand/20 rounded-lg shrink-0">
-          <span className="text-xs font-semibold text-brand">{selected.size} selected</span>
+          <span className="text-sm font-semibold text-brand">{selected.size} selected</span>
           <div className="w-px h-4 bg-brand/20 mx-1" />
-          <Button size="sm" variant="outline" className="h-7 text-xs"><Download className="size-3 mr-1" />Download Selected</Button>
+          <Button size="sm" variant="outline" className="h-7 text-sm"><Download className="size-3 mr-1" />Download Selected</Button>
           <button onClick={() => setSelected(new Set())} className="ml-auto size-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded">
             <X className="size-3.5" />
           </button>
@@ -213,7 +213,7 @@ export default function HistoryPage() {
 
       {/* Pagination */}
       <div className="flex items-center justify-end pt-3 shrink-0 gap-2">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-sm text-muted-foreground">
           {sorted.length === 0 ? '0' : `${page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, sorted.length)} of ${sorted.length}`}
         </span>
         <div className="flex items-center gap-1">
@@ -223,7 +223,7 @@ export default function HistoryPage() {
           </button>
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => (
             <button key={i} onClick={() => setPage(i)}
-              className={cn('size-7 flex items-center justify-center rounded-md text-xs border transition-colors',
+              className={cn('size-7 flex items-center justify-center rounded-md text-sm border transition-colors',
                 i === page ? 'bg-brand border-brand text-white' : 'border-border text-muted-foreground hover:bg-muted')}>
               {i + 1}
             </button>

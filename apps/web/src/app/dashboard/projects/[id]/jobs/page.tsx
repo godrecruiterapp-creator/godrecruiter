@@ -31,9 +31,9 @@ export default function ProjectJobsPage() {
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div>
           <h2 className="text-sm font-semibold">Linked Jobs</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Jobs linked to this project. Move candidates directly to any listed job.</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Jobs linked to this project. Move candidates directly to any listed job.</p>
         </div>
-        <Button size="sm" className="h-8 text-xs gap-1.5"><Plus className="size-3.5" />Link Job</Button>
+        <Button size="sm" className="h-8 text-sm gap-1.5"><Plus className="size-3.5" />Link Job</Button>
       </div>
       <div className="flex-1 overflow-auto border border-border rounded-lg">
         <table className="w-full border-collapse">
@@ -53,18 +53,18 @@ export default function ProjectJobsPage() {
                   <div className="flex items-center gap-2">
                     <Briefcase className="size-3.5 text-muted-foreground shrink-0" />
                     <div>
-                      <p className="text-xs font-semibold">{j.title}</p>
+                      <p className="text-sm font-semibold">{j.title}</p>
                       <p className="text-[10px] text-muted-foreground">{j.id}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{j.client}</span></td>
+                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{j.client}</span></td>
                 <td className="px-4 py-3"><span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', PRI_CFG[j.priority])}>{j.priority}</span></td>
                 <td className="px-4 py-3"><span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', STA_CFG[j.status])}>{j.status}</span></td>
-                <td className="px-4 py-3"><span className="text-xs font-medium tabular-nums">{j.openings}</span></td>
-                <td className="px-4 py-3"><span className="text-xs tabular-nums text-muted-foreground">{j.submissions}</span></td>
-                <td className="px-4 py-3"><span className={cn('text-xs font-semibold tabular-nums', j.placements > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>{j.placements}</span></td>
-                <td className="px-4 py-3"><span className={cn('text-xs font-bold tabular-nums', j.aiMatch >= 90 ? 'text-emerald-600' : j.aiMatch >= 75 ? 'text-amber-500' : 'text-red-500')}>{j.aiMatch}</span></td>
+                <td className="px-4 py-3"><span className="text-sm font-medium tabular-nums">{j.openings}</span></td>
+                <td className="px-4 py-3"><span className="text-sm tabular-nums text-muted-foreground">{j.submissions}</span></td>
+                <td className="px-4 py-3"><span className={cn('text-sm font-semibold tabular-nums', j.placements > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>{j.placements}</span></td>
+                <td className="px-4 py-3"><span className={cn('text-sm font-bold tabular-nums', j.aiMatch >= 90 ? 'text-emerald-600' : j.aiMatch >= 75 ? 'text-amber-500' : 'text-red-500')}>{j.aiMatch}</span></td>
                 <td className="px-4 py-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

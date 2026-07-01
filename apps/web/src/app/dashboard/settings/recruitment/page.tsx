@@ -28,13 +28,13 @@ function StageList({ stages, setStages }: { stages: Stage[]; setStages: (s: Stag
         <div className="flex gap-2">
           <input autoFocus value={val} onChange={e => setVal(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && val.trim()) { setStages([...stages, { id: Date.now().toString(), name: val.trim() }]); setVal(''); setAdding(false) } if (e.key === 'Escape') setAdding(false) }}
-            className="flex-1 h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Stage name…" />
+            className="flex-1 h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Stage name…" />
           <button onClick={() => { if (val.trim()) { setStages([...stages, { id: Date.now().toString(), name: val.trim() }]); setVal('') } setAdding(false) }}
-            className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">Add</button>
+            className="h-8 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">Add</button>
         </div>
       ) : (
         <button onClick={() => setAdding(true)}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1">
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-1">
           <Plus className="size-3.5" />Add stage
         </button>
       )}
@@ -101,7 +101,7 @@ export default function RecruitmentPage() {
           summary={
             <div className="flex flex-wrap gap-1.5">
               {candidateStages.map((s, i) => (
-                <div key={s.id} className="flex items-center gap-1.5 text-xs">
+                <div key={s.id} className="flex items-center gap-1.5 text-sm">
                   <span className="size-1.5 rounded-full bg-muted-foreground/30" />
                   <span>{s.name}</span>
                   {i < candidateStages.length - 1 && <span className="text-muted-foreground/30">›</span>}
@@ -137,7 +137,7 @@ export default function RecruitmentPage() {
               {skills.slice(0, 8).map(s => (
                 <span key={s.id} className="text-xs bg-muted px-2 py-0.5 rounded-full">{s.label}</span>
               ))}
-              {skills.length > 8 && <span className="text-xs text-muted-foreground">+{skills.length - 8} more</span>}
+              {skills.length > 8 && <span className="text-sm text-muted-foreground">+{skills.length - 8} more</span>}
             </div>
           }
         >
@@ -175,8 +175,8 @@ export default function RecruitmentPage() {
             <CardRow label="Auto-flag as Hot when SLA ≤" description="Jobs near their SLA deadline are automatically marked urgent">
               <div className="flex items-center gap-2">
                 <input type="number" value={hotThreshold} min={1} max={48} onChange={e => setHotThreshold(+e.target.value)}
-                  className="w-16 h-8 text-center text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
-                <span className="text-xs text-muted-foreground">hours</span>
+                  className="w-16 h-8 text-center text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                <span className="text-sm text-muted-foreground">hours</span>
               </div>
             </CardRow>
             <CardRow label="Auto-flag enabled">

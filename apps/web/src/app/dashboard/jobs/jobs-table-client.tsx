@@ -143,7 +143,7 @@ function DrawerSelect({ id, label, value, onChange, options, placeholder = 'All'
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+      <Label htmlFor={id} className="text-sm font-medium">{label}</Label>
       <Select value={value || '__all__'} onValueChange={v => onChange(v === '__all__' ? '' : v)}>
         <SelectTrigger id={id} className="h-9 text-sm"><SelectValue placeholder={placeholder} /></SelectTrigger>
         <SelectContent>
@@ -177,14 +177,14 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+        <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm">
           <Settings2 className="size-3.5" />Columns
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-60 p-0">
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
           <span className="text-sm font-semibold">Columns</span>
-          <button onClick={() => onChange(DEFAULT_COLS)} className="text-xs text-brand hover:underline">Reset</button>
+          <button onClick={() => onChange(DEFAULT_COLS)} className="text-sm text-brand hover:underline">Reset</button>
         </div>
         <div className="px-2 py-2 border-b max-h-64 overflow-y-auto">
           <p className="text-xs text-muted-foreground px-2 pb-1.5 font-semibold uppercase tracking-wide">Visible</p>
@@ -197,7 +197,7 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
                 <Check className="size-2.5 text-white" strokeWidth={3} />
               </span>
               <span className="text-sm flex-1">{COL_META[key].label}</span>
-              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
+              <button onClick={() => toggle(key)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity text-sm">✕</button>
             </div>
           ))}
         </div>
@@ -360,26 +360,26 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
       case 'title':
         return (
           <Link href={`/dashboard/jobs/${job.id}`} onClick={e => e.stopPropagation()}
-            className="text-sm font-medium truncate hover:text-brand transition-colors block">
+            className="text-base font-medium truncate hover:text-brand transition-colors block">
             {job.title}
           </Link>
         )
-      case 'client':     return <span className="text-xs text-muted-foreground truncate">{job.client ?? '—'}</span>
-      case 'city':       return <span className="text-xs text-muted-foreground truncate">{job.city ?? '—'}</span>
-      case 'state':      return <span className="text-xs text-muted-foreground">{job.state ?? '—'}</span>
-      case 'emp_type':   return <span className="text-xs text-muted-foreground whitespace-nowrap">{EMP_LABELS[job.employment_type ?? ''] ?? '—'}</span>
+      case 'client':     return <span className="text-sm text-muted-foreground truncate">{job.client ?? '—'}</span>
+      case 'city':       return <span className="text-sm text-muted-foreground truncate">{job.city ?? '—'}</span>
+      case 'state':      return <span className="text-sm text-muted-foreground">{job.state ?? '—'}</span>
+      case 'emp_type':   return <span className="text-sm text-muted-foreground whitespace-nowrap">{EMP_LABELS[job.employment_type ?? ''] ?? '—'}</span>
       case 'status':     return <Chip label={st.label} className={st.className} />
       case 'priority':   return <Chip label={pri.label} className={pri.className} />
-      case 'recruiter':  return <span className="text-xs text-muted-foreground">{job.recruiter_name ?? '—'}</span>
-      case 'openings':   return <span className="text-xs text-muted-foreground tabular-nums">{job.openings}</span>
-      case 'submitted':  return <span className="text-xs text-muted-foreground tabular-nums">0</span>
-      case 'interviews': return <span className="text-xs text-muted-foreground tabular-nums">0</span>
-      case 'offers':     return <span className="text-xs text-muted-foreground tabular-nums">0</span>
+      case 'recruiter':  return <span className="text-sm text-muted-foreground">{job.recruiter_name ?? '—'}</span>
+      case 'openings':   return <span className="text-sm text-muted-foreground tabular-nums">{job.openings}</span>
+      case 'submitted':  return <span className="text-sm text-muted-foreground tabular-nums">0</span>
+      case 'interviews': return <span className="text-sm text-muted-foreground tabular-nums">0</span>
+      case 'offers':     return <span className="text-sm text-muted-foreground tabular-nums">0</span>
       case 'created':    return <span className="text-xs text-muted-foreground whitespace-nowrap">{fmt(job.created_at)}</span>
       case 'modified':   return <span className="text-xs text-muted-foreground whitespace-nowrap">{fmt(job.updated_at)}</span>
       case 'aging':
         return (
-          <span className={`text-xs tabular-nums font-medium ${days > 30 ? 'text-red-600 dark:text-red-400' : days > 14 ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+          <span className={`text-sm tabular-nums font-medium ${days > 30 ? 'text-red-600 dark:text-red-400' : days > 14 ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
             {days}d
           </span>
         )
@@ -410,7 +410,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
               <Input value={applied.search}
                 onChange={e => { setApplied(p => ({ ...p, search: e.target.value })); setPage(0) }}
-                placeholder="Search by title, client, ID…" className="h-8 w-52 pl-8 pr-7 text-xs" />
+                placeholder="Search by title, client, ID…" className="h-8 w-52 pl-8 pr-7 text-sm" />
               {applied.search && (
                 <button onClick={() => { setApplied(p => ({ ...p, search: '' })); setPage(0) }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   <X className="size-3.5" />
@@ -447,18 +447,18 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
             {(applied.dateFrom || applied.dateTo) && (
               <ActiveChip label={`Date: ${applied.dateFrom || '…'} – ${applied.dateTo || '…'}`} onRemove={() => setApplied(p => ({ ...p, dateFrom: '', dateTo: '' }))} />
             )}
-            <button onClick={clearApplied} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
+            <button onClick={clearApplied} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
           </div>
         )}
 
         {/* ── Bulk action bar ──────────────────────────────────────────── */}
         {selected.size > 0 && (
           <div className="flex items-center gap-2 px-3 py-2 mb-2.5 bg-brand-muted border border-brand/20 rounded-lg shrink-0">
-            <span className="text-xs font-semibold text-brand">{selected.size} selected</span>
+            <span className="text-sm font-semibold text-brand">{selected.size} selected</span>
             <div className="w-px h-4 bg-brand/20 mx-1" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="outline" disabled={isPending} className="h-7 text-xs">
+                <Button size="sm" variant="outline" disabled={isPending} className="h-7 text-sm">
                   Manage <ChevronDown className="size-3.5 ml-1.5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -564,7 +564,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
               <div className="flex flex-col items-center justify-center py-20 gap-2">
                 <Search className="size-6 text-muted-foreground/30" />
                 <p className="text-sm text-muted-foreground">No jobs match your filters</p>
-                <button onClick={clearApplied} className="text-xs text-brand hover:underline">Clear filters</button>
+                <button onClick={clearApplied} className="text-sm text-brand hover:underline">Clear filters</button>
               </div>
             ) : (
               <table className="w-full border-collapse">
@@ -608,16 +608,16 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
         {/* ── Pagination ───────────────────────────────────────────────── */}
         <div className="flex items-center justify-between pt-3 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Rows per page</span>
+            <span className="text-sm text-muted-foreground">Rows per page</span>
             <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v) as 25 | 50 | 100); setPage(0) }}>
-              <SelectTrigger className="h-7 w-16 text-xs"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-7 w-16 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {PAGE_SIZES.map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {sorted.length === 0 ? '0' : `${page * pageSize + 1}–${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}
             </span>
             <div className="flex items-center gap-1">
@@ -629,7 +629,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
                 const pg = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i
                 return (
                   <button key={pg} onClick={() => setPage(pg)}
-                    className={`size-7 flex items-center justify-center rounded-md text-xs border transition-colors ${
+                    className={`size-7 flex items-center justify-center rounded-md text-sm border transition-colors ${
                       pg === page ? 'bg-brand border-brand text-white' : 'border-border text-muted-foreground hover:bg-muted'
                     }`}>
                     {pg + 1}
@@ -652,7 +652,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
             <div className="flex items-center justify-between">
               <SheetTitle className="text-base">Filters</SheetTitle>
               {Object.values(draft).some(Boolean) && (
-                <button onClick={clearDraft} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
+                <button onClick={clearDraft} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
               )}
             </div>
           </SheetHeader>
@@ -684,7 +684,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
               { value: '30', label: '30+ days' }, { value: '60', label: '60+ days' }, { value: '90', label: '90+ days' },
             ]} />
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Created date range</Label>
+              <Label className="text-sm font-medium">Created date range</Label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">From</span>

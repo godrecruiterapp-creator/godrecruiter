@@ -48,7 +48,7 @@ export default function ExecutiveReports() {
           <p className="text-sm text-muted-foreground">Top-line performance, growth trends, and strategic metrics</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>YTD 2026</option><option>Last Quarter</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>YTD 2026</option><option>Last Quarter</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
@@ -57,9 +57,9 @@ export default function ExecutiveReports() {
       <div className="grid grid-cols-5 gap-4">
         {KPIS.map((k) => (
           <div key={k.label} className="rounded-lg border bg-card p-4">
-            <p className="text-xs text-muted-foreground">{k.label}</p>
+            <p className="text-sm text-muted-foreground">{k.label}</p>
             <p className="text-2xl font-bold mt-1">{k.value}</p>
-            <p className="text-xs text-emerald-600 mt-0.5">{k.delta}</p>
+            <p className="text-sm text-emerald-600 mt-0.5">{k.delta}</p>
           </div>
         ))}
       </div>
@@ -73,8 +73,8 @@ export default function ExecutiveReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -85,7 +85,7 @@ export default function ExecutiveReports() {
         {/* Growth Trend */}
         <div className="rounded-lg border bg-card p-4">
           <p className="text-sm font-semibold mb-3">Business Growth Trend</p>
-          <div className="h-48 bg-muted/40 rounded-lg flex items-center justify-center text-xs text-muted-foreground text-center px-4">
+          <div className="h-48 bg-muted/40 rounded-lg flex items-center justify-center text-sm text-muted-foreground text-center px-4">
             Monthly revenue and placement trend — chart visualization coming soon
           </div>
         </div>
@@ -96,7 +96,7 @@ export default function ExecutiveReports() {
           <div className="flex flex-col items-center gap-1.5">
             {FUNNEL.map((f) => (
               <div key={f.label} className="w-full flex flex-col items-center gap-0.5">
-                <div className={`${f.color} rounded h-7 flex items-center justify-center text-xs font-medium text-white`} style={{ width: `${f.pct}%` }}>
+                <div className={`${f.color} rounded h-7 flex items-center justify-center text-sm font-medium text-white`} style={{ width: `${f.pct}%` }}>
                   {f.count}
                 </div>
                 <span className="text-[10px] text-muted-foreground">{f.label}</span>
@@ -122,7 +122,7 @@ export default function ExecutiveReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

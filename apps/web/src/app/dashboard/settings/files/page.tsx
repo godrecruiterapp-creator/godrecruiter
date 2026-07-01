@@ -24,7 +24,7 @@ export default function FilesPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold">Storage Usage</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">{totalUsed} GB of {totalLimit} GB used</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{totalUsed} GB of {totalLimit} GB used</p>
             </div>
             <span className={cn('text-sm font-bold tabular-nums', pct >= 90 ? 'text-red-600' : pct >= 75 ? 'text-amber-600' : 'text-foreground')}>
               {pct}%
@@ -36,7 +36,7 @@ export default function FilesPage() {
           </div>
           <div className="grid grid-cols-3 gap-4 mt-5">
             {STORAGE.map(s => (
-              <div key={s.label} className="flex items-center gap-2 text-xs">
+              <div key={s.label} className="flex items-center gap-2 text-sm">
                 <span className={`size-2.5 rounded-full shrink-0 ${s.color}`} />
                 <span className="text-muted-foreground">{s.label}</span>
                 <span className="font-medium ml-auto">{s.used} GB</span>
@@ -59,7 +59,7 @@ export default function FilesPage() {
         >
           <div className="space-y-3">
             <CardRow label="Maximum file size">
-              <select defaultValue="10" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="10" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="5">5 MB</option>
                 <option value="10">10 MB</option>
                 <option value="20">20 MB</option>
@@ -67,7 +67,7 @@ export default function FilesPage() {
               </select>
             </CardRow>
             <CardRow label="Maximum batch upload">
-              <select defaultValue="50" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="50" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="10">10 files</option>
                 <option value="50">50 files</option>
                 <option value="100">100 files</option>
@@ -89,7 +89,7 @@ export default function FilesPage() {
           }
         >
           <CardRow label="Primary storage provider">
-            <select defaultValue="internal" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+            <select defaultValue="internal" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
               <option value="internal">God Recruiter Cloud (default)</option>
               <option value="gdrive">Google Drive</option>
               <option value="onedrive">OneDrive</option>
@@ -103,7 +103,7 @@ export default function FilesPage() {
           title="Document Processing"
           description="Automated processing applied to uploaded files"
           summary={
-            <p className="text-xs text-muted-foreground">OCR, virus scan, auto-parse, and expiry alerts all active.</p>
+            <p className="text-sm text-muted-foreground">OCR, virus scan, auto-parse, and expiry alerts all active.</p>
           }
         >
           <div className="space-y-3">

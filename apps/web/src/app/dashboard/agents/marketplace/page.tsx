@@ -20,7 +20,7 @@ export default function MarketplacePage() {
         <Sparkles className="size-5 text-brand shrink-0" />
         <div>
           <p className="text-sm font-semibold text-brand">Marketplace Coming Soon</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Browse and install community-built agents. We are onboarding our first batch of agent creators — check back soon.</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Browse and install community-built agents. We are onboarding our first batch of agent creators — check back soon.</p>
         </div>
       </div>
 
@@ -36,14 +36,14 @@ export default function MarketplacePage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t.desc}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{t.desc}</p>
                 </div>
                 <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-muted/60 text-muted-foreground border-border w-fit">{t.category}</span>
               </Card>
               {/* Blur overlay */}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 backdrop-blur-[2px] bg-background/60 rounded-xl">
                 <Lock className="size-5 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">Coming Soon</span>
+                <span className="text-sm font-medium text-muted-foreground">Coming Soon</span>
               </div>
             </div>
           ))}

@@ -30,7 +30,7 @@ export default function CustomReports() {
       {notice && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 text-blue-800 text-sm px-4 py-3 flex items-center justify-between">
           Use the Report Builder tab to create custom reports.
-          <button onClick={() => setNotice(false)} className="text-blue-600 hover:text-blue-800 text-xs underline ml-4">Dismiss</button>
+          <button onClick={() => setNotice(false)} className="text-blue-600 hover:text-blue-800 text-sm underline ml-4">Dismiss</button>
         </div>
       )}
 
@@ -43,7 +43,7 @@ export default function CustomReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
                 <span className="inline-block mt-2 px-1.5 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">{r.category}</span>
                 <p className="text-[10px] text-muted-foreground mt-1">Last run: {r.lastRun}</p>
               </div>

@@ -27,14 +27,14 @@ export default function CareerPortalPage() {
               <div className={`size-2.5 rounded-full ${enabled ? 'bg-emerald-500' : 'bg-muted-foreground/40'}`} />
               <div>
                 <p className="text-sm font-semibold">{enabled ? 'Portal is live' : 'Portal is offline'}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {subdomain}.godrecruiter.com/careers
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {enabled && (
-                <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+                <button className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
                   <ExternalLink className="size-3.5" />Preview
                 </button>
               )}
@@ -56,7 +56,7 @@ export default function CareerPortalPage() {
         >
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Subdomain</label>
+              <label className="text-sm font-medium text-muted-foreground">Subdomain</label>
               <div className="flex items-center gap-0">
                 <input value={subdomain} onChange={e => setSubdomain(e.target.value)}
                   className="flex-1 h-9 px-3 text-sm rounded-l-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -66,12 +66,12 @@ export default function CareerPortalPage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Page title</label>
+              <label className="text-sm font-medium text-muted-foreground">Page title</label>
               <input value={title} onChange={e => setTitle(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Description</label>
+              <label className="text-sm font-medium text-muted-foreground">Description</label>
               <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2}
                 className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
             </div>
@@ -120,7 +120,7 @@ export default function CareerPortalPage() {
         >
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Meta title</label>
+              <label className="text-sm font-medium text-muted-foreground">Meta title</label>
               <input value={seoTitle} onChange={e => setSeoTitle(e.target.value)}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>

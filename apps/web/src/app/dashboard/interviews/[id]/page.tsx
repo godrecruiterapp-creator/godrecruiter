@@ -122,7 +122,7 @@ export default function InterviewDetailPage() {
                 { label: 'Created At', value: INTERVIEW.createdAt },
               ].map(f => (
                 <div key={f.label}>
-                  <p className="text-xs text-muted-foreground">{f.label}</p>
+                  <p className="text-sm text-muted-foreground">{f.label}</p>
                   {f.label === 'Date & Time' || f.label === 'Mode' || f.label === 'Meeting Link' ? (
                     <p className="text-sm font-medium mt-0.5">{f.value}</p>
                   ) : (
@@ -131,7 +131,7 @@ export default function InterviewDetailPage() {
                 </div>
               ))}
               <div>
-                <p className="text-xs text-muted-foreground">Meeting Link</p>
+                <p className="text-sm text-muted-foreground">Meeting Link</p>
                 <a href={INTERVIEW.meetingLink} target="_blank" rel="noopener noreferrer"
                   className="text-sm text-brand hover:underline flex items-center gap-1 mt-0.5">
                   Join Meeting <ExternalLink className="size-3" />
@@ -151,7 +151,7 @@ export default function InterviewDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium">{p.name}</p>
-                    <span className="text-xs text-muted-foreground">{p.role}</span>
+                    <span className="text-sm text-muted-foreground">{p.role}</span>
                   </div>
                 </div>
               ))}
@@ -165,7 +165,7 @@ export default function InterviewDetailPage() {
               {NOTES.map((n, i) => (
                 <div key={i} className="bg-muted/40 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium">{n.author}</span>
+                    <span className="text-sm font-medium">{n.author}</span>
                     <span className="text-[10px] text-muted-foreground">{n.time}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{n.text}</p>
@@ -183,7 +183,7 @@ export default function InterviewDetailPage() {
             <div className="flex items-center gap-3 py-2 text-sm text-muted-foreground">
               <AlertTriangle className="size-4 text-amber-500 shrink-0" />
               Feedback pending — send a reminder to the interviewer
-              <Button variant="outline" size="sm" className="h-7 text-xs ml-auto">
+              <Button variant="outline" size="sm" className="h-7 text-sm ml-auto">
                 <Bell className="size-3 mr-1" />Send Reminder
               </Button>
             </div>
@@ -235,29 +235,29 @@ export default function InterviewDetailPage() {
               <div className="size-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-semibold shrink-0">SJ</div>
               <div>
                 <p className="text-sm font-semibold">{INTERVIEW.candidate}</p>
-                <p className="text-xs text-muted-foreground">Senior Java Developer</p>
+                <p className="text-sm text-muted-foreground">Senior Java Developer</p>
               </div>
             </div>
-            <div className="space-y-1 text-xs text-muted-foreground mb-3">
+            <div className="space-y-1 text-sm text-muted-foreground mb-3">
               <p>{INTERVIEW.email}</p>
               <p>{INTERVIEW.phone}</p>
             </div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">{INTERVIEW.stage}</span>
             </div>
-            <Button variant="outline" size="sm" className="w-full h-8 text-xs">View Profile</Button>
+            <Button variant="outline" size="sm" className="w-full h-8 text-sm">View Profile</Button>
           </div>
 
           {/* Job Card */}
           <div className="rounded-lg border bg-card p-4">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Job</p>
             <p className="text-sm font-semibold">{INTERVIEW.job}</p>
-            <p className="text-xs text-muted-foreground mb-2">{INTERVIEW.client}</p>
+            <p className="text-sm text-muted-foreground mb-2">{INTERVIEW.client}</p>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Open</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">High Priority</span>
             </div>
-            <Button variant="outline" size="sm" className="w-full h-8 text-xs">View Job</Button>
+            <Button variant="outline" size="sm" className="w-full h-8 text-sm">View Job</Button>
           </div>
 
           {/* AI Insights */}
@@ -270,7 +270,7 @@ export default function InterviewDetailPage() {
               {AI_INSIGHTS.map((insight, i) => {
                 const Icon = insight.icon
                 return (
-                  <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <Icon className={`size-3.5 mt-0.5 shrink-0 ${insight.color}`} />
                     {insight.text}
                   </li>
@@ -290,7 +290,7 @@ export default function InterviewDetailPage() {
                 { icon: Bell,          label: 'Send Reminder' },
                 { icon: ClipboardList, label: 'View Resume' },
               ].map(({ icon: Icon, label }) => (
-                <Button key={label} variant="outline" size="sm" className="h-8 text-xs justify-start gap-2">
+                <Button key={label} variant="outline" size="sm" className="h-8 text-sm justify-start gap-2">
                   <Icon className="size-3.5" />{label}
                 </Button>
               ))}

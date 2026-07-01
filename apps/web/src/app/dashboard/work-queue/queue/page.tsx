@@ -113,7 +113,7 @@ function JobRow({
       {/* title + client */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-medium truncate">{job.title}</span>
+          <span className="text-sm font-medium truncate">{job.title}</span>
           <span className="text-[10px] text-muted-foreground">@</span>
           <span className="text-[10px] text-muted-foreground truncate">{job.client}</span>
           {job.tags.map(t => (
@@ -158,7 +158,7 @@ function JobRow({
       </div>
 
       {/* ai score */}
-      <div className={cn('hidden sm:block text-xs font-bold tabular-nums shrink-0 w-8 text-right', scoreColor(job.aiScore))}>
+      <div className={cn('hidden sm:block text-sm font-bold tabular-nums shrink-0 w-8 text-right', scoreColor(job.aiScore))}>
         {job.aiScore}
       </div>
 
@@ -196,7 +196,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
     <div className="w-80 shrink-0 border-l bg-background flex flex-col overflow-hidden">
       {/* header */}
       <div className="flex items-center justify-between px-4 py-3 border-b">
-        <span className="text-xs font-semibold">Job Details</span>
+        <span className="text-sm font-semibold">Job Details</span>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="size-3.5" />
         </button>
@@ -209,7 +209,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
             <div className={cn('size-2 rounded-full shrink-0 mt-1.5', PRIORITY_DOT[job.priority] ?? 'bg-slate-400')} />
             <div>
               <h3 className="text-sm font-semibold leading-tight">{job.title}</h3>
-              <p className="text-xs text-muted-foreground">{job.client}</p>
+              <p className="text-sm text-muted-foreground">{job.client}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-y-1.5 mt-3 text-[11px]">
@@ -277,7 +277,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
               <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center text-[10px] font-bold text-violet-700 dark:text-violet-400">
                 {assignedLocal.split(' ').map(n => n[0]).join('').slice(0, 2)}
               </div>
-              <span className="text-xs font-medium">{assignedLocal}</span>
+              <span className="text-sm font-medium">{assignedLocal}</span>
               <button className="ml-auto text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
                 <RefreshCw className="size-2.5" />Reassign
               </button>
@@ -302,7 +302,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold">{r.name}</span>
+                      <span className="text-sm font-semibold">{r.name}</span>
                       <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{r.match}%</span>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -320,7 +320,7 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
                 <button
                   onClick={() => handleAssign(r.name)}
                   className={cn(
-                    'mt-2.5 w-full h-7 rounded-md text-xs font-medium transition-colors',
+                    'mt-2.5 w-full h-7 rounded-md text-sm font-medium transition-colors',
                     assignedLocal === r.name
                       ? 'bg-emerald-600 text-white'
                       : i === 0
@@ -336,10 +336,10 @@ function RightPanel({ job, onClose, onAssign }: { job: WQJob; onClose: () => voi
 
           {/* Other actions */}
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <button className="h-7 rounded-md border border-border text-xs hover:bg-muted/60 transition-colors flex items-center justify-center gap-1">
+            <button className="h-7 rounded-md border border-border text-sm hover:bg-muted/60 transition-colors flex items-center justify-center gap-1">
               <Eye className="size-3" />Open Job
             </button>
-            <button className="h-7 rounded-md border border-border text-xs hover:bg-muted/60 transition-colors flex items-center justify-center gap-1">
+            <button className="h-7 rounded-md border border-border text-sm hover:bg-muted/60 transition-colors flex items-center justify-center gap-1">
               <Send className="size-3" />View Candidates
             </button>
           </div>
@@ -412,7 +412,7 @@ export default function QueuePage() {
           return (
             <button key={q.id} onClick={() => setActiveQueue(q.id)}
               className={cn(
-                'w-full flex items-center justify-between px-3 py-2 text-xs transition-colors',
+                'w-full flex items-center justify-between px-3 py-2 text-sm transition-colors',
                 active ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
               )}>
               <span>{q.label}</span>
@@ -443,22 +443,22 @@ export default function QueuePage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search jobs, clients, recruiters…"
-              className="w-full h-8 pl-8 pr-3 text-xs rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-full h-8 pl-8 pr-3 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
-          <button className="h-8 px-2.5 flex items-center gap-1.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors">
+          <button className="h-8 px-2.5 flex items-center gap-1.5 text-sm rounded-md border border-border hover:bg-muted/60 transition-colors">
             <Filter className="size-3.5" />Filters
           </button>
-          <button className="h-8 px-2.5 flex items-center gap-1.5 text-xs rounded-md border border-border hover:bg-muted/60 transition-colors">
+          <button className="h-8 px-2.5 flex items-center gap-1.5 text-sm rounded-md border border-border hover:bg-muted/60 transition-colors">
             <ArrowUpDown className="size-3.5" />Sort
           </button>
-          <span className="text-xs text-muted-foreground ml-auto tabular-nums">{jobs.length} jobs</span>
+          <span className="text-sm text-muted-foreground ml-auto tabular-nums">{jobs.length} jobs</span>
         </div>
 
         {/* bulk action bar */}
         {checkedIds.size > 0 && (
           <div className="flex items-center gap-2 px-4 py-2 bg-foreground text-background shrink-0">
-            <span className="text-xs font-medium">{checkedIds.size} selected</span>
+            <span className="text-sm font-medium">{checkedIds.size} selected</span>
             <div className="flex items-center gap-1.5 ml-auto">
               {[
                 { label: 'Assign by AI', icon: Sparkles },
@@ -466,7 +466,7 @@ export default function QueuePage() {
                 { label: 'Mark Urgent', icon: Zap },
                 { label: 'Archive', icon: Archive },
               ].map(a => (
-                <button key={a.label} className="h-7 px-2.5 flex items-center gap-1 text-xs rounded-md bg-background/10 hover:bg-background/20 transition-colors">
+                <button key={a.label} className="h-7 px-2.5 flex items-center gap-1 text-sm rounded-md bg-background/10 hover:bg-background/20 transition-colors">
                   <a.icon className="size-3" />{a.label}
                 </button>
               ))}

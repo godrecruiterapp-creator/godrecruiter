@@ -30,7 +30,7 @@ export default function ExportHistory() {
       </div>
 
       <div className="rounded-lg border bg-card">
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="py-3 px-4 text-left font-medium">Date</th>

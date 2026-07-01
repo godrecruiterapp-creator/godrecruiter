@@ -89,7 +89,7 @@ interface ExtractedData {
 
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="block text-xs font-semibold text-foreground mb-1.5">
+    <label className="block text-sm font-semibold text-foreground mb-1.5">
       {children}{required && <span className="text-[#dd7456] ml-0.5">*</span>}
     </label>
   )
@@ -125,7 +125,7 @@ function SectionCard({ n, icon: Icon, title, badge, children }: {
     <div className="rounded-2xl border border-border/60 bg-background shadow-sm overflow-hidden">
       <div className="flex items-center gap-3 px-6 py-4 border-b border-border/40 bg-muted/10">
         <div className="size-6 rounded-full bg-[#dd7456]/10 flex items-center justify-center shrink-0">
-          <span className="text-xs font-bold text-[#dd7456]">{n}</span>
+          <span className="text-sm font-bold text-[#dd7456]">{n}</span>
         </div>
         <Icon className="size-4 text-muted-foreground" />
         <h2 className="text-sm font-semibold">{title}</h2>
@@ -140,7 +140,7 @@ function PillToggle({ label, active, onClick }: { label: string; active: boolean
   return (
     <button type="button" onClick={onClick}
       className={cn(
-        'h-8 px-3 text-xs font-medium rounded-lg border transition-all',
+        'h-8 px-3 text-sm font-medium rounded-lg border transition-all',
         active
           ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
@@ -306,7 +306,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
       {/* Quick input panel */}
       {quickMode === 'email' && (
         <div className="rounded-xl border border-border bg-background p-4 space-y-3">
-          <p className="text-xs font-semibold">Search existing candidates</p>
+          <p className="text-sm font-semibold">Search existing candidates</p>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
@@ -321,13 +321,13 @@ function IntakeScreen({ onExtracted, onSkip }: {
             <div className="rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 p-3">
               <div className="flex items-center gap-2 mb-2">
                 <AlertCircle className="size-4 text-amber-600 dark:text-amber-400" />
-                <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">Candidate may already exist</p>
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">Candidate may already exist</p>
               </div>
-              <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">Michael Chen · michael.chen@email.com · Added 14 days ago by Arun Kumar</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">Michael Chen · michael.chen@email.com · Added 14 days ago by Arun Kumar</p>
               <div className="flex gap-2">
-                <button type="button" className="h-7 px-3 text-xs font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors">View Profile</button>
-                <button type="button" className="h-7 px-3 text-xs font-medium rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors">Merge</button>
-                <button type="button" onClick={onSkip} className="h-7 px-3 text-xs font-medium rounded-lg border border-border text-muted-foreground hover:bg-muted/60 transition-colors">Continue Anyway</button>
+                <button type="button" className="h-7 px-3 text-sm font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors">View Profile</button>
+                <button type="button" className="h-7 px-3 text-sm font-medium rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors">Merge</button>
+                <button type="button" onClick={onSkip} className="h-7 px-3 text-sm font-medium rounded-lg border border-border text-muted-foreground hover:bg-muted/60 transition-colors">Continue Anyway</button>
               </div>
             </div>
           )}
@@ -336,7 +336,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
 
       {quickMode === 'paste' && (
         <div className="rounded-xl border border-border bg-background p-4 space-y-3">
-          <p className="text-xs font-semibold">Paste resume text</p>
+          <p className="text-sm font-semibold">Paste resume text</p>
           <textarea
             value={quickInput}
             onChange={e => setQuickInput(e.target.value)}
@@ -355,7 +355,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
               onExtracted(mockExtract(quickInput), 'pasted-resume.txt')
               setProcessing(false)
             }}
-            className="h-8 px-4 text-xs font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
+            className="h-8 px-4 text-sm font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
             Extract with AI →
           </button>
         </div>
@@ -386,7 +386,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
         <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
-            <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">Resume parsed successfully</p>
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Resume parsed successfully</p>
           </div>
           <p className="text-[11px] text-emerald-700 dark:text-emerald-300">All fields pre-filled from resume. Review and correct anything highlighted in green.</p>
         </div>
@@ -424,7 +424,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
         <div className="rounded-2xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Briefcase className="size-4 text-violet-500" />
-            <p className="text-xs font-semibold text-violet-800 dark:text-violet-200">3 matching jobs</p>
+            <p className="text-sm font-semibold text-violet-800 dark:text-violet-200">3 matching jobs</p>
           </div>
           {MATCHING_JOBS_MOCK.map(j => (
             <div key={j.id} className="flex items-center justify-between py-2 border-b border-violet-200/60 dark:border-violet-800/40 last:border-0 gap-2">
@@ -444,7 +444,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
       <div className="rounded-2xl border border-border/60 bg-background shadow-sm p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="size-4 text-[#dd7456]" />
-          <p className="text-xs font-semibold">AI Insights</p>
+          <p className="text-sm font-semibold">AI Insights</p>
         </div>
         {extracted ? (
           <div className="space-y-2 text-[11px] text-muted-foreground leading-relaxed">
@@ -454,7 +454,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
             <p>🏆 Top 15% of Java profiles in your database</p>
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">Upload a resume to see AI insights about this candidate.</p>
+          <p className="text-sm text-muted-foreground">Upload a resume to see AI insights about this candidate.</p>
         )}
       </div>
 
@@ -618,7 +618,7 @@ export default function NewCandidatePage() {
             </Link>
             <div>
               <h1 className="text-lg font-bold tracking-tight">Add Candidate</h1>
-              <p className="text-xs text-muted-foreground">Start with a resume — AI fills the form for you</p>
+              <p className="text-sm text-muted-foreground">Start with a resume — AI fills the form for you</p>
             </div>
           </div>
           <IntakeScreen onExtracted={handleExtracted} onSkip={() => setStep('form')} />
@@ -641,13 +641,13 @@ export default function NewCandidatePage() {
             <div>
               <h1 className="text-lg font-bold tracking-tight">Add Candidate</h1>
               {extracted
-                ? <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 flex items-center gap-1"><CheckCircle2 className="size-3" />Resume parsed — {resumeName}</p>
-                : <p className="text-xs text-muted-foreground mt-0.5">Fill in candidate details</p>}
+                ? <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 flex items-center gap-1"><CheckCircle2 className="size-3" />Resume parsed — {resumeName}</p>
+                : <p className="text-sm text-muted-foreground mt-0.5">Fill in candidate details</p>}
             </div>
           </div>
           {!extracted && (
             <button type="button" onClick={() => setStep('intake')}
-              className="h-8 px-4 text-xs font-semibold rounded-lg border border-[#dd7456] text-[#dd7456] hover:bg-[#fdf0ec] dark:hover:bg-[#2a1a15] transition-colors flex items-center gap-1.5">
+              className="h-8 px-4 text-sm font-semibold rounded-lg border border-[#dd7456] text-[#dd7456] hover:bg-[#fdf0ec] dark:hover:bg-[#2a1a15] transition-colors flex items-center gap-1.5">
               <Upload className="size-3.5" />Upload Resume Instead
             </button>
           )}
@@ -701,7 +701,7 @@ export default function NewCandidatePage() {
                   </div>
                   {dupeState === 'found' && (
                     <div className="mt-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-2.5 flex items-center justify-between gap-2">
-                      <p className="text-xs text-amber-700 dark:text-amber-300">This email matches an existing candidate.</p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">This email matches an existing candidate.</p>
                       <div className="flex gap-1.5 shrink-0">
                         <button type="button" className="h-6 px-2 text-[10px] font-semibold rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors">View</button>
                         <button type="button" className="h-6 px-2 text-[10px] font-medium rounded-md border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 transition-colors">Merge</button>
@@ -845,7 +845,7 @@ export default function NewCandidatePage() {
                     {(['hourly', 'salary'] as const).map(t => (
                       <button key={t} type="button" onClick={() => setPayType(t)}
                         className={cn(
-                          'flex-1 h-9 text-xs font-semibold rounded-xl border-2 capitalize transition-all',
+                          'flex-1 h-9 text-sm font-semibold rounded-xl border-2 capitalize transition-all',
                           payType === t ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
                                         : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
                         )}>
@@ -885,7 +885,7 @@ export default function NewCandidatePage() {
                     {WORK_AUTH_OPTIONS.map(a => (
                       <button key={a} type="button" onClick={() => setWorkAuth(a === workAuth ? '' : a)}
                         className={cn(
-                          'h-8 px-3 text-xs font-medium rounded-lg border-2 transition-all',
+                          'h-8 px-3 text-sm font-medium rounded-lg border-2 transition-all',
                           workAuth === a
                             ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
                             : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
@@ -898,7 +898,7 @@ export default function NewCandidatePage() {
                     <div className="flex items-center gap-2 mt-3">
                       <input type="checkbox" id="sponsorship" checked={sponsorship} onChange={e => setSponsorship(e.target.checked)}
                         className="size-4 rounded accent-[#dd7456]" />
-                      <label htmlFor="sponsorship" className="text-xs text-muted-foreground cursor-pointer">
+                      <label htmlFor="sponsorship" className="text-sm text-muted-foreground cursor-pointer">
                         Requires H1B sponsorship or visa transfer
                       </label>
                     </div>
@@ -960,7 +960,7 @@ export default function NewCandidatePage() {
                         )}>
                         <div className={cn('mt-0.5 size-3.5 rounded-full shrink-0 border-2', status === s.value ? 'bg-[#dd7456] border-[#dd7456]' : 'border-muted-foreground/40')} />
                         <div>
-                          <p className={cn('text-xs font-semibold', status === s.value ? 'text-[#dd7456]' : 'text-foreground')}>{s.label}</p>
+                          <p className={cn('text-sm font-semibold', status === s.value ? 'text-[#dd7456]' : 'text-foreground')}>{s.label}</p>
                           <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
                         </div>
                       </button>
@@ -1013,7 +1013,7 @@ export default function NewCandidatePage() {
           {/* ── Sticky footer ──────────────────────────────── */}
           <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-sm px-6 py-3">
             <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
-              <div className="text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {firstName || lastName ? (
                   <span>
                     <span className="font-medium text-foreground">{`${firstName} ${lastName}`.trim()}</span>

@@ -197,7 +197,7 @@ function Widget({ title, icon: Icon, action, children, className, id }: {
           {Icon && <Icon className="size-3.5 text-muted-foreground" />}
           <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
         </div>
-        {action && <div className="text-xs text-muted-foreground">{action}</div>}
+        {action && <div className="text-sm text-muted-foreground">{action}</div>}
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto">{children}</div>
     </section>
@@ -227,7 +227,7 @@ function Btn({ label, variant = 'ghost', onClick, className }: {
     green:  'border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900',
   }[variant]
   return (
-    <button onClick={onClick} className={cn('h-7 px-3 text-xs rounded-lg font-medium transition-colors whitespace-nowrap', s, className)}>
+    <button onClick={onClick} className={cn('h-7 px-3 text-sm rounded-lg font-medium transition-colors whitespace-nowrap', s, className)}>
       {label}
     </button>
   )
@@ -275,7 +275,7 @@ function TodayFocus({ greetStr, firstName, date, onStart }: { greetStr:string; f
           <div className="flex items-baseline gap-2 mb-1">
             <h1 className="text-2xl font-bold tracking-tight">{greetStr}, {firstName} 👋</h1>
           </div>
-          <p className="text-xs text-muted-foreground mb-5">{date}</p>
+          <p className="text-sm text-muted-foreground mb-5">{date}</p>
 
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Today you have</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-8">
@@ -327,7 +327,7 @@ function PipelineFunnel() {
           <Activity className="size-3.5 text-muted-foreground" />
           <h3 className="text-sm font-semibold tracking-tight">Hiring Pipeline</h3>
         </div>
-        <Link href="/dashboard/candidates" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+        <Link href="/dashboard/candidates" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
           View all →
         </Link>
       </div>
@@ -452,7 +452,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
           )}
         </div>
         {counts.all === 0 && (
-          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">All done ✓</span>
+          <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">All done ✓</span>
         )}
       </div>
 
@@ -461,7 +461,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
         {(Object.keys(TASK_TAB_LABELS) as TaskTab[]).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={cn(
-              'px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors flex items-center gap-1.5',
+              'px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5',
               tab === t
                 ? 'border-b-2 border-[#dd7456] text-[#dd7456] bg-background'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
@@ -485,7 +485,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <CheckCircle2 className="size-9 text-emerald-500 mb-3" />
             <p className="text-sm font-semibold">All clear here!</p>
-            <p className="text-xs text-muted-foreground mt-1">Switch to another tab or take a break.</p>
+            <p className="text-sm text-muted-foreground mt-1">Switch to another tab or take a break.</p>
           </div>
         ) : visible.map(task => {
           const meta   = TASK_META[task.type]
@@ -575,7 +575,7 @@ function TodaySchedule() {
               )}>
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold truncate">{ev.candidate}</p>
+                  <p className="text-sm font-semibold truncate">{ev.candidate}</p>
                   <p className="text-[11px] text-muted-foreground truncate">{ev.role}</p>
                 </div>
                 <div className="text-right shrink-0">
@@ -620,7 +620,7 @@ function AIAssistant() {
       {visible.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center px-4">
           <Sparkles className="size-7 text-muted-foreground mb-2" />
-          <p className="text-xs text-muted-foreground">No suggestions right now. Check back soon.</p>
+          <p className="text-sm text-muted-foreground">No suggestions right now. Check back soon.</p>
         </div>
       ) : (
         <div className="p-3 space-y-2">
@@ -631,7 +631,7 @@ function AIAssistant() {
                 className={cn('rounded-xl border p-3 transition-all group', AI_COLOR[hint.color]!)}>
                 <div className="flex items-start gap-2 mb-2.5">
                   <Icon className={cn('size-3.5 shrink-0 mt-0.5', AI_ICON_COLOR[hint.color])} />
-                  <p className="text-xs text-foreground leading-relaxed flex-1">{hint.text}</p>
+                  <p className="text-sm text-foreground leading-relaxed flex-1">{hint.text}</p>
                   <button
                     onClick={() => setDismissed(s => { const n = new Set(s); n.add(hint.id); return n })}
                     className="size-4 rounded flex items-center justify-center text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-all shrink-0"
@@ -677,7 +677,7 @@ function MyJobs() {
                   <p className="text-sm font-semibold truncate">{job.title}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <Building2 className="size-3 text-muted-foreground shrink-0" />
-                    <p className="text-xs text-muted-foreground truncate">{job.client}</p>
+                    <p className="text-sm text-muted-foreground truncate">{job.client}</p>
                     <span className="text-muted-foreground/40">·</span>
                     <span className={cn('text-[11px] font-medium', aging)}>{job.daysOpen}d open</span>
                   </div>
@@ -711,7 +711,7 @@ function MyJobs() {
                 <p className="text-[11px] text-muted-foreground truncate">
                   <span className="font-medium">Next:</span> {job.nextStep}
                 </p>
-                <button className="h-7 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors font-medium shrink-0 opacity-0 group-hover:opacity-100">
+                <button className="h-7 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors font-medium shrink-0 opacity-0 group-hover:opacity-100">
                   Continue →
                 </button>
               </div>
@@ -749,7 +749,7 @@ function NeedsAttention() {
         <div className="flex flex-col items-center justify-center py-14 text-center">
           <CheckCircle2 className="size-9 text-emerald-500 mb-3" />
           <p className="text-sm font-semibold">All clear!</p>
-          <p className="text-xs text-muted-foreground mt-1">Nothing needs attention right now.</p>
+          <p className="text-sm text-muted-foreground mt-1">Nothing needs attention right now.</p>
         </div>
       ) : (
         <div className="divide-y divide-border/30">
@@ -766,7 +766,7 @@ function NeedsAttention() {
                     item.severity === 'high' ? 'bg-red-500' : 'bg-amber-400'
                   )} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold">{item.name}</p>
+                    <p className="text-sm font-medium">{item.name}</p>
                     <p className="text-[11px] text-muted-foreground truncate mt-0.5">{item.issue}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -814,7 +814,7 @@ function TodayProgress() {
                   'text-xl font-bold tabular-nums leading-none',
                   done ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
                 )}>{m.done}</span>
-                <span className="text-xs text-muted-foreground">/{m.goal}</span>
+                <span className="text-sm text-muted-foreground">/{m.goal}</span>
               </div>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">{m.label}</p>
               <div className="w-full h-1 rounded-full bg-muted overflow-hidden">
@@ -845,14 +845,14 @@ function PlacementWatch() {
             <div key={p.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/20 transition-colors group">
               <span className={cn('size-2 rounded-full shrink-0', s.dot)} />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold">{p.name}</p>
+                <p className="text-sm font-medium">{p.name}</p>
                 <p className="text-[11px] text-muted-foreground truncate mt-0.5">{p.company} · {p.detail}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap hidden sm:inline', s.badge)}>
                   {s.label}
                 </span>
-                <button className="h-7 px-2.5 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors font-medium opacity-0 group-hover:opacity-100">
+                <button className="h-7 px-2.5 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors font-medium opacity-0 group-hover:opacity-100">
                   {p.action}
                 </button>
               </div>
@@ -884,7 +884,7 @@ function RecentUpdates() {
         {FEED_TABS.map(t => (
           <button key={t.key} onClick={() => setFeed(t.key)}
             className={cn(
-              'flex-1 py-2.5 text-xs font-medium transition-colors whitespace-nowrap',
+              'flex-1 py-2.5 text-sm font-medium transition-colors whitespace-nowrap',
               feed === t.key
                 ? 'border-b-2 border-[#dd7456] text-[#dd7456] bg-background'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
@@ -896,7 +896,7 @@ function RecentUpdates() {
 
       <div className="px-5 py-2 divide-y divide-border/20">
         {visible.length === 0 ? (
-          <p className="py-8 text-center text-xs text-muted-foreground">Nothing here yet.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">Nothing here yet.</p>
         ) : visible.map(item => {
           const Icon = item.icon
           return (
@@ -904,7 +904,7 @@ function RecentUpdates() {
               <div className={cn('size-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5', item.color)}>
                 <Icon className="size-3.5" />
               </div>
-              <p className="flex-1 text-xs leading-relaxed">{item.text}</p>
+              <p className="flex-1 text-sm leading-relaxed">{item.text}</p>
               <span className="text-[10px] text-muted-foreground shrink-0 whitespace-nowrap mt-0.5">{item.time}</span>
             </div>
           )
@@ -974,14 +974,14 @@ export default function DashboardPage() {
               { label:'Automations',    icon:Zap,          href:'/dashboard/automation'     },
             ] as const).map(({ label, icon: Icon, href }) => (
               <Link key={label} href={href}
-                className="h-8 px-3 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors flex items-center gap-1.5 font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                className="h-8 px-3 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors flex items-center gap-1.5 font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                 <Icon className="size-3.5 shrink-0" />{label}
               </Link>
             ))}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => setShowModal(true)}
-              className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors flex items-center gap-1.5 font-medium">
+              className="h-8 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/85 transition-colors flex items-center gap-1.5 font-medium">
               <Plus className="size-3.5" />New
             </button>
           </div>

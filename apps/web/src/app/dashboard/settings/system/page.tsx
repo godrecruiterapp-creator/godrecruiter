@@ -46,7 +46,7 @@ export default function SystemPage() {
             <p className={cn('text-sm font-semibold', operational === total ? 'text-emerald-700' : 'text-amber-700')}>
               {operational === total ? 'All Systems Operational' : `${total - operational} Service${total - operational > 1 ? 's' : ''} Degraded`}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5">{operational}/{total} healthy · Last checked 2 min ago</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{operational}/{total} healthy · Last checked 2 min ago</p>
           </div>
           <button className="ml-auto p-1.5 rounded-lg hover:bg-black/5 transition-colors text-muted-foreground">
             <RefreshCw className="size-4" />
@@ -60,14 +60,14 @@ export default function SystemPage() {
           summary={
             <div className="space-y-1.5">
               {SERVICES.filter(s => s.status !== 'operational').map(s => (
-                <div key={s.name} className="flex items-center gap-2 text-xs">
+                <div key={s.name} className="flex items-center gap-2 text-sm">
                   <AlertTriangle className="size-3.5 text-amber-500 shrink-0" />
                   <span className="font-medium">{s.name}</span>
                   <span className="text-muted-foreground">— {s.latency} latency</span>
                 </div>
               ))}
               {SERVICES.filter(s => s.status !== 'operational').length === 0 && (
-                <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="size-3.5 text-emerald-500" />
                   <span className="text-muted-foreground">All services operating normally</span>
                 </div>
@@ -85,7 +85,7 @@ export default function SystemPage() {
                   }
                   <span className="text-sm">{s.name}</span>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{s.latency}</span>
                   <span>{s.uptime}</span>
                   <Badge variant={s.status === 'operational' ? 'success' : 'warning'}>{s.status}</Badge>
@@ -100,7 +100,7 @@ export default function SystemPage() {
           title="Version Information"
           description="Current build and environment details"
           summary={
-            <div className="flex items-center gap-6 text-xs">
+            <div className="flex items-center gap-6 text-sm">
               <div><span className="text-muted-foreground">Version </span><span className="font-mono font-semibold">v2.4.1</span></div>
               <div><span className="text-muted-foreground">Env </span><span className="font-medium">Production</span></div>
               <div><span className="text-muted-foreground">Region </span><span className="font-medium">us-east-1</span></div>
@@ -136,7 +136,7 @@ export default function SystemPage() {
                 <Badge key={f.id} variant="info">{f.name}</Badge>
               ))}
               {flags.filter(f => f.enabled).length === 0 && (
-                <span className="text-xs text-muted-foreground">No experimental features enabled.</span>
+                <span className="text-sm text-muted-foreground">No experimental features enabled.</span>
               )}
             </div>
           }
@@ -146,7 +146,7 @@ export default function SystemPage() {
               <div key={f.id} className="flex items-center justify-between py-3.5 border-b border-border/40 last:border-0">
                 <div>
                   <p className="text-sm font-medium">{f.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{f.desc}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{f.desc}</p>
                 </div>
                 <Toggle checked={f.enabled}
                   onChange={v => setFlags(p => p.map((x, j) => j === i ? { ...x, enabled: v } : x))} />
@@ -160,7 +160,7 @@ export default function SystemPage() {
           title="Recent System Events"
           description="Last 48 hours of system activity"
           summary={
-            <p className="text-xs text-muted-foreground">6 recent events · 1 warning · 0 errors</p>
+            <p className="text-sm text-muted-foreground">6 recent events · 1 warning · 0 errors</p>
           }
         >
           <div className="space-y-0">
@@ -177,7 +177,7 @@ export default function SystemPage() {
                   {log.level}
                 </Badge>
                 <div>
-                  <p className="text-xs">{log.msg}</p>
+                  <p className="text-sm">{log.msg}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">{log.time}</p>
                 </div>
               </div>

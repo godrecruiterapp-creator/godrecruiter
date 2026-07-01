@@ -27,7 +27,7 @@ export default function ProjectNotesPage() {
     <div className="flex flex-col h-full overflow-hidden p-5">
       <div className="flex items-center justify-between mb-4 shrink-0">
         <h2 className="text-sm font-semibold">Notes</h2>
-        <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5">
+        <Button size="sm" variant="outline" className="h-8 text-sm gap-1.5">
           <Sparkles className="size-3.5" />AI Summarize Notes
         </Button>
       </div>
@@ -38,10 +38,10 @@ export default function ProjectNotesPage() {
           placeholder="Write a note… Use @name to mention teammates"
           className="min-h-20 border-0 bg-transparent resize-none text-sm p-0 focus-visible:ring-0" />
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
-          <Button size="sm" variant="ghost" className="h-7 text-xs gap-1.5 text-muted-foreground">
+          <Button size="sm" variant="ghost" className="h-7 text-sm gap-1.5 text-muted-foreground">
             <Bot className="size-3.5" />Ask AI
           </Button>
-          <Button size="sm" className="h-7 text-xs" disabled={!draft.trim()} onClick={addNote}>
+          <Button size="sm" className="h-7 text-sm" disabled={!draft.trim()} onClick={addNote}>
             <Plus className="size-3 mr-1" />Add Note
           </Button>
         </div>
@@ -54,7 +54,7 @@ export default function ProjectNotesPage() {
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
                 <div className="size-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">{n.author.split(' ').map(x => x[0]).join('')}</div>
-                <span className="text-xs font-semibold">{n.author}</span>
+                <span className="text-sm font-semibold">{n.author}</span>
                 <span className="text-[10px] text-muted-foreground">{n.time}</span>
                 {n.pinned && <span className="inline-flex items-center gap-1 text-[10px] text-amber-600"><Pin className="size-2.5" />Pinned</span>}
               </div>

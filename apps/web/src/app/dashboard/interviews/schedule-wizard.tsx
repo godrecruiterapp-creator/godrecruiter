@@ -61,7 +61,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
         <SheetHeader className="px-6 py-4 border-b shrink-0">
           <div className="flex items-center justify-between">
             <SheetTitle>Schedule Interview</SheetTitle>
-            <span className="text-xs text-muted-foreground">Step {step + 1} of 7</span>
+            <span className="text-sm text-muted-foreground">Step {step + 1} of 7</span>
           </div>
           {/* Progress bar */}
           <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-2">
@@ -98,7 +98,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.role} · {c.email}</p>
+                      <p className="text-sm text-muted-foreground">{c.role} · {c.email}</p>
                     </div>
                     <span className={cn('text-xs px-2 py-0.5 rounded-full border',
                       c.availability === 'Available' || c.availability === 'Immediate'
@@ -125,7 +125,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                     )}>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{j.title}</p>
-                      <p className="text-xs text-muted-foreground">{j.client}</p>
+                      <p className="text-sm text-muted-foreground">{j.client}</p>
                     </div>
                     <span className="text-xs px-2 py-0.5 rounded-full border bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">{j.status}</span>
                     <span className={cn('text-xs px-2 py-0.5 rounded-full border',
@@ -146,7 +146,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
               <h2 className="text-sm font-semibold">Interview Details</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Interview Type</Label>
+                  <Label className="text-sm font-medium">Interview Type</Label>
                   <Select>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select type" /></SelectTrigger>
                     <SelectContent>
@@ -157,7 +157,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Interview Round</Label>
+                  <Label className="text-sm font-medium">Interview Round</Label>
                   <Select>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select round" /></SelectTrigger>
                     <SelectContent>
@@ -168,19 +168,19 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Date</Label>
+                  <Label className="text-sm font-medium">Date</Label>
                   <input type="date" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Start Time</Label>
+                  <Label className="text-sm font-medium">Start Time</Label>
                   <input type="time" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">End Time</Label>
+                  <Label className="text-sm font-medium">End Time</Label>
                   <input type="time" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Duration</Label>
+                  <Label className="text-sm font-medium">Duration</Label>
                   <Select>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select duration" /></SelectTrigger>
                     <SelectContent>
@@ -191,7 +191,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Time Zone</Label>
+                  <Label className="text-sm font-medium">Time Zone</Label>
                   <Select>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select timezone" /></SelectTrigger>
                     <SelectContent>
@@ -202,7 +202,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Interview Mode</Label>
+                  <Label className="text-sm font-medium">Interview Mode</Label>
                   <Select>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select mode" /></SelectTrigger>
                     <SelectContent>
@@ -226,23 +226,23 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                 { label: 'Client Contact', placeholder: 'Client contact name', default: '' },
               ].map(f => (
                 <div key={f.label} className="space-y-1.5">
-                  <Label className="text-xs">{f.label}</Label>
+                  <Label className="text-sm font-medium">{f.label}</Label>
                   <Input defaultValue={f.default} placeholder={f.placeholder} className="h-9" />
                 </div>
               ))}
               <div className="space-y-1.5">
-                <Label className="text-xs">Interviewer(s)</Label>
+                <Label className="text-sm font-medium">Interviewer(s)</Label>
                 {interviewers.map((v, i) => (
                   <Input key={i} value={v} placeholder="Interviewer name" className="h-9 mb-2"
                     onChange={e => { const n = [...interviewers]; n[i] = e.target.value; setInterviewers(n) }} />
                 ))}
-                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs"
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-sm"
                   onClick={() => setInterviewers([...interviewers, ''])}>
                   <Plus className="size-3.5" />Add Interviewer
                 </Button>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Additional Participants</Label>
+                <Label className="text-sm font-medium">Additional Participants</Label>
                 <Input placeholder="Additional participants" className="h-9" />
               </div>
             </div>
@@ -259,16 +259,16 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                 { label: 'Conference Room', placeholder: 'Room name or number' },
               ].map(f => (
                 <div key={f.label} className="space-y-1.5">
-                  <Label className="text-xs">{f.label}</Label>
+                  <Label className="text-sm font-medium">{f.label}</Label>
                   <Input placeholder={f.placeholder} className="h-9" />
                 </div>
               ))}
               <div className="space-y-1.5">
-                <Label className="text-xs">Notes to Interviewer</Label>
+                <Label className="text-sm font-medium">Notes to Interviewer</Label>
                 <Textarea placeholder="Internal notes for the interviewer…" className="resize-none h-20 text-sm" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Instructions to Candidate</Label>
+                <Label className="text-sm font-medium">Instructions to Candidate</Label>
                 <Textarea placeholder="What should the candidate bring or prepare…" className="resize-none h-20 text-sm" />
               </div>
             </div>
@@ -303,7 +303,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email Preview</p>
                 <div className="rounded-lg border bg-muted/20 p-4 text-sm space-y-2">
-                  <div className="text-xs text-muted-foreground border-b pb-2">
+                  <div className="text-sm text-muted-foreground border-b pb-2">
                     <p><strong>To:</strong> {candidate?.email ?? 'candidate@email.com'}</p>
                     <p><strong>Subject:</strong> Interview Invitation – {job?.title ?? 'Position'} at {job?.client ?? 'Company'}</p>
                   </div>
@@ -312,7 +312,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                   <p className="text-muted-foreground">Please confirm your availability at your earliest convenience. Details will be shared upon confirmation.</p>
                   <p className="text-muted-foreground">Best regards,<br />Arun Kumar<br />God Recruiter</p>
                 </div>
-                <Button variant="outline" size="sm" className="h-8 text-xs">Customize Email</Button>
+                <Button variant="outline" size="sm" className="h-8 text-sm">Customize Email</Button>
               </div>
             </div>
           )}
@@ -335,7 +335,7 @@ export function ScheduleWizard({ open, onOpenChange }: { open: boolean; onOpenCh
                   { label: 'Interviewer', value: interviewers[0] || '—' },
                 ].map(f => (
                   <div key={f.label} className="rounded-lg border bg-card p-3">
-                    <p className="text-xs text-muted-foreground">{f.label}</p>
+                    <p className="text-sm text-muted-foreground">{f.label}</p>
                     <p className="text-sm font-medium mt-0.5">{f.value}</p>
                   </div>
                 ))}

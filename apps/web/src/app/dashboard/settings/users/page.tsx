@@ -37,12 +37,12 @@ function InviteModal({ onClose }: { onClose: () => void }) {
         <h3 className="text-sm font-semibold mb-4">Invite Team Member</h3>
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Email address</label>
+            <label className="text-sm font-medium text-muted-foreground">Email address</label>
             <input placeholder="colleague@company.com"
               className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Role</label>
+            <label className="text-sm font-medium text-muted-foreground">Role</label>
             <select className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
               <option>Recruiter</option>
               <option>Team Lead</option>
@@ -51,7 +51,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
             </select>
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Department</label>
+            <label className="text-sm font-medium text-muted-foreground">Department</label>
             <select className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
               <option>Healthcare Recruitment</option>
               <option>IT Staffing</option>
@@ -60,8 +60,8 @@ function InviteModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
-          <button onClick={onClose} className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors">Cancel</button>
-          <button onClick={onClose} className="h-8 px-3 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
+          <button onClick={onClose} className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">Cancel</button>
+          <button onClick={onClose} className="h-8 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5">
             <Mail className="size-3.5" />Send invite
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function UsersPage() {
         description="Manage team members, roles, and recruiter capacity limits."
         action={
           <button onClick={() => setShowInvite(true)}
-            className="h-9 px-4 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">
+            className="h-9 px-4 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">
             <Plus className="size-3.5" />Invite user
           </button>
         }
@@ -103,11 +103,11 @@ export default function UsersPage() {
             <div className="relative max-w-xs">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search users…"
-                className="w-full h-8 pl-8 pr-3 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
+                className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
                   {['User', 'Role', 'Department', 'Status', 'Last login', ''].map(h => (
@@ -162,7 +162,7 @@ export default function UsersPage() {
           title="Teams"
           description="Organize recruiters into focused groups"
           action={
-            <button className="h-7 px-2.5 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+            <button className="h-7 px-2.5 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
               <Plus className="size-3.5" />New team
             </button>
           }
@@ -175,7 +175,7 @@ export default function UsersPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">Lead: {t.lead} · {t.members} members · {t.jobs} active jobs</p>
+                  <p className="text-sm text-muted-foreground">Lead: {t.lead} · {t.members} members · {t.jobs} active jobs</p>
                 </div>
               </div>
               <button className="text-muted-foreground hover:text-foreground transition-colors">
@@ -191,7 +191,7 @@ export default function UsersPage() {
           description="Set warn and max thresholds per recruiter. Changes save immediately."
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
                   {['Recruiter', 'Current', 'Warn at', 'Maximum'].map(h => (
@@ -211,12 +211,12 @@ export default function UsersPage() {
                     <td className="px-5 py-3 text-center">
                       <input type="number" value={r.warn} min={1} max={r.max}
                         onChange={e => setCapacity(c => c.map((x, j) => j === i ? { ...x, warn: +e.target.value } : x))}
-                        className="w-16 h-7 text-center text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
+                        className="w-16 h-7 text-center text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
                     </td>
                     <td className="px-5 py-3 text-center">
                       <input type="number" value={r.max} min={1}
                         onChange={e => setCapacity(c => c.map((x, j) => j === i ? { ...x, max: +e.target.value } : x))}
-                        className="w-16 h-7 text-center text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
+                        className="w-16 h-7 text-center text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
                     </td>
                   </tr>
                 ))}
@@ -239,14 +239,14 @@ export default function UsersPage() {
         >
           <div className="space-y-3">
             <CardRow label="Default role" description="Role assigned when a new user accepts their invite">
-              <select defaultValue="Recruiter" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="Recruiter" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>Recruiter</option>
                 <option>Team Lead</option>
                 <option>Manager</option>
               </select>
             </CardRow>
             <CardRow label="Default dashboard">
-              <select defaultValue="Work Queue" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="Work Queue" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>Dashboard</option>
                 <option>Work Queue</option>
                 <option>Jobs</option>
@@ -254,7 +254,7 @@ export default function UsersPage() {
               </select>
             </CardRow>
             <CardRow label="Online status visibility">
-              <select defaultValue="auto" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="auto" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="auto">Auto (based on login)</option>
                 <option value="always">Always show online</option>
                 <option value="off">Do not show</option>

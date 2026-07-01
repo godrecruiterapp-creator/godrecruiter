@@ -29,7 +29,7 @@ export default function ReportsPage() {
           summary={
             <div className="space-y-2">
               {TEMPLATES.slice(0, 4).map(t => (
-                <div key={t.name} className="flex items-center gap-2 text-xs">
+                <div key={t.name} className="flex items-center gap-2 text-sm">
                   <Clock className="size-3 text-muted-foreground shrink-0" />
                   <span className="font-medium">{t.name}</span>
                   <span className="text-muted-foreground">· {t.schedule}</span>
@@ -38,7 +38,7 @@ export default function ReportsPage() {
             </div>
           }
           action={
-            <button className="h-8 px-3 text-xs rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
+            <button className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors flex items-center gap-1.5">
               <Plus className="size-3.5" />New template
             </button>
           }
@@ -51,11 +51,11 @@ export default function ReportsPage() {
                     onChange={v => setSchedules(p => p.map((x, j) => j === i ? { ...x, on: v } : x))} />
                   <div>
                     <p className="text-sm font-medium">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.schedule} · <Badge>{t.type}</Badge></p>
+                    <p className="text-sm text-muted-foreground">{t.schedule} · <Badge>{t.type}</Badge></p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">Edit</button>
+                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">Edit</button>
                   <button className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
                     <Download className="size-3.5" />
                   </button>
@@ -70,7 +70,7 @@ export default function ReportsPage() {
           title="Report Recipients"
           description="Who receives scheduled reports automatically"
           summary={
-            <p className="text-xs text-muted-foreground">Managers and Super Admins receive weekly digests.</p>
+            <p className="text-sm text-muted-foreground">Managers and Super Admins receive weekly digests.</p>
           }
         >
           <div className="space-y-3">
@@ -91,19 +91,19 @@ export default function ReportsPage() {
           title="Export Defaults"
           description="File format and options when exporting data from any table"
           summary={
-            <p className="text-xs text-muted-foreground">CSV · With headers · Last 30 days · Excludes archived</p>
+            <p className="text-sm text-muted-foreground">CSV · With headers · Last 30 days · Excludes archived</p>
           }
         >
           <div className="space-y-3">
             <CardRow label="Default export format">
-              <select defaultValue="csv" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="csv" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="csv">CSV</option>
                 <option value="xlsx">Excel (XLSX)</option>
                 <option value="pdf">PDF</option>
               </select>
             </CardRow>
             <CardRow label="Default date range">
-              <select defaultValue="30d" className="h-8 px-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="30d" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
                 <option value="90d">Last 90 days</option>

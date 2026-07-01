@@ -19,13 +19,13 @@ export default function SharedProjectsPage() {
     <div className="flex flex-col h-full p-6 overflow-y-auto">
       <div className="mb-4">
         <h1 className="text-base font-semibold">Shared Projects</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Projects your teammates have shared with you.</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Projects your teammates have shared with you.</p>
       </div>
       {SHARED.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <FolderKanban className="size-10 text-muted-foreground/30 mb-3" />
           <p className="text-sm font-medium text-muted-foreground">No shared projects</p>
-          <p className="text-xs text-muted-foreground mt-1">When teammates share projects with you, they will appear here.</p>
+          <p className="text-sm text-muted-foreground mt-1">When teammates share projects with you, they will appear here.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -41,8 +41,8 @@ export default function SharedProjectsPage() {
                   {p.owner.split(' ').map(n => n[0]).join('')}
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{p.description}</p>
-              <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border">
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{p.description}</p>
+              <div className="flex items-center justify-between text-sm text-muted-foreground pt-1 border-t border-border">
                 <span className="flex items-center gap-1"><Users className="size-3" />{p.candidateCount} candidates</span>
                 <span>by {p.owner}</span>
               </div>

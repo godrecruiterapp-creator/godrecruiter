@@ -49,7 +49,7 @@ export default function SavedReports() {
       <div className="relative max-w-sm">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
         <input
-          className="h-8 w-full pl-8 pr-3 text-xs border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-8 w-full pl-8 pr-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
           placeholder="Search saved reports..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -60,7 +60,7 @@ export default function SavedReports() {
         <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">No saved reports yet</div>
       ) : (
         <div className="rounded-lg border bg-card">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="text-muted-foreground border-b">
                 <th className="py-3 px-4 text-left font-medium">Report Name</th>

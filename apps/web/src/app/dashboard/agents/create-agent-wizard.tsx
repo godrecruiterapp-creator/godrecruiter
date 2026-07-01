@@ -87,7 +87,7 @@ function Step2({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => v
       <div className="grid grid-cols-4 gap-2">
         {TRIGGER_TYPES.map(t => (
           <button key={t} onClick={() => set({ trigger: t })}
-            className={cn('rounded-lg border p-3 text-xs font-medium text-left transition-colors',
+            className={cn('rounded-lg border p-3 text-sm font-medium text-left transition-colors',
               s.trigger === t ? 'border-brand bg-brand-muted text-brand' : 'hover:bg-muted/60')}>
             {t}
           </button>
@@ -95,12 +95,12 @@ function Step2({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => v
       </div>
       {s.trigger === 'Event Based' && (
         <div className="space-y-2">
-          <Label className="text-xs">Trigger on events</Label>
+          <Label className="text-sm font-medium">Trigger on events</Label>
           <div className="grid grid-cols-2 gap-2">
             {EVENT_TYPES.map(ev => (
               <label key={ev} className="flex items-center gap-2 cursor-pointer">
                 <Checkbox checked={s.events.includes(ev)} onCheckedChange={() => set({ events: toggle(s.events, ev) })} />
-                <span className="text-xs">{ev}</span>
+                <span className="text-sm">{ev}</span>
               </label>
             ))}
           </div>
@@ -113,12 +113,12 @@ function Step2({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => v
 function Step3({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => void }) {
   return (
     <div className="space-y-2">
-      <p className="text-xs text-muted-foreground mb-3">Select data sources this agent can access.</p>
+      <p className="text-sm text-muted-foreground mb-3">Select data sources this agent can access.</p>
       <div className="grid grid-cols-3 gap-2">
         {DATA_SOURCES.map(src => (
           <label key={src} className="flex items-center gap-2 cursor-pointer p-2 rounded-md border hover:bg-muted/40 transition-colors">
             <Checkbox checked={s.sources.includes(src)} onCheckedChange={() => set({ sources: toggle(s.sources, src) })} />
-            <span className="text-xs">{src}</span>
+            <span className="text-sm">{src}</span>
           </label>
         ))}
       </div>
@@ -216,13 +216,13 @@ function Step5({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => v
       <div className="flex flex-wrap gap-2">
         {EXAMPLE_PROMPTS.map(p => (
           <button key={p} onClick={() => set({ objective: p })}
-            className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors">
+            className="inline-flex items-center rounded-full border px-2.5 py-1 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors">
             {p}
           </button>
         ))}
       </div>
       <button onClick={() => setShowAdv(x => !x)}
-        className="flex items-center gap-1 text-xs text-brand hover:underline">
+        className="flex items-center gap-1 text-sm text-brand hover:underline">
         Advanced Prompt {showAdv ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
       </button>
       {showAdv && (
@@ -242,10 +242,10 @@ function Step6({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => v
           {s.actions.map((a, i) => (
             <div key={a} className="flex items-center gap-2 p-3 rounded-lg border bg-muted/20">
               <GripVertical className="size-4 text-muted-foreground/40 shrink-0" />
-              <span className="size-5 flex items-center justify-center text-xs font-bold text-muted-foreground">{i + 1}</span>
+              <span className="size-5 flex items-center justify-center text-sm font-bold text-muted-foreground">{i + 1}</span>
               <span className="text-sm flex-1">{a}</span>
               <button onClick={() => set({ actions: s.actions.filter(x => x !== a) })}
-                className="text-xs text-muted-foreground hover:text-destructive transition-colors">✕</button>
+                className="text-sm text-muted-foreground hover:text-destructive transition-colors">✕</button>
             </div>
           ))}
         </div>
@@ -255,7 +255,7 @@ function Step6({ s, set }: { s: WizardState; set: (p: Partial<WizardState>) => v
         <div className="mt-2 flex flex-wrap gap-2">
           {AVAILABLE_ACTIONS.filter(a => !s.actions.includes(a)).map(a => (
             <button key={a} onClick={() => set({ actions: [...s.actions, a] })}
-              className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
+              className="inline-flex items-center rounded-full border px-2.5 py-1 text-sm hover:bg-accent hover:text-accent-foreground transition-colors">
               + {a}
             </button>
           ))}
@@ -354,10 +354,10 @@ function Step9({ s }: { s: WizardState }) {
         <Row label="Filters" value={[s.skills, s.location, s.experience].filter(Boolean).length ? 'Configured' : 'None'} />
         <Row label="AI Objective" value={s.objective ? s.objective.slice(0, 60) + (s.objective.length > 60 ? '…' : '') : '—'} />
         <div>
-          <span className="text-xs font-medium text-muted-foreground">Workflow Steps</span>
+          <span className="text-sm font-medium text-muted-foreground">Workflow Steps</span>
           <div className="mt-1 flex flex-col gap-0.5">
             {s.actions.map((a, i) => (
-              <span key={a} className="text-xs">{i + 1}. {a}</span>
+              <span key={a} className="text-sm">{i + 1}. {a}</span>
             ))}
           </div>
         </div>
@@ -366,15 +366,15 @@ function Step9({ s }: { s: WizardState }) {
       </div>
       <div className="rounded-lg border p-4 grid grid-cols-3 gap-4 bg-brand-muted/40">
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">Est. Runtime</p>
+          <p className="text-sm text-muted-foreground">Est. Runtime</p>
           <p className="text-sm font-semibold mt-0.5">~5 min</p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">Est. AI Cost</p>
+          <p className="text-sm text-muted-foreground">Est. AI Cost</p>
           <p className="text-sm font-semibold mt-0.5">$0.12</p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">Time Saved</p>
+          <p className="text-sm text-muted-foreground">Time Saved</p>
           <p className="text-sm font-semibold mt-0.5">2 hrs/week</p>
         </div>
       </div>
@@ -385,8 +385,8 @@ function Step9({ s }: { s: WizardState }) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <span className="text-xs text-muted-foreground shrink-0">{label}</span>
-      <span className="text-xs font-medium text-right">{value}</span>
+      <span className="text-sm text-muted-foreground shrink-0">{label}</span>
+      <span className="text-sm font-medium text-right">{value}</span>
     </div>
   )
 }
@@ -407,17 +407,17 @@ export function CreateAgentWizard({ open, onClose }: { open: boolean; onClose: (
         <SheetHeader className="px-6 py-4 border-b shrink-0">
           <div className="flex items-center justify-between">
             <SheetTitle>Create Agent</SheetTitle>
-            <span className="text-xs text-muted-foreground">Step {step} of {STEPS.length}</span>
+            <span className="text-sm text-muted-foreground">Step {step} of {STEPS.length}</span>
           </div>
           <div className="flex items-center gap-3 pt-1">
             <Progress value={(step / STEPS.length) * 100} className="flex-1 h-1.5" />
-            <span className="text-xs font-medium text-brand shrink-0">{STEPS[step - 1]}</span>
+            <span className="text-sm font-medium text-brand shrink-0">{STEPS[step - 1]}</span>
           </div>
           {/* Step pills */}
           <div className="flex gap-1 flex-wrap pt-1">
             {STEPS.map((s, i) => (
               <button key={s} onClick={() => setStep(i + 1)}
-                className={cn('px-2 py-0.5 rounded text-xs transition-colors',
+                className={cn('px-2 py-0.5 rounded text-sm transition-colors',
                   i + 1 === step ? 'bg-brand text-white' : i + 1 < step ? 'bg-brand-muted text-brand' : 'text-muted-foreground hover:bg-muted/60')}>
                 {s}
               </button>

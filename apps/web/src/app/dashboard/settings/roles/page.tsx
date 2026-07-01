@@ -70,7 +70,7 @@ export default function RolesPage() {
 
       <div className="rounded-xl border border-border bg-background overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left px-6 py-3.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide w-64">Permission</th>

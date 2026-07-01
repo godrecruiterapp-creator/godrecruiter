@@ -43,7 +43,7 @@ export default function AnalyticsPage() {
           <div key={label} className="rounded-lg border bg-muted/40 h-52 flex flex-col items-center justify-center gap-2">
             <TrendingUp className="size-6 text-muted-foreground/30" />
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="text-xs text-muted-foreground/60">Chart coming soon</p>
+            <p className="text-sm text-muted-foreground/60">Chart coming soon</p>
           </div>
         ))}
       </div>

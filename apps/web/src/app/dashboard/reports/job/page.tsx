@@ -51,8 +51,8 @@ export default function JobReports() {
           <p className="text-sm text-muted-foreground">Analyze job orders, aging, pipeline, and fill rates</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>Last 30 Days</option><option>Last 7 Days</option></select>
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>All Clients</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>Last 30 Days</option><option>Last 7 Days</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>All Clients</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
@@ -66,8 +66,8 @@ export default function JobReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function JobReports() {
 
       <div className="rounded-lg border bg-card p-4">
         <p className="text-sm font-semibold mb-3">Job Aging Report</p>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="pb-2 text-left font-medium">Job ID</th>
@@ -122,7 +122,7 @@ export default function JobReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

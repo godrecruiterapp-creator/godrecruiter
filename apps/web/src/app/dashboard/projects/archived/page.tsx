@@ -14,7 +14,7 @@ export default function ArchivedProjectsPage() {
     <div className="flex flex-col h-full p-6 overflow-y-auto">
       <div className="mb-4">
         <h1 className="text-base font-semibold">Archived Projects</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Archived projects are read-only. Restore to make them active again.</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Archived projects are read-only. Restore to make them active again.</p>
       </div>
       {ARCHIVED.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -30,7 +30,7 @@ export default function ArchivedProjectsPage() {
                 <p className="text-sm font-medium">{p.name}</p>
                 <p className="text-[10px] text-muted-foreground">{p.type} · {p.candidates} candidates · Archived {p.archivedOn}</p>
               </div>
-              <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5 shrink-0">
+              <Button size="sm" variant="outline" className="h-7 text-sm gap-1.5 shrink-0">
                 <ArchiveRestore className="size-3.5" />Restore
               </Button>
             </div>

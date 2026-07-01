@@ -26,9 +26,9 @@ export default function ProjectDocumentsPage() {
       <div className="flex items-center justify-between mb-4 shrink-0 gap-3">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-          <Input placeholder="Search documents…" className="h-8 w-52 pl-8 text-xs" />
+          <Input placeholder="Search documents…" className="h-8 w-52 pl-8 text-sm" />
         </div>
-        <Button size="sm" className="h-8 text-xs gap-1.5 shrink-0"><Upload className="size-3.5" />Upload</Button>
+        <Button size="sm" className="h-8 text-sm gap-1.5 shrink-0"><Upload className="size-3.5" />Upload</Button>
       </div>
       <div className="flex-1 overflow-auto border border-border rounded-lg">
         <table className="w-full border-collapse">
@@ -47,15 +47,15 @@ export default function ProjectDocumentsPage() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <FileText className="size-4 text-muted-foreground shrink-0" />
-                    <span className="text-xs font-medium">{d.name}</span>
+                    <span className="text-sm font-medium">{d.name}</span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${TYPE_CFG[d.type] ?? ''}`}>{d.type}</span>
                 </td>
-                <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{d.size}</span></td>
+                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{d.size}</span></td>
                 <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{d.uploaded}</span></td>
-                <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{d.by}</span></td>
+                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{d.by}</span></td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button className="size-7 flex items-center justify-center rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors">

@@ -115,13 +115,13 @@ export default function MyInterviewsPage() {
       case 'select':        return <Checkbox checked={selected.has(r.id)} onCheckedChange={v => toggleRow(r.id, !!v)} onClick={e => e.stopPropagation()} />
       case 'interview_id':  return <Link href={`/dashboard/interviews/${r.id}`} onClick={e => e.stopPropagation()} className="text-xs text-muted-foreground font-medium tabular-nums hover:text-brand transition-colors">{r.interview_id}</Link>
       case 'candidate':     return <Link href={`/dashboard/interviews/${r.id}`} onClick={e => e.stopPropagation()} className="text-sm font-medium truncate hover:text-brand transition-colors block">{r.candidate}</Link>
-      case 'job':           return <span className="text-xs text-muted-foreground truncate block">{r.job}</span>
-      case 'client':        return <span className="text-xs text-muted-foreground truncate">{r.client}</span>
-      case 'type':          return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.type}</span>
-      case 'round':         return <span className="text-xs text-muted-foreground">{r.round}</span>
+      case 'job':           return <span className="text-sm text-muted-foreground truncate block">{r.job}</span>
+      case 'client':        return <span className="text-sm text-muted-foreground truncate">{r.client}</span>
+      case 'type':          return <span className="text-sm text-muted-foreground whitespace-nowrap">{r.type}</span>
+      case 'round':         return <span className="text-sm text-muted-foreground">{r.round}</span>
       case 'date':          return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.date}</span>
       case 'time':          return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.time}</span>
-      case 'interviewer':   return <span className="text-xs text-muted-foreground truncate">{r.interviewer}</span>
+      case 'interviewer':   return <span className="text-sm text-muted-foreground truncate">{r.interviewer}</span>
       case 'status':        return <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${STATUS_BADGE[r.status] ?? ''}`}>{r.status.replace('_',' ')}</span>
       case 'feedback':      return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${r.feedback === 'submitted' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{r.feedback}</span>
       case 'actions':       return (
@@ -159,7 +159,7 @@ export default function MyInterviewsPage() {
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input value={search} onChange={e => { setSearch(e.target.value); setPage(0) }}
-              placeholder="Search candidate, ID…" className="h-8 w-52 pl-8 text-xs" />
+              placeholder="Search candidate, ID…" className="h-8 w-52 pl-8 text-sm" />
           </div>
           <Button size="sm" className="h-8" onClick={() => setWizardOpen(true)}>
             <CalendarCheck className="size-3.5 mr-1.5" />Schedule Interview
@@ -168,10 +168,10 @@ export default function MyInterviewsPage() {
 
         {selected.size > 0 && (
           <div className="flex items-center gap-2 px-3 py-2 mb-2.5 bg-brand-muted border border-brand/20 rounded-lg shrink-0">
-            <span className="text-xs font-semibold text-brand">{selected.size} selected</span>
+            <span className="text-sm font-semibold text-brand">{selected.size} selected</span>
             <div className="w-px h-4 bg-brand/20 mx-1" />
             {['Send Reminder','Reschedule','Cancel'].map(a => (
-              <Button key={a} size="sm" variant="outline" className="h-7 text-xs">{a}</Button>
+              <Button key={a} size="sm" variant="outline" className="h-7 text-sm">{a}</Button>
             ))}
             <button onClick={() => setSelected(new Set())} className="ml-auto size-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded">
               <X className="size-3.5" />
@@ -216,14 +216,14 @@ export default function MyInterviewsPage() {
 
         <div className="flex items-center justify-between pt-3 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Rows per page</span>
+            <span className="text-sm text-muted-foreground">Rows per page</span>
             <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v) as 25|50|100); setPage(0) }}>
-              <SelectTrigger className="h-7 w-16 text-xs"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-7 w-16 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>{PAGE_SIZES.map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{sorted.length === 0 ? '0' : `${page * pageSize + 1}–${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}</span>
+            <span className="text-sm text-muted-foreground">{sorted.length === 0 ? '0' : `${page * pageSize + 1}–${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}</span>
             <div className="flex items-center gap-1">
               <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
                 className="size-7 flex items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed">

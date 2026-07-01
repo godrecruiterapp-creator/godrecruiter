@@ -122,7 +122,7 @@ function NotesTab({ candidateId, notes, setNotes }: {
               {authors.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
             </SelectContent>
           </Select>
-          {byFilter && <button onClick={() => setByFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
+          {byFilter && <button onClick={() => setByFilter('')} className="text-sm text-brand hover:underline">Clear</button>}
         </div>
         <div className="flex-1 overflow-auto px-5 py-4 space-y-3">
           {visible.length === 0 && (
@@ -156,7 +156,7 @@ function NotesTab({ candidateId, notes, setNotes }: {
             className="h-36 resize-none border-0 rounded-none shadow-none focus-visible:ring-0 text-sm px-4 py-3"
           />
           <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20">
-            <span className="text-xs text-muted-foreground">Visible to all team members</span>
+            <span className="text-sm text-muted-foreground">Visible to all team members</span>
             <Button onClick={addNote} disabled={!text.trim()} size="sm"
               className="h-8 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40">
               Post Note
@@ -237,7 +237,7 @@ function DocumentsTab({ candidateId, docs, setDocs }: {
             {types.map(t => <SelectItem key={t} value={t}>{t.toUpperCase()}</SelectItem>)}
           </SelectContent>
         </Select>
-        {typeFilter && <button onClick={() => setTypeFilter('')} className="text-xs text-brand hover:underline">Clear</button>}
+        {typeFilter && <button onClick={() => setTypeFilter('')} className="text-sm text-brand hover:underline">Clear</button>}
       </div>
       <div className="flex-1 overflow-auto">
         {visible.length === 0 ? (
@@ -257,7 +257,7 @@ function DocumentsTab({ candidateId, docs, setDocs }: {
                   <p className="text-xs text-muted-foreground">{doc.size} · {doc.uploadedAt}</p>
                 </div>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="text-xs border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
+                  <button className="text-sm border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors">Download</button>
                   <button onClick={() => deleteDoc(doc.id)}
                     className="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors">
                     <Trash2 className="size-3.5" />
@@ -318,7 +318,7 @@ function JobsTab({ jobs }: { jobs: JobRow[] }) {
           {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
         </button>
         {(stageFilter || statusFilter) && (
-          <button onClick={() => { setStageFilter(''); setStatusFilter('') }} className="text-xs text-brand hover:underline">Clear</button>
+          <button onClick={() => { setStageFilter(''); setStatusFilter('') }} className="text-sm text-brand hover:underline">Clear</button>
         )}
       </div>
 
@@ -366,7 +366,7 @@ function JobsTab({ jobs }: { jobs: JobRow[] }) {
                   <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedAt}</span></td>
                   <td className="px-5 py-2.5">
                     <Link href={`/dashboard/jobs/${j.jobId}`}
-                      className="text-xs border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100">
+                      className="text-sm border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100">
                       View
                     </Link>
                   </td>
@@ -429,7 +429,7 @@ function ResumeSection({ candidateId, initialUrl }: { candidateId: string; initi
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{resumeName ?? 'Resume'}</p>
-          <p className="text-xs text-muted-foreground">Resume</p>
+          <p className="text-sm text-muted-foreground">Resume</p>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           <button
@@ -445,7 +445,7 @@ function ResumeSection({ candidateId, initialUrl }: { candidateId: string; initi
           </a>
           <Button variant="outline" size="sm" disabled={uploading}
             onClick={() => inputRef.current?.click()}
-            className="h-8 text-xs gap-1 text-muted-foreground">
+            className="h-8 text-sm gap-1 text-muted-foreground">
             <Upload className="size-3" />{uploading ? 'Uploading…' : 'Replace'}
           </Button>
         </div>
@@ -633,7 +633,7 @@ export function CandidateDetailClient({ candidate, initialNotes, initialDocs, in
                 <div className="space-y-3.5">
                   {infoRows.map(({ label, value, href }) => (
                     <div key={label} className="flex items-start gap-3">
-                      <span className="text-xs text-muted-foreground w-24 shrink-0 leading-5">{label}</span>
+                      <span className="text-sm text-muted-foreground w-28 shrink-0 leading-5">{label}</span>
                       {href ? (
                         <a href={href} target={href.startsWith('http') ? '_blank' : undefined}
                           rel="noopener noreferrer"

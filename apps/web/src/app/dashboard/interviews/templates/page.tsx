@@ -49,7 +49,7 @@ export default function TemplatesPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t.target}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{t.target}</p>
                 </div>
               </div>
 
@@ -61,8 +61,8 @@ export default function TemplatesPage() {
               </div>
 
               <div className="flex items-center gap-2 pt-1 border-t">
-                <Button size="sm" className="h-7 text-xs flex-1">Use Template</Button>
-                <Button size="sm" variant="outline" className="h-7 text-xs flex-1">Preview</Button>
+                <Button size="sm" className="h-7 text-sm flex-1">Use Template</Button>
+                <Button size="sm" variant="outline" className="h-7 text-sm flex-1">Preview</Button>
               </div>
             </div>
           )

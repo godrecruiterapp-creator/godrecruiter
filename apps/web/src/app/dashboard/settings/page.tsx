@@ -71,7 +71,7 @@ export default function SettingsDashboard() {
           <div className="flex items-center gap-2 flex-wrap">
             {RECENT.map(r => (
               <Link key={r.href} href={r.href}
-                className="inline-flex items-center gap-1.5 h-8 px-3 text-xs rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors">
+                className="inline-flex items-center gap-1.5 h-8 px-3 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors">
                 <Clock className="size-3 text-muted-foreground" />
                 {r.label}
               </Link>
@@ -97,8 +97,8 @@ export default function SettingsDashboard() {
                     <p className="text-sm font-semibold truncate">{card.label}</p>
                     <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{card.desc}</p>
-                  <p className="text-xs font-medium mt-2.5 text-foreground/60">{card.stat}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{card.desc}</p>
+                  <p className="text-sm font-medium mt-2.5 text-foreground/60">{card.stat}</p>
                 </div>
               </div>
             </Link>

@@ -69,7 +69,7 @@ export default function ReportsDashboard() {
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`h-8 px-3 text-xs transition-colors ${range === r ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}
+                className={`h-8 px-3 text-sm transition-colors ${range === r ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}
               >
                 {r}
               </button>
@@ -86,9 +86,9 @@ export default function ReportsDashboard() {
       <div className="grid grid-cols-5 gap-4">
         {KPIS.slice(0, 5).map((k) => (
           <div key={k.label} className="rounded-lg border bg-card p-4">
-            <p className="text-xs text-muted-foreground">{k.label}</p>
+            <p className="text-sm text-muted-foreground">{k.label}</p>
             <p className="text-2xl font-bold mt-1">{k.value}</p>
-            <p className={`text-xs mt-0.5 ${k.positive === true ? 'text-emerald-600' : k.positive === false ? 'text-red-600' : 'text-muted-foreground'}`}>{k.delta}</p>
+            <p className={`text-sm mt-0.5 ${k.positive === true ? 'text-emerald-600' : k.positive === false ? 'text-red-600' : 'text-muted-foreground'}`}>{k.delta}</p>
           </div>
         ))}
       </div>
@@ -97,9 +97,9 @@ export default function ReportsDashboard() {
       <div className="grid grid-cols-5 gap-4">
         {KPIS.slice(5, 10).map((k) => (
           <div key={k.label} className="rounded-lg border bg-card p-4">
-            <p className="text-xs text-muted-foreground">{k.label}</p>
+            <p className="text-sm text-muted-foreground">{k.label}</p>
             <p className="text-2xl font-bold mt-1">{k.value}</p>
-            <p className={`text-xs mt-0.5 ${k.positive === true ? 'text-emerald-600' : k.positive === false ? 'text-red-600' : 'text-muted-foreground'}`}>{k.delta}</p>
+            <p className={`text-sm mt-0.5 ${k.positive === true ? 'text-emerald-600' : k.positive === false ? 'text-red-600' : 'text-muted-foreground'}`}>{k.delta}</p>
           </div>
         ))}
       </div>
@@ -112,11 +112,11 @@ export default function ReportsDashboard() {
             <p className="text-sm font-semibold">Activity Overview</p>
             <div className="flex items-center gap-1">
               {['Line', 'Bar'].map((t) => (
-                <button key={t} className="h-6 px-2.5 text-xs border rounded hover:bg-muted transition-colors">{t}</button>
+                <button key={t} className="h-6 px-2.5 text-sm border rounded hover:bg-muted transition-colors">{t}</button>
               ))}
             </div>
           </div>
-          <div className="h-56 bg-muted/40 rounded-lg flex items-center justify-center text-xs text-muted-foreground text-center px-4">
+          <div className="h-56 bg-muted/40 rounded-lg flex items-center justify-center text-sm text-muted-foreground text-center px-4">
             Daily submissions, interviews and placements — chart visualization coming soon
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function ReportsDashboard() {
             {FUNNEL.map((f) => (
               <div key={f.label} className="w-full flex flex-col items-center gap-0.5">
                 <div
-                  className={`${f.color} rounded h-7 flex items-center justify-center text-xs font-medium text-white`}
+                  className={`${f.color} rounded h-7 flex items-center justify-center text-sm font-medium text-white`}
                   style={{ width: `${f.pct}%` }}
                 >
                   {f.count}
@@ -144,7 +144,7 @@ export default function ReportsDashboard() {
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 rounded-lg border bg-card p-4">
           <p className="text-sm font-semibold mb-3">Recruiter Leaderboard</p>
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="text-muted-foreground border-b">
                 <th className="pb-2 text-left font-medium">Rank</th>
@@ -173,7 +173,7 @@ export default function ReportsDashboard() {
           <div className="flex flex-col gap-3">
             {SOURCES.map((s) => (
               <div key={s.label} className="flex flex-col gap-1">
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between text-sm">
                   <span>{s.label}</span>
                   <span className="text-muted-foreground">{s.pct}%</span>
                 </div>
@@ -206,7 +206,7 @@ export default function ReportsDashboard() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>

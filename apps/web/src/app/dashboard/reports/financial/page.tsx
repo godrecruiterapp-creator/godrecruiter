@@ -48,7 +48,7 @@ export default function FinancialReports() {
           <p className="text-sm text-muted-foreground">Revenue, margin, bill rates, and financial performance metrics</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-xs border rounded-md px-2 bg-background"><option>YTD 2026</option><option>Last Quarter</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>YTD 2026</option><option>Last Quarter</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
@@ -72,8 +72,8 @@ export default function FinancialReports() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{r.desc}</p>
-                <p className="text-xs text-brand mt-2">View Report →</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{r.desc}</p>
+                <p className="text-sm text-brand mt-2">View Report →</p>
               </div>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function FinancialReports() {
 
       <div className="rounded-lg border bg-card p-4">
         <p className="text-sm font-semibold mb-3">Revenue Summary</p>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="pb-2 text-left font-medium">Period</th>
@@ -122,7 +122,7 @@ export default function FinancialReports() {
         </ul>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {['Summarize', 'Explain Trends', 'Detect Anomalies', 'Forecast', 'Recommend Actions'].map((a) => (
-            <button key={a} className="h-7 px-3 text-xs border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
+            <button key={a} className="h-7 px-3 text-sm border border-border rounded-md hover:bg-muted transition-colors">{a}</button>
           ))}
         </div>
       </div>
