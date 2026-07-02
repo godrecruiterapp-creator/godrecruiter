@@ -141,7 +141,7 @@ export async function getCandidatePreviewAction(candidateId: string) {
   const admin = createAdminClient()
   const [notesRes, jobsRes, interviewsRes, candRes] = await Promise.all([
     admin.from('candidate_notes').select('id, author_name, text, created_at').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
-    admin.from('job_candidates').select('id, stage, jobs(id, title, client, status)').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
+    admin.from('job_candidates').select('id, stage, created_at, jobs(id, display_id, title, client, status), platform_users(full_name)').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
     admin.from('interviews')
       .select('id, interview_type, status, scheduled_at, duration_minutes, interviewer_name, location, meeting_url, notes, job_candidates!inner(candidate_id, jobs(id, title, client))')
       .eq('job_candidates.candidate_id', candidateId)
@@ -158,7 +158,18 @@ export async function getCandidatePreviewAction(candidateId: string) {
   return {
     resume_url: (candRes.data as any)?.resume_url ?? null,
     notes: (notesRes.data ?? []).map((n: any) => ({ id: n.id, author: n.author_name, text: n.text, time: rel(n.created_at) })),
-    jobs: (jobsRes.data ?? []).map((jc: any) => ({ submissionId: jc.id, stage: jc.stage, jobId: jc.jobs?.id ?? '', title: jc.jobs?.title ?? '—', client: jc.jobs?.client ?? null, status: jc.jobs?.status ?? '—' })),
+    jobs: (jobsRes.data ?? []).map((jc: any) => ({
+      submissionId: jc.id,
+      stage: jc.stage,
+      jobId: jc.jobs?.id ?? '',
+      jobDisplayId: jc.jobs?.display_id ?? null,
+      title: jc.jobs?.title ?? '—',
+      client: jc.jobs?.client ?? null,
+      status: jc.jobs?.status ?? '—',
+      submittedAt: jc.created_at,
+      submittedAtLabel: new Date(jc.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      submittedBy: jc.platform_users?.full_name ?? null,
+    })),
     interviews: (interviewsRes.data ?? []).map((iv: any) => ({
       id: iv.id,
       jobId: iv.job_candidates?.jobs?.id ?? '',

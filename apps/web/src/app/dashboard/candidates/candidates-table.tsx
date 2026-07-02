@@ -21,7 +21,7 @@ import {
   Mail, Phone, Send, Eye, Pencil, ChevronLeft, ChevronRight,
   BookmarkPlus, Bookmark, Download, SlidersHorizontal,
   FileText, ExternalLink, Loader2, Sparkles, SearchCode,
-  CalendarClock, MapPin, Link2,
+  CalendarClock, MapPin, Link2, ArrowUpDown,
 } from 'lucide-react'
 import {
   getCandidatePreviewAction,
@@ -232,7 +232,11 @@ function persistViews(v: SavedView[]) { localStorage.setItem(VIEWS_KEY, JSON.str
 // ── Preview data types ────────────────────────────────────────────────────────
 
 type PreviewNote = { id: string; author: string; text: string; time: string }
-type PreviewJob  = { submissionId: string; stage: string; jobId: string; title: string; client: string | null; status: string }
+type PreviewJob  = {
+  submissionId: string; stage: string; jobId: string; jobDisplayId: string | null
+  title: string; client: string | null; status: string
+  submittedAt: string; submittedAtLabel: string; submittedBy: string | null
+}
 type PreviewInterview = {
   id: string; jobId: string; jobTitle: string; client: string | null
   type: string; status: string; scheduledAt: string; scheduledLabel: string
@@ -476,6 +480,112 @@ function AddInterviewDialog({ candidateId, jobs, onClose, onCreated }: {
   )
 }
 
+// ── Submissions tab ────────────────────────────────────────────────────────────
+
+function SubmissionsTab({ jobs }: { jobs: PreviewJob[] }) {
+  const [stageFilter, setStageFilter]   = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [sortDir, setSortDir]           = useState<'desc' | 'asc'>('desc')
+
+  const stages   = [...new Set(jobs.map(j => j.stage))]
+  const statuses = [...new Set(jobs.map(j => j.status))]
+
+  const visible = jobs
+    .filter(j => (!stageFilter || j.stage === stageFilter) && (!statusFilter || j.status === statusFilter))
+    .sort((a, b) => {
+      const d = new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
+      return sortDir === 'desc' ? -d : d
+    })
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-2.5 px-6 py-2.5 border-b shrink-0 bg-muted/10">
+        <Select value={stageFilter || '__all__'} onValueChange={v => setStageFilter(v === '__all__' ? '' : v)}>
+          <SelectTrigger className="h-8 text-sm w-36"><SelectValue placeholder="Stage" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Stages</SelectItem>
+            {stages.map(s => <SelectItem key={s} value={s}>{STAGE_LABEL[s] ?? s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter || '__all__'} onValueChange={v => setStatusFilter(v === '__all__' ? '' : v)}>
+          <SelectTrigger className="h-8 text-sm w-36"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Statuses</SelectItem>
+            {statuses.map(s => <SelectItem key={s} value={s}>{s.replace('_', ' ')}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <button
+          onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')}
+          className="h-8 flex items-center gap-1.5 px-3 rounded-md border border-border text-sm text-foreground hover:bg-muted transition-colors"
+        >
+          <ArrowUpDown className="size-3.5" />
+          {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
+        </button>
+        {(stageFilter || statusFilter) && (
+          <button onClick={() => { setStageFilter(''); setStatusFilter('') }} className="text-sm text-brand hover:underline">Clear</button>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {jobs.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-2">
+            <Send className="size-6 text-muted-foreground/30" />
+            <p className="text-sm text-muted-foreground">No job submissions yet</p>
+          </div>
+        ) : visible.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-2">
+            <p className="text-sm text-muted-foreground">No submissions match your filters</p>
+            <button onClick={() => { setStageFilter(''); setStatusFilter('') }} className="text-sm text-brand hover:underline">Clear filters</button>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="sticky top-0 bg-muted/60 backdrop-blur-sm border-b border-border">
+              <tr>
+                {['Job ID', 'Job Title', 'Client Name', 'Submitted On', 'Submitted By', 'Job Status', 'Stage'].map(h => (
+                  <th key={h} className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground px-5 h-9 whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {visible.map(j => (
+                <tr key={j.submissionId} className="hover:bg-muted/30 transition-colors group">
+                  <td className="px-5 py-2.5">
+                    <Link href={`/dashboard/jobs/${j.jobId}`} onClick={e => e.stopPropagation()}
+                      className="text-sm text-muted-foreground font-medium tabular-nums hover:text-brand transition-colors">
+                      {j.jobDisplayId ?? '—'}
+                    </Link>
+                  </td>
+                  <td className="px-5 py-2.5">
+                    <Link href={`/dashboard/jobs/${j.jobId}`}
+                      className="text-sm font-medium hover:text-brand transition-colors">
+                      {j.title}
+                    </Link>
+                  </td>
+                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.client ?? '—'}</span></td>
+                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedAtLabel}</span></td>
+                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedBy ?? '—'}</span></td>
+                  <td className="px-5 py-2.5">
+                    <span className={`text-sm font-medium ${STATUS_BADGE[j.status] ?? 'text-muted-foreground'}`}>
+                      {j.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-5 py-2.5">
+                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${STAGE_BADGE[j.stage] ?? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}>
+                      {STAGE_LABEL[j.stage] ?? j.stage}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function CandidatePreviewSheet({
   candidate, onClose,
 }: {
@@ -540,12 +650,12 @@ function CandidatePreviewSheet({
       <SheetContent
         side="right"
         className="p-0 flex flex-col overflow-hidden"
-        style={{ width: '80vw', maxWidth: '80vw' }}
+        style={{ width: '90vw', maxWidth: '90vw' }}
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="px-6 py-4 border-b shrink-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-start gap-4">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <Avatar className="size-10 shrink-0">
                 <AvatarFallback className="text-sm font-semibold bg-brand-muted text-brand">{initials}</AvatarFallback>
               </Avatar>
@@ -562,15 +672,42 @@ function CandidatePreviewSheet({
                 {candidate.location && <p className="text-sm text-muted-foreground truncate">{candidate.location}</p>}
               </div>
             </div>
+
+            {(candidate.email || candidate.phone || candidate.source) && (
+              <>
+                <div className="w-px self-stretch bg-border shrink-0" />
+                <div className="flex flex-col gap-1 shrink-0 min-w-[180px] max-w-[240px]">
+                  {candidate.email && (
+                    <a href={`mailto:${candidate.email}`}
+                      className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand hover:underline truncate">
+                      <Mail className="size-3 shrink-0" />
+                      <span className="truncate">{candidate.email}</span>
+                    </a>
+                  )}
+                  {candidate.phone && (
+                    <a href={`tel:${candidate.phone}`}
+                      className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand hover:underline truncate">
+                      <Phone className="size-3 shrink-0" />
+                      <span className="truncate">{candidate.phone}</span>
+                    </a>
+                  )}
+                  {candidate.source && (
+                    <span className="text-sm text-muted-foreground truncate">Source: {candidate.source}</span>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
+          <div className="border-t border-border my-4" />
+
           {/* Action buttons */}
-          <div className="flex items-center gap-1.5 mt-4 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <Link href={`/dashboard/candidates/${candidate.id}/edit`}
               className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
               <Pencil className="size-3" />Edit
             </Link>
-            <button className="h-8 px-3 flex items-center gap-1.5 rounded-md bg-brand text-white text-sm font-medium hover:bg-brand/90 transition-colors">
+            <button className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-border text-sm font-medium hover:bg-muted transition-colors">
               <Send className="size-3" />Submit
             </button>
             {candidate.email && (
@@ -603,17 +740,6 @@ function CandidatePreviewSheet({
 
         {/* ── Info strip ──────────────────────────────────────────────── */}
         <div className="flex items-center gap-4 px-6 py-2.5 bg-muted/40 border-b shrink-0 flex-wrap">
-          {candidate.email && (
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Mail className="size-3 shrink-0" />
-              <a href={`mailto:${candidate.email}`} className="hover:text-brand hover:underline truncate max-w-[180px]">{candidate.email}</a>
-            </div>
-          )}
-          {candidate.phone && (
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Phone className="size-3 shrink-0" />{candidate.phone}
-            </div>
-          )}
           {candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
             <span className="text-sm text-muted-foreground">{WORK_AUTH[candidate.candidate_type]}</span>
           )}
@@ -622,9 +748,6 @@ function CandidatePreviewSheet({
           )}
           {candidate.expected_ctc && (
             <span className="text-sm text-muted-foreground">Pay: {formatCtc(candidate.expected_ctc)}</span>
-          )}
-          {candidate.source && (
-            <span className="text-sm text-muted-foreground">Source: {candidate.source}</span>
           )}
         </div>
 
@@ -694,43 +817,16 @@ function CandidatePreviewSheet({
           </div>
         ) : tab === 'submissions' ? (
           /* Submissions tab */
-          <div className="flex-1 overflow-y-auto px-6 py-4">
-            {jobs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-2">
-                <Send className="size-6 text-muted-foreground/30" />
-                <p className="text-sm text-muted-foreground">No job submissions yet</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {jobs.map(j => (
-                  <Link key={j.submissionId} href={`/dashboard/jobs/${j.jobId}`}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/40 transition-colors group">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate group-hover:text-brand transition-colors">{j.title}</p>
-                      {j.client && <p className="text-sm text-muted-foreground truncate">{j.client}</p>}
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {j.stage && (
-                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${STAGE_BADGE[j.stage] ?? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}>
-                          {STAGE_LABEL[j.stage] ?? j.stage}
-                        </span>
-                      )}
-                      <span className={`text-sm font-medium ${STATUS_BADGE[j.status] ?? 'text-muted-foreground'}`}>
-                        {j.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+          <div className="flex-1 overflow-hidden">
+            <SubmissionsTab jobs={jobs} />
           </div>
         ) : (
           /* Interviews tab */
           <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between px-6 py-3 border-b shrink-0">
-              <p className="text-sm text-muted-foreground">
-                {jobs.length === 0 ? 'Submit this candidate to a job before scheduling an interview.' : 'Interviews scheduled for this candidate'}
-              </p>
+              {jobs.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Submit this candidate to a job before scheduling an interview.</p>
+              ) : <span />}
               <Button size="sm" disabled={jobs.length === 0} onClick={() => setAddInterviewOpen(true)}
                 className="h-8 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40 shrink-0">
                 <Plus className="size-3.5" />Add Interview
