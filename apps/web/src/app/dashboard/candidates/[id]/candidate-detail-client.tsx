@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useTransition } from 'react'
+import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ import {
   addCandidateNoteAction, deleteCandidateNoteAction,
   uploadCandidateDocumentAction, deleteCandidateDocumentAction,
   uploadCandidateResumeAction,
+  getOpenJobsForSubmitAction, submitCandidateToJobAction,
 } from '../actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -479,6 +480,78 @@ function ResumeSection({ candidateId, initialUrl }: { candidateId: string; initi
   )
 }
 
+// ── Submit to job dialog ───────────────────────────────────────────────────────
+
+type SubmitJobOption = { id: string; title: string; client: string | null }
+
+function SubmitToJobDialog({ candidateId, onClose, onSubmitted }: {
+  candidateId: string
+  onClose: () => void
+  onSubmitted: () => void
+}) {
+  const [jobs, setJobs] = useState<SubmitJobOption[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedJobId, setSelectedJobId] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getOpenJobsForSubmitAction().then(res => {
+      setLoading(false)
+      if ('jobs' in res) setJobs(res.jobs)
+      else setError(res.error)
+    })
+  }, [])
+
+  async function handleSubmit() {
+    if (!selectedJobId) return
+    setSubmitting(true)
+    setError(null)
+    const res = await submitCandidateToJobAction(candidateId, selectedJobId)
+    setSubmitting(false)
+    if ('error' in res) { setError(res.error); return }
+    onSubmitted()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
+      <div className="bg-background rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b">
+          <p className="text-sm font-semibold">Submit to job</p>
+          <button onClick={onClose} className="size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <X className="size-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-3">
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Loading open jobs…</p>
+          ) : jobs.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No open jobs to submit this candidate to.</p>
+          ) : (
+            <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select a job" /></SelectTrigger>
+              <SelectContent>
+                {jobs.map(j => (
+                  <SelectItem key={j.id} value={j.id}>{j.title}{j.client ? ` — ${j.client}` : ''}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+        <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t bg-muted/20">
+          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
+          <Button size="sm" disabled={!selectedJobId || submitting}
+            onClick={handleSubmit}
+            className="bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40">
+            {submitting ? 'Submitting…' : 'Submit'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CandidateDetailClient({ candidate, initialNotes, initialDocs, initialActivity, initialJobs }: {
@@ -493,6 +566,7 @@ export function CandidateDetailClient({ candidate, initialNotes, initialDocs, in
   const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'notes' | 'documents' | 'activity'>('overview')
   const [notes, setNotes]   = useState<NoteRow[]>(initialNotes)
   const [docs, setDocs]     = useState<DocRow[]>(initialDocs)
+  const [submitOpen, setSubmitOpen] = useState(false)
 
   const name     = [candidate.first_name, candidate.last_name].filter(Boolean).join(' ') || 'Unnamed'
   const initials = [candidate.first_name?.[0], candidate.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'
@@ -557,7 +631,8 @@ export function CandidateDetailClient({ candidate, initialNotes, initialDocs, in
               <Pencil className="size-3.5" />Edit
             </Link>
           </Button>
-          <Button size="sm" className="h-9 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0">
+          <Button size="sm" onClick={() => setSubmitOpen(true)}
+            className="h-9 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0">
             <Send className="size-3.5" />Submit
           </Button>
           <DropdownMenu>
@@ -715,6 +790,18 @@ export function CandidateDetailClient({ candidate, initialNotes, initialDocs, in
         )}
 
       </div>
+
+      {submitOpen && (
+        <SubmitToJobDialog
+          candidateId={candidate.id}
+          onClose={() => setSubmitOpen(false)}
+          onSubmitted={() => {
+            setSubmitOpen(false)
+            setActiveTab('jobs')
+            router.refresh()
+          }}
+        />
+      )}
     </div>
   )
 }

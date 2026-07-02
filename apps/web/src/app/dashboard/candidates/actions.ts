@@ -72,6 +72,55 @@ export async function createCandidateAction(formData: FormData): Promise<{ error
   redirect(`/dashboard/candidates/${candidate.id}`)
 }
 
+export async function updateCandidateAction(candidateId: string, formData: FormData): Promise<{ error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+
+  const first_name       = formData.get('first_name') as string
+  const last_name        = formData.get('last_name') as string
+  const email            = formData.get('email') as string
+  const phone            = formData.get('phone') as string
+  const current_title    = formData.get('current_title') as string
+  const current_company  = formData.get('current_company') as string
+  const location         = formData.get('location') as string
+  const linkedin_url     = formData.get('linkedin_url') as string
+  const candidate_type   = formData.get('candidate_type') as string
+  const notice_period    = formData.get('notice_period') as string
+  const source           = formData.get('source') as string
+  const notes            = formData.get('notes') as string
+  const current_ctc_raw  = formData.get('current_ctc') as string
+  const expected_ctc_raw = formData.get('expected_ctc') as string
+
+  if (!first_name || !last_name) return { error: 'First and last name are required.' }
+  if (!email) return { error: 'Email is required.' }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('candidates').update({
+    first_name,
+    last_name,
+    email,
+    phone: phone || null,
+    current_title: current_title || null,
+    current_company: current_company || null,
+    location: location || null,
+    linkedin_url: linkedin_url || null,
+    candidate_type: candidate_type || 'unknown',
+    notice_period: notice_period || null,
+    source: source || null,
+    notes: notes || null,
+    current_ctc: current_ctc_raw ? parseInt(current_ctc_raw) : null,
+    expected_ctc: expected_ctc_raw ? parseInt(expected_ctc_raw) : null,
+  }).eq('id', candidateId)
+
+  if (error) {
+    if (error.code === '23505') return { error: 'A candidate with this email already exists.' }
+    return { error: `Failed to update candidate: ${error.message}` }
+  }
+
+  redirect(`/dashboard/candidates/${candidateId}`)
+}
+
 export async function deleteCandidateAction(candidateId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -219,6 +268,46 @@ export async function uploadCandidateResumeAction(candidateId: string, formData:
     actor_id: ctx.user.id, actor_name: ctx.name, action: `Uploaded resume: ${file.name}`,
   })
   return { success: true as const, resumeUrl: publicUrl, resumeName: file.name }
+}
+
+// ── Submit to job ──────────────────────────────────────────────────────────────
+
+export async function getOpenJobsForSubmitAction() {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const admin = createAdminClient()
+  const { data, error } = await admin.from('jobs')
+    .select('id, title, client')
+    .eq('tenant_id', ctx.tenant_id)
+    .eq('status', 'open')
+    .is('deleted_at', null)
+    .order('title')
+  if (error) return { error: error.message }
+  return { jobs: (data ?? []).map((j: any) => ({ id: j.id, title: j.title, client: j.client ?? null })) }
+}
+
+export async function submitCandidateToJobAction(candidateId: string, jobId: string) {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const admin = createAdminClient()
+
+  const { data: job } = await admin.from('jobs').select('title').eq('id', jobId).single()
+
+  const { error } = await admin.from('job_candidates').insert({
+    id: ulid(), job_id: jobId, candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    stage: 'submitted', added_by: ctx.user.id,
+  })
+  if (error) {
+    if (error.code === '23505') return { error: 'This candidate is already submitted to that job.' }
+    return { error: error.message }
+  }
+
+  await admin.from('candidate_activity').insert({
+    id: ulid(), candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    actor_id: ctx.user.id, actor_name: ctx.name, action: `Submitted to job: ${job?.title ?? 'Unknown job'}`,
+  })
+
+  return { success: true as const }
 }
 
 // ── Resume parsing (real extraction + AI structuring, never fabricated) ─────────
