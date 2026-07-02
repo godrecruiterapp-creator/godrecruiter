@@ -27,11 +27,6 @@ const PERMISSIONS = [
     { id: 'cand_delete', label: 'Delete candidates',       super: true, admin: true,  manager: false, lead: false, recruiter: false },
     { id: 'cand_export', label: 'Export candidate data',   super: true, admin: true,  manager: true,  lead: false, recruiter: false },
   ]},
-  { group: 'Work Queue', items: [
-    { id: 'wq_view',     label: 'View work queue',         super: true, admin: true,  manager: true,  lead: true,  recruiter: true  },
-    { id: 'wq_assign',   label: 'Assign from work queue',  super: true, admin: true,  manager: true,  lead: true,  recruiter: false },
-    { id: 'wq_reassign', label: 'Reassign jobs',           super: true, admin: true,  manager: true,  lead: false, recruiter: false },
-  ]},
   { group: 'Reports & Analytics', items: [
     { id: 'rep_view',    label: 'View reports',            super: true, admin: true,  manager: true,  lead: true,  recruiter: false },
     { id: 'rep_export',  label: 'Export reports',          super: true, admin: true,  manager: true,  lead: false, recruiter: false },

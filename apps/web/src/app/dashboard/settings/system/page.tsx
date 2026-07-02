@@ -169,7 +169,6 @@ export default function SystemPage() {
               { level: 'warn',  msg: 'Fieldglass VMS response slow (1.2s) — retried successfully',  time: 'Today 10:43 AM' },
               { level: 'info',  msg: 'AI briefing generated for 6 recruiters',                     time: 'Today 08:00 AM' },
               { level: 'info',  msg: 'Daily backup completed — 18.4 GB',                           time: 'Today 02:00 AM' },
-              { level: 'info',  msg: 'Scheduled report sent: Daily Work Queue Summary',            time: 'Yesterday 7AM'  },
               { level: 'info',  msg: 'User sarah@godrecruiter.com invited',                        time: 'Yesterday 3PM'  },
             ].map((log, i) => (
               <div key={i} className="flex items-start gap-3 py-3 border-b border-border/40 last:border-0">

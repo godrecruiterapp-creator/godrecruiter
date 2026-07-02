@@ -30,7 +30,6 @@ const SEGMENT_LABELS: Record<string, string> = {
   automation:       'Automation',
   agents:           'AI Agent Hub',
   profile:          'My Profile',
-  'work-queue':     'Work Queue',
   // sub-sections
   new:              'New',
   edit:             'Edit',

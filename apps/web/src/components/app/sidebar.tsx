@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutDashboard, Briefcase, Users,
-  CalendarCheck, BarChart3, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban, ListTodo, UserCheck, Building2,
+  CalendarCheck, BarChart3, ChevronLeft, ChevronRight, Bot, Zap, FolderKanban, UserCheck, Building2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -15,7 +15,6 @@ type NavItem = { label: string; href: string; icon: React.ComponentType<{ classN
 
 const NAV: NavItem[] = [
   { label: 'Dashboard',   href: '/dashboard',              icon: LayoutDashboard },
-  { label: 'Work Queue',  href: '/dashboard/work-queue',   icon: ListTodo },
   { label: 'Clients',     href: '/dashboard/clients',      icon: Building2 },
   { label: 'Jobs',        href: '/dashboard/jobs',         icon: Briefcase },
   { label: 'Candidates',  href: '/dashboard/candidates',   icon: Users },

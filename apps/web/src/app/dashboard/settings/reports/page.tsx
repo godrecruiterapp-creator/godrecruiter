@@ -6,7 +6,6 @@ import { Breadcrumb, PageHeader, SettingCard, CardRow, Toggle, Badge } from '../
 
 const TEMPLATES = [
   { name: 'Weekly Recruiter Performance', type: 'Recruiter',  schedule: 'Every Monday',   status: 'active' },
-  { name: 'Daily Work Queue Summary',     type: 'Operations', schedule: 'Every weekday',  status: 'active' },
   { name: 'Monthly Placement Report',     type: 'Executive',  schedule: 'First of month', status: 'active' },
   { name: 'SLA Compliance Report',        type: 'Operations', schedule: 'Every Friday',   status: 'active' },
   { name: 'Client Submission Summary',    type: 'Client',     schedule: 'On demand',      status: 'draft'  },

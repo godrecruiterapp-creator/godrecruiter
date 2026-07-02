@@ -8,7 +8,7 @@ Scope note: this guide is language-only. It does not propose layout, IA, or visu
 
 ## 1. Complete Language Audit — What Was Reviewed
 
-Every route under `apps/web/src/app/dashboard/**` (Dashboard, Candidates, Jobs, Interviews, Placements, Projects, Reports, Work Queue, AI Agent Hub, Automation, Settings) and shared components in `apps/web/src/components/**` were reviewed for:
+Every route under `apps/web/src/app/dashboard/**` (Dashboard, Candidates, Jobs, Interviews, Placements, Projects, Reports, AI Agent Hub, Automation, Settings) and shared components in `apps/web/src/components/**` were reviewed for:
 
 - Page titles, section headers, breadcrumbs, tab labels
 - Entity names and field labels across forms and detail views
@@ -104,8 +104,7 @@ The single source of truth for entity and role names. If a term isn't in the "Ap
 | Successful hire, ongoing assignment | **Placement** | Hire, Join | "Hire" survives only inside feedback scores ("Strong Hire") |
 | Pipeline stage: offer extended | **Offer** | — | Pipeline stage only, not the entity |
 | Candidate sent to client | **Submission** | Presentation | |
-| Client-specific work initiative / talent pool | **Project** | Assignment (entity) | "Assignment" retained only for work-queue job-to-recruiter allocation |
-| Recruiter's allocated workload item | **Assignment** | Project | Work Queue context only |
+| Client-specific work initiative / talent pool | **Project** | Assignment (entity) | |
 | Internal written note | **Note** | Comment, Remark | |
 | Candidate resume file | **Resume** | CV | |
 | Recruiter to-do item | **Task** | Activity, To-do | |
@@ -159,7 +158,7 @@ Kill on sight: `New Candidate`, `New Dashboard`, `Build My Dashboard`, `Launch`,
 
 ## 7. Page Naming Standards
 
-- Top-level nav pages: plural noun, no qualifier — `Jobs`, `Candidates`, `Interviews`, `Placements`, `Projects`, `Reports`, `Settings`, `Work Queue`.
+- Top-level nav pages: plural noun, no qualifier — `Jobs`, `Candidates`, `Interviews`, `Placements`, `Projects`, `Reports`, `Settings`.
 - Creation pages: `[Verb] [Entity]` per §6, no article — `Post Job` (not "Post a Job"), `Add Candidate`.
 - Detail pages: the entity's own name/title as the page heading (candidate's name, job title) — no suffix like "Details," "Profile," or "Overview" needed in the heading itself; use breadcrumbs for hierarchy.
 - Nested settings pages: `[Module] Settings` consistently — `Interview Settings`, `Agent Settings` (currently missing an explicit title — add it), `Automation Settings`.
@@ -184,7 +183,6 @@ Settings' "customize your stages" feature is allowed to *rename* these ten stage
 - Placement status: `Active · Starting Today · Starting Soon · Ending Soon · Completed · Needs Attention`
 - Interview status: `Scheduled · Confirmed · Completed · Rescheduled · Cancelled · No Show`
 - Agent/Automation run status: `Running · Scheduled · Paused · Completed · Failed`
-- Work Queue status: `Needs Assignment · Assigned · In Progress · No Activity · Completed · Overdue`
 
 ## 10. Notification (Toast) Standards
 

@@ -232,7 +232,7 @@ export default function UsersPage() {
           summary={
             <SummaryGrid items={[
               { label: 'Default role',      value: 'Recruiter' },
-              { label: 'Default dashboard', value: 'Work Queue' },
+              { label: 'Default dashboard', value: 'Dashboard' },
               { label: 'Online status',     value: 'Auto (based on login)' },
             ]} />
           }
@@ -246,9 +246,8 @@ export default function UsersPage() {
               </select>
             </CardRow>
             <CardRow label="Default dashboard">
-              <select defaultValue="Work Queue" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="Dashboard" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
                 <option>Dashboard</option>
-                <option>Work Queue</option>
                 <option>Jobs</option>
                 <option>Candidates</option>
               </select>
