@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
@@ -393,15 +394,12 @@ function AddInterviewDialog({ candidateId, jobs, onClose, onCreated }: {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
-      <div className="bg-background rounded-xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 py-3.5 border-b shrink-0">
-          <p className="text-sm font-semibold">Schedule interview</p>
-          <button onClick={onClose} className="size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-            <X className="size-4" />
-          </button>
-        </div>
-        <div className="p-5 space-y-3.5 overflow-y-auto">
+    <Dialog open onOpenChange={open => { if (!open) onClose() }}>
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Schedule interview</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3.5">
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="space-y-1.5">
@@ -465,16 +463,16 @@ function AddInterviewDialog({ candidateId, jobs, onClose, onCreated }: {
               className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground" />
           </div>
         </div>
-        <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t bg-muted/20 shrink-0">
+        <DialogFooter>
           <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
           <Button size="sm" disabled={!jobCandidateId || !date || !time || submitting}
             onClick={handleSubmit}
             className="bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40">
             {submitting ? 'Scheduling…' : 'Schedule Interview'}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
