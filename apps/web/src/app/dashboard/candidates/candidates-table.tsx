@@ -600,6 +600,7 @@ function CandidatePreviewSheet({
   const [loading, setLoading]     = useState(false)
   const [noteText, setNoteText]   = useState('')
   const [saving, setSaving]       = useState(false)
+  const [addNoteOpen, setAddNoteOpen] = useState(false)
   const [addInterviewOpen, setAddInterviewOpen] = useState(false)
   const [, startTransition]       = useTransition()
 
@@ -613,7 +614,7 @@ function CandidatePreviewSheet({
 
   useEffect(() => {
     if (!candidate) return
-    setTab('notes'); setNotes([]); setJobs([]); setInterviews([]); setResumeUrl(null); setNoteText('')
+    setTab('notes'); setNotes([]); setJobs([]); setInterviews([]); setResumeUrl(null); setNoteText(''); setAddNoteOpen(false)
     loadPreview(candidate.id)
   }, [candidate?.id])
 
@@ -630,6 +631,7 @@ function CandidatePreviewSheet({
         time: 'Just now',
       }, ...prev])
       setNoteText('')
+      setAddNoteOpen(false)
     }
     setSaving(false)
   }
@@ -655,7 +657,7 @@ function CandidatePreviewSheet({
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="px-6 py-4 border-b shrink-0">
           <div className="flex items-start gap-4">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-3 min-w-0">
               <Avatar className="size-10 shrink-0">
                 <AvatarFallback className="text-sm font-semibold bg-brand-muted text-brand">{initials}</AvatarFallback>
               </Avatar>
@@ -673,7 +675,7 @@ function CandidatePreviewSheet({
               </div>
             </div>
 
-            {(candidate.email || candidate.phone || candidate.source) && (
+            {(candidate.email || candidate.phone || candidate.source || candidate.candidate_type) && (
               <>
                 <div className="w-px self-stretch bg-border shrink-0" />
                 <div className="flex flex-col gap-1 shrink-0 min-w-[180px] max-w-[240px]">
@@ -693,6 +695,9 @@ function CandidatePreviewSheet({
                   )}
                   {candidate.source && (
                     <span className="text-sm text-muted-foreground truncate">Source: {candidate.source}</span>
+                  )}
+                  {candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
+                    <span className="text-sm text-muted-foreground truncate">Type: {WORK_AUTH[candidate.candidate_type]}</span>
                   )}
                 </div>
               </>
@@ -740,9 +745,6 @@ function CandidatePreviewSheet({
 
         {/* ── Info strip ──────────────────────────────────────────────── */}
         <div className="flex items-center gap-4 px-6 py-2.5 bg-muted/40 border-b shrink-0 flex-wrap">
-          {candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
-            <span className="text-sm text-muted-foreground">{WORK_AUTH[candidate.candidate_type]}</span>
-          )}
           {candidate.notice_period && (
             <span className="text-sm text-muted-foreground">Available: {candidate.notice_period}</span>
           )}
@@ -773,20 +775,32 @@ function CandidatePreviewSheet({
         ) : tab === 'notes' ? (
           <div className="flex-1 flex flex-col min-h-0">
             {/* Add note */}
-            <div className="px-6 py-4 border-b shrink-0">
-              <textarea
-                value={noteText}
-                onChange={e => setNoteText(e.target.value)}
-                placeholder="Add a note…"
-                rows={3}
-                className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground"
-              />
-              <div className="flex justify-end mt-2">
-                <Button size="sm" disabled={!noteText.trim() || saving} onClick={submitNote} className="h-7 text-sm">
-                  {saving ? <Loader2 className="size-3 animate-spin mr-1.5" /> : null}
-                  Add Note
+            <div className="px-6 py-3 border-b shrink-0">
+              {!addNoteOpen ? (
+                <Button variant="outline" size="sm" onClick={() => setAddNoteOpen(true)} className="h-7 px-2.5 gap-1.5 text-sm">
+                  <Plus className="size-3" />Add Note
                 </Button>
-              </div>
+              ) : (
+                <div>
+                  <textarea
+                    autoFocus
+                    value={noteText}
+                    onChange={e => setNoteText(e.target.value)}
+                    placeholder="Add a note…"
+                    rows={3}
+                    className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground"
+                  />
+                  <div className="flex justify-end gap-2 mt-2">
+                    <Button variant="outline" size="sm" onClick={() => { setAddNoteOpen(false); setNoteText('') }} className="h-7 text-sm">
+                      Cancel
+                    </Button>
+                    <Button size="sm" disabled={!noteText.trim() || saving} onClick={submitNote} className="h-7 text-sm">
+                      {saving ? <Loader2 className="size-3 animate-spin mr-1.5" /> : null}
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Notes list */}
@@ -823,14 +837,14 @@ function CandidatePreviewSheet({
         ) : (
           /* Interviews tab */
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex items-center justify-between px-6 py-3 border-b shrink-0">
-              {jobs.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Submit this candidate to a job before scheduling an interview.</p>
-              ) : <span />}
+            <div className="flex items-center gap-3 px-6 py-3 border-b shrink-0">
               <Button size="sm" disabled={jobs.length === 0} onClick={() => setAddInterviewOpen(true)}
-                className="h-8 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40 shrink-0">
-                <Plus className="size-3.5" />Add Interview
+                className="h-7 px-2.5 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40 shrink-0">
+                <Plus className="size-3" />Add Interview
               </Button>
+              {jobs.length === 0 && (
+                <p className="text-sm text-muted-foreground">Submit this candidate to a job before scheduling an interview.</p>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {interviews.length === 0 ? (
