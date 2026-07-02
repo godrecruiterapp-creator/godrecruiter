@@ -26,7 +26,27 @@ import {
   deleteJobAction, updateJobStatusAction,
   addJobNoteAction, deleteJobNoteAction,
   uploadJobDocumentAction, deleteJobDocumentAction,
+  generateOutreachEmailAction,
 } from '../actions'
+import { toInitials } from '@/lib/format'
+import {
+  ExecutiveSummaryCard, JobIntelligenceCard, RecommendedRecruiterCard,
+  NextBestActionsCard, JobReadinessCard,
+} from './job-intelligence-sections'
+import type {
+  computeJobReadiness, computeJobHealth, computeFillProbability,
+  computeRecruiterMatches, computeCandidateCategories, computeNextBestActions,
+  CategoryCandidate,
+} from '@/lib/job-intelligence'
+
+export type JobIntelligenceBundle = {
+  readiness: ReturnType<typeof computeJobReadiness>
+  health: ReturnType<typeof computeJobHealth>
+  fillProbability: ReturnType<typeof computeFillProbability>
+  recruiterMatches: ReturnType<typeof computeRecruiterMatches>
+  candidateCategories: ReturnType<typeof computeCandidateCategories>
+  nextBestActions: ReturnType<typeof computeNextBestActions>
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -34,7 +54,7 @@ export interface JobDetailData {
   id: string; display_id: string | null; title: string
   client: string | null; city: string | null; state: string | null
   employment_type: string | null; work_mode: string | null; client_type: string | null
-  status: string; priority: string | null; recruiter_name: string | null
+  status: string; priority: string | null; recruiter_id: string | null; recruiter_name: string | null
   openings: number | null; department: string | null
   description: string | null; requirements: string | null
   salary_min: number | null; salary_max: number | null
@@ -64,7 +84,7 @@ const STAGES = [
 ]
 
 type Candidate = {
-  id: string; name: string; initials: string
+  id: string; candidateId: string; name: string; initials: string
   exp: string; expYears: number; location: string
   visa: string; score: number; stage: string
 }
@@ -72,7 +92,15 @@ type Note         = { id: string; author: string; initials: string; text: string
 type Doc          = { id: string; name: string; size: string; type: string; uploadedAt: string }
 type ActivityItem = { id: string; actor: string; action: string; time: string }
 
-// ponytail: CANDIDATES/NOTES/DOCS are empty until job_candidates/job_notes/job_documents tables exist
+function toDisplayCandidate(entry: CategoryCandidate): Candidate {
+  const c = entry.candidate
+  const name = `${c.first_name} ${c.last_name}`
+  return {
+    id: c.id, candidateId: c.id, name, initials: toInitials(name),
+    exp: '—', expYears: 0, location: c.location ?? '—', visa: '—',
+    score: entry.score ?? 0, stage: 'sourced',
+  }
+}
 
 // ── Score badge ───────────────────────────────────────────────────────────────
 
@@ -230,14 +258,54 @@ function CandidateTable({ candidates, onSelect }: { candidates: Candidate[]; onS
   )
 }
 
+// ── Candidate category group (suggestions, not yet in this job's pipeline) ────
+
+function CandidateCategoryGroup({ title, description, candidates, onSelect }: {
+  title: string; description: string; candidates: Candidate[]; onSelect: (c: Candidate) => void
+}) {
+  const [open, setOpen] = useState(true)
+  if (candidates.length === 0) return null
+  return (
+    <div className="border border-border rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between gap-4 px-5 py-3 bg-muted/20 hover:bg-muted/30 transition-colors text-left"
+      >
+        <div className="min-w-0">
+          <p className="text-base font-medium text-foreground">
+            {title} <span className="text-sm text-muted-foreground font-normal">({candidates.length})</span>
+          </p>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        <ChevronDown className={`size-4 text-muted-foreground shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && <CandidateTable candidates={candidates} onSelect={onSelect} />}
+    </div>
+  )
+}
+
 // ── Candidate drawer (50% width) ──────────────────────────────────────────────
 
-function CandidateDrawer({ c, open, onClose }: { c: Candidate | null; open: boolean; onClose: () => void }) {
+function CandidateDrawer({ c, open, onClose, jobId, aiEnabled }: {
+  c: Candidate | null; open: boolean; onClose: () => void; jobId: string; aiEnabled: boolean
+}) {
   const [tab, setTab] = useState<'profile' | 'resume' | 'notes'>('profile')
   const [noteText, setNoteText] = useState('')
   const [notes, setNotes] = useState<{ id: string; text: string; time: string }[]>([])
+  const [emailPending, startEmailTransition] = useTransition()
+  const [generatedEmail, setGeneratedEmail] = useState<string | null>(null)
+  const [emailError, setEmailError] = useState<string | null>(null)
 
   if (!c) return null
+
+  function generateEmail() {
+    setEmailError(null)
+    startEmailTransition(async () => {
+      const res = await generateOutreachEmailAction(jobId, c!.candidateId)
+      if ('error' in res) setEmailError(res.error)
+      else setGeneratedEmail(res.text)
+    })
+  }
 
   function addNote() {
     if (!noteText.trim()) return
@@ -303,13 +371,26 @@ function CandidateDrawer({ c, open, onClose }: { c: Candidate | null; open: bool
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <button className="size-9 flex items-center justify-center border border-border rounded-md text-muted-foreground hover:text-brand hover:border-brand transition-colors">
+            <button
+              onClick={generateEmail}
+              disabled={!aiEnabled || emailPending}
+              title={aiEnabled ? 'Generate outreach email' : 'AI features not configured'}
+              className="size-9 flex items-center justify-center border border-border rounded-md text-muted-foreground hover:text-brand hover:border-brand transition-colors disabled:opacity-40"
+            >
               <Mail className="size-4" />
             </button>
             <button className="size-9 flex items-center justify-center border border-border rounded-md text-muted-foreground hover:text-brand hover:border-brand transition-colors">
               <Phone className="size-4" />
             </button>
           </div>
+
+          {emailError && <p className="text-sm text-destructive mb-4">{emailError}</p>}
+          {generatedEmail && (
+            <div className="mb-5 rounded-lg border border-purple-200 dark:border-purple-900 bg-purple-50/40 dark:bg-purple-950/20 p-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400 mb-2">AI generated outreach email</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{generatedEmail}</p>
+            </div>
+          )}
 
           {/* Sub-tabs */}
           <div className="flex items-center gap-0">
@@ -739,16 +820,32 @@ function DocumentsTab({ jobId, docs, setDocs }: {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function JobDetailClient({ job, initialNotes, initialDocs, initialActivity }: {
+export function JobDetailClient({ job, initialNotes, initialDocs, initialActivity, initialCandidates, intelligence, aiEnabled }: {
   job: JobDetailData
   initialNotes: Note[]
   initialDocs: Doc[]
   initialActivity: ActivityItem[]
+  initialCandidates: Candidate[]
+  intelligence: JobIntelligenceBundle
+  aiEnabled: boolean
 }) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
-  const [candidates, setCandidates]           = useState<Candidate[]>([])
+  const { readiness, health, fillProbability, recruiterMatches, candidateCategories, nextBestActions } = intelligence
+
+  const categoryGroups = useMemo(() => ([
+    { key: 'strongMatches',       title: 'Strong matches',        description: 'High keyword overlap with this job, not yet in the pipeline', candidates: candidateCategories.strongMatches.map(toDisplayCandidate) },
+    { key: 'internalMatches',     title: 'Internal matches',      description: 'Partial keyword overlap with this job, worth a look',          candidates: candidateCategories.internalMatches.map(toDisplayCandidate) },
+    { key: 'previousPlacements',  title: 'Previous placements',   description: `Placed at ${job.client ?? 'this client'} before`,               candidates: candidateCategories.previousPlacements.map(toDisplayCandidate) },
+    { key: 'previousInterviews',  title: 'Previous interviews',   description: `Interviewed at ${job.client ?? 'this client'} before`,          candidates: candidateCategories.previousInterviews.map(toDisplayCandidate) },
+    { key: 'silverMedalists',     title: 'Silver medalists',      description: 'Reached offer stage on a prior job, not placed',                candidates: candidateCategories.silverMedalists.map(toDisplayCandidate) },
+    { key: 'submittedPreviously', title: 'Submitted previously',  description: `Submitted to ${job.client ?? 'this client'} before`,            candidates: candidateCategories.submittedPreviously.map(toDisplayCandidate) },
+    { key: 'recentlyActive',      title: 'Recently active',       description: 'Updated in your ATS in the last 14 days',                       candidates: candidateCategories.recentlyActive.map(toDisplayCandidate) },
+    { key: 'passive',             title: 'Passive candidates',    description: 'No activity in over 90 days',                                   candidates: candidateCategories.passive.map(toDisplayCandidate) },
+  ]), [candidateCategories, job.client])
+
+  const [candidates, setCandidates]           = useState<Candidate[]>(initialCandidates)
   const [notes, setNotes]                     = useState<Note[]>(initialNotes)
   const [docs, setDocs]                       = useState<Doc[]>(initialDocs)
   const [activity]                            = useState<ActivityItem[]>(initialActivity)
@@ -991,25 +1088,56 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
                     <span className="text-sm text-muted-foreground">{filteredCandidates.length} of {candidates.length}</span>
                   )}
                 </div>
-                {/* Table */}
+                {/* Pipeline table + candidate strategy suggestions */}
                 <div className="flex-1 overflow-auto">
                   <CandidateTable
                     candidates={filteredCandidates}
                     onSelect={c => { setActiveCandidate(c); setDrawerOpen(true) }}
                   />
+
+                  <div className="px-5 py-6 space-y-4 border-t">
+                    <div>
+                      <p className="text-lg font-semibold text-foreground">Candidate strategy</p>
+                      <p className="text-sm text-muted-foreground">Candidates not yet in this job's pipeline, grouped by why they're worth a look</p>
+                    </div>
+                    {categoryGroups.map(g => (
+                      <CandidateCategoryGroup
+                        key={g.key}
+                        title={g.title}
+                        description={g.description}
+                        candidates={g.candidates}
+                        onSelect={c => { setActiveCandidate(c); setDrawerOpen(true) }}
+                      />
+                    ))}
+                    {candidateCategories.needExternalSearch.count > 0 && (
+                      <div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20">
+                        <Search className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Need external search</p>
+                          <p className="text-sm text-muted-foreground">{candidateCategories.needExternalSearch.reason}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* ── Overview (70/30 split) ──────────────────────────────────── */}
+            {/* ── Overview ───────────────────────────────────────────────── */}
             {activeTab === 'details' && (
               <div className="flex-1 overflow-auto">
-                <div className="flex h-full divide-x divide-border">
+                <div className="max-w-[880px] mx-auto px-6 py-6 space-y-8">
 
-                  {/* 70% — Job Description */}
-                  <div className="w-[70%] px-6 py-6 overflow-auto">
+                  <ExecutiveSummaryCard health={health} readiness={readiness} fillProbability={fillProbability} />
+                  <JobIntelligenceCard jobId={job.id} fillProbability={fillProbability} health={health} aiEnabled={aiEnabled} />
+                  <RecommendedRecruiterCard jobId={job.id} matches={recruiterMatches} currentRecruiterId={job.recruiter_id} />
+                  <NextBestActionsCard actions={nextBestActions} />
+                  <JobReadinessCard readiness={readiness} />
+
+                  {/* Job Description */}
+                  <div>
                     <div className="flex items-center justify-between mb-4">
-                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Job Description</p>
+                      <p className="text-lg font-semibold text-foreground">Job description</p>
                       <button
                         onClick={() => setDescOpen(true)}
                         className="size-7 flex items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -1019,7 +1147,7 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
                       </button>
                     </div>
                     {job.description ? (
-                      <p className="text-sm text-foreground leading-7 whitespace-pre-wrap">{job.description}</p>
+                      <p className="text-base text-foreground leading-7 whitespace-pre-wrap">{job.description}</p>
                     ) : (
                       <div className="border-2 border-dashed border-border rounded-lg py-14 flex flex-col items-center gap-3 text-center">
                         <FileText className="size-8 text-muted-foreground/30" />
@@ -1029,19 +1157,67 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
                     )}
                   </div>
 
-                  {/* 30% — Job details */}
-                  <div className="w-[30%] px-5 py-6 space-y-5 overflow-auto">
-                    {[
-                      { label: 'Department', value: job.department || '—' },
-                      { label: 'Duration',   value: empType       || '—' },
-                      { label: 'Work Mode',  value: workMode      || '—' },
-                      { label: 'Openings',   value: String(job.openings ?? 1) },
-                    ].map(({ label, value }) => (
-                      <div key={label}>
-                        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">{label}</p>
-                        <p className="text-sm text-foreground leading-relaxed">{value}</p>
-                      </div>
-                    ))}
+                  {/* Requirements */}
+                  <div>
+                    <p className="text-lg font-semibold text-foreground mb-4">Requirements</p>
+                    {job.requirements ? (
+                      <p className="text-base text-foreground leading-7 whitespace-pre-wrap">{job.requirements}</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No requirements listed yet.</p>
+                    )}
+                  </div>
+
+                  {/* Rate information */}
+                  <div>
+                    <p className="text-lg font-semibold text-foreground mb-4">Rate information</p>
+                    <div className="grid grid-cols-4 gap-2.5">
+                      {[
+                        { label: 'Bill Rate', value: `$${billRate}/hr`, cls: 'text-foreground' },
+                        { label: 'Pay Rate',  value: `$${payRate}/hr`,  cls: 'text-foreground' },
+                        { label: 'Margin',    value: `$${margin}/hr`,   cls: 'text-emerald-600 dark:text-emerald-400' },
+                        { label: 'Margin %',  value: `${marginPct}%`,   cls: 'text-emerald-600 dark:text-emerald-400' },
+                      ].map(({ label, value, cls }) => (
+                        <div key={label} className="rounded-lg border border-border bg-muted/20 px-3 py-2.5">
+                          <p className="text-sm text-muted-foreground mb-1">{label}</p>
+                          <p className={`text-sm font-bold tabular-nums ${cls}`}>{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Client information */}
+                  <div>
+                    <p className="text-lg font-semibold text-foreground mb-4">Client information</p>
+                    <div className="grid grid-cols-2 gap-5">
+                      {[
+                        { label: 'Client',    value: job.client || '—' },
+                        { label: 'Location',  value: location || '—' },
+                        { label: 'Client Type', value: job.client_type === 'vms' ? 'VMS' : job.client_type === 'direct' ? 'Direct' : '—' },
+                        { label: 'Recruiter', value: job.recruiter_name || 'Unassigned' },
+                      ].map(({ label, value }) => (
+                        <div key={label}>
+                          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">{label}</p>
+                          <p className="text-sm text-foreground leading-relaxed">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Job timeline */}
+                  <div>
+                    <p className="text-lg font-semibold text-foreground mb-4">Job timeline</p>
+                    <div className="grid grid-cols-3 gap-5">
+                      {[
+                        { label: 'Posted',    value: new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) },
+                        { label: 'Open for',  value: `${ageDays} day${ageDays === 1 ? '' : 's'}` },
+                        { label: 'Last updated', value: new Date(job.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) },
+                      ].map(({ label, value }) => (
+                        <div key={label}>
+                          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">{label}</p>
+                          <p className="text-sm text-foreground leading-relaxed">{value}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -1135,6 +1311,8 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
         c={activeCandidate}
         open={drawerOpen}
         onClose={() => { setDrawerOpen(false); setActiveCandidate(null) }}
+        jobId={job.id}
+        aiEnabled={aiEnabled}
       />
     </div>
   )

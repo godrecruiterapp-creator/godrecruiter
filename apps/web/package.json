@@ -10,6 +10,7 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.1",
     "@god-recruiter/types": "workspace:*",
     "@god-recruiter/validators": "workspace:*",
     "@radix-ui/react-avatar": "^1.2.0",

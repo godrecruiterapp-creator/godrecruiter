@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getAnthropicClient } from '@/lib/anthropic'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
@@ -257,4 +258,84 @@ export async function deleteJobDocumentAction(docId: string) {
   if (doc?.storage_path) await admin.storage.from('job-documents').remove([doc.storage_path])
   await admin.from('job_documents').delete().eq('id', docId)
   return { success: true }
+}
+
+// ── Recruiter assignment ─────────────────────────────────────────────────────
+
+export async function assignRecruiterAction(jobId: string, recruiterId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const admin = createAdminClient()
+
+  const { data: recruiter } = await admin.from('platform_users').select('full_name').eq('id', recruiterId).single()
+  if (!recruiter) return { error: 'Recruiter not found.' }
+
+  const { error } = await admin.from('jobs')
+    .update({ recruiter_id: recruiterId, recruiter_name: recruiter.full_name })
+    .eq('id', jobId)
+  if (error) return { error: error.message }
+
+  await admin.from('job_activity').insert({
+    id: ulid(), job_id: jobId, tenant_id: ctx.tenant_id,
+    actor_id: ctx.user.id, actor_name: ctx.name, action: `Assigned ${recruiter.full_name} as recruiter`,
+  })
+  return { success: true as const }
+}
+
+// ── AI generative text (outreach / sourcing) — never used for scoring ────────
+
+export async function generateOutreachEmailAction(jobId: string, candidateId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const client = getAnthropicClient()
+  if (!client) return { error: 'AI features are not configured.' }
+
+  const admin = createAdminClient()
+  const [{ data: job }, { data: candidate }] = await Promise.all([
+    admin.from('jobs').select('title, client, city, state, requirements').eq('id', jobId).single(),
+    admin.from('candidates').select('first_name, last_name, current_title, current_company').eq('id', candidateId).single(),
+  ])
+  if (!job || !candidate) return { error: 'Job or candidate not found.' }
+
+  const message = await client.messages.create({
+    model: 'claude-sonnet-5',
+    max_tokens: 400,
+    messages: [{
+      role: 'user',
+      content: `Write a short, friendly recruiter outreach email to a candidate about a job opening. Plain text, no subject line, no placeholders.
+
+Candidate: ${candidate.first_name} ${candidate.last_name}, currently ${candidate.current_title ?? 'unknown title'} at ${candidate.current_company ?? 'unknown company'}.
+Job: ${job.title} at ${job.client ?? 'our client'}${job.city ? ` in ${job.city}${job.state ? `, ${job.state}` : ''}` : ''}.
+Requirements: ${job.requirements ?? 'not specified'}.`,
+    }],
+  })
+  const text = message.content.find(b => b.type === 'text')?.text ?? ''
+  return { success: true as const, text }
+}
+
+export async function generateBooleanSearchAction(jobId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+  const client = getAnthropicClient()
+  if (!client) return { error: 'AI features are not configured.' }
+
+  const admin = createAdminClient()
+  const { data: job } = await admin.from('jobs').select('title, department, requirements, city, state').eq('id', jobId).single()
+  if (!job) return { error: 'Job not found.' }
+
+  const message = await client.messages.create({
+    model: 'claude-sonnet-5',
+    max_tokens: 300,
+    messages: [{
+      role: 'user',
+      content: `Write a single LinkedIn/Google X-ray boolean search string for sourcing candidates for this job. Return only the boolean string, no explanation.
+
+Title: ${job.title}
+Department: ${job.department ?? 'not specified'}
+Requirements: ${job.requirements ?? 'not specified'}
+Location: ${[job.city, job.state].filter(Boolean).join(', ') || 'not specified'}`,
+    }],
+  })
+  const text = message.content.find(b => b.type === 'text')?.text ?? ''
+  return { success: true as const, text }
 }
