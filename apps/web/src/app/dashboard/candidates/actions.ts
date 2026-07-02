@@ -137,11 +137,15 @@ export async function deleteCandidateAction(candidateId: string) {
 export async function getCandidatePreviewAction(candidateId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { notes: [], jobs: [], resume_url: null }
+  if (!user) return { notes: [], jobs: [], interviews: [], resume_url: null }
   const admin = createAdminClient()
-  const [notesRes, jobsRes, candRes] = await Promise.all([
+  const [notesRes, jobsRes, interviewsRes, candRes] = await Promise.all([
     admin.from('candidate_notes').select('id, author_name, text, created_at').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
     admin.from('job_candidates').select('id, stage, jobs(id, title, client, status)').eq('candidate_id', candidateId).order('created_at', { ascending: false }),
+    admin.from('interviews')
+      .select('id, interview_type, status, scheduled_at, duration_minutes, interviewer_name, location, meeting_url, notes, job_candidates!inner(candidate_id, jobs(id, title, client))')
+      .eq('job_candidates.candidate_id', candidateId)
+      .order('scheduled_at', { ascending: false }),
     admin.from('candidates').select('resume_url').eq('id', candidateId).single(),
   ])
   function rel(iso: string) {
@@ -155,7 +159,66 @@ export async function getCandidatePreviewAction(candidateId: string) {
     resume_url: (candRes.data as any)?.resume_url ?? null,
     notes: (notesRes.data ?? []).map((n: any) => ({ id: n.id, author: n.author_name, text: n.text, time: rel(n.created_at) })),
     jobs: (jobsRes.data ?? []).map((jc: any) => ({ submissionId: jc.id, stage: jc.stage, jobId: jc.jobs?.id ?? '', title: jc.jobs?.title ?? '—', client: jc.jobs?.client ?? null, status: jc.jobs?.status ?? '—' })),
+    interviews: (interviewsRes.data ?? []).map((iv: any) => ({
+      id: iv.id,
+      jobId: iv.job_candidates?.jobs?.id ?? '',
+      jobTitle: iv.job_candidates?.jobs?.title ?? '—',
+      client: iv.job_candidates?.jobs?.client ?? null,
+      type: iv.interview_type,
+      status: iv.status,
+      scheduledAt: iv.scheduled_at,
+      scheduledLabel: new Date(iv.scheduled_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+      durationMinutes: iv.duration_minutes,
+      interviewer: iv.interviewer_name,
+      location: iv.location,
+      meetingUrl: iv.meeting_url,
+      notes: iv.notes,
+    })),
   }
+}
+
+// ── Interviews ─────────────────────────────────────────────────────────────────
+
+export async function createInterviewAction(candidateId: string, formData: FormData) {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+
+  const jobCandidateId  = formData.get('job_candidate_id') as string
+  const interviewType   = formData.get('interview_type') as string
+  const dateStr         = formData.get('date') as string
+  const timeStr         = formData.get('time') as string
+  const durationRaw     = formData.get('duration_minutes') as string
+  const interviewerName = formData.get('interviewer_name') as string
+  const location        = formData.get('location') as string
+  const meetingUrl      = formData.get('meeting_url') as string
+  const notes           = formData.get('notes') as string
+
+  if (!jobCandidateId) return { error: 'Select which job submission this interview is for.' }
+  if (!dateStr || !timeStr) return { error: 'Date and time are required.' }
+
+  const scheduledAt = new Date(`${dateStr}T${timeStr}`)
+  if (isNaN(scheduledAt.getTime())) return { error: 'Invalid date or time.' }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('interviews').insert({
+    id: ulid(), job_candidate_id: jobCandidateId, tenant_id: ctx.tenant_id,
+    interview_type: interviewType || 'video',
+    scheduled_at: scheduledAt.toISOString(),
+    duration_minutes: durationRaw ? parseInt(durationRaw) : 30,
+    interviewer_name: interviewerName || null,
+    location: location || null,
+    meeting_url: meetingUrl || null,
+    notes: notes || null,
+    created_by: ctx.user.id,
+  })
+  if (error) return { error: error.message }
+
+  await admin.from('candidate_activity').insert({
+    id: ulid(), candidate_id: candidateId, tenant_id: ctx.tenant_id,
+    actor_id: ctx.user.id, actor_name: ctx.name, action: 'Scheduled an interview',
+  })
+
+  return { success: true as const }
 }
 
 // ── Shared context ─────────────────────────────────────────────────────────────

@@ -20,11 +20,13 @@ import {
   Mail, Phone, Send, Eye, Pencil, ChevronLeft, ChevronRight,
   BookmarkPlus, Bookmark, Download, SlidersHorizontal,
   FileText, ExternalLink, Loader2, Sparkles, SearchCode,
+  CalendarClock, MapPin, Link2,
 } from 'lucide-react'
 import {
   getCandidatePreviewAction,
   addCandidateNoteAction,
   deleteCandidateNoteAction,
+  createInterviewAction,
 } from './actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -230,6 +232,23 @@ function persistViews(v: SavedView[]) { localStorage.setItem(VIEWS_KEY, JSON.str
 
 type PreviewNote = { id: string; author: string; text: string; time: string }
 type PreviewJob  = { submissionId: string; stage: string; jobId: string; title: string; client: string | null; status: string }
+type PreviewInterview = {
+  id: string; jobId: string; jobTitle: string; client: string | null
+  type: string; status: string; scheduledAt: string; scheduledLabel: string
+  durationMinutes: number; interviewer: string | null; location: string | null
+  meetingUrl: string | null; notes: string | null
+}
+
+const INTERVIEW_TYPE_LABEL: Record<string, string> = {
+  phone: 'Phone Screen', video: 'Video', onsite: 'Onsite',
+  technical: 'Technical', panel: 'Panel', hiring_manager: 'Hiring Manager',
+}
+const INTERVIEW_STATUS_BADGE: Record<string, string> = {
+  scheduled: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+  completed: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+  cancelled: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700',
+  no_show:   'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+}
 
 // ── Shared small components ───────────────────────────────────────────────────
 
@@ -333,29 +352,161 @@ function ColPicker({ cols, onChange }: { cols: ColKey[]; onChange: (c: ColKey[])
 
 // ── Candidate preview sheet ───────────────────────────────────────────────────
 
+// ── Add interview dialog ──────────────────────────────────────────────────────
+
+function AddInterviewDialog({ candidateId, jobs, onClose, onCreated }: {
+  candidateId: string
+  jobs: PreviewJob[]
+  onClose: () => void
+  onCreated: () => void
+}) {
+  const [jobCandidateId, setJobCandidateId] = useState(jobs[0]?.submissionId ?? '')
+  const [interviewType, setInterviewType]   = useState('video')
+  const [date, setDate]                     = useState('')
+  const [time, setTime]                     = useState('')
+  const [duration, setDuration]             = useState('30')
+  const [interviewer, setInterviewer]       = useState('')
+  const [location, setLocation]             = useState('')
+  const [meetingUrl, setMeetingUrl]         = useState('')
+  const [notes, setNotes]                   = useState('')
+  const [submitting, setSubmitting]         = useState(false)
+  const [error, setError]                   = useState<string | null>(null)
+
+  async function handleSubmit() {
+    if (!jobCandidateId || !date || !time) return
+    setSubmitting(true)
+    setError(null)
+    const fd = new FormData()
+    fd.set('job_candidate_id', jobCandidateId)
+    fd.set('interview_type', interviewType)
+    fd.set('date', date)
+    fd.set('time', time)
+    fd.set('duration_minutes', duration)
+    fd.set('interviewer_name', interviewer)
+    fd.set('location', location)
+    fd.set('meeting_url', meetingUrl)
+    fd.set('notes', notes)
+    const res = await createInterviewAction(candidateId, fd)
+    setSubmitting(false)
+    if ('error' in res) { setError(res.error); return }
+    onCreated()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
+      <div className="bg-background rounded-xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b shrink-0">
+          <p className="text-sm font-semibold">Schedule interview</p>
+          <button onClick={onClose} className="size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <X className="size-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-3.5 overflow-y-auto">
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Job submission</Label>
+            <Select value={jobCandidateId} onValueChange={setJobCandidateId}>
+              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select a job submission" /></SelectTrigger>
+              <SelectContent>
+                {jobs.map(j => (
+                  <SelectItem key={j.submissionId} value={j.submissionId}>{j.title}{j.client ? ` — ${j.client}` : ''}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Type</Label>
+              <Select value={interviewType} onValueChange={setInterviewType}>
+                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(INTERVIEW_TYPE_LABEL).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Duration (min)</Label>
+              <Input type="number" min="15" step="15" value={duration} onChange={e => setDuration(e.target.value)} className="h-9 text-sm" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Date <span className="text-destructive">*</span></Label>
+              <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="h-9 text-sm" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Time <span className="text-destructive">*</span></Label>
+              <Input type="time" value={time} onChange={e => setTime(e.target.value)} className="h-9 text-sm" />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Interviewer</Label>
+            <Input value={interviewer} onChange={e => setInterviewer(e.target.value)} placeholder="e.g. Priya Sharma" className="h-9 text-sm" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Location</Label>
+              <Input value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. Office, 3rd floor" className="h-9 text-sm" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Meeting link</Label>
+              <Input value={meetingUrl} onChange={e => setMeetingUrl(e.target.value)} placeholder="https://…" className="h-9 text-sm" />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Notes</Label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
+              className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground" />
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t bg-muted/20 shrink-0">
+          <Button variant="outline" size="sm" onClick={onClose}>Cancel</Button>
+          <Button size="sm" disabled={!jobCandidateId || !date || !time || submitting}
+            onClick={handleSubmit}
+            className="bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40">
+            {submitting ? 'Scheduling…' : 'Schedule Interview'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CandidatePreviewSheet({
   candidate, onClose,
 }: {
   candidate: CandidateRow | null
   onClose: () => void
 }) {
-  const [tab, setTab]       = useState<'notes' | 'submissions'>('notes')
+  const [tab, setTab]       = useState<'notes' | 'submissions' | 'interviews'>('notes')
   const [notes, setNotes]   = useState<PreviewNote[]>([])
   const [jobs, setJobs]     = useState<PreviewJob[]>([])
+  const [interviews, setInterviews] = useState<PreviewInterview[]>([])
   const [resumeUrl, setResumeUrl] = useState<string | null>(null)
   const [loading, setLoading]     = useState(false)
   const [noteText, setNoteText]   = useState('')
   const [saving, setSaving]       = useState(false)
+  const [addInterviewOpen, setAddInterviewOpen] = useState(false)
   const [, startTransition]       = useTransition()
+
+  function loadPreview(id: string) {
+    setLoading(true)
+    return getCandidatePreviewAction(id).then(d => {
+      setNotes(d.notes); setJobs(d.jobs); setInterviews(d.interviews ?? []); setResumeUrl(d.resume_url)
+      setLoading(false)
+    })
+  }
 
   useEffect(() => {
     if (!candidate) return
-    setTab('notes'); setNotes([]); setJobs([]); setResumeUrl(null); setNoteText('')
-    setLoading(true)
-    getCandidatePreviewAction(candidate.id).then(d => {
-      setNotes(d.notes); setJobs(d.jobs); setResumeUrl(d.resume_url)
-      setLoading(false)
-    })
+    setTab('notes'); setNotes([]); setJobs([]); setInterviews([]); setResumeUrl(null); setNoteText('')
+    loadPreview(candidate.id)
   }, [candidate?.id])
 
   async function submitNote() {
@@ -391,7 +542,7 @@ function CandidatePreviewSheet({
       <SheetContent
         side="right"
         className="p-0 flex flex-col overflow-hidden"
-        style={{ width: '50vw', maxWidth: '50vw' }}
+        style={{ width: '80vw', maxWidth: '80vw' }}
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="px-6 py-4 border-b shrink-0">
@@ -481,12 +632,14 @@ function CandidatePreviewSheet({
 
         {/* ── Tabs ────────────────────────────────────────────────────── */}
         <div className="flex items-center gap-0 border-b px-6 shrink-0">
-          {(['notes', 'submissions'] as const).map(t => (
+          {(['notes', 'submissions', 'interviews'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`h-10 px-4 text-sm font-medium border-b-2 transition-colors capitalize ${
                 tab === t ? 'border-brand text-brand' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}>
-              {t === 'notes' ? `Notes${notes.length ? ` (${notes.length})` : ''}` : `Submissions${jobs.length ? ` (${jobs.length})` : ''}`}
+              {t === 'notes' ? `Notes${notes.length ? ` (${notes.length})` : ''}`
+                : t === 'submissions' ? `Submissions${jobs.length ? ` (${jobs.length})` : ''}`
+                : `Interviews${interviews.length ? ` (${interviews.length})` : ''}`}
             </button>
           ))}
         </div>
@@ -541,7 +694,7 @@ function CandidatePreviewSheet({
               ))}
             </div>
           </div>
-        ) : (
+        ) : tab === 'submissions' ? (
           /* Submissions tab */
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {jobs.length === 0 ? (
@@ -573,8 +726,73 @@ function CandidatePreviewSheet({
               </div>
             )}
           </div>
+        ) : (
+          /* Interviews tab */
+          <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex items-center justify-between px-6 py-3 border-b shrink-0">
+              <p className="text-sm text-muted-foreground">
+                {jobs.length === 0 ? 'Submit this candidate to a job before scheduling an interview.' : 'Interviews scheduled for this candidate'}
+              </p>
+              <Button size="sm" disabled={jobs.length === 0} onClick={() => setAddInterviewOpen(true)}
+                className="h-8 gap-1.5 text-sm bg-brand hover:bg-brand/90 text-white border-0 disabled:opacity-40 shrink-0">
+                <Plus className="size-3.5" />Add Interview
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {interviews.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-2">
+                  <CalendarClock className="size-6 text-muted-foreground/30" />
+                  <p className="text-sm text-muted-foreground">No interviews scheduled yet</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {interviews.map(iv => (
+                    <div key={iv.id} className="p-3 rounded-lg border border-border">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{iv.jobTitle}{iv.client ? ` — ${iv.client}` : ''}</p>
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                            <CalendarClock className="size-3 shrink-0" />
+                            {iv.scheduledLabel} · {iv.durationMinutes}m
+                          </div>
+                          {iv.interviewer && <p className="text-sm text-muted-foreground mt-0.5">Interviewer: {iv.interviewer}</p>}
+                          {iv.location && (
+                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
+                              <MapPin className="size-3 shrink-0" />{iv.location}
+                            </div>
+                          )}
+                          {iv.meetingUrl && (
+                            <a href={iv.meetingUrl} target="_blank" rel="noreferrer"
+                              className="flex items-center gap-1.5 text-sm text-brand hover:underline mt-0.5 truncate">
+                              <Link2 className="size-3 shrink-0" />{iv.meetingUrl}
+                            </a>
+                          )}
+                          {iv.notes && <p className="text-sm text-foreground mt-1.5 whitespace-pre-wrap break-words">{iv.notes}</p>}
+                        </div>
+                        <div className="flex flex-col items-end gap-1.5 shrink-0">
+                          <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${INTERVIEW_STATUS_BADGE[iv.status] ?? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}>
+                            {iv.status.replace('_', ' ')}
+                          </span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">{INTERVIEW_TYPE_LABEL[iv.type] ?? iv.type}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </SheetContent>
+
+      {addInterviewOpen && (
+        <AddInterviewDialog
+          candidateId={candidate.id}
+          jobs={jobs}
+          onClose={() => setAddInterviewOpen(false)}
+          onCreated={() => { setAddInterviewOpen(false); loadPreview(candidate.id) }}
+        />
+      )}
     </Sheet>
   )
 }
