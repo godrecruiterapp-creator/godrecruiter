@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getAnthropicClient } from '@/lib/anthropic'
+import { getOpenAIClient, OPENAI_MODEL, friendlyOpenAIError } from '@/lib/openai'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
@@ -287,7 +287,7 @@ export async function assignRecruiterAction(jobId: string, recruiterId: string) 
 export async function generateOutreachEmailAction(jobId: string, candidateId: string) {
   const ctx = await getUserContext()
   if (!ctx) return { error: 'Not authenticated.' }
-  const client = getAnthropicClient()
+  const client = getOpenAIClient()
   if (!client) return { error: 'AI features are not configured.' }
 
   const admin = createAdminClient()
@@ -297,45 +297,57 @@ export async function generateOutreachEmailAction(jobId: string, candidateId: st
   ])
   if (!job || !candidate) return { error: 'Job or candidate not found.' }
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-5',
-    max_tokens: 400,
-    messages: [{
-      role: 'user',
-      content: `Write a short, friendly recruiter outreach email to a candidate about a job opening. Plain text, no subject line, no placeholders.
+  let completion
+  try {
+    completion = await client.chat.completions.create({
+      model: OPENAI_MODEL,
+      max_tokens: 400,
+      messages: [{
+        role: 'user',
+        content: `Write a short, friendly recruiter outreach email to a candidate about a job opening. Plain text, no subject line, no placeholders.
 
 Candidate: ${candidate.first_name} ${candidate.last_name}, currently ${candidate.current_title ?? 'unknown title'} at ${candidate.current_company ?? 'unknown company'}.
 Job: ${job.title} at ${job.client ?? 'our client'}${job.city ? ` in ${job.city}${job.state ? `, ${job.state}` : ''}` : ''}.
 Requirements: ${job.requirements ?? 'not specified'}.`,
-    }],
-  })
-  const text = message.content.find(b => b.type === 'text')?.text ?? ''
+      }],
+    })
+  } catch (err) {
+    console.error('[generateOutreachEmailAction] OpenAI request failed:', err)
+    return { error: friendlyOpenAIError(err) }
+  }
+  const text = completion.choices[0]?.message.content ?? ''
   return { success: true as const, text }
 }
 
 export async function generateBooleanSearchAction(jobId: string) {
   const ctx = await getUserContext()
   if (!ctx) return { error: 'Not authenticated.' }
-  const client = getAnthropicClient()
+  const client = getOpenAIClient()
   if (!client) return { error: 'AI features are not configured.' }
 
   const admin = createAdminClient()
   const { data: job } = await admin.from('jobs').select('title, department, requirements, city, state').eq('id', jobId).single()
   if (!job) return { error: 'Job not found.' }
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-5',
-    max_tokens: 300,
-    messages: [{
-      role: 'user',
-      content: `Write a single LinkedIn/Google X-ray boolean search string for sourcing candidates for this job. Return only the boolean string, no explanation.
+  let completion
+  try {
+    completion = await client.chat.completions.create({
+      model: OPENAI_MODEL,
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: `Write a single LinkedIn/Google X-ray boolean search string for sourcing candidates for this job. Return only the boolean string, no explanation.
 
 Title: ${job.title}
 Department: ${job.department ?? 'not specified'}
 Requirements: ${job.requirements ?? 'not specified'}
 Location: ${[job.city, job.state].filter(Boolean).join(', ') || 'not specified'}`,
-    }],
-  })
-  const text = message.content.find(b => b.type === 'text')?.text ?? ''
+      }],
+    })
+  } catch (err) {
+    console.error('[generateBooleanSearchAction] OpenAI request failed:', err)
+    return { error: friendlyOpenAIError(err) }
+  }
+  const text = completion.choices[0]?.message.content ?? ''
   return { success: true as const, text }
 }

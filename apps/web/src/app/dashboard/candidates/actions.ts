@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getOpenAIClient, OPENAI_MODEL, friendlyOpenAIError } from '@/lib/openai'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
@@ -218,4 +219,169 @@ export async function uploadCandidateResumeAction(candidateId: string, formData:
     actor_id: ctx.user.id, actor_name: ctx.name, action: `Uploaded resume: ${file.name}`,
   })
   return { success: true as const, resumeUrl: publicUrl, resumeName: file.name }
+}
+
+// ── Resume parsing (real extraction + AI structuring, never fabricated) ─────────
+
+export type ExtractedCandidateData = {
+  first_name: string; last_name: string; email: string; phone: string
+  current_title: string; current_company: string; location: string
+  experience: string; work_auth: string; skills: string[]
+  education: string; certifications: string[]; linkedin_url: string; summary: string
+}
+
+async function extractTextFromFile(file: File): Promise<{ text: string } | { error: string }> {
+  const ext = (file.name.split('.').pop() ?? '').toLowerCase()
+  const buffer = Buffer.from(await file.arrayBuffer())
+
+  if (ext === 'pdf') {
+    const { PDFParse } = await import('pdf-parse')
+    const parser = new PDFParse({ data: buffer })
+    try {
+      const result = await parser.getText()
+      return { text: result.text }
+    } catch (err) {
+      console.error('[extractTextFromFile] PDF parse failed:', err)
+      return { error: "Couldn't read this PDF. It may be scanned/image-only — try pasting the resume text instead." }
+    } finally {
+      await parser.destroy()
+    }
+  }
+  if (ext === 'docx') {
+    const mammoth = await import('mammoth')
+    try {
+      const result = await mammoth.extractRawText({ buffer })
+      return { text: result.value }
+    } catch {
+      return { error: "Couldn't read this Word document. Try pasting the resume text instead." }
+    }
+  }
+  if (ext === 'txt') {
+    return { text: buffer.toString('utf-8') }
+  }
+  if (ext === 'doc') {
+    return { error: "Legacy .doc files aren't supported. Save as PDF, DOCX, or plain text and try again." }
+  }
+  return { error: `Unsupported file type: .${ext || 'unknown'}` }
+}
+
+async function structureResumeText(text: string): Promise<{ data: ExtractedCandidateData } | { error: string }> {
+  const client = getOpenAIClient()
+  if (!client) return { error: 'AI features are not configured.' }
+
+  const trimmed = text.trim()
+  if (trimmed.length < 30) {
+    return { error: "Couldn't find enough text to parse. Try pasting the resume text instead." }
+  }
+
+  let completion
+  try {
+    completion = await client.chat.completions.create({
+    model: OPENAI_MODEL,
+    max_tokens: 1024,
+    tools: [{
+      type: 'function',
+      function: {
+        name: 'extract_candidate',
+        description: 'Extract structured candidate fields from resume or profile text',
+        parameters: {
+          type: 'object',
+          properties: {
+            first_name: { type: 'string' },
+            last_name: { type: 'string' },
+            email: { type: 'string' },
+            phone: { type: 'string' },
+            current_title: { type: 'string' },
+            current_company: { type: 'string' },
+            location: { type: 'string' },
+            experience: { type: 'string', description: 'Total years of professional experience as a plain number string, e.g. "8". Empty string if unknown.' },
+            work_auth: { type: 'string', description: 'Work authorization status if mentioned, e.g. "US Citizen", "H1B", "Green Card". Empty string if not mentioned.' },
+            skills: { type: 'array', items: { type: 'string' } },
+            education: { type: 'string' },
+            certifications: { type: 'array', items: { type: 'string' } },
+            linkedin_url: { type: 'string' },
+            summary: { type: 'string', description: 'A 2-3 sentence professional summary based only on what is in the text.' },
+          },
+          required: ['first_name', 'last_name', 'email', 'phone', 'current_title', 'current_company', 'location', 'experience', 'work_auth', 'skills', 'education', 'certifications', 'linkedin_url', 'summary'],
+        },
+      },
+    }],
+    tool_choice: { type: 'function', function: { name: 'extract_candidate' } },
+    messages: [{
+      role: 'user',
+      content: `Extract candidate information from the following text. Use only information present in the text — if a field isn't present, return an empty string or empty array. Never invent or guess data.\n\n${trimmed.slice(0, 15000)}`,
+    }],
+    })
+  } catch (err) {
+    console.error('[structureResumeText] OpenAI request failed:', err)
+    return { error: friendlyOpenAIError(err) }
+  }
+
+  const toolCall = completion.choices[0]?.message.tool_calls?.[0]
+  if (!toolCall || toolCall.type !== 'function') {
+    return { error: 'AI could not extract structured data from this text. Try entering details manually.' }
+  }
+  try {
+    return { data: JSON.parse(toolCall.function.arguments) as ExtractedCandidateData }
+  } catch {
+    return { error: 'AI could not extract structured data from this text. Try entering details manually.' }
+  }
+}
+
+export async function parseResumeAction(formData: FormData): Promise<{ data: ExtractedCandidateData } | { error: string }> {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+
+  const file = formData.get('file') as File | null
+  const pastedText = formData.get('text') as string | null
+
+  let text: string
+  if (file && file.size > 0) {
+    const extracted = await extractTextFromFile(file)
+    if ('error' in extracted) return extracted
+    text = extracted.text
+  } else if (pastedText) {
+    text = pastedText
+  } else {
+    return { error: 'No resume file or text provided.' }
+  }
+
+  return structureResumeText(text)
+}
+
+// ── Duplicate search (email / phone) ─────────────────────────────────────────────
+
+export type CandidateContactMatch = {
+  id: string; name: string; email: string; phone: string | null
+  createdAt: string; createdByName: string | null
+}
+
+export async function searchCandidatesByContactAction(query: string): Promise<{ matches: CandidateContactMatch[] } | { error: string }> {
+  const ctx = await getCandidateUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+
+  // Strip characters that are syntactically significant in PostgREST's .or() filter DSL
+  const q = query.trim().replace(/[,()]/g, '')
+  if (q.length < 4) return { matches: [] }
+
+  const admin = createAdminClient()
+  const { data, error } = await admin.from('candidates')
+    .select('id, first_name, last_name, email, phone, created_at, platform_users(full_name)')
+    .eq('tenant_id', ctx.tenant_id)
+    .is('deleted_at', null)
+    .or(`email.ilike.%${q}%,phone.ilike.%${q}%`)
+    .limit(5)
+
+  if (error) return { error: error.message }
+
+  return {
+    matches: (data ?? []).map((c: any) => ({
+      id: c.id,
+      name: `${c.first_name} ${c.last_name}`,
+      email: c.email,
+      phone: c.phone,
+      createdAt: c.created_at,
+      createdByName: c.platform_users?.full_name ?? null,
+    })),
+  }
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition, useRef, useCallback, useMemo } from 'react'
+import { useState, useTransition, useRef, useCallback, useMemo, useEffect } from 'react'
 import Link from 'next/link'
-import { createCandidateAction } from '../actions'
+import { createCandidateAction, parseResumeAction, searchCandidatesByContactAction, type CandidateContactMatch } from '../actions'
 import {
   ArrowLeft, Upload, FileText, Link2, Mail, Phone,
   Sparkles, Users, Briefcase, MapPin, DollarSign,
@@ -48,30 +48,6 @@ const MATCHING_JOBS_MOCK = [
   { title: 'Cloud Architect',       client: 'Shell',          payRate: '$85/hr', id: 'j2' },
   { title: 'Java + Spring Boot',    client: 'AT&T',           payRate: '$60/hr', id: 'j3' },
 ]
-
-// ─── Mock resume extraction result ────────────────────────────────────────────
-function mockExtract(fileName: string) {
-  const isNurse = /rn|nurse|icu|cna/i.test(fileName)
-  const isJava  = /java|spring|backend/i.test(fileName)
-  return {
-    first_name:      isNurse ? 'Sarah'   : 'Michael',
-    last_name:       isNurse ? 'Johnson' : 'Chen',
-    email:           isNurse ? 'sarah.johnson@email.com' : 'michael.chen@email.com',
-    phone:           '(713) 555-0192',
-    current_title:   isNurse ? 'Staff RN — ICU'         : 'Senior Java Developer',
-    current_company: isNurse ? 'Houston Methodist'       : 'TechCorp Inc',
-    location:        isNurse ? 'Houston, TX'             : 'Austin, TX',
-    experience:      isNurse ? '6'                       : '8',
-    work_auth:       isNurse ? 'US Citizen'              : 'H1B',
-    skills:          isNurse ? ['RN License','BLS','ACLS','ICU','Epic EMR'] : ['Java','Spring Boot','AWS','Microservices','SQL'],
-    education:       isNurse ? 'BSN — University of Texas (2018)' : "B.S. Computer Science — UT Austin (2016)",
-    certifications:  isNurse ? ['BLS','ACLS','NIHSS'] : ['AWS Solutions Architect'],
-    linkedin_url:    '',
-    summary:         isNurse
-      ? 'Experienced ICU nurse with 6 years of critical care experience. Proficient in Epic EMR, hemodynamic monitoring, and ventilator management.'
-      : 'Full-stack Java developer with 8 years building distributed microservices on AWS. Led teams of 5+ engineers at multiple Fortune 500 companies.',
-  }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -202,14 +178,27 @@ function IntakeScreen({ onExtracted, onSkip }: {
   const [dragging,    setDragging]   = useState(false)
   const [processing,  setProcessing] = useState(false)
   const [quickInput,  setQuickInput] = useState('')
-  const [quickMode,   setQuickMode]  = useState<'email' | 'paste' | null>(null)
+  const [quickMode,   setQuickMode]  = useState<'email' | 'paste' | 'linkedin' | null>(null)
+  const [error,       setError]      = useState<string | null>(null)
+  const [linkedinUrl, setLinkedinUrl]= useState('')
+  const [matches,     setMatches]    = useState<CandidateContactMatch[]>([])
+  const [searching,   setSearching]  = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const processFile = async (file: File) => {
+  const runExtraction = async (fd: FormData, resultFileName: string, overrides?: Partial<ExtractedData>) => {
+    setQuickMode(null)
     setProcessing(true)
-    await new Promise(r => setTimeout(r, 1800))
-    onExtracted(mockExtract(file.name), file.name)
+    setError(null)
+    const res = await parseResumeAction(fd)
     setProcessing(false)
+    if ('error' in res) { setError(res.error); return }
+    onExtracted({ ...res.data, ...overrides }, resultFileName)
+  }
+
+  const processFile = async (file: File) => {
+    const fd = new FormData()
+    fd.set('file', file)
+    await runExtraction(fd, file.name)
   }
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -222,6 +211,20 @@ function IntakeScreen({ onExtracted, onSkip }: {
     const file = e.target.files?.[0]
     if (file) processFile(file)
   }
+
+  // Debounced duplicate search
+  useEffect(() => {
+    if (quickMode !== 'email') { setMatches([]); return }
+    const q = quickInput.trim()
+    if (q.length < 4) { setMatches([]); return }
+    setSearching(true)
+    const timer = setTimeout(async () => {
+      const res = await searchCandidatesByContactAction(q)
+      setSearching(false)
+      setMatches('matches' in res ? res.matches : [])
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [quickInput, quickMode])
 
   if (processing) {
     return (
@@ -244,6 +247,13 @@ function IntakeScreen({ onExtracted, onSkip }: {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-6">
+      {error && (
+        <div className="mb-6 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/60 px-4 py-3 flex items-start gap-2.5">
+          <AlertCircle className="size-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+        </div>
+      )}
+
       {/* Drop zone */}
       <div
         onDrop={handleDrop}
@@ -256,12 +266,12 @@ function IntakeScreen({ onExtracted, onSkip }: {
             ? 'border-[#dd7456] bg-[#fdf0ec]/60 dark:bg-[#2a1a15]/60 scale-[1.01]'
             : 'border-border bg-muted/10 hover:border-[#dd7456]/50 hover:bg-[#fdf0ec]/20 dark:hover:bg-[#2a1a15]/20'
         )}>
-        <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={handleFile} />
+        <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" className="hidden" onChange={handleFile} />
         <div className="size-16 rounded-xl bg-[#fdf0ec] dark:bg-[#2a1a15] flex items-center justify-center mx-auto mb-4">
           <Upload className="size-8 text-[#dd7456]" />
         </div>
         <p className="text-lg font-bold mb-1">Drop resume here</p>
-        <p className="text-sm text-muted-foreground mb-4">PDF, Word, or plain text — AI will extract all fields automatically</p>
+        <p className="text-sm text-muted-foreground mb-4">PDF, Word (.docx), or plain text — AI will extract all fields automatically</p>
         <span className="inline-flex items-center h-9 px-5 rounded-xl bg-[#dd7456] text-white text-sm font-semibold hover:bg-[#c45e3e] transition-colors">
           Browse Resume
         </span>
@@ -269,7 +279,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
 
       {/* Alternate intake methods */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <button type="button" onClick={() => setQuickMode('paste')}
+        <button type="button" onClick={() => { setQuickMode('paste'); setError(null) }}
           className="flex items-center gap-3 p-4 rounded-xl border border-border bg-background hover:bg-muted/40 transition-colors text-left">
           <FileText className="size-5 text-muted-foreground shrink-0" />
           <div>
@@ -277,7 +287,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             <p className="text-[11px] text-muted-foreground">Copy-paste the full resume</p>
           </div>
         </button>
-        <button type="button" onClick={() => setQuickMode('email')}
+        <button type="button" onClick={() => { setQuickMode('email'); setError(null) }}
           className="flex items-center gap-3 p-4 rounded-xl border border-border bg-background hover:bg-muted/40 transition-colors text-left">
           <Mail className="size-5 text-muted-foreground shrink-0" />
           <div>
@@ -285,14 +295,14 @@ function IntakeScreen({ onExtracted, onSkip }: {
             <p className="text-[11px] text-muted-foreground">Check if candidate already exists</p>
           </div>
         </button>
-        <a href="https://www.linkedin.com" target="_blank" rel="noreferrer"
+        <button type="button" onClick={() => { setQuickMode('linkedin'); setError(null) }}
           className="flex items-center gap-3 p-4 rounded-xl border border-border bg-background hover:bg-muted/40 transition-colors text-left">
           <Link2 className="size-5 text-blue-500 shrink-0" />
           <div>
             <p className="text-sm font-semibold">Paste LinkedIn URL</p>
-            <p className="text-[11px] text-muted-foreground">Import from LinkedIn profile</p>
+            <p className="text-[11px] text-muted-foreground">Import from a LinkedIn profile</p>
           </div>
-        </a>
+        </button>
         <button type="button" onClick={onSkip}
           className="flex items-center gap-3 p-4 rounded-xl border border-border bg-background hover:bg-muted/40 transition-colors text-left">
           <User className="size-5 text-muted-foreground shrink-0" />
@@ -317,20 +327,25 @@ function IntakeScreen({ onExtracted, onSkip }: {
               autoFocus
             />
           </div>
-          {quickInput.length > 4 && (
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 p-3">
+          {searching && <p className="text-sm text-muted-foreground">Searching…</p>}
+          {!searching && quickInput.trim().length >= 4 && matches.length === 0 && (
+            <p className="text-sm text-muted-foreground">No existing candidate matches this email or phone.</p>
+          )}
+          {!searching && matches.map(m => (
+            <div key={m.id} className="rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 p-3">
               <div className="flex items-center gap-2 mb-2">
                 <AlertCircle className="size-4 text-amber-600 dark:text-amber-400" />
                 <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">Candidate may already exist</p>
               </div>
-              <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">Michael Chen · michael.chen@email.com · Added 14 days ago by Arun Kumar</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                {m.name} · {m.email}{m.phone ? ` · ${m.phone}` : ''} · Added {new Date(m.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}{m.createdByName ? ` by ${m.createdByName}` : ''}
+              </p>
               <div className="flex gap-2">
-                <button type="button" className="h-7 px-3 text-sm font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors">View Profile</button>
-                <button type="button" className="h-7 px-3 text-sm font-medium rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors">Merge</button>
+                <Link href={`/dashboard/candidates/${m.id}`} className="h-7 px-3 text-sm font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors flex items-center">View Profile</Link>
                 <button type="button" onClick={onSkip} className="h-7 px-3 text-sm font-medium rounded-lg border border-border text-muted-foreground hover:bg-muted/60 transition-colors">Continue Anyway</button>
               </div>
             </div>
-          )}
+          ))}
         </div>
       )}
 
@@ -349,11 +364,43 @@ function IntakeScreen({ onExtracted, onSkip }: {
             type="button"
             disabled={!quickInput.trim()}
             onClick={async () => {
-              setQuickMode(null)
-              setProcessing(true)
-              await new Promise(r => setTimeout(r, 1500))
-              onExtracted(mockExtract(quickInput), 'pasted-resume.txt')
-              setProcessing(false)
+              const fd = new FormData()
+              fd.set('text', quickInput)
+              await runExtraction(fd, 'Pasted resume text')
+            }}
+            className="h-8 px-4 text-sm font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
+            Extract with AI →
+          </button>
+        </div>
+      )}
+
+      {quickMode === 'linkedin' && (
+        <div className="rounded-xl border border-border bg-background p-4 space-y-3">
+          <p className="text-sm font-semibold">Import from LinkedIn</p>
+          <p className="text-[11px] text-muted-foreground -mt-2">
+            We can't pull LinkedIn profiles automatically — that requires LinkedIn's partner API. Paste the profile URL, then copy the visible profile text from your browser and paste it below.
+          </p>
+          <input
+            value={linkedinUrl}
+            onChange={e => setLinkedinUrl(e.target.value)}
+            placeholder="https://www.linkedin.com/in/…"
+            className="w-full h-9 px-3 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]"
+            autoFocus
+          />
+          <textarea
+            value={quickInput}
+            onChange={e => setQuickInput(e.target.value)}
+            placeholder="Paste the profile's About / Experience / Skills text here…"
+            rows={7}
+            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground"
+          />
+          <button
+            type="button"
+            disabled={!quickInput.trim()}
+            onClick={async () => {
+              const fd = new FormData()
+              fd.set('text', quickInput)
+              await runExtraction(fd, 'LinkedIn profile', linkedinUrl.trim() ? { linkedin_url: linkedinUrl.trim() } : undefined)
             }}
             className="h-8 px-4 text-sm font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
             Extract with AI →

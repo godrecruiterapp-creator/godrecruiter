@@ -143,7 +143,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       initialActivity={initialActivity}
       initialCandidates={initialCandidates}
       intelligence={{ readiness, health, fillProbability, recruiterMatches, candidateCategories, nextBestActions }}
-      aiEnabled={!!process.env.ANTHROPIC_API_KEY}
+      aiEnabled={!!process.env.OPENAI_API_KEY}
     />
     </>
   )
