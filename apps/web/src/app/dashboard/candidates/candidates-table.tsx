@@ -19,7 +19,7 @@ import {
   ChevronUp, ChevronDown, ChevronsUpDown, Search, X,
   Mail, Phone, Send, Eye, Pencil, ChevronLeft, ChevronRight,
   BookmarkPlus, Bookmark, Download, SlidersHorizontal,
-  FileText, ExternalLink, Loader2, Sparkles,
+  FileText, ExternalLink, Loader2, Sparkles, SearchCode,
 } from 'lucide-react'
 import {
   getCandidatePreviewAction,
@@ -111,6 +111,98 @@ function formatCtc(ctc: number) {
 }
 
 function canId(n: number) { return `CAN-${String(n).padStart(4, '0')}` }
+
+// ── Boolean search ────────────────────────────────────────────────────────────
+// Supports AND / OR / NOT, parentheses, and "quoted phrases". Adjacent terms
+// with no operator between them are treated as AND (e.g. `java aws` = `java AND aws`).
+
+type BoolNode =
+  | { type: 'TERM'; value: string }
+  | { type: 'AND' | 'OR'; left: BoolNode; right: BoolNode }
+  | { type: 'NOT'; node: BoolNode }
+
+function tokenizeBoolQuery(query: string): string[] {
+  const tokens: string[] = []
+  let i = 0
+  while (i < query.length) {
+    const ch = query[i]!
+    if (/\s/.test(ch)) { i++; continue }
+    if (ch === '(' || ch === ')') { tokens.push(ch); i++; continue }
+    if (ch === '"') {
+      let j = i + 1
+      while (j < query.length && query[j] !== '"') j++
+      tokens.push(query.slice(i + 1, j))
+      i = j + 1
+      continue
+    }
+    let j = i
+    while (j < query.length && !/[\s()]/.test(query[j]!)) j++
+    tokens.push(query.slice(i, j))
+    i = j
+  }
+  return tokens
+}
+
+function parseBooleanQuery(query: string): BoolNode {
+  const tokens = tokenizeBoolQuery(query)
+  let pos = 0
+  const peek = () => tokens[pos]
+  const next = () => tokens[pos++]
+
+  function parseOr(): BoolNode {
+    let node = parseAnd()
+    while (peek() !== undefined && peek()!.toUpperCase() === 'OR') { next(); node = { type: 'OR', left: node, right: parseAnd() } }
+    return node
+  }
+  function parseAnd(): BoolNode {
+    let node = parseNot()
+    while (peek() !== undefined && peek() !== ')' && peek()!.toUpperCase() !== 'OR') {
+      if (peek()!.toUpperCase() === 'AND') next()
+      node = { type: 'AND', left: node, right: parseNot() }
+    }
+    return node
+  }
+  function parseNot(): BoolNode {
+    if (peek() !== undefined && peek()!.toUpperCase() === 'NOT') { next(); return { type: 'NOT', node: parseNot() } }
+    return parseAtom()
+  }
+  function parseAtom(): BoolNode {
+    const tok = next()
+    if (tok === undefined) throw new Error('Unexpected end of query.')
+    if (tok === '(') {
+      const node = parseOr()
+      if (peek() !== ')') throw new Error('Missing closing parenthesis.')
+      next()
+      return node
+    }
+    if (tok === ')') throw new Error('Unexpected closing parenthesis.')
+    return { type: 'TERM', value: tok }
+  }
+
+  if (tokens.length === 0) throw new Error('Empty query.')
+  const result = parseOr()
+  if (pos < tokens.length) throw new Error('Unexpected extra text after a complete expression.')
+  return result
+}
+
+function evalBoolNode(node: BoolNode, haystack: string): boolean {
+  switch (node.type) {
+    case 'TERM': return node.value.trim() === '' || haystack.includes(node.value.toLowerCase())
+    case 'AND':  return evalBoolNode(node.left, haystack) && evalBoolNode(node.right, haystack)
+    case 'OR':   return evalBoolNode(node.left, haystack) || evalBoolNode(node.right, haystack)
+    case 'NOT':  return !evalBoolNode(node.node, haystack)
+  }
+}
+
+function candidateHaystack(c: CandidateRow): string {
+  return [
+    canId(c.candidate_number),
+    [c.first_name, c.last_name].filter(Boolean).join(' '),
+    c.email, c.phone, c.current_title, c.current_company, c.location,
+    WORK_AUTH[c.candidate_type ?? ''] ?? c.candidate_type,
+    c.notice_period, c.source,
+  ].filter(Boolean).join(' ').toLowerCase()
+}
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 
@@ -506,6 +598,8 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
   const [views, setViews]           = useState<SavedView[]>([])
   const [viewName, setViewName]     = useState('')
   const [savingView, setSavingView] = useState(false)
+  const [boolQuery, setBoolQuery]   = useState('')
+  const [boolOpen, setBoolOpen]     = useState(false)
 
   useEffect(() => { setViews(loadViews()) }, [])
 
@@ -521,8 +615,19 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
   const notices = useMemo(() => [...new Set(all.map(c => c.notice_period).filter(Boolean))].sort() as string[], [all])
   const sources = useMemo(() => [...new Set(all.map(c => c.source).filter(Boolean))].sort() as string[], [all])
 
+  const { boolAst, boolError } = useMemo(() => {
+    const q = boolQuery.trim()
+    if (!q) return { boolAst: null as BoolNode | null, boolError: null as string | null }
+    try { return { boolAst: parseBooleanQuery(q), boolError: null } }
+    catch (e) { return { boolAst: null, boolError: e instanceof Error ? e.message : 'Invalid query.' } }
+  }, [boolQuery])
+
   const filtered = useMemo(() => all.filter(c => {
-    if (applied.search) {
+    if (boolQuery.trim()) {
+      const haystack = candidateHaystack(c)
+      if (boolAst) { if (!evalBoolNode(boolAst, haystack)) return false }
+      else if (!haystack.includes(boolQuery.trim().toLowerCase())) return false
+    } else if (applied.search) {
       const q = applied.search.toLowerCase()
       const n = [c.first_name, c.last_name].filter(Boolean).join(' ').toLowerCase()
       if (!n.includes(q) && !c.email.toLowerCase().includes(q) && !canId(c.candidate_number).toLowerCase().includes(q) && !(c.current_title ?? '').toLowerCase().includes(q)) return false
@@ -536,7 +641,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
     if (applied.date_from && new Date(c.created_at) < new Date(applied.date_from)) return false
     if (applied.date_to   && new Date(c.created_at) > new Date(applied.date_to + 'T23:59:59')) return false
     return true
-  }), [all, applied])
+  }), [all, applied, boolQuery, boolAst])
 
   const sorted = useMemo(() => sortKey ? [...filtered].sort((a, b) => {
     const get = (c: CandidateRow): string => {
@@ -683,9 +788,11 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
             <div className="relative shrink-0">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
               <Input value={applied.search}
+                disabled={!!boolQuery.trim()}
                 onChange={e => { setApplied(p => ({ ...p, search: e.target.value })); setPage(0) }}
-                placeholder="Search by name, email, ID…" className="h-8 w-52 pl-8 pr-7 text-sm" />
-              {applied.search && (
+                placeholder={boolQuery.trim() ? 'Boolean search active…' : 'Search by name, email, ID…'}
+                className="h-8 w-52 pl-8 pr-7 text-sm disabled:opacity-50" />
+              {applied.search && !boolQuery.trim() && (
                 <button onClick={() => { setApplied(p => ({ ...p, search: '' })); setPage(0) }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   <X className="size-3.5" />
                 </button>
@@ -706,6 +813,38 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            <Popover open={boolOpen} onOpenChange={setBoolOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline" size="icon"
+                  title="Boolean search"
+                  className={`h-8 w-8 ${boolQuery.trim() ? 'border-brand text-brand bg-brand-muted' : ''}`}
+                >
+                  <SearchCode className="size-3.5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-96 p-3">
+                <p className="text-sm font-semibold mb-1">Boolean search</p>
+                <p className="text-xs text-muted-foreground mb-2.5">
+                  Combine terms with <span className="font-medium text-foreground">AND</span>, <span className="font-medium text-foreground">OR</span>, <span className="font-medium text-foreground">NOT</span>, and parentheses. Use "quotes" for exact phrases. Matches name, ID, email, phone, title, company, location, work authorization, availability, and source.
+                </p>
+                <div className="relative">
+                  <Input
+                    autoFocus
+                    value={boolQuery}
+                    onChange={e => { setBoolQuery(e.target.value); setPage(0) }}
+                    placeholder='e.g. java AND (aws OR azure) NOT contract'
+                    className="h-9 text-sm pr-7"
+                  />
+                  {boolQuery && (
+                    <button onClick={() => setBoolQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      <X className="size-3.5" />
+                    </button>
+                  )}
+                </div>
+                {boolError && <p className="text-xs text-destructive mt-1.5">{boolError} Showing plain text matches instead.</p>}
+              </PopoverContent>
+            </Popover>
             {savingView ? (
               <div className="flex items-center gap-1">
                 <input autoFocus value={viewName} onChange={e => setViewName(e.target.value)}
@@ -735,8 +874,9 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
         </div>
 
         {/* ── Active filter chips ──────────────────────────────────────── */}
-        {activeCount > 0 && (
+        {(activeCount > 0 || boolQuery.trim()) && (
           <div className="flex items-center gap-1.5 flex-wrap pb-3 shrink-0">
+            {boolQuery.trim()  && <ActiveChip label={`Boolean: ${boolQuery.trim()}`} onRemove={() => setBoolQuery('')} />}
             {applied.stage     && <ActiveChip label={`Stage: ${applied.stage}`} onRemove={() => setApplied(p => ({ ...p, stage: '' }))} />}
             {applied.work_auth && <ActiveChip label={`Auth: ${WORK_AUTH[applied.work_auth] ?? applied.work_auth}`} onRemove={() => setApplied(p => ({ ...p, work_auth: '' }))} />}
             {applied.notice    && <ActiveChip label={`Availability: ${applied.notice}`} onRemove={() => setApplied(p => ({ ...p, notice: '' }))} />}
@@ -750,7 +890,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <ActiveChip label={`Created: ${applied.date_from || '…'} – ${applied.date_to || '…'}`}
                 onRemove={() => setApplied(p => ({ ...p, date_from: '', date_to: '' }))} />
             )}
-            <button onClick={clearApplied} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
+            <button onClick={() => { clearApplied(); setBoolQuery('') }} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2">Clear all</button>
           </div>
         )}
 
@@ -784,7 +924,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <div className="flex flex-col items-center justify-center py-20 gap-2">
                 <Search className="size-6 text-muted-foreground/30" />
                 <p className="text-sm text-muted-foreground">No candidates match your filters</p>
-                <button onClick={clearApplied} className="text-sm text-brand hover:underline">Clear filters</button>
+                <button onClick={() => { clearApplied(); setBoolQuery('') }} className="text-sm text-brand hover:underline">Clear filters</button>
               </div>
             ) : (
               <table className="w-full border-collapse">
