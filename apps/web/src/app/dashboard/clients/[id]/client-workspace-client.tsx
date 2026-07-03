@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -9,13 +9,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import { relTime, formatSize, toInitials } from '@/lib/format'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
   Building2, Plus, FileText, Upload, Hospital, X, Pencil,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
+import {
+  addClientActivityAction, addClientContactAction, addClientFacilityAction,
+  addClientNoteAction, deleteClientDocumentAction, updateClientInfoAction,
+  uploadClientDocumentAction,
+} from '../actions'
 import { PLACEMENTS } from '../../placements/_data'
-import type { WorkspaceJob, WorkspaceCandidate } from './page'
+import type { WorkspaceJob, WorkspaceCandidate, WorkspaceDoc, WorkspaceActivity, WorkspaceNote } from './page'
 
 // ── Canonical candidate pipeline labels (matches candidates/jobs modules) ─────
 const STAGE_LABEL: Record<string, string> = {
@@ -51,53 +57,10 @@ const CLIENT_STATUS_BADGE: Record<Client['status'], string> = {
 }
 const CLIENT_STATUS_LABEL: Record<Client['status'], string> = { active: 'Active', prospect: 'Prospect', inactive: 'Inactive' }
 
-// ── Per-client mock content (Documents/Tasks/Activity/Notes) ─────────────────
-// ponytail: only a handful of "hero" clients get seeded demo content; every
-// other client renders the tab's real empty state instead of fake data.
-
-type Doc = { id: string; name: string; category: string; size: string; uploadedAt: string }
+// ── Tasks are local-only (no task infrastructure exists anywhere else in the
+// app yet — add a real tasks table when the app gets a cross-module Tasks
+// feature, not just for this one tab) ─────────────────────────────────────────
 type TaskItem = { id: string; title: string; type: string; assignee: string; due: string; priority: 'High' | 'Medium' | 'Low'; status: 'Open' | 'Done' }
-type ActivityItem = { id: string; actor: string; action: string; time: string }
-type NoteItem = { id: string; author: string; text: string; time: string; visibility: 'shared' | 'private'; pinned: boolean }
-
-const DOCS: Record<string, Doc[]> = {
-  cl1: [
-    { id: 'd1', name: 'MSA — Houston Methodist.pdf', category: 'Contracts', size: '412 KB', uploadedAt: 'Jan 12, 2023' },
-    { id: 'd2', name: 'Certificate of Insurance 2026.pdf', category: 'Insurance', size: '188 KB', uploadedAt: 'Mar 2, 2026' },
-  ],
-  cl21: [
-    { id: 'd3', name: 'MSA — TechCorp Inc.pdf', category: 'Contracts', size: '365 KB', uploadedAt: 'Feb 3, 2023' },
-    { id: 'd4', name: 'Q2 Invoice.pdf', category: 'Invoices', size: '96 KB', uploadedAt: 'Jun 15, 2026' },
-  ],
-}
-
-const TASKS: Record<string, TaskItem[]> = {
-  cl1: [
-    { id: 't1', title: 'Follow up on ICU submission feedback', type: 'Follow-up', assignee: 'Sarah M.', due: 'Jul 5, 2026', priority: 'High', status: 'Open' },
-    { id: 't2', title: 'Renew credentialing packet for new hires', type: 'Credentialing', assignee: 'Sarah M.', due: 'Jul 20, 2026', priority: 'Medium', status: 'Open' },
-  ],
-  cl21: [
-    { id: 't3', title: 'Schedule quarterly business review', type: 'Meeting', assignee: 'Arun Kumar', due: 'Jul 10, 2026', priority: 'Medium', status: 'Open' },
-  ],
-}
-
-const ACTIVITY: Record<string, ActivityItem[]> = {
-  cl1: [
-    { id: 'a1', actor: 'Sarah M.', action: 'submitted Maria Lopez for ICU RN', time: '2 hours ago' },
-    { id: 'a2', actor: 'Sarah M.', action: 'logged a call with Dr. Sarah Kim', time: '1 day ago' },
-    { id: 'a3', actor: 'System', action: 'uploaded Certificate of Insurance 2026.pdf', time: '3 days ago' },
-  ],
-  cl21: [
-    { id: 'a4', actor: 'Arun Kumar', action: 'sent an email to Rachel Brown', time: '1 hour ago' },
-    { id: 'a5', actor: 'Arun Kumar', action: 'created job Senior Java Developer', time: '2 days ago' },
-  ],
-}
-
-const NOTES: Record<string, NoteItem[]> = {
-  cl1: [
-    { id: 'n1', author: 'Sarah M.', text: 'Client prefers candidates with Epic EMR experience — flagged for all future ICU submissions.', time: '2 days ago', visibility: 'shared', pinned: true },
-  ],
-}
 
 const FACILITY_TYPES: ClientFacility['type'][] = ['Hospital', 'Clinic', 'Laboratory', 'Rehabilitation', 'Urgent Care', 'Skilled Nursing', 'Home Health']
 const TASK_TYPES = ['Follow-up', 'Meeting', 'Document Request', 'Contract Renewal', 'Client Visit', 'Credentialing']
@@ -106,10 +69,6 @@ const TASK_TYPES = ['Follow-up', 'Meeting', 'Document Request', 'Contract Renewa
 
 function Chip({ label, className }: { label: string; className: string }) {
   return <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${className}`}>{label}</span>
-}
-
-function toInitials(name: string) {
-  return name.split(' ').map(w => w[0] ?? '').join('').toUpperCase().slice(0, 2) || '??'
 }
 
 function Metric({ label, value }: { label: string; value: string | number }) {
@@ -184,11 +143,13 @@ const TABS = [
 ] as const
 type TabId = typeof TABS[number]['id']
 
-export function ClientWorkspaceClient({ client, contacts, facilities, jobs, candidates }: {
+export function ClientWorkspaceClient({ client, contacts, facilities, jobs, candidates, documents, activity, notes }: {
   client: Client; contacts: ClientContact[]; facilities: ClientFacility[]
   jobs: WorkspaceJob[]; candidates: WorkspaceCandidate[]
+  documents: WorkspaceDoc[]; activity: WorkspaceActivity[]; notes: WorkspaceNote[]
 }) {
   const router = useRouter()
+  const [, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
 
   // Editable client info (name/id stay fixed — they key filtering/routing elsewhere)
@@ -198,16 +159,17 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
   const [contactList, setContactList]   = useState<ClientContact[]>(contacts)
   const [facilityList, setFacilityList] = useState<ClientFacility[]>(facilities)
-  const [docList, setDocList]           = useState<Doc[]>(() => DOCS[client.id] ?? [])
-  const [taskList, setTaskList]         = useState<TaskItem[]>(() => TASKS[client.id] ?? [])
-  const [activityList, setActivityList] = useState<ActivityItem[]>(() => ACTIVITY[client.id] ?? [])
+  const [docList, setDocList]           = useState<WorkspaceDoc[]>(documents)
+  const [taskList, setTaskList]         = useState<TaskItem[]>([])
+  const [activityList, setActivityList] = useState<WorkspaceActivity[]>(activity)
   const [noteText, setNoteText] = useState('')
-  const [notes, setNotes] = useState<NoteItem[]>(() => NOTES[client.id] ?? [])
+  const [notesList, setNotesList] = useState<WorkspaceNote[]>(notes)
 
   const [contactDrawerOpen, setContactDrawerOpen] = useState(false)
   const [facilityDrawerOpen, setFacilityDrawerOpen] = useState(false)
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false)
   const [selectedContact, setSelectedContact] = useState<ClientContact | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isHealthcare = clientInfo.industry === 'Healthcare'
   const tabs = TABS.filter(t => t.id !== 'facilities' || isHealthcare)
@@ -225,15 +187,23 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const revenue = placements.reduce((sum, p) => sum + p.weeklyRevenue, 0)
   const avgMargin = placements.length ? Math.round(placements.reduce((s, p) => s + p.marginPct, 0) / placements.length) : 0
 
-  function addNote() {
-    if (!noteText.trim()) return
-    setNotes(prev => [{ id: `n${Date.now()}`, author: 'You', text: noteText, time: 'Just now', visibility: 'shared', pinned: false }, ...prev])
-    setNoteText('')
-    toast('Note added.')
+  function logActivity(action: string) {
+    startTransition(async () => {
+      const res = await addClientActivityAction(clientInfo.id, action)
+      if (res.success) setActivityList(prev => [{ id: res.id, actor: res.actor_name, action, time: res.created_at }, ...prev])
+    })
   }
 
-  function logActivity(action: string) {
-    setActivityList(prev => [{ id: `a${Date.now()}`, actor: 'You', action, time: 'Just now' }, ...prev])
+  function addNote() {
+    if (!noteText.trim()) return
+    const text = noteText
+    setNoteText('')
+    startTransition(async () => {
+      const res = await addClientNoteAction(clientInfo.id, text)
+      if (!res.success) { toast.error(res.error); return }
+      setNotesList(prev => [{ id: res.id, author: res.author_name, text, time: res.created_at }, ...prev])
+      toast('Note added.')
+    })
   }
 
   function startEditInfo() {
@@ -241,10 +211,22 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     setEditingInfo(true)
   }
   function saveInfo() {
-    setClientInfo(draftInfo)
+    const info = draftInfo
+    setClientInfo(info)
     setEditingInfo(false)
-    logActivity('updated client info')
-    toast('Client info saved.')
+    startTransition(async () => {
+      const fd = new FormData()
+      fd.set('display_name', info.displayName)
+      fd.set('legal_name', info.legalName)
+      fd.set('website', info.website)
+      fd.set('tax_id', info.taxId)
+      fd.set('city', info.city)
+      fd.set('state', info.state)
+      fd.set('special_instructions', info.specialInstructions)
+      const res = await updateClientInfoAction(clientInfo.id, fd)
+      if (!res.success) { toast.error(res.error); return }
+      toast('Client info saved.')
+    })
   }
   function cancelEditInfo() {
     setEditingInfo(false)
@@ -264,16 +246,20 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   function submitContact(e: React.FormEvent) {
     e.preventDefault()
     if (!ncName.trim()) return
-    const contact: ClientContact = {
-      id: `cc${Date.now()}`, clientId: clientInfo.id, name: ncName, title: ncTitle, department: ncDept,
-      email: ncEmail, phone: ncPhone, mobile: '', linkedin: '', preferredContactMethod: 'Email',
-      decisionMaker: ncDecisionMaker, primary: contactList.length === 0, status: 'active', notes: '',
-    }
-    setContactList(prev => [...prev, contact])
-    logActivity(`added contact ${ncName}`)
-    toast(`${ncName} added as a contact.`)
+    const fd = new FormData()
+    fd.set('name', ncName); fd.set('title', ncTitle); fd.set('department', ncDept)
+    fd.set('email', ncEmail); fd.set('phone', ncPhone)
+    if (ncDecisionMaker) fd.set('decision_maker', 'on')
+    const name = ncName
     resetContactForm()
     setContactDrawerOpen(false)
+    startTransition(async () => {
+      const res = await addClientContactAction(clientInfo.id, fd)
+      if (!res.success) { toast.error(res.error); return }
+      setContactList(prev => [...prev, res.contact])
+      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `added contact ${name}`, time: new Date().toISOString() }, ...prev])
+      toast(`${name} added as a contact.`)
+    })
   }
 
   // ── Add facility form ─────────────────────────────────────────────────────
@@ -289,19 +275,22 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   function submitFacility(e: React.FormEvent) {
     e.preventDefault()
     if (!nfName.trim()) return
-    const facility: ClientFacility = {
-      id: `cf${Date.now()}`, clientId: clientInfo.id, name: nfName, type: nfType,
-      city: nfCity, state: nfState, departments: [], specialties: [],
-      facilityManager: nfManager, primaryContact: '', timezone: clientInfo.timezone, notes: '',
-    }
-    setFacilityList(prev => [...prev, facility])
-    logActivity(`added facility ${nfName}`)
-    toast(`${nfName} added.`)
+    const fd = new FormData()
+    fd.set('name', nfName); fd.set('type', nfType); fd.set('city', nfCity)
+    fd.set('state', nfState); fd.set('facility_manager', nfManager)
+    const name = nfName
     resetFacilityForm()
     setFacilityDrawerOpen(false)
+    startTransition(async () => {
+      const res = await addClientFacilityAction(clientInfo.id, fd)
+      if (!res.success) { toast.error(res.error); return }
+      setFacilityList(prev => [...prev, res.facility])
+      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `added facility ${name}`, time: new Date().toISOString() }, ...prev])
+      toast(`${name} added.`)
+    })
   }
 
-  // ── Create task form ──────────────────────────────────────────────────────
+  // ── Create task form (local-only, see TaskItem note above) ───────────────
   const [ntTitle, setNtTitle] = useState('')
   const [ntType, setNtType] = useState(TASK_TYPES[0]!)
   const [ntAssignee, setNtAssignee] = useState('')
@@ -325,14 +314,26 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     setTaskDrawerOpen(false)
   }
 
-  function uploadDocument() {
-    const doc: Doc = {
-      id: `d${Date.now()}`, name: 'New Document.pdf', category: 'Other',
-      size: '—', uploadedAt: 'Just now',
-    }
-    setDocList(prev => [doc, ...prev])
-    logActivity('uploaded New Document.pdf')
-    toast('Document uploaded.')
+  function triggerUpload() {
+    fileInputRef.current?.click()
+  }
+  function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const fd = new FormData()
+    fd.set('file', file)
+    startTransition(async () => {
+      const res = await uploadClientDocumentAction(clientInfo.id, fd)
+      if (!res.success) { toast.error(res.error); return }
+      setDocList(prev => [{ id: res.id, name: res.name, category: 'Other', size: res.size, uploadedAt: res.created_at }, ...prev])
+      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `uploaded document: ${res.name}`, time: new Date().toISOString() }, ...prev])
+      toast('Document uploaded.')
+    })
+  }
+  function removeDocument(docId: string) {
+    setDocList(prev => prev.filter(d => d.id !== docId))
+    startTransition(async () => { await deleteClientDocumentAction(docId) })
   }
 
   return (
@@ -354,7 +355,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <Chip label={clientInfo.industry} className="bg-muted text-muted-foreground border-border" />
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Account owner {clientInfo.accountOwner} · Recruitment manager {clientInfo.recruitmentManager} · Primary recruiter {clientInfo.primaryRecruiter}
+                Account owner {clientInfo.accountOwner || '—'} · Recruitment manager {clientInfo.recruitmentManager || '—'} · Primary recruiter {clientInfo.primaryRecruiter || '—'}
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">Client since {clientInfo.clientSince} · Last activity {clientInfo.lastActivity}</p>
             </div>
@@ -371,7 +372,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             <Link href={`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Briefcase className="size-3.5" />Post job</Link>
             <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
             <button type="button"
-              onClick={() => toast(`Meeting scheduling opened for ${clientInfo.name}.`)}
+              onClick={() => { toast(`Meeting scheduling opened for ${clientInfo.name}.`); logActivity(`scheduled a meeting with ${clientInfo.name}`) }}
               className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><CalendarPlus className="size-3.5" />Schedule meeting</button>
             <button type="button" onClick={() => setTaskDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5"><CheckSquare className="size-3.5" />Create task</button>
           </div>
@@ -432,7 +433,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                       <div key={a.id} className="flex items-start gap-2.5 text-sm">
                         <span className="font-medium">{a.actor}</span>
                         <span className="text-muted-foreground">{a.action}</span>
-                        <span className="text-muted-foreground ml-auto shrink-0 text-xs">{a.time}</span>
+                        <span className="text-muted-foreground ml-auto shrink-0 text-xs">{relTime(a.time)}</span>
                       </div>
                     ))}
                   </div>
@@ -480,7 +481,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     { label: 'Company type', value: clientInfo.companyType === 'vms' ? 'VMS' : 'Direct client' },
                     { label: 'Website', value: clientInfo.website },
                     { label: 'Tax ID', value: clientInfo.taxId },
-                    { label: 'Company size', value: `${clientInfo.companySize} employees` },
+                    { label: 'Company size', value: clientInfo.companySize ? `${clientInfo.companySize} employees` : '—' },
                     { label: 'Address', value: `${clientInfo.city}, ${clientInfo.state} ${clientInfo.zip}, ${clientInfo.country}` },
                     { label: 'Time zone', value: clientInfo.timezone },
                     { label: 'Tags', value: clientInfo.tags.length ? clientInfo.tags.join(', ') : '—' },
@@ -488,7 +489,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                   ].map(({ label, value }) => (
                     <div key={label} className="flex items-start gap-6 border-b border-border/60 pb-3">
                       <span className="text-sm text-muted-foreground w-40 shrink-0">{label}</span>
-                      <span className="text-sm font-medium">{value}</span>
+                      <span className="text-sm font-medium">{value || '—'}</span>
                     </div>
                   ))}
                 </div>
@@ -679,15 +680,16 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'documents' && (
           <div className="px-6 py-6">
+            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelected} />
             <div className="flex justify-end mb-3">
               {docList.length > 0 && (
-                <button type="button" onClick={uploadDocument} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                <button type="button" onClick={triggerUpload} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
                   <Upload className="size-3.5" />Upload document
                 </button>
               )}
             </div>
             {docList.length === 0 ? (
-              <EmptyTab icon={Upload} title="No documents yet" description="Contracts, insurance, invoices, and other files for this client will show up here." actionLabel="Upload document" onAction={uploadDocument} />
+              <EmptyTab icon={Upload} title="No documents yet" description="Contracts, insurance, invoices, and other files for this client will show up here." actionLabel="Upload document" onAction={triggerUpload} />
             ) : (
               <div className="space-y-2">
                 {docList.map(d => (
@@ -695,7 +697,10 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     <FileText className="size-4 text-muted-foreground shrink-0" />
                     <span className="text-sm font-medium truncate">{d.name}</span>
                     <Chip label={d.category} className="bg-muted text-muted-foreground border-border ml-2" />
-                    <span className="text-sm text-muted-foreground ml-auto shrink-0">{d.size} · {d.uploadedAt}</span>
+                    <span className="text-sm text-muted-foreground ml-auto shrink-0">{formatSize(d.size)} · {relTime(d.uploadedAt)}</span>
+                    <button type="button" onClick={() => removeDocument(d.id)} className="size-6 rounded-md hover:bg-muted flex items-center justify-center shrink-0">
+                      <X className="size-3.5 text-muted-foreground" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -738,7 +743,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(a.actor)}</AvatarFallback></Avatar>
                     <div className="min-w-0">
                       <p className="text-sm"><span className="font-medium">{a.actor}</span> <span className="text-muted-foreground">{a.action}</span></p>
-                      <p className="text-sm text-muted-foreground mt-0.5">{a.time}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">{relTime(a.time)}</p>
                     </div>
                   </div>
                 ))}
@@ -756,17 +761,15 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <button type="button" onClick={addNote} disabled={!noteText.trim()} className="h-8 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white disabled:opacity-40">Add note</button>
               </div>
             </div>
-            {notes.length === 0 ? (
+            {notesList.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">No notes yet. Add one above.</p>
             ) : (
-              notes.map(n => (
+              notesList.map(n => (
                 <div key={n.id} className="border border-border rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Avatar className="size-7"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(n.author)}</AvatarFallback></Avatar>
                     <span className="text-sm font-medium">{n.author}</span>
-                    {n.pinned && <Chip label="Pinned" className="bg-brand-muted text-brand border-brand/25" />}
-                    <Chip label={n.visibility === 'shared' ? 'Shared' : 'Private'} className="bg-muted text-muted-foreground border-border" />
-                    <span className="text-xs text-muted-foreground ml-auto">{n.time}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{relTime(n.time)}</span>
                   </div>
                   <p className="text-sm text-foreground leading-relaxed">{n.text}</p>
                 </div>
@@ -918,7 +921,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     activityList.filter(a => a.action.includes(selectedContact.name)).map(a => (
                       <div key={a.id} className="text-sm">
                         <span className="font-medium">{a.actor}</span> <span className="text-muted-foreground">{a.action}</span>
-                        <p className="text-xs text-muted-foreground mt-0.5">{a.time}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{relTime(a.time)}</p>
                       </div>
                     ))
                   )}

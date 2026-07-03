@@ -4,7 +4,7 @@ import { useState, useTransition, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createJobAction } from '../actions'
-import { CLIENTS, getClientByName, getContactsForClient } from '../../clients/_data'
+import { getClientsAutofillAction, type ClientAutofillRow } from '../../clients/actions'
 import {
   ArrowLeft, Sparkles, Users, Building2, MapPin,
   DollarSign, FileText, User, Plus, X, CheckCircle2,
@@ -15,7 +15,6 @@ import { cn } from '@/lib/utils'
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
-const RECENT_CLIENTS  = CLIENTS.map(c => c.name)
 const RECENT_TITLES   = ['Travel RN (ICU)', 'Senior Java Developer', 'Cloud Architect', 'DevOps Engineer', 'Staff RN', 'Project Manager', 'Data Engineer', 'SAP Consultant']
 const RECENT_RECRUITERS = ['Arun Kumar', 'Priya Sharma', 'James Wilson', 'Sarah Chen']
 const DURATIONS       = ['1 month', '3 months', '6 months', '12 months', '18 months', '24 months', 'Ongoing']
@@ -32,18 +31,6 @@ const SKILL_SUGGESTIONS: Record<string, string[]> = {
 }
 
 const VISA_OPTIONS = ['US Citizen', 'Green Card', 'H1B Transfer', 'OPT / CPT', 'TN Visa', 'EAD', 'Any']
-
-function clientAutofill(name: string) {
-  const client = getClientByName(name)
-  if (!client) return null
-  const primaryContact = getContactsForClient(client.id).find(c => c.primary)
-  return {
-    city: client.city,
-    state: client.state,
-    hiringManager: primaryContact?.name ?? '',
-    clientType: client.companyType,
-  }
-}
 
 const SIMILAR_JOBS_MOCK = [
   { title:'Travel RN — ICU', client:'Houston Methodist', daysOpen:5,  id:'j1' },
@@ -374,6 +361,15 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function NewJobPage() {
+  const [clients, setClients] = useState<ClientAutofillRow[]>([])
+  useEffect(() => { getClientsAutofillAction().then(setClients) }, [])
+  const recentClients = clients.map(c => c.name)
+  function clientAutofill(name: string) {
+    const c = clients.find(c => c.name === name)
+    if (!c) return null
+    return { city: c.city, state: c.state, hiringManager: c.hiringManager, clientType: c.companyType }
+  }
+
   // ── Core fields
   const [title,         setTitle]        = useState('')
   const [client,        setClient]       = useState('')
@@ -443,13 +439,14 @@ export default function NewJobPage() {
     }
   }
 
-  // Pre-fill client from the Client Workspace's "Post job" quick action
+  // Pre-fill client from the Client Workspace's "Post job" quick action.
+  // Re-runs once `clients` finishes loading so autofill has data to match against.
   const searchParams = useSearchParams()
   useEffect(() => {
     const c = searchParams.get('client')
     if (c) { setClient(c); handleClientSelect(c) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [clients])
 
   // AI description generation (mock)
   const generateDescription = async () => {
@@ -618,14 +615,14 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     <SmartCombobox
                       value={client}
                       onChange={setClient}
-                      options={RECENT_CLIENTS}
+                      options={recentClients}
                       placeholder="Search or type client name…"
                       onSelect={handleClientSelect}
                     />
                     {!client && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         <span className="text-[10px] text-muted-foreground self-center">Recent:</span>
-                        {RECENT_CLIENTS.slice(0, 4).map(c => (
+                        {recentClients.slice(0, 4).map(c => (
                           <button key={c} type="button" onClick={() => { setClient(c); handleClientSelect(c) }}
                             className="h-6 px-2 text-[10px] rounded-md bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                             {c}

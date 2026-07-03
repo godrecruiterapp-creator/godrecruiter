@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import {
   ArrowLeft, Building2, MapPin, Users, Settings2, Tag, AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Industry } from '../_data'
+import { createClientAction } from '../actions'
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -96,7 +96,7 @@ function SectionCard({ n, icon: Icon, title, children }: {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AddClientPage() {
-  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   const [name, setName]               = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -136,11 +136,35 @@ export default function AddClientPage() {
     if (errs.length) { setErrors(errs); return }
     setErrors([])
 
-    // ponytail: Clients are mock data with no persistence layer yet — land on an
-    // existing populated workspace to show the "after create" experience, same
-    // shortcut used by /dashboard/projects/new. Wire to a real create action
-    // once Clients moves to a real table.
-    router.push('/dashboard/clients/cl21')
+    const fd = new FormData()
+    fd.set('name', name)
+    fd.set('display_name', displayName)
+    fd.set('legal_name', legalName)
+    fd.set('website', website)
+    fd.set('tax_id', taxId)
+    fd.set('company_size', companySize)
+    fd.set('industry', industry)
+    fd.set('company_type', companyType)
+    fd.set('city', city)
+    fd.set('state', state)
+    fd.set('country', country)
+    fd.set('zip', zip)
+    fd.set('timezone', timezone)
+    fd.set('account_owner', accountOwner)
+    fd.set('recruitment_manager', recruitmentManager)
+    fd.set('primary_recruiter', primaryRecruiter)
+    fd.set('preferred_communication', preferredCommunication)
+    fd.set('preferred_submission_method', preferredSubmissionMethod)
+    fd.set('preferred_resume_format', preferredResumeFormat)
+    fd.set('preferred_interview_process', preferredInterviewProcess)
+    fd.set('special_instructions', specialInstructions)
+    fd.set('status', status)
+    fd.set('tags', tagsInput)
+
+    startTransition(async () => {
+      const res = await createClientAction(fd)
+      if (res?.error) setErrors([res.error])
+    })
   }
 
   return (
@@ -313,8 +337,8 @@ export default function AddClientPage() {
             <Link href="/dashboard/clients" className="h-9 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium">
               Cancel
             </Link>
-            <button type="submit" className="h-9 px-5 text-sm rounded-lg bg-[#dd7456] hover:bg-[#c9603d] text-white transition-colors font-medium">
-              Add client
+            <button type="submit" disabled={isPending} className="h-9 px-5 text-sm rounded-lg bg-[#dd7456] hover:bg-[#c9603d] text-white transition-colors font-medium disabled:opacity-60">
+              {isPending ? 'Adding…' : 'Add client'}
             </button>
           </div>
         </form>
