@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,7 +15,7 @@ import { relTime, formatSize, toInitials } from '@/lib/format'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
   Building2, Plus, FileText, Upload, Hospital, X, Pencil, MoreHorizontal,
-  Settings, BarChart3, ChevronRight,
+  Settings, BarChart3,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
 import {
@@ -27,32 +26,11 @@ import {
 import { PLACEMENTS } from '../../placements/_data'
 import type { WorkspaceJob, WorkspaceCandidate, WorkspaceDoc, WorkspaceActivity, WorkspaceNote } from './page'
 
-// ── Canonical candidate pipeline labels (matches candidates/jobs modules) ─────
-const STAGE_LABEL: Record<string, string> = {
-  sourced: 'New', qualified: 'Reviewing', submitted: 'Submitted',
-  interview: 'Interview Scheduled', offer: 'Offer Sent', start: 'Placed',
-}
-const STAGE_BADGE: Record<string, string> = {
-  sourced:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
-  qualified: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-  submitted: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  interview: 'bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800',
-  offer:     'bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800',
-  start:     'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
-}
 const JOB_STATUS_BADGE: Record<string, string> = {
   open:    'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
   on_hold: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
   closed:  'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
   filled:  'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-}
-const PLACEMENT_STATUS_BADGE: Record<string, string> = {
-  active:          'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400',
-  starting_today:  'bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-400',
-  starting_soon:   'bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-400',
-  ending_soon:     'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-400',
-  completed:       'bg-muted text-muted-foreground',
-  needs_attention: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400',
 }
 const CLIENT_STATUS_BADGE: Record<Client['status'], string> = {
   active:   'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
@@ -136,10 +114,6 @@ const TABS = [
   { id: 'info',        label: 'Client info' },
   { id: 'contacts',    label: 'Contacts' },
   { id: 'facilities',  label: 'Facilities' },
-  { id: 'jobs',        label: 'Jobs' },
-  { id: 'candidates',  label: 'Candidates' },
-  { id: 'submissions', label: 'Submissions' },
-  { id: 'placements',  label: 'Placements' },
   { id: 'documents',   label: 'Documents' },
   { id: 'tasks',       label: 'Tasks' },
   { id: 'activity',    label: 'Activity' },
@@ -152,7 +126,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   jobs: WorkspaceJob[]; candidates: WorkspaceCandidate[]
   documents: WorkspaceDoc[]; activity: WorkspaceActivity[]; notes: WorkspaceNote[]
 }) {
-  const router = useRouter()
   const [, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
 
@@ -395,12 +368,8 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <Chip label={CLIENT_STATUS_LABEL[clientInfo.status]} className={CLIENT_STATUS_BADGE[clientInfo.status]} />
                 <Chip label={clientInfo.industry} className="bg-muted text-muted-foreground border-border" />
               </div>
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Account owner {clientInfo.accountOwner || '—'}
-                <button type="button" onClick={openTeamDrawer} title="Edit team & roles"
-                  className="size-5 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                  <Settings className="size-3.5" />
-                </button>
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">Client since {clientInfo.clientSince} · Last activity {clientInfo.lastActivity}</p>
             </div>
@@ -409,6 +378,12 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
           {/* Quick actions */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
             <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
+            <button type="button" onClick={openTeamDrawer} title="Team & roles" className="size-8 rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center justify-center shrink-0">
+              <Settings className="size-3.5" />
+            </button>
+            <button type="button" onClick={() => setMetricsDrawerOpen(true)} title="Metrics" className="size-8 rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center justify-center shrink-0">
+              <BarChart3 className="size-3.5" />
+            </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button type="button" title="More actions" className="size-8 rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center justify-center shrink-0">
@@ -438,12 +413,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             </DropdownMenu>
           </div>
         </div>
-
-        {/* Metrics — tucked behind a drawer to keep the header compact */}
-        <button type="button" onClick={() => setMetricsDrawerOpen(true)}
-          className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5">
-          <BarChart3 className="size-3.5" />Metrics<ChevronRight className="size-3.5 text-muted-foreground" />
-        </button>
       </div>
 
       {/* Tab bar */}
@@ -652,84 +621,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'jobs' && (
-          <div className="px-6 py-6">
-            {jobs.length === 0 ? (
-              <EmptyTab icon={Briefcase} title="No jobs yet" description="Jobs posted for this client will show up here." actionLabel="Post job" onAction={() => router.push(`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`)} />
-            ) : (
-              <>
-                <SimpleTable
-                  headers={['Job title', 'Status', 'Openings', 'Recruiter']}
-                  rows={jobs.map(j => [
-                    <Link key="t" href={`/dashboard/jobs/${j.id}`} className="font-medium hover:text-brand">{j.title}</Link>,
-                    <Chip key="s" label={j.status} className={JOB_STATUS_BADGE[j.status] ?? ''} />,
-                    String(j.openings ?? 1),
-                    j.recruiter_name ?? 'Unassigned',
-                  ])}
-                />
-                <Link href={`/dashboard/jobs?client=${encodeURIComponent(clientInfo.name)}`} className="inline-block mt-4 text-sm font-medium text-brand hover:underline">View all in Jobs →</Link>
-              </>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'candidates' && (
-          <div className="px-6 py-6">
-            {distinctCandidates.length === 0 ? (
-              <EmptyTab icon={UserPlus} title="No candidates yet" description="Candidates submitted to this client's jobs will show up here." />
-            ) : (
-              <SimpleTable
-                headers={['Candidate', 'Latest job', 'Stage']}
-                rows={distinctCandidates.map(c => [
-                  <Link key="n" href={`/dashboard/candidates/${c.candidateId}`} className="font-medium hover:text-brand">{c.name}</Link>,
-                  c.jobTitle,
-                  <Chip key="s" label={STAGE_LABEL[c.stage] ?? c.stage} className={STAGE_BADGE[c.stage] ?? ''} />,
-                ])}
-              />
-            )}
-          </div>
-        )}
-
-        {activeTab === 'submissions' && (
-          <div className="px-6 py-6">
-            {candidates.length === 0 ? (
-              <EmptyTab icon={FileText} title="No submissions yet" description="Every time a candidate is submitted to a job at this client, it'll show up here." />
-            ) : (
-              <SimpleTable
-                headers={['Candidate', 'Job', 'Stage', 'Submitted']}
-                rows={candidates.map(c => [
-                  <Link key="n" href={`/dashboard/candidates/${c.candidateId}`} className="font-medium hover:text-brand">{c.name}</Link>,
-                  c.jobTitle,
-                  <Chip key="s" label={STAGE_LABEL[c.stage] ?? c.stage} className={STAGE_BADGE[c.stage] ?? ''} />,
-                  new Date(c.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                ])}
-              />
-            )}
-          </div>
-        )}
-
-        {activeTab === 'placements' && (
-          <div className="px-6 py-6">
-            {placements.length === 0 ? (
-              <EmptyTab icon={CheckSquare} title="No placements yet" description="Completed placements with this client will show up here." />
-            ) : (
-              <>
-                <SimpleTable
-                  headers={['Candidate', 'Job title', 'Status', 'Bill rate', 'Margin']}
-                  rows={placements.map(p => [
-                    p.candidate,
-                    p.jobTitle,
-                    <Chip key="s" label={p.status.replace('_', ' ')} className={PLACEMENT_STATUS_BADGE[p.status] ?? ''} />,
-                    `$${p.billRate}/hr`,
-                    `${p.marginPct}%`,
-                  ])}
-                />
-                <Link href="/dashboard/placements" className="inline-block mt-4 text-sm font-medium text-brand hover:underline">View all in Placements →</Link>
-              </>
             )}
           </div>
         )}
