@@ -693,11 +693,18 @@ function CandidatePreviewSheet({
                       <span className="truncate">{candidate.phone}</span>
                     </a>
                   )}
-                  {candidate.source && (
-                    <span className="text-sm text-muted-foreground truncate">Source: {candidate.source}</span>
-                  )}
-                  {candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
-                    <span className="text-sm text-muted-foreground truncate">Type: {WORK_AUTH[candidate.candidate_type]}</span>
+                  {(candidate.source || (candidate.candidate_type && WORK_AUTH[candidate.candidate_type])) && (
+                    <div className="flex items-center gap-2 min-w-0">
+                      {candidate.source && (
+                        <span className="text-sm text-muted-foreground truncate">Source: {candidate.source}</span>
+                      )}
+                      {candidate.source && candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
+                        <div className="w-px h-3 bg-border shrink-0" />
+                      )}
+                      {candidate.candidate_type && WORK_AUTH[candidate.candidate_type] && (
+                        <span className="text-sm text-muted-foreground truncate">Type: {WORK_AUTH[candidate.candidate_type]}</span>
+                      )}
+                    </div>
                   )}
                 </div>
               </>
@@ -744,21 +751,23 @@ function CandidatePreviewSheet({
         </div>
 
         {/* ── Info strip ──────────────────────────────────────────────── */}
-        <div className="flex items-center gap-4 px-6 py-2.5 bg-muted/40 border-b shrink-0 flex-wrap">
-          {candidate.notice_period && (
-            <span className="text-sm text-muted-foreground">Available: {candidate.notice_period}</span>
-          )}
-          {candidate.expected_ctc && (
-            <span className="text-sm text-muted-foreground">Pay: {formatCtc(candidate.expected_ctc)}</span>
-          )}
-        </div>
+        {(candidate.notice_period || candidate.expected_ctc) && (
+          <div className="flex items-center gap-4 px-6 py-2.5 bg-muted/40 border-b shrink-0 flex-wrap">
+            {candidate.notice_period && (
+              <span className="text-sm text-muted-foreground">Available: {candidate.notice_period}</span>
+            )}
+            {candidate.expected_ctc && (
+              <span className="text-sm text-muted-foreground">Pay: {formatCtc(candidate.expected_ctc)}</span>
+            )}
+          </div>
+        )}
 
         {/* ── Tabs ────────────────────────────────────────────────────── */}
         <div className="flex items-center gap-0 border-b px-6 shrink-0">
           {(['notes', 'submissions', 'interviews'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`h-10 px-4 text-sm font-medium border-b-2 transition-colors capitalize ${
-                tab === t ? 'border-brand text-brand' : 'border-transparent text-muted-foreground hover:text-foreground'
+                tab === t ? 'border-brand text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}>
               {t === 'notes' ? `Notes${notes.length ? ` (${notes.length})` : ''}`
                 : t === 'submissions' ? `Submissions${jobs.length ? ` (${jobs.length})` : ''}`

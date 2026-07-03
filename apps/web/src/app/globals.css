@@ -139,8 +139,10 @@
   --color-brand-dark: #c45e3e;
 }
 
-* {
-  border-color: var(--border);
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 body {
