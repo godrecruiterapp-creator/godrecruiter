@@ -12,7 +12,7 @@ export type WorkspaceJob = {
 export type WorkspaceCandidate = {
   submissionId: string; candidateId: string; name: string; jobTitle: string; stage: string; submittedAt: string
 }
-export type WorkspaceDoc = { id: string; name: string; category: string; size: number; uploadedAt: string }
+export type WorkspaceDoc = { id: string; name: string; category: string; size: number; uploadedAt: string; uploaderName: string }
 export type WorkspaceActivity = { id: string; actor: string; action: string; time: string }
 export type WorkspaceNote = { id: string; author: string; text: string; time: string }
 
@@ -80,7 +80,7 @@ export default async function ClientWorkspacePage({ params }: { params: Promise<
     }))
     contacts = (contactRows ?? []).map(mapContactRow)
     facilities = (facilityRows ?? []).map(mapFacilityRow)
-    documents = (docRows ?? []).map((d: any) => ({ id: d.id, name: d.name, category: d.category, size: d.size ?? 0, uploadedAt: d.created_at }))
+    documents = (docRows ?? []).map((d: any) => ({ id: d.id, name: d.name, category: d.category, size: d.size ?? 0, uploadedAt: d.created_at, uploaderName: d.uploader_name }))
     activity = (activityRows ?? []).map((a: any) => ({ id: a.id, actor: a.actor_name, action: a.action, time: a.created_at }))
     notes = (noteRows ?? []).map((n: any) => ({ id: n.id, author: n.author_name, text: n.text, time: n.created_at }))
   } catch (err) {

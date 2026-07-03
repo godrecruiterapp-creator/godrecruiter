@@ -255,6 +255,39 @@ export async function addClientFacilityAction(clientId: string, formData: FormDa
   return { success: true as const, facility: mapFacilityRow(row) }
 }
 
+export async function updateClientFacilityAction(facilityId: string, formData: FormData) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+  const name = formData.get('name') as string
+  if (!name?.trim()) return { success: false as const, error: 'Facility name is required.' }
+
+  const admin = createAdminClient()
+  const { data: row, error } = await admin.from('client_facilities').update({
+    name,
+    type: (formData.get('type') as string) || 'Hospital',
+    city: (formData.get('city') as string) || null,
+    state: (formData.get('state') as string) || null,
+    facility_manager: (formData.get('facility_manager') as string) || null,
+  }).eq('id', facilityId).select().single()
+
+  if (error) return { success: false as const, error: error.message }
+  await logActivity(admin, row.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `updated facility ${name}`)
+  return { success: true as const, facility: mapFacilityRow(row) }
+}
+
+export async function deleteClientFacilityAction(facilityId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const admin = createAdminClient()
+  const { data: facility } = await admin.from('client_facilities').select('client_id, name').eq('id', facilityId).single()
+  const { error } = await admin.from('client_facilities').delete().eq('id', facilityId)
+  if (error) return { success: false as const, error: error.message }
+
+  if (facility) await logActivity(admin, facility.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `deleted facility ${facility.name}`)
+  return { success: true as const }
+}
+
 // ── Notes ──────────────────────────────────────────────────────────────────────
 
 export async function addClientNoteAction(clientId: string, text: string) {
@@ -272,6 +305,19 @@ export async function addClientNoteAction(clientId: string, text: string) {
   if (error) return { success: false as const, error: error.message }
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'added a note')
   return { success: true as const, id, author_name: ctx.name, created_at }
+}
+
+export async function updateClientNoteAction(noteId: string, text: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+  if (!text.trim()) return { success: false as const, error: 'Note text is required.' }
+
+  const admin = createAdminClient()
+  const { data: row, error } = await admin.from('client_notes').update({ text }).eq('id', noteId).select().single()
+  if (error) return { success: false as const, error: error.message }
+
+  await logActivity(admin, row.client_id, ctx.tenant_id, ctx.user.id, ctx.name, 'edited a note')
+  return { success: true as const }
 }
 
 export async function deleteClientNoteAction(noteId: string) {
@@ -318,26 +364,56 @@ export async function uploadClientDocumentAction(clientId: string, formData: For
   const { error: upErr } = await admin.storage.from('client-documents').upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type })
   if (upErr) return { success: false as const, error: upErr.message }
 
+  const category = (formData.get('category') as string) || 'Other'
   const created_at = new Date().toISOString()
   const { error: dbErr } = await admin.from('client_documents').insert({
     id: fileId, client_id: clientId, tenant_id: ctx.tenant_id,
-    name: file.name, size: file.size, file_type: file.type,
+    name: file.name, size: file.size, file_type: file.type, category,
     storage_path: path, uploader_id: ctx.user.id, uploader_name: ctx.name,
   })
   if (dbErr) return { success: false as const, error: dbErr.message }
 
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, `uploaded document: ${file.name}`)
-  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at }
+  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, category, uploader_name: ctx.name, created_at }
+}
+
+export async function replaceClientDocumentAction(docId: string, formData: FormData) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+  const file = formData.get('file') as File
+  if (!file) return { success: false as const, error: 'No file.' }
+
+  const admin = createAdminClient()
+  const { data: existing } = await admin.from('client_documents').select('client_id, storage_path').eq('id', docId).single()
+  if (!existing) return { success: false as const, error: 'Document not found.' }
+
+  const ext = file.name.split('.').pop()
+  const path = `${ctx.tenant_id}/${existing.client_id}/${docId}.${ext}`
+  const { error: upErr } = await admin.storage.from('client-documents').upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type, upsert: true })
+  if (upErr) return { success: false as const, error: upErr.message }
+  if (existing.storage_path && existing.storage_path !== path) {
+    await admin.storage.from('client-documents').remove([existing.storage_path])
+  }
+
+  const created_at = new Date().toISOString()
+  const { error: dbErr } = await admin.from('client_documents').update({
+    name: file.name, size: file.size, file_type: file.type,
+    storage_path: path, uploader_id: ctx.user.id, uploader_name: ctx.name, created_at,
+  }).eq('id', docId)
+  if (dbErr) return { success: false as const, error: dbErr.message }
+
+  await logActivity(admin, existing.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `replaced document: ${file.name}`)
+  return { success: true as const, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at }
 }
 
 export async function deleteClientDocumentAction(docId: string) {
   const ctx = await getUserContext()
-  if (!ctx) return { error: 'Not authenticated.' }
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
   const admin = createAdminClient()
   const { data: doc } = await admin.from('client_documents').select('storage_path').eq('id', docId).single()
   if (doc?.storage_path) await admin.storage.from('client-documents').remove([doc.storage_path])
   await admin.from('client_documents').delete().eq('id', docId)
-  return { success: true }
+  return { success: true as const }
 }
 
 // ── Client picker for the "New job" autofill (client name → city/state/contact) ─

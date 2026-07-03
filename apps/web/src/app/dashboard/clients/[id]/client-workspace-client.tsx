@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -14,15 +14,17 @@ import { cn } from '@/lib/utils'
 import { relTime, formatSize, toInitials } from '@/lib/format'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
-  Building2, Plus, FileText, Upload, Hospital, X, Pencil, MoreHorizontal,
+  Building2, Plus, FileText, Upload, Hospital, Pencil, MoreHorizontal,
   Settings, BarChart3, Trash2,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
 import {
   addClientActivityAction, addClientContactAction, addClientFacilityAction,
   addClientNoteAction, deleteClientAction, deleteClientContactAction,
-  deleteClientDocumentAction, deleteClientNoteAction, updateClientContactAction,
-  updateClientInfoAction, updateClientTeamAction, uploadClientDocumentAction,
+  deleteClientDocumentAction, deleteClientFacilityAction, deleteClientNoteAction,
+  replaceClientDocumentAction, updateClientContactAction, updateClientFacilityAction,
+  updateClientInfoAction, updateClientNoteAction, updateClientTeamAction,
+  uploadClientDocumentAction,
 } from '../actions'
 import { PLACEMENTS } from '../../placements/_data'
 import type { WorkspaceJob, WorkspaceCandidate, WorkspaceDoc, WorkspaceActivity, WorkspaceNote } from './page'
@@ -47,6 +49,7 @@ type TaskItem = { id: string; title: string; type: string; assignee: string; due
 
 const FACILITY_TYPES: ClientFacility['type'][] = ['Hospital', 'Clinic', 'Laboratory', 'Rehabilitation', 'Urgent Care', 'Skilled Nursing', 'Home Health']
 const TASK_TYPES = ['Follow-up', 'Meeting', 'Document Request', 'Contract Renewal', 'Client Visit', 'Credentialing']
+const DOCUMENT_CATEGORIES = ['Contract', 'Agreement', 'Other']
 
 // ── Small pieces ───────────────────────────────────────────────────────────────
 
@@ -110,6 +113,20 @@ function FieldSelect({ className, children, ...props }: React.SelectHTMLAttribut
   )
 }
 
+function ManageMenu({ count, children }: { count: number; children: React.ReactNode }) {
+  if (count === 0) return null
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5">
+          Manage ({count})<MoreHorizontal className="size-3.5" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">{children}</DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 const TABS = [
   { id: 'overview',    label: 'Overview' },
   { id: 'info',        label: 'Client info' },
@@ -140,15 +157,13 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const [docList, setDocList]           = useState<WorkspaceDoc[]>(documents)
   const [taskList, setTaskList]         = useState<TaskItem[]>([])
   const [activityList, setActivityList] = useState<WorkspaceActivity[]>(activity)
-  const [noteText, setNoteText] = useState('')
-  const [notesList, setNotesList] = useState<WorkspaceNote[]>(notes)
+  const [notesList, setNotesList]       = useState<WorkspaceNote[]>(notes)
 
-  const [contactDrawerOpen, setContactDrawerOpen] = useState(false)
+  const [contactDrawerOpen, setContactDrawerOpen]   = useState(false)
   const [facilityDrawerOpen, setFacilityDrawerOpen] = useState(false)
-  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false)
-  const [metricsDrawerOpen, setMetricsDrawerOpen] = useState(false)
-  const [selectedContact, setSelectedContact] = useState<ClientContact | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [taskDrawerOpen, setTaskDrawerOpen]         = useState(false)
+  const [metricsDrawerOpen, setMetricsDrawerOpen]   = useState(false)
+  const [selectedContact, setSelectedContact]       = useState<ClientContact | null>(null)
 
   // ── Team & roles panel ────────────────────────────────────────────────────
   const [teamDrawerOpen, setTeamDrawerOpen] = useState(false)
@@ -191,7 +206,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
   const placements = useMemo(() => PLACEMENTS.filter(p => p.client === clientInfo.name), [clientInfo.name])
 
-  // Distinct candidates (Candidates tab), vs one row per submission event (Submissions tab)
+  // Distinct candidates, for the metrics count
   const distinctCandidates = useMemo(() => {
     const seen = new Map<string, WorkspaceCandidate>()
     for (const c of candidates) if (!seen.has(c.candidateId)) seen.set(c.candidateId, c)
@@ -206,18 +221,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     startTransition(async () => {
       const res = await addClientActivityAction(clientInfo.id, action)
       if (res.success) setActivityList(prev => [{ id: res.id, actor: res.actor_name, action, time: res.created_at }, ...prev])
-    })
-  }
-
-  function addNote() {
-    if (!noteText.trim()) return
-    const text = noteText
-    setNoteText('')
-    startTransition(async () => {
-      const res = await addClientNoteAction(clientInfo.id, text)
-      if (!res.success) { toast.error(res.error); return }
-      setNotesList(prev => [{ id: res.id, author: res.author_name, text, time: res.created_at }, ...prev])
-      toast('Note added.')
     })
   }
 
@@ -255,6 +258,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const [ncPhone, setNcPhone] = useState('')
   const [ncDecisionMaker, setNcDecisionMaker] = useState(false)
   const [editingContactId, setEditingContactId] = useState<string | null>(null)
+  const [selectedContactIds, setSelectedContactIds] = useState<string[]>([])
 
   function resetContactForm() {
     setNcName(''); setNcTitle(''); setNcDept(''); setNcEmail(''); setNcPhone(''); setNcDecisionMaker(false)
@@ -303,16 +307,46 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
       }
     })
   }
+  function toggleContactSelect(id: string) {
+    setSelectedContactIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+  function deleteSelectedContacts() {
+    if (!confirm(`Delete ${selectedContactIds.length} contact(s)?`)) return
+    const ids = selectedContactIds
+    setContactList(prev => prev.filter(c => !ids.includes(c.id)))
+    setSelectedContactIds([])
+    startTransition(async () => { await Promise.all(ids.map(id => deleteClientContactAction(id))) })
+  }
+  function emailSelectedContacts() {
+    const chosen = contactList.filter(c => selectedContactIds.includes(c.id))
+    const emails = chosen.map(c => c.email).filter(Boolean)
+    if (!emails.length) { toast.error('No email on file for the selected contact(s).'); return }
+    window.open(`mailto:${emails.join(',')}`)
+    logActivity(emails.length > 1 ? `emailed ${emails.length} contacts` : `emailed ${chosen[0]?.name}`)
+    setSelectedContactIds([])
+  }
 
-  // ── Add facility form ─────────────────────────────────────────────────────
+  // ── Add / edit facility form ──────────────────────────────────────────────
   const [nfName, setNfName] = useState('')
   const [nfType, setNfType] = useState<ClientFacility['type']>('Hospital')
   const [nfCity, setNfCity] = useState('')
   const [nfState, setNfState] = useState('')
   const [nfManager, setNfManager] = useState('')
+  const [editingFacilityId, setEditingFacilityId] = useState<string | null>(null)
+  const [selectedFacilityIds, setSelectedFacilityIds] = useState<string[]>([])
 
   function resetFacilityForm() {
     setNfName(''); setNfType('Hospital'); setNfCity(''); setNfState(''); setNfManager('')
+  }
+  function openAddFacility() {
+    setEditingFacilityId(null)
+    resetFacilityForm()
+    setFacilityDrawerOpen(true)
+  }
+  function openEditFacility(f: ClientFacility) {
+    setEditingFacilityId(f.id)
+    setNfName(f.name); setNfType(f.type); setNfCity(f.city); setNfState(f.state); setNfManager(f.facilityManager)
+    setFacilityDrawerOpen(true)
   }
   function submitFacility(e: React.FormEvent) {
     e.preventDefault()
@@ -321,15 +355,34 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     fd.set('name', nfName); fd.set('type', nfType); fd.set('city', nfCity)
     fd.set('state', nfState); fd.set('facility_manager', nfManager)
     const name = nfName
+    const editingId = editingFacilityId
     resetFacilityForm()
+    setEditingFacilityId(null)
     setFacilityDrawerOpen(false)
     startTransition(async () => {
-      const res = await addClientFacilityAction(clientInfo.id, fd)
+      const res = editingId
+        ? await updateClientFacilityAction(editingId, fd)
+        : await addClientFacilityAction(clientInfo.id, fd)
       if (!res.success) { toast.error(res.error); return }
-      setFacilityList(prev => [...prev, res.facility])
-      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `added facility ${name}`, time: new Date().toISOString() }, ...prev])
-      toast(`${name} added.`)
+      if (editingId) {
+        setFacilityList(prev => prev.map(f => f.id === editingId ? res.facility : f))
+        toast(`${name} updated.`)
+      } else {
+        setFacilityList(prev => [...prev, res.facility])
+        toast(`${name} added.`)
+      }
+      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `${editingId ? 'updated' : 'added'} facility ${name}`, time: new Date().toISOString() }, ...prev])
     })
+  }
+  function toggleFacilitySelect(id: string) {
+    setSelectedFacilityIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+  function deleteSelectedFacilities() {
+    if (!confirm(`Delete ${selectedFacilityIds.length} facilit${selectedFacilityIds.length > 1 ? 'ies' : 'y'}?`)) return
+    const ids = selectedFacilityIds
+    setFacilityList(prev => prev.filter(f => !ids.includes(f.id)))
+    setSelectedFacilityIds([])
+    startTransition(async () => { await Promise.all(ids.map(id => deleteClientFacilityAction(id))) })
   }
 
   // ── Create task form (local-only, see TaskItem note above) ───────────────
@@ -356,26 +409,57 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     setTaskDrawerOpen(false)
   }
 
-  function triggerUpload() {
-    fileInputRef.current?.click()
+  // ── Upload / replace document ─────────────────────────────────────────────
+  const [docDrawerOpen, setDocDrawerOpen] = useState(false)
+  const [docMode, setDocMode] = useState<'add' | 'replace'>('add')
+  const [replacingDocId, setReplacingDocId] = useState<string | null>(null)
+  const [docCategory, setDocCategory] = useState(DOCUMENT_CATEGORIES[0]!)
+  const [docFile, setDocFile] = useState<File | null>(null)
+  const [selectedDocIds, setSelectedDocIds] = useState<string[]>([])
+
+  function openUploadDocument() {
+    setDocMode('add'); setReplacingDocId(null); setDocCategory(DOCUMENT_CATEGORIES[0]!); setDocFile(null)
+    setDocDrawerOpen(true)
   }
-  function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
+  function openReplaceDocument(doc: WorkspaceDoc) {
+    setDocMode('replace'); setReplacingDocId(doc.id); setDocFile(null)
+    setDocDrawerOpen(true)
+  }
+  function submitDocument(e: React.FormEvent) {
+    e.preventDefault()
+    if (!docFile) { toast.error('Choose a file to upload.'); return }
     const fd = new FormData()
-    fd.set('file', file)
+    fd.set('file', docFile)
+    if (docMode === 'add') fd.set('category', docCategory)
+    const mode = docMode
+    const replaceId = replacingDocId
+    setDocDrawerOpen(false)
+    setDocFile(null)
     startTransition(async () => {
-      const res = await uploadClientDocumentAction(clientInfo.id, fd)
-      if (!res.success) { toast.error(res.error); return }
-      setDocList(prev => [{ id: res.id, name: res.name, category: 'Other', size: res.size, uploadedAt: res.created_at }, ...prev])
-      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `uploaded document: ${res.name}`, time: new Date().toISOString() }, ...prev])
-      toast('Document uploaded.')
+      if (mode === 'add') {
+        const res = await uploadClientDocumentAction(clientInfo.id, fd)
+        if (!res.success) { toast.error(res.error); return }
+        setDocList(prev => [{ id: res.id, name: res.name, category: res.category, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name }, ...prev])
+        setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `uploaded document: ${res.name}`, time: new Date().toISOString() }, ...prev])
+        toast('Document uploaded.')
+      } else if (replaceId) {
+        const res = await replaceClientDocumentAction(replaceId, fd)
+        if (!res.success) { toast.error(res.error); return }
+        setDocList(prev => prev.map(d => d.id === replaceId ? { ...d, name: res.name, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name } : d))
+        setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `replaced document: ${res.name}`, time: new Date().toISOString() }, ...prev])
+        toast('Document updated.')
+      }
     })
   }
-  function removeDocument(docId: string) {
-    setDocList(prev => prev.filter(d => d.id !== docId))
-    startTransition(async () => { await deleteClientDocumentAction(docId) })
+  function toggleDocSelect(id: string) {
+    setSelectedDocIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+  function deleteSelectedDocuments() {
+    if (!confirm(`Delete ${selectedDocIds.length} document(s)?`)) return
+    const ids = selectedDocIds
+    setDocList(prev => prev.filter(d => !ids.includes(d.id)))
+    setSelectedDocIds([])
+    startTransition(async () => { await Promise.all(ids.map(id => deleteClientDocumentAction(id))) })
   }
 
   function deleteClient() {
@@ -383,17 +467,66 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     startTransition(async () => { await deleteClientAction(clientInfo.id) })
   }
 
-  function deleteContact(contact: ClientContact) {
-    if (!confirm(`Delete ${contact.name}?`)) return
-    setContactList(prev => prev.filter(c => c.id !== contact.id))
-    startTransition(async () => { await deleteClientContactAction(contact.id) })
+  // ── Add / edit note ───────────────────────────────────────────────────────
+  const [noteDrawerOpen, setNoteDrawerOpen] = useState(false)
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [noteText, setNoteText] = useState('')
+  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([])
+
+  function openAddNote() {
+    setEditingNoteId(null)
+    setNoteText('')
+    setNoteDrawerOpen(true)
+  }
+  function openEditNote(note: WorkspaceNote) {
+    setEditingNoteId(note.id)
+    setNoteText(note.text)
+    setNoteDrawerOpen(true)
+  }
+  function submitNote(e: React.FormEvent) {
+    e.preventDefault()
+    if (!noteText.trim()) return
+    const text = noteText
+    const editingId = editingNoteId
+    setNoteText('')
+    setEditingNoteId(null)
+    setNoteDrawerOpen(false)
+    startTransition(async () => {
+      if (editingId) {
+        const res = await updateClientNoteAction(editingId, text)
+        if (!res.success) { toast.error(res.error); return }
+        setNotesList(prev => prev.map(n => n.id === editingId ? { ...n, text } : n))
+        toast('Note updated.')
+      } else {
+        const res = await addClientNoteAction(clientInfo.id, text)
+        if (!res.success) { toast.error(res.error); return }
+        setNotesList(prev => [{ id: res.id, author: res.author_name, text, time: res.created_at }, ...prev])
+        toast('Note added.')
+      }
+    })
+  }
+  function toggleNoteSelect(id: string) {
+    setSelectedNoteIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+  function deleteSelectedNotes() {
+    if (!confirm(`Delete ${selectedNoteIds.length} note(s)?`)) return
+    const ids = selectedNoteIds
+    setNotesList(prev => prev.filter(n => !ids.includes(n.id)))
+    setSelectedNoteIds([])
+    startTransition(async () => { await Promise.all(ids.map(id => deleteClientNoteAction(id))) })
   }
 
-  function deleteNote(noteId: string) {
-    if (!confirm('Delete this note?')) return
-    setNotesList(prev => prev.filter(n => n.id !== noteId))
-    startTransition(async () => { await deleteClientNoteAction(noteId) })
-  }
+  // ── Activity filters ──────────────────────────────────────────────────────
+  const distinctActors = useMemo(() => Array.from(new Set(activityList.map(a => a.actor))).sort(), [activityList])
+  const [filterActor, setFilterActor] = useState('__all__')
+  const [filterFrom, setFilterFrom] = useState('')
+  const [filterTo, setFilterTo] = useState('')
+  const filteredActivity = useMemo(() => activityList.filter(a => {
+    if (filterActor !== '__all__' && a.actor !== filterActor) return false
+    if (filterFrom && new Date(a.time) < new Date(filterFrom)) return false
+    if (filterTo && new Date(a.time) > new Date(`${filterTo}T23:59:59`)) return false
+    return true
+  }), [activityList, filterActor, filterFrom, filterTo])
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
@@ -436,6 +569,9 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               </DropdownMenuContent>
             </DropdownMenu>
             <button type="button" onClick={openAddContact} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
+            {isHealthcare && (
+              <button type="button" onClick={openAddFacility} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Hospital className="size-3.5" />Add facility</button>
+            )}
             <button type="button" onClick={openTeamDrawer} title="Team & roles" className="size-8 rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center justify-center shrink-0">
               <Settings className="size-3.5" />
             </button>
@@ -627,83 +763,128 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             {contactList.length === 0 ? (
               <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." />
             ) : (
-              <SimpleTable
-                headers={['Contact', 'Title', 'Department', 'Email', 'Phone', 'Status', '']}
-                rows={contactList.map(c => [
-                  <button key="n" type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 font-medium hover:text-brand">
-                    <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
-                    {c.name}
-                  </button>,
-                  c.title || '—',
-                  c.department || '—',
-                  c.email || '—',
-                  c.phone || '—',
-                  <div key="s" className="flex gap-1.5">
-                    {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25" />}
-                    {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border" />}
-                  </div>,
-                  <button key="del" type="button" onClick={() => deleteContact(c)} className="size-7 rounded-md hover:bg-muted flex items-center justify-center">
-                    <Trash2 className="size-3.5 text-muted-foreground" />
-                  </button>,
-                ])}
-              />
+              <>
+                <div className="flex justify-end mb-3">
+                  <ManageMenu count={selectedContactIds.length}>
+                    {selectedContactIds.length === 1 && (
+                      <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                        const c = contactList.find(c => c.id === selectedContactIds[0])
+                        setSelectedContactIds([])
+                        if (c) openEditContact(c)
+                      }}>
+                        <Pencil className="size-3.5" />Edit
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem className="text-sm gap-2" onClick={emailSelectedContacts}>
+                      <Mail className="size-3.5" />Send email
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedContacts}>
+                      <Trash2 className="size-3.5" />Delete
+                    </DropdownMenuItem>
+                  </ManageMenu>
+                </div>
+                <SimpleTable
+                  headers={['', 'Contact', 'Title', 'Department', 'Email', 'Phone', 'Status']}
+                  rows={contactList.map(c => [
+                    <input key="cb" type="checkbox" checked={selectedContactIds.includes(c.id)} onChange={() => toggleContactSelect(c.id)} className="size-4" />,
+                    <button key="n" type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 font-medium hover:text-brand">
+                      <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
+                      {c.name}
+                    </button>,
+                    c.title || '—',
+                    c.department || '—',
+                    c.email || '—',
+                    c.phone || '—',
+                    <div key="s" className="flex gap-1.5">
+                      {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25" />}
+                      {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border" />}
+                    </div>,
+                  ])}
+                />
+              </>
             )}
           </div>
         )}
 
         {activeTab === 'facilities' && isHealthcare && (
           <div className="px-6 py-6">
-            <div className="flex justify-end mb-3">
-              {facilityList.length > 0 && (
-                <button type="button" onClick={() => setFacilityDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
-                  <Plus className="size-3.5" />Add facility
-                </button>
-              )}
-            </div>
             {facilityList.length === 0 ? (
-              <EmptyTab icon={Hospital} title="No facilities yet" description="Add the hospitals, clinics, or labs this client operates so jobs can reference the right location." actionLabel="Add facility" onAction={() => setFacilityDrawerOpen(true)} />
+              <EmptyTab icon={Hospital} title="No facilities yet" description="Add the hospitals, clinics, or labs this client operates so jobs can reference the right location." actionLabel="Add facility" onAction={openAddFacility} />
             ) : (
-              <SimpleTable
-                headers={['Facility', 'Type', 'Location', 'Departments', 'Specialties', 'Manager']}
-                rows={facilityList.map(f => [
-                  <span key="n" className="font-medium">{f.name}</span>,
-                  <Chip key="t" label={f.type} className="bg-muted text-muted-foreground border-border" />,
-                  [f.city, f.state].filter(Boolean).join(', ') || '—',
-                  f.departments.length ? f.departments.join(', ') : '—',
-                  f.specialties.length ? f.specialties.join(', ') : '—',
-                  f.facilityManager || '—',
-                ])}
-              />
+              <>
+                <div className="flex justify-end mb-3">
+                  <ManageMenu count={selectedFacilityIds.length}>
+                    {selectedFacilityIds.length === 1 && (
+                      <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                        const f = facilityList.find(f => f.id === selectedFacilityIds[0])
+                        setSelectedFacilityIds([])
+                        if (f) openEditFacility(f)
+                      }}>
+                        <Pencil className="size-3.5" />Edit
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedFacilities}>
+                      <Trash2 className="size-3.5" />Delete
+                    </DropdownMenuItem>
+                  </ManageMenu>
+                </div>
+                <SimpleTable
+                  headers={['', 'Facility', 'Type', 'Location', 'Departments', 'Specialties', 'Manager']}
+                  rows={facilityList.map(f => [
+                    <input key="cb" type="checkbox" checked={selectedFacilityIds.includes(f.id)} onChange={() => toggleFacilitySelect(f.id)} className="size-4" />,
+                    <span key="n" className="font-medium">{f.name}</span>,
+                    <Chip key="t" label={f.type} className="bg-muted text-muted-foreground border-border" />,
+                    [f.city, f.state].filter(Boolean).join(', ') || '—',
+                    f.departments.length ? f.departments.join(', ') : '—',
+                    f.specialties.length ? f.specialties.join(', ') : '—',
+                    f.facilityManager || '—',
+                  ])}
+                />
+              </>
             )}
           </div>
         )}
 
         {activeTab === 'documents' && (
           <div className="px-6 py-6">
-            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelected} />
-            <div className="flex justify-end mb-3">
+            <div className="flex justify-end mb-3 gap-2">
+              <ManageMenu count={selectedDocIds.length}>
+                {selectedDocIds.length === 1 && (
+                  <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                    const d = docList.find(d => d.id === selectedDocIds[0])
+                    setSelectedDocIds([])
+                    if (d) openReplaceDocument(d)
+                  }}>
+                    <Upload className="size-3.5" />Change document
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedDocuments}>
+                  <Trash2 className="size-3.5" />Delete
+                </DropdownMenuItem>
+              </ManageMenu>
               {docList.length > 0 && (
-                <button type="button" onClick={triggerUpload} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                <button type="button" onClick={openUploadDocument} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
                   <Upload className="size-3.5" />Upload document
                 </button>
               )}
             </div>
             {docList.length === 0 ? (
-              <EmptyTab icon={Upload} title="No documents yet" description="Contracts, insurance, invoices, and other files for this client will show up here." actionLabel="Upload document" onAction={triggerUpload} />
+              <EmptyTab icon={Upload} title="No documents yet" description="Contracts, agreements, and other files for this client will show up here." actionLabel="Upload document" onAction={openUploadDocument} />
             ) : (
-              <div className="space-y-2">
-                {docList.map(d => (
-                  <div key={d.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
-                    <FileText className="size-4 text-muted-foreground shrink-0" />
-                    <span className="text-sm font-medium truncate">{d.name}</span>
-                    <Chip label={d.category} className="bg-muted text-muted-foreground border-border ml-2" />
-                    <span className="text-sm text-muted-foreground ml-auto shrink-0">{formatSize(d.size)} · {relTime(d.uploadedAt)}</span>
-                    <button type="button" onClick={() => removeDocument(d.id)} className="size-6 rounded-md hover:bg-muted flex items-center justify-center shrink-0">
-                      <X className="size-3.5 text-muted-foreground" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <SimpleTable
+                headers={['', 'Name', 'Category', 'Size', 'Uploaded', 'Uploaded by']}
+                rows={docList.map(d => [
+                  <input key="cb" type="checkbox" checked={selectedDocIds.includes(d.id)} onChange={() => toggleDocSelect(d.id)} className="size-4" />,
+                  <span key="n" className="flex items-center gap-2 font-medium"><FileText className="size-4 text-muted-foreground shrink-0" />{d.name}</span>,
+                  <Chip key="c" label={d.category} className="bg-muted text-muted-foreground border-border" />,
+                  formatSize(d.size),
+                  relTime(d.uploadedAt),
+                  d.uploaderName || '—',
+                ])}
+              />
             )}
           </div>
         )}
@@ -734,12 +915,26 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'activity' && (
           <div className="px-6 py-6">
-            {activityList.length === 0 ? (
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <FieldSelect value={filterActor} onChange={e => setFilterActor(e.target.value)} className="w-44">
+                <option value="__all__">All users</option>
+                {distinctActors.map(a => <option key={a} value={a}>{a}</option>)}
+              </FieldSelect>
+              <FieldInput type="date" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} className="w-40" />
+              <span className="text-sm text-muted-foreground">to</span>
+              <FieldInput type="date" value={filterTo} onChange={e => setFilterTo(e.target.value)} className="w-40" />
+              {(filterActor !== '__all__' || filterFrom || filterTo) && (
+                <button type="button" onClick={() => { setFilterActor('__all__'); setFilterFrom(''); setFilterTo('') }} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Clear filters
+                </button>
+              )}
+            </div>
+            {filteredActivity.length === 0 ? (
               <EmptyTab icon={Briefcase} title="No activity yet" description="Calls, emails, meetings, and updates for this client will show up here." />
             ) : (
               <SimpleTable
                 headers={['Actor', 'Action', 'Time']}
-                rows={activityList.map(a => [
+                rows={filteredActivity.map(a => [
                   <div key="a" className="flex items-center gap-2.5 font-medium">
                     <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(a.actor)}</AvatarFallback></Avatar>
                     {a.actor}
@@ -753,29 +948,42 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
         )}
 
         {activeTab === 'notes' && (
-          <div className="px-6 py-6 space-y-5">
-            <div className="max-w-2xl border border-border rounded-lg p-4 bg-muted/20">
-              <Textarea value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Write a note about this client…" className="h-24 resize-none mb-3 text-sm" />
-              <div className="flex items-center justify-end gap-2">
-                <button type="button" onClick={() => setNoteText('')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Clear</button>
-                <button type="button" onClick={addNote} disabled={!noteText.trim()} className="h-8 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white disabled:opacity-40">Add note</button>
-              </div>
+          <div className="px-6 py-6">
+            <div className="flex justify-end mb-3 gap-2">
+              <ManageMenu count={selectedNoteIds.length}>
+                {selectedNoteIds.length === 1 && (
+                  <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                    const n = notesList.find(n => n.id === selectedNoteIds[0])
+                    setSelectedNoteIds([])
+                    if (n) openEditNote(n)
+                  }}>
+                    <Pencil className="size-3.5" />Edit
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedNotes}>
+                  <Trash2 className="size-3.5" />Delete
+                </DropdownMenuItem>
+              </ManageMenu>
+              {notesList.length > 0 && (
+                <button type="button" onClick={openAddNote} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                  <Plus className="size-3.5" />Add note
+                </button>
+              )}
             </div>
             {notesList.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No notes yet. Add one above.</p>
+              <EmptyTab icon={FileText} title="No notes yet" description="Add notes about this client so the team stays in sync." actionLabel="Add note" onAction={openAddNote} />
             ) : (
               <SimpleTable
-                headers={['Author', 'Note', 'Time', '']}
+                headers={['', 'Note', 'Created by', 'Created on']}
                 rows={notesList.map(n => [
+                  <input key="cb" type="checkbox" checked={selectedNoteIds.includes(n.id)} onChange={() => toggleNoteSelect(n.id)} className="size-4" />,
+                  <span key="t" className="text-foreground">{n.text}</span>,
                   <div key="a" className="flex items-center gap-2.5 font-medium shrink-0">
                     <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(n.author)}</AvatarFallback></Avatar>
                     {n.author}
                   </div>,
-                  <span key="t" className="text-foreground">{n.text}</span>,
                   <span key="ti" className="whitespace-nowrap">{relTime(n.time)}</span>,
-                  <button key="del" type="button" onClick={() => deleteNote(n.id)} className="size-7 rounded-md hover:bg-muted flex items-center justify-center">
-                    <Trash2 className="size-3.5 text-muted-foreground" />
-                  </button>,
                 ])}
               />
             )}
@@ -865,10 +1073,10 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
         </SheetContent>
       </Sheet>
 
-      {/* Add facility drawer */}
+      {/* Add / edit facility drawer */}
       <Sheet open={facilityDrawerOpen} onOpenChange={setFacilityDrawerOpen}>
         <SheetContent className="w-[420px] sm:max-w-[420px]">
-          <SheetHeader><SheetTitle>Add facility</SheetTitle></SheetHeader>
+          <SheetHeader><SheetTitle>{editingFacilityId ? 'Edit facility' : 'Add facility'}</SheetTitle></SheetHeader>
           <form onSubmit={submitFacility} className="px-4 py-4 space-y-4 overflow-y-auto">
             <div>
               <FieldLabel>Facility name</FieldLabel>
@@ -896,7 +1104,33 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             </div>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button type="button" onClick={() => setFacilityDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
-              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Add facility</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">{editingFacilityId ? 'Save facility' : 'Add facility'}</button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Upload / replace document drawer */}
+      <Sheet open={docDrawerOpen} onOpenChange={setDocDrawerOpen}>
+        <SheetContent className="w-[420px] sm:max-w-[420px]">
+          <SheetHeader><SheetTitle>{docMode === 'replace' ? 'Change document' : 'Upload document'}</SheetTitle></SheetHeader>
+          <form onSubmit={submitDocument} className="px-4 py-4 space-y-4 overflow-y-auto">
+            {docMode === 'add' && (
+              <div>
+                <FieldLabel>Document type</FieldLabel>
+                <FieldSelect value={docCategory} onChange={e => setDocCategory(e.target.value)}>
+                  {DOCUMENT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </FieldSelect>
+              </div>
+            )}
+            <div>
+              <FieldLabel>File</FieldLabel>
+              <input type="file" onChange={e => setDocFile(e.target.files?.[0] ?? null)}
+                className="w-full text-sm file:mr-3 file:h-8 file:px-3 file:rounded-lg file:border-0 file:bg-brand file:text-white file:text-sm file:font-medium file:cursor-pointer" />
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setDocDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">{docMode === 'replace' ? 'Save' : 'Upload'}</button>
             </div>
           </form>
         </SheetContent>
@@ -936,6 +1170,20 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             <div className="flex items-center justify-end gap-2 pt-2">
               <button type="button" onClick={() => setTaskDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
               <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Create task</button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Add / edit note drawer */}
+      <Sheet open={noteDrawerOpen} onOpenChange={setNoteDrawerOpen}>
+        <SheetContent className="w-[420px] sm:max-w-[420px]">
+          <SheetHeader><SheetTitle>{editingNoteId ? 'Edit note' : 'Add note'}</SheetTitle></SheetHeader>
+          <form onSubmit={submitNote} className="px-4 py-4 space-y-4">
+            <Textarea value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Write a note about this client…" className="h-32 resize-none text-sm" required />
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setNoteDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">{editingNoteId ? 'Save' : 'Add note'}</button>
             </div>
           </form>
         </SheetContent>
@@ -1001,7 +1249,7 @@ function SimpleTable({ headers, rows }: { headers: string[]; rows: React.ReactNo
       <table className="w-full text-sm border-collapse">
         <thead className="bg-muted/40">
           <tr className="border-b border-border">
-            {headers.map(h => <th key={h} className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">{h}</th>)}
+            {headers.map((h, i) => <th key={h || `h${i}`} className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">{h}</th>)}
           </tr>
         </thead>
         <tbody>
