@@ -65,12 +65,12 @@ export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | '
         <div className="flex items-center justify-between h-12 border-b px-3 flex-shrink-0">
           {!collapsed && (
             <div className="flex items-center gap-2 min-w-0">
-              <div className="size-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-xs flex-shrink-0">G</div>
+              <img src="/logo-icon-square.png" alt="God Recruiter" className="size-7 object-contain flex-shrink-0" />
               <span className="font-semibold text-base tracking-tight truncate">God Recruiter</span>
             </div>
           )}
           {collapsed && (
-            <div className="size-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-xs mx-auto">G</div>
+            <img src="/logo-icon-square.png" alt="God Recruiter" className="size-7 object-contain mx-auto" />
           )}
           {!collapsed && showToggle && (
             <button

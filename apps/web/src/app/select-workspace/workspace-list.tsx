@@ -38,12 +38,7 @@ export function WorkspaceList({ workspaces, userName }: Props) {
     }}>
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
-        <div style={{
-          width: '32px', height: '32px', borderRadius: '8px',
-          background: 'var(--accent-primary)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontWeight: '700', fontSize: '16px',
-        }}>G</div>
+        <img src="/logo-icon-square.png" alt="" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
         <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
           God Recruiter
         </span>

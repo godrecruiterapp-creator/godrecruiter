@@ -16,9 +16,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 no-underline mb-9">
-          <div className="w-[26px] h-[26px] rounded-[6px] bg-foreground flex items-center justify-center text-[13px] font-bold text-white">
-            G
-          </div>
+          <img src="/logo-icon-square.png" alt="" className="w-[26px] h-[26px] object-contain" />
           <span className="text-[14px] font-semibold text-foreground tracking-tight">
             God Recruiter
           </span>
