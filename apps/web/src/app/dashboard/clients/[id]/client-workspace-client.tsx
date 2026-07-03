@@ -966,6 +966,9 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <button type="button"
                   onClick={() => { toast(`Email opened for ${selectedContact.name}.`); logActivity(`emailed ${selectedContact.name}`) }}
                   className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5"><Mail className="size-3.5" />Email</button>
+                <button type="button"
+                  onClick={() => { const c = selectedContact; setSelectedContact(null); openEditContact(c) }}
+                  className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5 ml-auto"><Pencil className="size-3.5" />Edit</button>
               </div>
             </div>
           )}
