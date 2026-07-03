@@ -117,6 +117,16 @@ export async function updateClientAction(clientId: string, formData: FormData) {
   redirect(`/dashboard/clients/${clientId}`)
 }
 
+export async function deleteClientAction(clientId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const admin = createAdminClient()
+  await admin.from('clients').update({ deleted_at: new Date().toISOString() }).eq('id', clientId).eq('tenant_id', ctx.tenant_id)
+
+  redirect('/dashboard/clients')
+}
+
 export async function updateClientInfoAction(clientId: string, formData: FormData) {
   const ctx = await getUserContext()
   if (!ctx) return { success: false as const, error: 'Not authenticated.' }
@@ -208,6 +218,19 @@ export async function updateClientContactAction(contactId: string, formData: For
   return { success: true as const, contact: mapContactRow(row) }
 }
 
+export async function deleteClientContactAction(contactId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const admin = createAdminClient()
+  const { data: contact } = await admin.from('client_contacts').select('client_id, name').eq('id', contactId).single()
+  const { error } = await admin.from('client_contacts').delete().eq('id', contactId)
+  if (error) return { success: false as const, error: error.message }
+
+  if (contact) await logActivity(admin, contact.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `deleted contact ${contact.name}`)
+  return { success: true as const }
+}
+
 // ── Facilities ─────────────────────────────────────────────────────────────────
 
 export async function addClientFacilityAction(clientId: string, formData: FormData) {
@@ -249,6 +272,19 @@ export async function addClientNoteAction(clientId: string, text: string) {
   if (error) return { success: false as const, error: error.message }
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'added a note')
   return { success: true as const, id, author_name: ctx.name, created_at }
+}
+
+export async function deleteClientNoteAction(noteId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const admin = createAdminClient()
+  const { data: note } = await admin.from('client_notes').select('client_id').eq('id', noteId).single()
+  const { error } = await admin.from('client_notes').delete().eq('id', noteId)
+  if (error) return { success: false as const, error: error.message }
+
+  if (note) await logActivity(admin, note.client_id, ctx.tenant_id, ctx.user.id, ctx.name, 'deleted a note')
+  return { success: true as const }
 }
 
 // ── Activity (also used by quick-action buttons: Call / Email / Schedule) ─────

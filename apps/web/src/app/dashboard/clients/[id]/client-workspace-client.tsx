@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
@@ -15,12 +15,13 @@ import { relTime, formatSize, toInitials } from '@/lib/format'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
   Building2, Plus, FileText, Upload, Hospital, X, Pencil, MoreHorizontal,
-  Settings, BarChart3,
+  Settings, BarChart3, Trash2,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
 import {
   addClientActivityAction, addClientContactAction, addClientFacilityAction,
-  addClientNoteAction, deleteClientDocumentAction, updateClientContactAction,
+  addClientNoteAction, deleteClientAction, deleteClientContactAction,
+  deleteClientDocumentAction, deleteClientNoteAction, updateClientContactAction,
   updateClientInfoAction, updateClientTeamAction, uploadClientDocumentAction,
 } from '../actions'
 import { PLACEMENTS } from '../../placements/_data'
@@ -377,6 +378,23 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     startTransition(async () => { await deleteClientDocumentAction(docId) })
   }
 
+  function deleteClient() {
+    if (!confirm(`Delete ${clientInfo.name}? This cannot be undone.`)) return
+    startTransition(async () => { await deleteClientAction(clientInfo.id) })
+  }
+
+  function deleteContact(contact: ClientContact) {
+    if (!confirm(`Delete ${contact.name}?`)) return
+    setContactList(prev => prev.filter(c => c.id !== contact.id))
+    startTransition(async () => { await deleteClientContactAction(contact.id) })
+  }
+
+  function deleteNote(noteId: string) {
+    if (!confirm('Delete this note?')) return
+    setNotesList(prev => prev.filter(n => n.id !== noteId))
+    startTransition(async () => { await deleteClientNoteAction(noteId) })
+  }
+
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
       {/* Header */}
@@ -448,6 +466,10 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-sm gap-2" onClick={() => setTaskDrawerOpen(true)}>
                   <CheckSquare className="size-3.5" />Create task
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteClient}>
+                  <Trash2 className="size-3.5" />Delete client
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -602,35 +624,29 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'contacts' && (
           <div className="px-6 py-6">
-            <div className="flex justify-end mb-3">
-              {contactList.length > 0 && (
-                <button type="button" onClick={openAddContact} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
-                  <Plus className="size-3.5" />Add contact
-                </button>
-              )}
-            </div>
             {contactList.length === 0 ? (
-              <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." actionLabel="Add contact" onAction={openAddContact} />
+              <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {contactList.map(c => (
-                  <button type="button" key={c.id} onClick={() => setSelectedContact(c)} className="text-left rounded-xl border border-border p-4 hover:bg-muted/30 hover:border-brand/40 transition-colors">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Avatar className="size-9"><AvatarFallback className="text-sm font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{c.name}</p>
-                        <p className="text-sm text-muted-foreground truncate">{c.title}{c.department ? ` · ${c.department}` : ''}</p>
-                      </div>
-                      {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25 ml-auto" />}
-                    </div>
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      <p>{c.email}</p>
-                      <p>{c.phone}</p>
-                    </div>
-                    {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border mt-2" />}
-                  </button>
-                ))}
-              </div>
+              <SimpleTable
+                headers={['Contact', 'Title', 'Department', 'Email', 'Phone', 'Status', '']}
+                rows={contactList.map(c => [
+                  <button key="n" type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 font-medium hover:text-brand">
+                    <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
+                    {c.name}
+                  </button>,
+                  c.title || '—',
+                  c.department || '—',
+                  c.email || '—',
+                  c.phone || '—',
+                  <div key="s" className="flex gap-1.5">
+                    {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25" />}
+                    {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border" />}
+                  </div>,
+                  <button key="del" type="button" onClick={() => deleteContact(c)} className="size-7 rounded-md hover:bg-muted flex items-center justify-center">
+                    <Trash2 className="size-3.5 text-muted-foreground" />
+                  </button>,
+                ])}
+              />
             )}
           </div>
         )}
@@ -647,20 +663,17 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             {facilityList.length === 0 ? (
               <EmptyTab icon={Hospital} title="No facilities yet" description="Add the hospitals, clinics, or labs this client operates so jobs can reference the right location." actionLabel="Add facility" onAction={() => setFacilityDrawerOpen(true)} />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {facilityList.map(f => (
-                  <div key={f.id} className="rounded-xl border border-border p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium">{f.name}</p>
-                      <Chip label={f.type} className="bg-muted text-muted-foreground border-border" />
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">{f.city}, {f.state}</p>
-                    {f.departments.length > 0 && <p className="text-sm"><span className="text-muted-foreground">Departments: </span>{f.departments.join(', ')}</p>}
-                    {f.specialties.length > 0 && <p className="text-sm"><span className="text-muted-foreground">Specialties: </span>{f.specialties.join(', ')}</p>}
-                    <p className="text-sm mt-2"><span className="text-muted-foreground">Manager: </span>{f.facilityManager || '—'}</p>
-                  </div>
-                ))}
-              </div>
+              <SimpleTable
+                headers={['Facility', 'Type', 'Location', 'Departments', 'Specialties', 'Manager']}
+                rows={facilityList.map(f => [
+                  <span key="n" className="font-medium">{f.name}</span>,
+                  <Chip key="t" label={f.type} className="bg-muted text-muted-foreground border-border" />,
+                  [f.city, f.state].filter(Boolean).join(', ') || '—',
+                  f.departments.length ? f.departments.join(', ') : '—',
+                  f.specialties.length ? f.specialties.join(', ') : '—',
+                  f.facilityManager || '—',
+                ])}
+              />
             )}
           </div>
         )}
@@ -720,28 +733,28 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
         )}
 
         {activeTab === 'activity' && (
-          <div className="px-6 py-6 max-w-2xl">
+          <div className="px-6 py-6">
             {activityList.length === 0 ? (
               <EmptyTab icon={Briefcase} title="No activity yet" description="Calls, emails, meetings, and updates for this client will show up here." />
             ) : (
-              <div className="space-y-4">
-                {activityList.map(a => (
-                  <div key={a.id} className="flex items-start gap-3 border-b border-border/60 pb-4 last:border-0">
+              <SimpleTable
+                headers={['Actor', 'Action', 'Time']}
+                rows={activityList.map(a => [
+                  <div key="a" className="flex items-center gap-2.5 font-medium">
                     <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(a.actor)}</AvatarFallback></Avatar>
-                    <div className="min-w-0">
-                      <p className="text-sm"><span className="font-medium">{a.actor}</span> <span className="text-muted-foreground">{a.action}</span></p>
-                      <p className="text-sm text-muted-foreground mt-0.5">{relTime(a.time)}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    {a.actor}
+                  </div>,
+                  a.action,
+                  relTime(a.time),
+                ])}
+              />
             )}
           </div>
         )}
 
         {activeTab === 'notes' && (
-          <div className="px-6 py-6 max-w-2xl space-y-5">
-            <div className="border border-border rounded-lg p-4 bg-muted/20">
+          <div className="px-6 py-6 space-y-5">
+            <div className="max-w-2xl border border-border rounded-lg p-4 bg-muted/20">
               <Textarea value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Write a note about this client…" className="h-24 resize-none mb-3 text-sm" />
               <div className="flex items-center justify-end gap-2">
                 <button type="button" onClick={() => setNoteText('')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Clear</button>
@@ -751,16 +764,20 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             {notesList.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">No notes yet. Add one above.</p>
             ) : (
-              notesList.map(n => (
-                <div key={n.id} className="border border-border rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Avatar className="size-7"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(n.author)}</AvatarFallback></Avatar>
-                    <span className="text-sm font-medium">{n.author}</span>
-                    <span className="text-xs text-muted-foreground ml-auto">{relTime(n.time)}</span>
-                  </div>
-                  <p className="text-sm text-foreground leading-relaxed">{n.text}</p>
-                </div>
-              ))
+              <SimpleTable
+                headers={['Author', 'Note', 'Time', '']}
+                rows={notesList.map(n => [
+                  <div key="a" className="flex items-center gap-2.5 font-medium shrink-0">
+                    <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(n.author)}</AvatarFallback></Avatar>
+                    {n.author}
+                  </div>,
+                  <span key="t" className="text-foreground">{n.text}</span>,
+                  <span key="ti" className="whitespace-nowrap">{relTime(n.time)}</span>,
+                  <button key="del" type="button" onClick={() => deleteNote(n.id)} className="size-7 rounded-md hover:bg-muted flex items-center justify-center">
+                    <Trash2 className="size-3.5 text-muted-foreground" />
+                  </button>,
+                ])}
+              />
             )}
           </div>
         )}
