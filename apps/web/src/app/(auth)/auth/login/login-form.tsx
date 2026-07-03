@@ -60,9 +60,9 @@ export function LoginForm({ redirectTo, reset }: Props) {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-2.5">
-            <img src="/logo-icon-square.png" alt="" className="size-10 object-contain" />
-            <span className="text-lg font-semibold tracking-tight">God Recruiter</span>
+          <div className="flex items-center gap-3">
+            <img src="/logo-icon-square.png" alt="" className="size-12 object-contain" />
+            <span className="text-xl font-semibold tracking-tight">God Recruiter</span>
           </div>
         </div>
 
