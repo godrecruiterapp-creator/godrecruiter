@@ -20,8 +20,8 @@ import {
 import type { Client, ClientContact, ClientFacility } from '../_data'
 import {
   addClientActivityAction, addClientContactAction, addClientFacilityAction,
-  addClientNoteAction, deleteClientDocumentAction, updateClientInfoAction,
-  updateClientTeamAction, uploadClientDocumentAction,
+  addClientNoteAction, deleteClientDocumentAction, updateClientContactAction,
+  updateClientInfoAction, updateClientTeamAction, uploadClientDocumentAction,
 } from '../actions'
 import { PLACEMENTS } from '../../placements/_data'
 import type { WorkspaceJob, WorkspaceCandidate, WorkspaceDoc, WorkspaceActivity, WorkspaceNote } from './page'
@@ -246,16 +246,33 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     setEditingInfo(false)
   }
 
-  // ── Add contact form ──────────────────────────────────────────────────────
+  // ── Add / edit contact form ───────────────────────────────────────────────
   const [ncName, setNcName] = useState('')
   const [ncTitle, setNcTitle] = useState('')
   const [ncDept, setNcDept] = useState('')
   const [ncEmail, setNcEmail] = useState('')
   const [ncPhone, setNcPhone] = useState('')
   const [ncDecisionMaker, setNcDecisionMaker] = useState(false)
+  const [editingContactId, setEditingContactId] = useState<string | null>(null)
 
   function resetContactForm() {
     setNcName(''); setNcTitle(''); setNcDept(''); setNcEmail(''); setNcPhone(''); setNcDecisionMaker(false)
+  }
+  function openAddContact() {
+    setEditingContactId(null)
+    resetContactForm()
+    setContactDrawerOpen(true)
+  }
+  function openEditContact(contact: ClientContact) {
+    setEditingContactId(contact.id)
+    setNcName(contact.name); setNcTitle(contact.title); setNcDept(contact.department)
+    setNcEmail(contact.email); setNcPhone(contact.phone); setNcDecisionMaker(contact.decisionMaker)
+    setContactDrawerOpen(true)
+  }
+  function openEditPrimaryContact() {
+    const primary = contactList.find(c => c.primary) ?? contactList[0]
+    if (primary) openEditContact(primary)
+    else openAddContact()
   }
   function submitContact(e: React.FormEvent) {
     e.preventDefault()
@@ -265,14 +282,24 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     fd.set('email', ncEmail); fd.set('phone', ncPhone)
     if (ncDecisionMaker) fd.set('decision_maker', 'on')
     const name = ncName
+    const editingId = editingContactId
     resetContactForm()
+    setEditingContactId(null)
     setContactDrawerOpen(false)
     startTransition(async () => {
-      const res = await addClientContactAction(clientInfo.id, fd)
+      const res = editingId
+        ? await updateClientContactAction(editingId, fd)
+        : await addClientContactAction(clientInfo.id, fd)
       if (!res.success) { toast.error(res.error); return }
-      setContactList(prev => [...prev, res.contact])
-      setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `added contact ${name}`, time: new Date().toISOString() }, ...prev])
-      toast(`${name} added as a contact.`)
+      if (editingId) {
+        setContactList(prev => prev.map(c => c.id === editingId ? res.contact : c))
+        setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `updated contact ${name}`, time: new Date().toISOString() }, ...prev])
+        toast(`${name} updated.`)
+      } else {
+        setContactList(prev => [...prev, res.contact])
+        setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `added contact ${name}`, time: new Date().toISOString() }, ...prev])
+        toast(`${name} added as a contact.`)
+      }
     })
   }
 
@@ -377,7 +404,20 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
           {/* Quick actions */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-            <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Pencil className="size-3.5" />Edit</button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-44">
+                <DropdownMenuItem asChild className="text-sm gap-2">
+                  <Link href={`/dashboard/clients/${clientInfo.id}/edit`}><Building2 className="size-3.5" />Edit client</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-sm gap-2" onClick={openEditPrimaryContact}>
+                  <UserPlus className="size-3.5" />Edit contact
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button type="button" onClick={openAddContact} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
             <button type="button" onClick={openTeamDrawer} title="Team & roles" className="size-8 rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center justify-center shrink-0">
               <Settings className="size-3.5" />
             </button>
@@ -564,13 +604,13 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
           <div className="px-6 py-6">
             <div className="flex justify-end mb-3">
               {contactList.length > 0 && (
-                <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
+                <button type="button" onClick={openAddContact} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
                   <Plus className="size-3.5" />Add contact
                 </button>
               )}
             </div>
             {contactList.length === 0 ? (
-              <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." actionLabel="Add contact" onAction={() => setContactDrawerOpen(true)} />
+              <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." actionLabel="Add contact" onAction={openAddContact} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {contactList.map(c => (
@@ -771,10 +811,10 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
         </SheetContent>
       </Sheet>
 
-      {/* Add contact drawer */}
+      {/* Add / edit contact drawer */}
       <Sheet open={contactDrawerOpen} onOpenChange={setContactDrawerOpen}>
         <SheetContent className="w-[420px] sm:max-w-[420px]">
-          <SheetHeader><SheetTitle>Add contact</SheetTitle></SheetHeader>
+          <SheetHeader><SheetTitle>{editingContactId ? 'Edit contact' : 'Add contact'}</SheetTitle></SheetHeader>
           <form onSubmit={submitContact} className="px-4 py-4 space-y-4 overflow-y-auto">
             <div>
               <FieldLabel>Name</FieldLabel>
@@ -802,7 +842,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             </label>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button type="button" onClick={() => setContactDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
-              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Add contact</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">{editingContactId ? 'Save contact' : 'Add contact'}</button>
             </div>
           </form>
         </SheetContent>

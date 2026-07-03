@@ -74,6 +74,49 @@ export async function createClientAction(formData: FormData) {
   redirect(`/dashboard/clients/${id}`)
 }
 
+export async function updateClientAction(clientId: string, formData: FormData) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const name = formData.get('name') as string
+  if (!name?.trim()) return { success: false as const, error: 'Company name is required.' }
+
+  const admin = createAdminClient()
+  const tags = (formData.get('tags') as string || '').split(',').map(t => t.trim()).filter(Boolean)
+
+  const { error } = await admin.from('clients').update({
+    name,
+    display_name: (formData.get('display_name') as string) || name,
+    legal_name: (formData.get('legal_name') as string) || null,
+    industry: (formData.get('industry') as string) || 'Other',
+    company_type: (formData.get('company_type') as string) || 'direct',
+    status: (formData.get('status') as string) || 'prospect',
+    website: (formData.get('website') as string) || null,
+    tax_id: (formData.get('tax_id') as string) || null,
+    company_size: (formData.get('company_size') as string) || null,
+    city: (formData.get('city') as string) || null,
+    state: (formData.get('state') as string) || null,
+    country: (formData.get('country') as string) || 'USA',
+    zip: (formData.get('zip') as string) || null,
+    timezone: (formData.get('timezone') as string) || null,
+    account_owner: (formData.get('account_owner') as string) || null,
+    recruitment_manager: (formData.get('recruitment_manager') as string) || null,
+    primary_recruiter: (formData.get('primary_recruiter') as string) || null,
+    preferred_communication: (formData.get('preferred_communication') as string) || 'Email',
+    preferred_submission_method: (formData.get('preferred_submission_method') as string) || 'Email',
+    preferred_resume_format: (formData.get('preferred_resume_format') as string) || 'PDF',
+    preferred_interview_process: (formData.get('preferred_interview_process') as string) || null,
+    special_instructions: (formData.get('special_instructions') as string) || null,
+    tags,
+  }).eq('id', clientId).eq('tenant_id', ctx.tenant_id)
+
+  if (error) return { success: false as const, error: `Failed to save client: ${error.message}` }
+
+  await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'updated client details')
+
+  redirect(`/dashboard/clients/${clientId}`)
+}
+
 export async function updateClientInfoAction(clientId: string, formData: FormData) {
   const ctx = await getUserContext()
   if (!ctx) return { success: false as const, error: 'Not authenticated.' }
@@ -141,6 +184,27 @@ export async function addClientContactAction(clientId: string, formData: FormDat
 
   if (error) return { success: false as const, error: error.message }
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, `added contact ${name}`)
+  return { success: true as const, contact: mapContactRow(row) }
+}
+
+export async function updateClientContactAction(contactId: string, formData: FormData) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+  const name = formData.get('name') as string
+  if (!name?.trim()) return { success: false as const, error: 'Contact name is required.' }
+
+  const admin = createAdminClient()
+  const { data: row, error } = await admin.from('client_contacts').update({
+    name,
+    title: (formData.get('title') as string) || null,
+    department: (formData.get('department') as string) || null,
+    email: (formData.get('email') as string) || null,
+    phone: (formData.get('phone') as string) || null,
+    decision_maker: formData.get('decision_maker') === 'on',
+  }).eq('id', contactId).select().single()
+
+  if (error) return { success: false as const, error: error.message }
+  await logActivity(admin, row.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `updated contact ${name}`)
   return { success: true as const, contact: mapContactRow(row) }
 }
 
