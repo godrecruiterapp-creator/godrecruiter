@@ -95,6 +95,27 @@ export async function updateClientInfoAction(clientId: string, formData: FormDat
   return { success: true as const }
 }
 
+export async function updateClientTeamAction(clientId: string, formData: FormData) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const assignedRecruiters = (formData.get('assigned_recruiters') as string || '')
+    .split(',').map(s => s.trim()).filter(Boolean)
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('clients').update({
+    account_owner: (formData.get('account_owner') as string) || null,
+    recruitment_manager: (formData.get('recruitment_manager') as string) || null,
+    team_lead: (formData.get('team_lead') as string) || null,
+    assigned_recruiters: assignedRecruiters,
+  }).eq('id', clientId).eq('tenant_id', ctx.tenant_id)
+
+  if (error) return { success: false as const, error: error.message }
+
+  await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'updated the client team')
+  return { success: true as const }
+}
+
 // ── Contacts ───────────────────────────────────────────────────────────────────
 
 export async function addClientContactAction(clientId: string, formData: FormData) {

@@ -7,18 +7,22 @@ import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { relTime, formatSize, toInitials } from '@/lib/format'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
-  Building2, Plus, FileText, Upload, Hospital, X, Pencil,
+  Building2, Plus, FileText, Upload, Hospital, X, Pencil, MoreHorizontal,
+  Settings, BarChart3, ChevronRight,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
 import {
   addClientActivityAction, addClientContactAction, addClientFacilityAction,
   addClientNoteAction, deleteClientDocumentAction, updateClientInfoAction,
-  uploadClientDocumentAction,
+  updateClientTeamAction, uploadClientDocumentAction,
 } from '../actions'
 import { PLACEMENTS } from '../../placements/_data'
 import type { WorkspaceJob, WorkspaceCandidate, WorkspaceDoc, WorkspaceActivity, WorkspaceNote } from './page'
@@ -168,8 +172,45 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const [contactDrawerOpen, setContactDrawerOpen] = useState(false)
   const [facilityDrawerOpen, setFacilityDrawerOpen] = useState(false)
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false)
+  const [metricsDrawerOpen, setMetricsDrawerOpen] = useState(false)
   const [selectedContact, setSelectedContact] = useState<ClientContact | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // ── Team & roles panel ────────────────────────────────────────────────────
+  const [teamDrawerOpen, setTeamDrawerOpen] = useState(false)
+  const [tAccountManager, setTAccountManager] = useState('')
+  const [tRecruitmentManager, setTRecruitmentManager] = useState('')
+  const [tTeamLead, setTTeamLead] = useState('')
+  const [tAssignedRecruiters, setTAssignedRecruiters] = useState('')
+
+  function openTeamDrawer() {
+    setTAccountManager(clientInfo.accountOwner)
+    setTRecruitmentManager(clientInfo.recruitmentManager)
+    setTTeamLead(clientInfo.teamLead)
+    setTAssignedRecruiters(clientInfo.assignedRecruiters.join(', '))
+    setTeamDrawerOpen(true)
+  }
+  function submitTeam(e: React.FormEvent) {
+    e.preventDefault()
+    const fd = new FormData()
+    fd.set('account_owner', tAccountManager)
+    fd.set('recruitment_manager', tRecruitmentManager)
+    fd.set('team_lead', tTeamLead)
+    fd.set('assigned_recruiters', tAssignedRecruiters)
+    setClientInfo(c => ({
+      ...c,
+      accountOwner: tAccountManager,
+      recruitmentManager: tRecruitmentManager,
+      teamLead: tTeamLead,
+      assignedRecruiters: tAssignedRecruiters.split(',').map(s => s.trim()).filter(Boolean),
+    }))
+    setTeamDrawerOpen(false)
+    startTransition(async () => {
+      const res = await updateClientTeamAction(clientInfo.id, fd)
+      if (!res.success) { toast.error(res.error); return }
+      toast('Team & roles updated.')
+    })
+  }
 
   const isHealthcare = clientInfo.industry === 'Healthcare'
   const tabs = TABS.filter(t => t.id !== 'facilities' || isHealthcare)
@@ -354,8 +395,12 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <Chip label={CLIENT_STATUS_LABEL[clientInfo.status]} className={CLIENT_STATUS_BADGE[clientInfo.status]} />
                 <Chip label={clientInfo.industry} className="bg-muted text-muted-foreground border-border" />
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Account owner {clientInfo.accountOwner || '—'} · Recruitment manager {clientInfo.recruitmentManager || '—'} · Primary recruiter {clientInfo.primaryRecruiter || '—'}
+              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                Account owner {clientInfo.accountOwner || '—'}
+                <button type="button" onClick={openTeamDrawer} title="Edit team & roles"
+                  className="size-5 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                  <Settings className="size-3.5" />
+                </button>
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">Client since {clientInfo.clientSince} · Last activity {clientInfo.lastActivity}</p>
             </div>
@@ -363,31 +408,42 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
           {/* Quick actions */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-            <button type="button"
-              onClick={() => { toast(`Calling ${clientInfo.name}…`); logActivity(`called ${clientInfo.name}`) }}
-              className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Phone className="size-3.5" />Call</button>
-            <button type="button"
-              onClick={() => { toast(`Email opened for ${clientInfo.name}.`); logActivity(`emailed ${clientInfo.name}`) }}
-              className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Mail className="size-3.5" />Email</button>
-            <Link href={`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Briefcase className="size-3.5" />Post job</Link>
             <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
-            <button type="button"
-              onClick={() => { toast(`Meeting scheduling opened for ${clientInfo.name}.`); logActivity(`scheduled a meeting with ${clientInfo.name}`) }}
-              className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><CalendarPlus className="size-3.5" />Schedule meeting</button>
-            <button type="button" onClick={() => setTaskDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5"><CheckSquare className="size-3.5" />Create task</button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" title="More actions" className="size-8 rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center justify-center shrink-0">
+                  <MoreHorizontal className="size-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem className="text-sm gap-2"
+                  onClick={() => { toast(`Calling ${clientInfo.name}…`); logActivity(`called ${clientInfo.name}`) }}>
+                  <Phone className="size-3.5" />Call
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-sm gap-2"
+                  onClick={() => { toast(`Email opened for ${clientInfo.name}.`); logActivity(`emailed ${clientInfo.name}`) }}>
+                  <Mail className="size-3.5" />Email
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="text-sm gap-2">
+                  <Link href={`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`}><Briefcase className="size-3.5" />Post job</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-sm gap-2"
+                  onClick={() => { toast(`Meeting scheduling opened for ${clientInfo.name}.`); logActivity(`scheduled a meeting with ${clientInfo.name}`) }}>
+                  <CalendarPlus className="size-3.5" />Schedule meeting
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-sm gap-2" onClick={() => setTaskDrawerOpen(true)}>
+                  <CheckSquare className="size-3.5" />Create task
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* Metrics — all visible without scrolling */}
-        <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
-          <Metric label="Total jobs" value={jobs.length} />
-          <Metric label="Open jobs" value={openJobs} />
-          <Metric label="Candidates submitted" value={distinctCandidates.length} />
-          <Metric label="Placements" value={placements.length} />
-          <Metric label="Revenue" value={`$${revenue.toLocaleString()}/wk`} />
-          <Metric label="Avg margin" value={placements.length ? `${avgMargin}%` : '—'} />
-          <Metric label="Avg fill time" value={placements.length ? '18 days' : '—'} />
-        </div>
+        {/* Metrics — tucked behind a drawer to keep the header compact */}
+        <button type="button" onClick={() => setMetricsDrawerOpen(true)}
+          className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5">
+          <BarChart3 className="size-3.5" />Metrics<ChevronRight className="size-3.5 text-muted-foreground" />
+        </button>
       </div>
 
       {/* Tab bar */}
@@ -778,6 +834,51 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
           </div>
         )}
       </div>
+
+      {/* Metrics drawer */}
+      <Sheet open={metricsDrawerOpen} onOpenChange={setMetricsDrawerOpen}>
+        <SheetContent className="w-[360px] sm:max-w-[360px]">
+          <SheetHeader><SheetTitle>Metrics</SheetTitle></SheetHeader>
+          <div className="px-4 py-4 grid grid-cols-2 gap-3">
+            <Metric label="Total jobs" value={jobs.length} />
+            <Metric label="Open jobs" value={openJobs} />
+            <Metric label="Candidates submitted" value={distinctCandidates.length} />
+            <Metric label="Placements" value={placements.length} />
+            <Metric label="Revenue" value={`$${revenue.toLocaleString()}/wk`} />
+            <Metric label="Avg margin" value={placements.length ? `${avgMargin}%` : '—'} />
+            <Metric label="Avg fill time" value={placements.length ? '18 days' : '—'} />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Team & roles drawer */}
+      <Sheet open={teamDrawerOpen} onOpenChange={setTeamDrawerOpen}>
+        <SheetContent className="w-[420px] sm:max-w-[420px]">
+          <SheetHeader><SheetTitle>Team & roles</SheetTitle></SheetHeader>
+          <form onSubmit={submitTeam} className="px-4 py-4 space-y-4 overflow-y-auto">
+            <div>
+              <FieldLabel>Account manager</FieldLabel>
+              <FieldInput value={tAccountManager} onChange={e => setTAccountManager(e.target.value)} placeholder="e.g. Arun Kumar" />
+            </div>
+            <div>
+              <FieldLabel>Recruitment manager</FieldLabel>
+              <FieldInput value={tRecruitmentManager} onChange={e => setTRecruitmentManager(e.target.value)} placeholder="e.g. Sarah M." />
+            </div>
+            <div>
+              <FieldLabel>Team lead</FieldLabel>
+              <FieldInput value={tTeamLead} onChange={e => setTTeamLead(e.target.value)} placeholder="e.g. James R." />
+            </div>
+            <div>
+              <FieldLabel>Assigned recruiters</FieldLabel>
+              <FieldInput value={tAssignedRecruiters} onChange={e => setTAssignedRecruiters(e.target.value)} placeholder="Comma-separated, e.g. Emily T., Priya S." />
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setTeamDrawerOpen(false)} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
+              <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Save</button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
 
       {/* Add contact drawer */}
       <Sheet open={contactDrawerOpen} onOpenChange={setContactDrawerOpen}>

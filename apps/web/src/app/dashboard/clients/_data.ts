@@ -25,6 +25,8 @@ export type Client = {
   accountOwner: string
   recruitmentManager: string
   primaryRecruiter: string
+  teamLead: string
+  assignedRecruiters: string[]
   clientSince: string
   lastActivity: string
   tags: string[]
@@ -89,6 +91,8 @@ export function mapClientRow(r: any): Client {
     accountOwner: r.account_owner ?? '',
     recruitmentManager: r.recruitment_manager ?? '',
     primaryRecruiter: r.primary_recruiter ?? '',
+    teamLead: r.team_lead ?? '',
+    assignedRecruiters: r.assigned_recruiters ?? [],
     clientSince: r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', MONTH_YEAR) : '',
     lastActivity: r.updated_at ? relTime(r.updated_at) : '',
     tags: r.tags ?? [],
