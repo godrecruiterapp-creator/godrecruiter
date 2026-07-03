@@ -22,7 +22,6 @@ const SEGMENT_LABELS: Record<string, string> = {
   dashboard:        'Dashboard',
   jobs:             'Jobs',
   candidates:       'Candidates',
-  interviews:       'Interviews',
   placements:       'Placements',
   projects:         'Projects',
   reports:          'Reports',

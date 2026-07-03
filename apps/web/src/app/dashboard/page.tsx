@@ -422,7 +422,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
       return
     }
     if (action === 'Notes') {
-      router.push('/dashboard/interviews')
+      router.push('/dashboard/candidates')
       return
     }
     if (action === 'Join') {
@@ -600,7 +600,7 @@ function TodaySchedule() {
   const router = useRouter()
   return (
     <Widget title="Today's Schedule" icon={CalendarDays}
-      action={<Link href="/dashboard/interviews" className="hover:text-foreground transition-colors">View all →</Link>}
+      action={<Link href="/dashboard/candidates" className="hover:text-foreground transition-colors">View all →</Link>}
     >
       <div className="px-4 py-3 space-y-2">
         {SCHEDULE.map(ev => {
@@ -637,11 +637,6 @@ function TodaySchedule() {
                     onClick={() => router.push('/dashboard/candidates')}
                     className="h-6 px-2 text-[10px] font-medium rounded-md border border-border hover:bg-muted/60 transition-colors">
                     Candidate
-                  </button>
-                  <button
-                    onClick={() => router.push('/dashboard/interviews')}
-                    className="h-6 px-2 text-[10px] font-medium rounded-md border border-border hover:bg-muted/60 transition-colors">
-                    Notes
                   </button>
                 </div>
               )}
@@ -1044,7 +1039,6 @@ export default function DashboardPage() {
             {([
               { label:'Post Job',       icon:Briefcase,    href:'/dashboard/jobs/new'       },
               { label:'Add Candidate',  icon:UserPlus,     href:'/dashboard/candidates/new' },
-              { label:'New Interview',  icon:CalendarCheck,href:'/dashboard/interviews'     },
               { label:'Import Resume',  icon:Upload,       href:'/dashboard/candidates/new' },
               { label:'AI Agents',      icon:Sparkles,     href:'/dashboard/agents'         },
               { label:'Automations',    icon:Zap,          href:'/dashboard/automation'     },

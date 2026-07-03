@@ -14,7 +14,6 @@ import {
   Building2, Plus, FileText, Upload, Hospital, X, Pencil,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
-import { MOCK_INTERVIEWS } from '../../interviews/_data'
 import { PLACEMENTS } from '../../placements/_data'
 import type { WorkspaceJob, WorkspaceCandidate } from './page'
 
@@ -36,14 +35,6 @@ const JOB_STATUS_BADGE: Record<string, string> = {
   on_hold: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
   closed:  'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
   filled:  'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-}
-const INTERVIEW_STATUS_BADGE: Record<string, string> = {
-  scheduled:   'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-  confirmed:   'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
-  completed:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
-  cancelled:   'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
-  rescheduled: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  no_show:     'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
 }
 const PLACEMENT_STATUS_BADGE: Record<string, string> = {
   active:          'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400',
@@ -185,7 +176,6 @@ const TABS = [
   { id: 'jobs',        label: 'Jobs' },
   { id: 'candidates',  label: 'Candidates' },
   { id: 'submissions', label: 'Submissions' },
-  { id: 'interviews',  label: 'Interviews' },
   { id: 'placements',  label: 'Placements' },
   { id: 'documents',   label: 'Documents' },
   { id: 'tasks',       label: 'Tasks' },
@@ -222,7 +212,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const isHealthcare = clientInfo.industry === 'Healthcare'
   const tabs = TABS.filter(t => t.id !== 'facilities' || isHealthcare)
 
-  const interviews = useMemo(() => MOCK_INTERVIEWS.filter(i => i.client === clientInfo.name), [clientInfo.name])
   const placements = useMemo(() => PLACEMENTS.filter(p => p.client === clientInfo.name), [clientInfo.name])
 
   // Distinct candidates (Candidates tab), vs one row per submission event (Submissions tab)
@@ -382,18 +371,17 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             <Link href={`/dashboard/jobs/new?client=${encodeURIComponent(clientInfo.name)}`} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Briefcase className="size-3.5" />Post job</Link>
             <button type="button" onClick={() => setContactDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
             <button type="button"
-              onClick={() => { toast(`Meeting scheduling opened for ${clientInfo.name}.`); router.push('/dashboard/interviews') }}
+              onClick={() => toast(`Meeting scheduling opened for ${clientInfo.name}.`)}
               className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><CalendarPlus className="size-3.5" />Schedule meeting</button>
             <button type="button" onClick={() => setTaskDrawerOpen(true)} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5"><CheckSquare className="size-3.5" />Create task</button>
           </div>
         </div>
 
         {/* Metrics — all visible without scrolling */}
-        <div className="grid grid-cols-4 lg:grid-cols-8 gap-2">
+        <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
           <Metric label="Total jobs" value={jobs.length} />
           <Metric label="Open jobs" value={openJobs} />
           <Metric label="Candidates submitted" value={distinctCandidates.length} />
-          <Metric label="Interviews" value={interviews.length} />
           <Metric label="Placements" value={placements.length} />
           <Metric label="Revenue" value={`$${revenue.toLocaleString()}/wk`} />
           <Metric label="Avg margin" value={placements.length ? `${avgMargin}%` : '—'} />
@@ -663,27 +651,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                   new Date(c.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                 ])}
               />
-            )}
-          </div>
-        )}
-
-        {activeTab === 'interviews' && (
-          <div className="px-6 py-6">
-            {interviews.length === 0 ? (
-              <EmptyTab icon={CalendarPlus} title="No interviews yet" description="Interviews scheduled with this client will show up here." />
-            ) : (
-              <>
-                <SimpleTable
-                  headers={['Candidate', 'Job', 'Date', 'Status']}
-                  rows={interviews.map(i => [
-                    <Link key="c" href={`/dashboard/interviews/${i.id}`} className="font-medium hover:text-brand">{i.candidate}</Link>,
-                    i.job,
-                    `${i.date} · ${i.time}`,
-                    <Chip key="s" label={i.status.replace('_', ' ')} className={INTERVIEW_STATUS_BADGE[i.status] ?? ''} />,
-                  ])}
-                />
-                <Link href="/dashboard/interviews/all" className="inline-block mt-4 text-sm font-medium text-brand hover:underline">View all in Interviews →</Link>
-              </>
             )}
           </div>
         )}
