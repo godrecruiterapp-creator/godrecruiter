@@ -80,13 +80,11 @@ const JOB_TEMPLATES: JobTemplate[] = [
   },
 ]
 
-// Reverses the `${jobType}_${taxTerm}` encoding createJobAction writes to `employment_type`.
-function parseEmploymentType(v: string): { jobType: JobType; taxTerm: TaxTerm } {
-  if (v === 'direct_hire') return { jobType: 'direct_hire', taxTerm: '' }
-  const m = v.match(/^(contract|cth)_(w2|c2c|1099)$/)
-  if (m) return { jobType: m[1] as JobType, taxTerm: m[2] as TaxTerm }
-  if (v === 'contract' || v === 'cth') return { jobType: v as JobType, taxTerm: '' }
-  return { jobType: 'contract', taxTerm: 'w2' }
+// employment_type only ever stores a plain job type (DB check constraint rejects
+// anything else) — tax term travels in `requirements` text instead, alongside
+// duration/experience/etc.
+function parseEmploymentType(v: string): JobType {
+  return v === 'direct_hire' || v === 'cth' ? v : 'contract'
 }
 
 // Reverses the "Label: value" lines handleSubmit joins into `requirements`.
@@ -94,9 +92,11 @@ function parseRequirements(text: string) {
   const lines = (text || '').split('\n')
   const get = (label: string) => lines.find(l => l.startsWith(`${label}:`))?.slice(label.length + 1).trim() ?? ''
   const list = (label: string) => { const v = get(label); return v ? v.split(',').map(s => s.trim()).filter(Boolean) : [] }
+  const taxTermRaw = get('Tax Term').toLowerCase()
   return {
     hiringManager: get('Hiring Manager'),
     duration: get('Duration'),
+    taxTerm: (['w2', 'c2c', '1099'] as string[]).includes(taxTermRaw) ? (taxTermRaw as TaxTerm) : '',
     experience: get('Experience Required').replace(/\+ years$/, ''),
     mustHave: list('Must-Have Skills'),
     niceToHave: list('Nice to Have'),
@@ -555,9 +555,8 @@ export default function NewJobPage() {
     setDepartment(job.department ?? '')
     setClientType(job.client_type === 'vms' ? 'vms' : 'direct')
     setWorkMode((['onsite', 'hybrid', 'remote'] as const).includes(job.work_mode as WorkMode) ? (job.work_mode as WorkMode) : 'onsite')
-    const { jobType: jt, taxTerm: tt } = parseEmploymentType(job.employment_type ?? '')
+    const jt = parseEmploymentType(job.employment_type ?? '')
     setJobType(jt)
-    setTaxTerm(tt)
     setOpenings(String(job.openings ?? 1))
     setRecruiter(job.recruiter_name ?? '')
     setPriority((['high', 'medium', 'low'] as const).includes(job.priority as Priority) ? (job.priority as Priority) : 'medium')
@@ -566,6 +565,7 @@ export default function NewJobPage() {
     const req = parseRequirements(job.requirements ?? '')
     setHiringManager(req.hiringManager)
     setDuration(req.duration)
+    setTaxTerm(req.taxTerm)
     setExperience(req.experience)
     setMustHave(req.mustHave)
     setNiceToHave(req.niceToHave)
@@ -653,7 +653,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
     fd.set('city',            city)
     fd.set('state',           stateVal)
     fd.set('department',      department)
-    fd.set('employment_type', isContract && taxTerm ? `${jobType}_${taxTerm}` : jobType)
+    fd.set('employment_type', jobType)
     fd.set('work_mode',       workMode)
     fd.set('client_type',     clientType)
     fd.set('openings',        openings)
@@ -665,6 +665,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
     // Encode all requirement fields into requirements text
     const reqLines: string[] = []
     if (hiringManager)  reqLines.push(`Hiring Manager: ${hiringManager}`)
+    if (isContract && taxTerm) reqLines.push(`Tax Term: ${taxTerm.toUpperCase()}`)
     if (duration)       reqLines.push(`Duration: ${duration}`)
     if (startDate)      reqLines.push(`Start Date: ${startDate}`)
     if (deadline)       reqLines.push(`Submission Deadline: ${deadline}`)
