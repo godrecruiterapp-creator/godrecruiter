@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOpenAIClient, OPENAI_MODEL, friendlyOpenAIError } from '@/lib/openai'
+import { notifyUser } from '@/lib/notifications'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
@@ -229,6 +230,20 @@ export async function createInterviewAction(candidateId: string, formData: FormD
     actor_id: ctx.user.id, actor_name: ctx.name, action: 'Scheduled an interview',
   })
 
+  const [{ data: jc }, { data: candidate }] = await Promise.all([
+    admin.from('job_candidates').select('jobs(id, title, recruiter_id)').eq('id', jobCandidateId).single(),
+    admin.from('candidates').select('first_name, last_name').eq('id', candidateId).single(),
+  ])
+  const job = jc ? (Array.isArray(jc.jobs) ? jc.jobs[0] : jc.jobs) : null
+  if (job) {
+    const candidateName = candidate ? `${candidate.first_name} ${candidate.last_name}`.trim() : 'a candidate'
+    await notifyUser({
+      tenantId: ctx.tenant_id, recipientId: job.recruiter_id, actorId: ctx.user.id, actorName: ctx.name,
+      type: 'interview_scheduled', title: `Interview scheduled for ${candidateName} — ${job.title}`,
+      link: `/dashboard/candidates/${candidateId}`,
+    })
+  }
+
   return { success: true as const }
 }
 
@@ -365,7 +380,10 @@ export async function submitCandidateToJobAction(candidateId: string, jobId: str
   if (!ctx) return { error: 'Not authenticated.' }
   const admin = createAdminClient()
 
-  const { data: job } = await admin.from('jobs').select('title').eq('id', jobId).single()
+  const [{ data: job }, { data: candidate }] = await Promise.all([
+    admin.from('jobs').select('title, recruiter_id').eq('id', jobId).single(),
+    admin.from('candidates').select('first_name, last_name').eq('id', candidateId).single(),
+  ])
 
   const { error } = await admin.from('job_candidates').insert({
     id: ulid(), job_id: jobId, candidate_id: candidateId, tenant_id: ctx.tenant_id,
@@ -379,6 +397,13 @@ export async function submitCandidateToJobAction(candidateId: string, jobId: str
   await admin.from('candidate_activity').insert({
     id: ulid(), candidate_id: candidateId, tenant_id: ctx.tenant_id,
     actor_id: ctx.user.id, actor_name: ctx.name, action: `Submitted to job: ${job?.title ?? 'Unknown job'}`,
+  })
+
+  const candidateName = candidate ? `${candidate.first_name} ${candidate.last_name}`.trim() : 'A candidate'
+  await notifyUser({
+    tenantId: ctx.tenant_id, recipientId: job?.recruiter_id, actorId: ctx.user.id, actorName: ctx.name,
+    type: 'candidate_submitted', title: `${candidateName} was submitted to ${job?.title ?? 'a job'}`,
+    link: `/dashboard/candidates/${candidateId}`,
   })
 
   return { success: true as const }

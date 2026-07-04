@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOpenAIClient, OPENAI_MODEL, friendlyOpenAIError } from '@/lib/openai'
+import { notifyUser } from '@/lib/notifications'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
@@ -239,6 +240,16 @@ export async function addJobNoteAction(jobId: string, text: string) {
     id: ulid(), job_id: jobId, tenant_id: ctx.tenant_id,
     actor_id: ctx.user.id, actor_name: ctx.name, action: 'Added a note',
   })
+
+  const { data: job } = await admin.from('jobs').select('title, recruiter_id').eq('id', jobId).single()
+  if (job) {
+    await notifyUser({
+      tenantId: ctx.tenant_id, recipientId: job.recruiter_id, actorId: ctx.user.id, actorName: ctx.name,
+      type: 'job_note', title: `${ctx.name} added a note on ${job.title}`, body: text.slice(0, 140),
+      link: `/dashboard/jobs/${jobId}`,
+    })
+  }
+
   return { success: true as const, id, author_name: ctx.name, created_at }
 }
 
@@ -298,15 +309,24 @@ export async function assignRecruiterAction(jobId: string, recruiterId: string) 
   const { data: recruiter } = await admin.from('platform_users').select('full_name').eq('id', recruiterId).single()
   if (!recruiter) return { error: 'Recruiter not found.' }
 
-  const { error } = await admin.from('jobs')
+  const { data: job, error } = await admin.from('jobs')
     .update({ recruiter_id: recruiterId, recruiter_name: recruiter.full_name })
     .eq('id', jobId)
+    .select('title')
+    .single()
   if (error) return { error: error.message }
 
   await admin.from('job_activity').insert({
     id: ulid(), job_id: jobId, tenant_id: ctx.tenant_id,
     actor_id: ctx.user.id, actor_name: ctx.name, action: `Assigned ${recruiter.full_name} as recruiter`,
   })
+
+  await notifyUser({
+    tenantId: ctx.tenant_id, recipientId: recruiterId, actorId: ctx.user.id, actorName: ctx.name,
+    type: 'job_assigned', title: `${ctx.name} assigned you to ${job?.title ?? 'a job'}`,
+    link: `/dashboard/jobs/${jobId}`,
+  })
+
   return { success: true as const }
 }
 

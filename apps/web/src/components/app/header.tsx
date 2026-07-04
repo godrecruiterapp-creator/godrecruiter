@@ -3,19 +3,28 @@
 import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell, Home, Settings } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell, Home, Settings, CheckCheck } from 'lucide-react'
 import { useBreadcrumbTitle } from '@/components/app/breadcrumb-provider'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTheme } from 'next-themes'
 import { globalSearchAction, type SearchResult } from '@/app/dashboard/search-action'
+import {
+  getNotificationsAction, markNotificationReadAction, markAllNotificationsReadAction,
+  type NotificationRow,
+} from '@/app/dashboard/notifications/actions'
+import { createClient } from '@/lib/supabase/client'
+import { relTime } from '@/lib/format'
 
 interface Props {
   userName: string
   userEmail: string
+  userId: string
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
@@ -119,7 +128,7 @@ const STATUS_DOT: Record<string, string> = {
   open: 'bg-emerald-500', on_hold: 'bg-amber-500', filled: 'bg-blue-500', closed: 'bg-zinc-400',
 }
 
-export function Header({ userName, userEmail }: Props) {
+export function Header({ userName, userEmail, userId }: Props) {
   const initials = userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   const crumbs = useBreadcrumbs()
   const router = useRouter()
@@ -134,6 +143,67 @@ export function Header({ userName, userEmail }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // ── Notifications: initial load + live updates via Supabase Realtime ──────
+  const notifPathname = usePathname()
+  const [notifications, setNotifications] = useState<NotificationRow[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [notifOpen, setNotifOpen] = useState(false)
+
+  function refreshNotifications() {
+    getNotificationsAction().then(({ notifications, unreadCount }) => {
+      setNotifications(notifications)
+      setUnreadCount(unreadCount)
+    })
+  }
+
+  // Realtime pushes new notifications instantly. Route changes and tab
+  // refocus also reconcile against the server — a channel can silently miss
+  // an insert around a navigation or after the tab was backgrounded/asleep,
+  // and this closes that gap without waiting for a full page reload.
+  useEffect(() => { refreshNotifications() }, [notifPathname])
+
+  useEffect(() => {
+    function onFocus() { refreshNotifications() }
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', onFocus)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onFocus)
+    }
+  }, [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`notifications:${userId}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}`,
+      }, payload => {
+        const row = payload.new as NotificationRow
+        setNotifications(prev => prev.some(x => x.id === row.id) ? prev : [row, ...prev].slice(0, 30))
+        setUnreadCount(prev => prev + 1)
+        toast(row.title, { description: row.body ?? undefined })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [userId])
+
+  function openNotification(n: NotificationRow) {
+    if (!n.read_at) {
+      setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, read_at: new Date().toISOString() } : x))
+      setUnreadCount(prev => Math.max(0, prev - 1))
+      markNotificationReadAction(n.id)
+    }
+    setNotifOpen(false)
+    if (n.link) router.push(n.link)
+  }
+
+  function markAllRead() {
+    setNotifications(prev => prev.map(x => ({ ...x, read_at: x.read_at ?? new Date().toISOString() })))
+    setUnreadCount(0)
+    markAllNotificationsReadAction()
+  }
 
   // Focus input when search opens
   useEffect(() => {
@@ -348,12 +418,51 @@ export function Header({ userName, userEmail }: Props) {
         `}</style>
 
         {/* Bell */}
-        <button
-          className="size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell className="size-4" />
-        </button>
+        <Popover open={notifOpen} onOpenChange={setNotifOpen}>
+          <PopoverTrigger asChild>
+            <button
+              className="relative size-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell className="size-4" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 min-w-[15px] h-[15px] px-[3px] rounded-full bg-[#dd7456] text-white text-[10px] font-semibold leading-[15px] text-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-0">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b">
+              <span className="text-sm font-semibold">Notifications</span>
+              {unreadCount > 0 && (
+                <button onClick={markAllRead} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  <CheckCheck className="size-3.5" />Mark all read
+                </button>
+              )}
+            </div>
+            <div className="max-h-96 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-10">No notifications yet.</p>
+              ) : (
+                notifications.map(n => (
+                  <button
+                    key={n.id}
+                    onClick={() => openNotification(n)}
+                    className={`w-full text-left px-4 py-2.5 border-b last:border-0 hover:bg-muted/50 transition-colors flex gap-2.5 ${!n.read_at ? 'bg-muted/30' : ''}`}
+                  >
+                    <span className={`mt-1.5 size-1.5 rounded-full shrink-0 ${!n.read_at ? 'bg-[#dd7456]' : 'bg-transparent'}`} />
+                    <span className="min-w-0 flex-1">
+                      <span className={`block text-sm leading-snug ${!n.read_at ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>{n.title}</span>
+                      {n.body && <span className="block text-xs text-muted-foreground truncate mt-0.5">{n.body}</span>}
+                      <span className="block text-[11px] text-muted-foreground mt-0.5">{relTime(n.created_at)}</span>
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <Separator orientation="vertical" className="h-4 mx-1" />
 

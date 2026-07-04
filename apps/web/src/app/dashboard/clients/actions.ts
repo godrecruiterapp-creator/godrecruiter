@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 import { mapContactRow, mapFacilityRow } from './_data'
+import { notifyUser, resolveUserIdsByNames } from '@/lib/notifications'
 
 async function getUserContext() {
   const supabase = await createClient()
@@ -296,6 +297,17 @@ export async function addClientNoteAction(clientId: string, text: string) {
   })
   if (error) return { success: false as const, error: error.message }
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'added a note')
+
+  const { data: client } = await admin.from('clients').select('name, assigned_recruiters').eq('id', clientId).single()
+  if (client) {
+    const recipientIds = await resolveUserIdsByNames(ctx.tenant_id, client.assigned_recruiters ?? [])
+    await Promise.all(recipientIds.map(recipientId => notifyUser({
+      tenantId: ctx.tenant_id, recipientId, actorId: ctx.user.id, actorName: ctx.name,
+      type: 'client_note', title: `${ctx.name} added a note on ${client.name}`, body: text.slice(0, 140),
+      link: `/dashboard/clients/${clientId}`,
+    })))
+  }
+
   return { success: true as const, id, author_name: ctx.name, created_at }
 }
 
