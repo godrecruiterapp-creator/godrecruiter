@@ -24,8 +24,8 @@ import {
   addClientActivityAction, addClientContactAction, addClientFacilityAction,
   addClientNoteAction, deleteClientAction, deleteClientContactAction,
   deleteClientDocumentAction, deleteClientFacilityAction, deleteClientNoteAction,
-  replaceClientDocumentAction, updateClientContactAction, updateClientFacilityAction,
-  updateClientInfoAction, updateClientNoteAction, updateClientTeamAction,
+  getClientDocumentViewUrlAction, replaceClientDocumentAction, updateClientContactAction,
+  updateClientFacilityAction, updateClientNoteAction, updateClientTeamAction,
   uploadClientDocumentAction,
 } from '../actions'
 import { PLACEMENTS } from '../../placements/_data'
@@ -182,8 +182,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
   // Editable client info (name/id stay fixed — they key filtering/routing elsewhere)
   const [clientInfo, setClientInfo] = useState<Client>(client)
-  const [editingInfo, setEditingInfo] = useState(false)
-  const [draftInfo, setDraftInfo] = useState<Client>(client)
 
   const [contactList, setContactList]   = useState<ClientContact[]>(contacts)
   const [facilityList, setFacilityList] = useState<ClientFacility[]>(facilities)
@@ -255,32 +253,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
       const res = await addClientActivityAction(clientInfo.id, action)
       if (res.success) setActivityList(prev => [{ id: res.id, actor: res.actor_name, action, time: res.created_at }, ...prev])
     })
-  }
-
-  function startEditInfo() {
-    setDraftInfo(clientInfo)
-    setEditingInfo(true)
-  }
-  function saveInfo() {
-    const info = draftInfo
-    setClientInfo(info)
-    setEditingInfo(false)
-    startTransition(async () => {
-      const fd = new FormData()
-      fd.set('display_name', info.displayName)
-      fd.set('legal_name', info.legalName)
-      fd.set('website', info.website)
-      fd.set('tax_id', info.taxId)
-      fd.set('city', info.city)
-      fd.set('state', info.state)
-      fd.set('special_instructions', info.specialInstructions)
-      const res = await updateClientInfoAction(clientInfo.id, fd)
-      if (!res.success) { toast.error(res.error); return }
-      toast('Client info saved.')
-    })
-  }
-  function cancelEditInfo() {
-    setEditingInfo(false)
   }
 
   // ── Add / edit contact form ───────────────────────────────────────────────
@@ -472,13 +444,13 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
       if (mode === 'add') {
         const res = await uploadClientDocumentAction(clientInfo.id, fd)
         if (!res.success) { toast.error(res.error); return }
-        setDocList(prev => [{ id: res.id, name: res.name, category: res.category, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name, url: res.url }, ...prev])
+        setDocList(prev => [{ id: res.id, name: res.name, category: res.category, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name }, ...prev])
         setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `uploaded document: ${res.name}`, time: new Date().toISOString() }, ...prev])
         toast('Document uploaded.')
       } else if (replaceId) {
         const res = await replaceClientDocumentAction(replaceId, fd)
         if (!res.success) { toast.error(res.error); return }
-        setDocList(prev => prev.map(d => d.id === replaceId ? { ...d, name: res.name, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name, url: res.url } : d))
+        setDocList(prev => prev.map(d => d.id === replaceId ? { ...d, name: res.name, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name } : d))
         setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `replaced document: ${res.name}`, time: new Date().toISOString() }, ...prev])
         toast('Document updated.')
       }
@@ -497,9 +469,15 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     setSelectedDocIds(prev => prev.filter(id => !ids.includes(id)))
     startTransition(async () => { await Promise.all(ids.map(id => deleteClientDocumentAction(id))) })
   }
+  // Documents live in a private bucket — every preview fetches a fresh,
+  // short-lived signed URL and shows it in-app instead of a shareable link.
+  const [docPreview, setDocPreview] = useState<{ name: string; url: string } | null>(null)
   function viewDocument(d: WorkspaceDoc) {
-    if (!d.url) { toast.error('No file URL available.'); return }
-    window.open(d.url, '_blank')
+    startTransition(async () => {
+      const res = await getClientDocumentViewUrlAction(d.id)
+      if (!res.success) { toast.error(res.error); return }
+      setDocPreview({ name: d.name, url: res.url })
+    })
   }
 
   function deleteClient() {
@@ -659,39 +637,19 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
           <div className="flex h-full divide-x divide-border">
             <div className="w-[65%] px-6 py-6 overflow-auto space-y-6">
               <section>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Open jobs</p>
-                {jobs.filter(j => j.status === 'open').length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No open jobs right now.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {jobs.filter(j => j.status === 'open').slice(0, 5).map(j => (
-                      <Link key={j.id} href={`/dashboard/jobs/${j.id}`} className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5 hover:bg-muted/30 transition-colors">
-                        <span className="text-sm font-medium">{j.title}</span>
-                        <Chip label={j.status} className={JOB_STATUS_BADGE[j.status] ?? ''} />
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Description</p>
+                <p className="text-sm text-foreground leading-relaxed">{clientInfo.description || 'No description yet.'}</p>
               </section>
               <Separator />
               <section>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Recent activity</p>
-                {activityList.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No recent activity yet.</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Website</p>
+                {clientInfo.website ? (
+                  <a href={clientInfo.website} target="_blank" rel="noopener noreferrer" className="text-sm text-brand hover:underline">{clientInfo.website}</a>
                 ) : (
-                  <div className="space-y-3">
-                    {activityList.slice(0, 5).map(a => (
-                      <div key={a.id} className="flex items-start gap-2.5 text-sm">
-                        <span className="font-medium">{a.actor}</span>
-                        <span className="text-muted-foreground">{a.action}</span>
-                        <span className="text-muted-foreground ml-auto shrink-0 text-xs">{relTime(a.time)}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-sm text-muted-foreground">—</p>
                 )}
               </section>
-            </div>
-            <div className="w-[35%] px-6 py-6 overflow-auto space-y-6">
+              <Separator />
               <section>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Preferences</p>
                 <div className="space-y-2.5 text-sm">
@@ -711,78 +669,64 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 </>
               )}
             </div>
+            <div className="w-[35%] px-6 py-6 overflow-auto space-y-6">
+              {isHealthcare && (
+                <section>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Facilities</p>
+                  {facilityList.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No facilities added yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {facilityList.map(f => (
+                        <div key={f.id} className="rounded-lg border border-border px-3 py-2.5">
+                          <p className="text-sm font-medium">{f.name}</p>
+                          <p className="text-xs text-muted-foreground">{f.type}{(f.city || f.state) ? ` · ${[f.city, f.state].filter(Boolean).join(', ')}` : ''}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
+            </div>
           </div>
         )}
 
         {activeTab === 'info' && (
           <div className="max-w-2xl px-6 py-6">
-            {!editingInfo ? (
-              <>
-                <div className="flex justify-end mb-3">
-                  <button type="button" onClick={startEditInfo} className="h-8 px-3 text-sm font-medium rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5">
-                    <Pencil className="size-3.5" />Edit
-                  </button>
+            <div className="space-y-5">
+              {[
+                { label: 'Company name', value: clientInfo.name },
+                { label: 'Display name', value: clientInfo.displayName },
+                { label: 'Legal name', value: clientInfo.legalName },
+                { label: 'Description', value: clientInfo.description },
+                { label: 'Website', value: clientInfo.website },
+                { label: 'Tax ID', value: clientInfo.taxId },
+                { label: 'Company size', value: clientInfo.companySize ? `${clientInfo.companySize} employees` : '—' },
+                { label: 'Industry', value: clientInfo.industry },
+                { label: 'Company type', value: clientInfo.companyType === 'vms' ? 'VMS' : 'Direct client' },
+                { label: 'City', value: clientInfo.city },
+                { label: 'State', value: clientInfo.state },
+                { label: 'Country', value: clientInfo.country },
+                { label: 'Zip', value: clientInfo.zip },
+                { label: 'Time zone', value: clientInfo.timezone },
+                { label: 'Account owner', value: clientInfo.accountOwner.join(', ') },
+                { label: 'Recruitment manager', value: clientInfo.recruitmentManager.join(', ') },
+                { label: 'Primary recruiter', value: clientInfo.primaryRecruiter.join(', ') },
+                { label: 'Assigned recruiter(s)', value: clientInfo.assignedRecruiters.join(', ') },
+                { label: 'Preferred communication', value: clientInfo.preferredCommunication },
+                { label: 'Preferred submission method', value: clientInfo.preferredSubmissionMethod },
+                { label: 'Preferred resume format', value: clientInfo.preferredResumeFormat },
+                { label: 'Preferred interview process', value: clientInfo.preferredInterviewProcess },
+                { label: 'Special instructions', value: clientInfo.specialInstructions },
+                { label: 'Status', value: CLIENT_STATUS_LABEL[clientInfo.status] },
+                { label: 'Tags', value: clientInfo.tags.length ? clientInfo.tags.join(', ') : '' },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex items-start gap-6 border-b border-border/60 pb-3">
+                  <span className="text-sm text-muted-foreground w-48 shrink-0">{label}</span>
+                  <span className="text-sm font-medium">{value || '—'}</span>
                 </div>
-                <div className="space-y-5">
-                  {[
-                    { label: 'Company name', value: clientInfo.name },
-                    { label: 'Display name', value: clientInfo.displayName },
-                    { label: 'Legal name', value: clientInfo.legalName },
-                    { label: 'Industry', value: clientInfo.industry },
-                    { label: 'Company type', value: clientInfo.companyType === 'vms' ? 'VMS' : 'Direct client' },
-                    { label: 'Website', value: clientInfo.website },
-                    { label: 'Tax ID', value: clientInfo.taxId },
-                    { label: 'Company size', value: clientInfo.companySize ? `${clientInfo.companySize} employees` : '—' },
-                    { label: 'Address', value: `${clientInfo.city}, ${clientInfo.state} ${clientInfo.zip}, ${clientInfo.country}` },
-                    { label: 'Time zone', value: clientInfo.timezone },
-                    { label: 'Tags', value: clientInfo.tags.length ? clientInfo.tags.join(', ') : '—' },
-                    { label: 'Special instructions', value: clientInfo.specialInstructions || '—' },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="flex items-start gap-6 border-b border-border/60 pb-3">
-                      <span className="text-sm text-muted-foreground w-40 shrink-0">{label}</span>
-                      <span className="text-sm font-medium">{value || '—'}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <form onSubmit={e => { e.preventDefault(); saveInfo() }} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <FieldLabel>Display name</FieldLabel>
-                    <FieldInput value={draftInfo.displayName} onChange={e => setDraftInfo(d => ({ ...d, displayName: e.target.value }))} />
-                  </div>
-                  <div>
-                    <FieldLabel>Legal name</FieldLabel>
-                    <FieldInput value={draftInfo.legalName} onChange={e => setDraftInfo(d => ({ ...d, legalName: e.target.value }))} />
-                  </div>
-                  <div>
-                    <FieldLabel>Website</FieldLabel>
-                    <FieldInput value={draftInfo.website} onChange={e => setDraftInfo(d => ({ ...d, website: e.target.value }))} />
-                  </div>
-                  <div>
-                    <FieldLabel>Tax ID</FieldLabel>
-                    <FieldInput value={draftInfo.taxId} onChange={e => setDraftInfo(d => ({ ...d, taxId: e.target.value }))} />
-                  </div>
-                  <div>
-                    <FieldLabel>City</FieldLabel>
-                    <FieldInput value={draftInfo.city} onChange={e => setDraftInfo(d => ({ ...d, city: e.target.value }))} />
-                  </div>
-                  <div>
-                    <FieldLabel>State</FieldLabel>
-                    <FieldInput value={draftInfo.state} onChange={e => setDraftInfo(d => ({ ...d, state: e.target.value }))} />
-                  </div>
-                  <div className="col-span-2">
-                    <FieldLabel>Special instructions</FieldLabel>
-                    <Textarea value={draftInfo.specialInstructions} onChange={e => setDraftInfo(d => ({ ...d, specialInstructions: e.target.value }))} className="text-sm" rows={3} />
-                  </div>
-                </div>
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button type="button" onClick={cancelEditInfo} className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted/60">Cancel</button>
-                  <button type="submit" className="h-9 px-4 text-sm rounded-lg bg-brand hover:bg-brand/90 text-white">Save</button>
-                </div>
-              </form>
-            )}
+              ))}
+            </div>
           </div>
         )}
 
@@ -1327,6 +1271,16 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                   className="h-8 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 flex items-center gap-1.5 ml-auto"><Pencil className="size-3.5" />Edit</button>
               </div>
             </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Document preview drawer — signed URL, never a public link */}
+      <Sheet open={!!docPreview} onOpenChange={open => !open && setDocPreview(null)}>
+        <SheetContent className="w-[700px] sm:max-w-[700px] flex flex-col">
+          <SheetHeader><SheetTitle className="truncate">{docPreview?.name}</SheetTitle></SheetHeader>
+          {docPreview && (
+            <iframe src={docPreview.url} title={docPreview.name} className="flex-1 w-full border-0 rounded-lg" />
           )}
         </SheetContent>
       </Sheet>

@@ -14,6 +14,7 @@ export type Client = {
   industry: Industry
   companyType: 'direct' | 'vms'
   status: 'active' | 'prospect' | 'inactive'
+  description: string
   website: string
   taxId: string
   companySize: string
@@ -80,6 +81,7 @@ export function mapClientRow(r: any): Client {
     industry: r.industry,
     companyType: r.company_type,
     status: r.status,
+    description: r.description ?? '',
     website: r.website ?? '',
     taxId: r.tax_id ?? '',
     companySize: r.company_size ?? '',

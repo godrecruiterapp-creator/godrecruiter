@@ -150,6 +150,7 @@ export function ClientForm({ mode, clientId, initial }: {
   const [name, setName]               = useState(initial?.name ?? '')
   const [displayName, setDisplayName] = useState(initial?.displayName ?? '')
   const [legalName, setLegalName]     = useState(initial?.legalName ?? '')
+  const [description, setDescription] = useState(initial?.description ?? '')
   const [website, setWebsite]         = useState(initial?.website ?? '')
   const [taxId, setTaxId]             = useState(initial?.taxId ?? '')
   const [companySize, setCompanySize] = useState(initial?.companySize || COMPANY_SIZES[0]!)
@@ -204,6 +205,7 @@ export function ClientForm({ mode, clientId, initial }: {
     fd.set('name', name)
     fd.set('display_name', displayName)
     fd.set('legal_name', legalName)
+    fd.set('description', description)
     fd.set('website', website)
     fd.set('tax_id', taxId)
     fd.set('company_size', companySize)
@@ -281,6 +283,10 @@ export function ClientForm({ mode, clientId, initial }: {
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Website</FieldLabel>
                 <FieldInput value={website} onChange={e => setWebsite(e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <FieldLabel>Description</FieldLabel>
+                <FieldTextarea value={description} onChange={e => setDescription(e.target.value)} rows={3} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Tax ID</FieldLabel>

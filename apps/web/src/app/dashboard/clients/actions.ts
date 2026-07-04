@@ -57,6 +57,7 @@ export async function createClientAction(formData: FormData) {
     industry: (formData.get('industry') as string) || 'Other',
     company_type: (formData.get('company_type') as string) || 'direct',
     status: (formData.get('status') as string) || 'prospect',
+    description: (formData.get('description') as string) || null,
     website: (formData.get('website') as string) || null,
     tax_id: (formData.get('tax_id') as string) || null,
     company_size: (formData.get('company_size') as string) || null,
@@ -102,6 +103,7 @@ export async function updateClientAction(clientId: string, formData: FormData) {
     industry: (formData.get('industry') as string) || 'Other',
     company_type: (formData.get('company_type') as string) || 'direct',
     status: (formData.get('status') as string) || 'prospect',
+    description: (formData.get('description') as string) || null,
     website: (formData.get('website') as string) || null,
     tax_id: (formData.get('tax_id') as string) || null,
     company_size: (formData.get('company_size') as string) || null,
@@ -137,27 +139,6 @@ export async function deleteClientAction(clientId: string) {
   await admin.from('clients').update({ deleted_at: new Date().toISOString() }).eq('id', clientId).eq('tenant_id', ctx.tenant_id)
 
   redirect('/dashboard/clients')
-}
-
-export async function updateClientInfoAction(clientId: string, formData: FormData) {
-  const ctx = await getUserContext()
-  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
-
-  const admin = createAdminClient()
-  const { error } = await admin.from('clients').update({
-    display_name: formData.get('display_name') as string,
-    legal_name: formData.get('legal_name') as string,
-    website: formData.get('website') as string,
-    tax_id: formData.get('tax_id') as string,
-    city: formData.get('city') as string,
-    state: formData.get('state') as string,
-    special_instructions: formData.get('special_instructions') as string,
-  }).eq('id', clientId).eq('tenant_id', ctx.tenant_id)
-
-  if (error) return { success: false as const, error: error.message }
-
-  await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'updated client info')
-  return { success: true as const }
 }
 
 export async function updateClientTeamAction(clientId: string, formData: FormData) {
@@ -385,8 +366,7 @@ export async function uploadClientDocumentAction(clientId: string, formData: For
   if (dbErr) return { success: false as const, error: dbErr.message }
 
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, `uploaded document: ${file.name}`)
-  const url = admin.storage.from('client-documents').getPublicUrl(path).data.publicUrl
-  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, category, uploader_name: ctx.name, created_at, url }
+  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, category, uploader_name: ctx.name, created_at }
 }
 
 export async function replaceClientDocumentAction(docId: string, formData: FormData) {
@@ -415,8 +395,7 @@ export async function replaceClientDocumentAction(docId: string, formData: FormD
   if (dbErr) return { success: false as const, error: dbErr.message }
 
   await logActivity(admin, existing.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `replaced document: ${file.name}`)
-  const url = admin.storage.from('client-documents').getPublicUrl(path).data.publicUrl
-  return { success: true as const, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at, url }
+  return { success: true as const, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at }
 }
 
 export async function deleteClientDocumentAction(docId: string) {
@@ -427,6 +406,22 @@ export async function deleteClientDocumentAction(docId: string) {
   if (doc?.storage_path) await admin.storage.from('client-documents').remove([doc.storage_path])
   await admin.from('client_documents').delete().eq('id', docId)
   return { success: true as const }
+}
+
+// client-documents is a private bucket (migration 0014) — every view goes
+// through a short-lived signed URL instead of a permanent public link.
+export async function getClientDocumentViewUrlAction(docId: string) {
+  const ctx = await getUserContext()
+  if (!ctx) return { success: false as const, error: 'Not authenticated.' }
+
+  const admin = createAdminClient()
+  const { data: doc } = await admin.from('client_documents').select('storage_path, tenant_id').eq('id', docId).single()
+  if (!doc || doc.tenant_id !== ctx.tenant_id || !doc.storage_path) return { success: false as const, error: 'Document not found.' }
+
+  const { data, error } = await admin.storage.from('client-documents').createSignedUrl(doc.storage_path, 300)
+  if (error || !data) return { success: false as const, error: error?.message ?? 'Could not create a preview link.' }
+
+  return { success: true as const, url: data.signedUrl }
 }
 
 // ── Tenant team members (for Account owner / Recruitment manager / etc pickers) ─
