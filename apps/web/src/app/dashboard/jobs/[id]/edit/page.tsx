@@ -8,10 +8,24 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
+
+// Plain native <select> — the Radix Select's hidden native-select shim mispositions
+// itself inside this page's nested scroll container, which made the whole document
+// scroll far past the visible content. A native select has no such shim.
+function NativeSelect({ className, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select
+      {...props}
+      className={cn(
+        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
+        'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        className
+      )}
+    />
+  )
+}
 
 export default async function EditJobPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -40,20 +54,28 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="p-6 overflow-auto flex-1">
-      <div className="flex items-center gap-3 mb-6">
-        <Button variant="outline" size="icon" className="size-8" asChild>
-          <Link href={`/dashboard/jobs/${id}`}><ArrowLeft className="size-4" /></Link>
-        </Button>
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">Edit job</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {job.display_id && <span className="font-mono mr-1">{job.display_id} ·</span>}
-            {job.title}
-          </p>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="icon" className="size-8" asChild>
+            <Link href={`/dashboard/jobs/${id}`}><ArrowLeft className="size-4" /></Link>
+          </Button>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">Edit job</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {job.display_id && <span className="font-mono mr-1">{job.display_id} ·</span>}
+              {job.title}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="outline" asChild>
+            <Link href={`/dashboard/jobs/${id}`}>Cancel</Link>
+          </Button>
+          <Button type="submit" form="edit-job-form">Save changes</Button>
         </div>
       </div>
 
-      <form action={action} className="space-y-4">
+      <form action={action} id="edit-job-form" className="space-y-4 pb-10">
 
         {/* Basic info */}
         <Card>
@@ -97,41 +119,32 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="employment_type">Employment type</Label>
-                <Select name="employment_type" defaultValue={job.employment_type ?? 'full_time'}>
-                  <SelectTrigger id="employment_type"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="full_time">Full-Time</SelectItem>
-                    <SelectItem value="contract">Contract</SelectItem>
-                    <SelectItem value="cth">Contract to Hire (CTH)</SelectItem>
-                    <SelectItem value="direct_hire">Direct Hire</SelectItem>
-                    <SelectItem value="remote">Remote</SelectItem>
-                    <SelectItem value="hybrid">Hybrid</SelectItem>
-                  </SelectContent>
-                </Select>
+                <NativeSelect id="employment_type" name="employment_type" defaultValue={job.employment_type ?? 'full_time'}>
+                  <option value="full_time">Full-Time</option>
+                  <option value="contract">Contract</option>
+                  <option value="cth">Contract to Hire (CTH)</option>
+                  <option value="direct_hire">Direct Hire</option>
+                  <option value="remote">Remote</option>
+                  <option value="hybrid">Hybrid</option>
+                </NativeSelect>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="work_mode">Work mode</Label>
-                <Select name="work_mode" defaultValue={job.work_mode ?? 'onsite'}>
-                  <SelectTrigger id="work_mode"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="onsite">On-site</SelectItem>
-                    <SelectItem value="hybrid">Hybrid</SelectItem>
-                    <SelectItem value="remote">Remote</SelectItem>
-                  </SelectContent>
-                </Select>
+                <NativeSelect id="work_mode" name="work_mode" defaultValue={job.work_mode ?? 'onsite'}>
+                  <option value="onsite">On-site</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="remote">Remote</option>
+                </NativeSelect>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="client_type">Client type</Label>
-                <Select name="client_type" defaultValue={job.client_type ?? ''}>
-                  <SelectTrigger id="client_type"><SelectValue placeholder="— Select —" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">— Select —</SelectItem>
-                    <SelectItem value="direct">Direct Client</SelectItem>
-                    <SelectItem value="vms">VMS</SelectItem>
-                  </SelectContent>
-                </Select>
+                <NativeSelect id="client_type" name="client_type" defaultValue={job.client_type ?? ''}>
+                  <option value="">— Select —</option>
+                  <option value="direct">Direct Client</option>
+                  <option value="vms">VMS</option>
+                </NativeSelect>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="openings">Openings</Label>
@@ -181,37 +194,24 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="status">Status</Label>
-                <Select name="status" defaultValue={job.status ?? 'open'}>
-                  <SelectTrigger id="status"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="on_hold">On Hold</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
-                    <SelectItem value="filled">Filled</SelectItem>
-                  </SelectContent>
-                </Select>
+                <NativeSelect id="status" name="status" defaultValue={job.status ?? 'open'}>
+                  <option value="open">Open</option>
+                  <option value="on_hold">On Hold</option>
+                  <option value="closed">Closed</option>
+                  <option value="filled">Filled</option>
+                </NativeSelect>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="priority">Priority</Label>
-                <Select name="priority" defaultValue={job.priority ?? 'medium'}>
-                  <SelectTrigger id="priority"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                  </SelectContent>
-                </Select>
+                <NativeSelect id="priority" name="priority" defaultValue={job.priority ?? 'medium'}>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </NativeSelect>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <div className="flex gap-2 pb-10">
-          <Button type="submit">Save changes</Button>
-          <Button variant="outline" asChild>
-            <Link href={`/dashboard/jobs/${id}`}>Cancel</Link>
-          </Button>
-        </div>
       </form>
     </div>
   )
