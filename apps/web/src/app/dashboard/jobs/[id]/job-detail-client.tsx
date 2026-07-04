@@ -52,7 +52,7 @@ export type JobIntelligenceBundle = {
 
 export interface JobDetailData {
   id: string; display_id: string | null; title: string
-  client: string | null; city: string | null; state: string | null
+  client: string | null; client_job_id: string | null; city: string | null; state: string | null
   employment_type: string | null; work_mode: string | null; client_type: string | null
   status: string; priority: string | null; recruiter_id: string | null; recruiter_name: string | null
   openings: number | null; department: string | null
@@ -934,6 +934,11 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
           {job.display_id && (
             <span className="shrink-0 text-xs font-sans text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-md">
               {job.display_id}
+            </span>
+          )}
+          {job.client_job_id && (
+            <span className="shrink-0 text-xs font-sans text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-md" title="Client Job ID">
+              Client ID: {job.client_job_id}
             </span>
           )}
           <span className="shrink-0 flex items-center gap-1.5 text-sm font-medium">

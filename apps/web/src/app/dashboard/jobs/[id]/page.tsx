@@ -20,7 +20,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
   const admin = createAdminClient()
   const { data: job } = await admin.from('jobs')
-    .select('id, tenant_id, display_id, title, client, city, state, employment_type, work_mode, client_type, status, priority, recruiter_id, recruiter_name, openings, department, description, requirements, salary_min, salary_max, created_at, updated_at')
+    .select('id, tenant_id, display_id, title, client, client_job_id, city, state, employment_type, work_mode, client_type, status, priority, recruiter_id, recruiter_name, openings, department, description, requirements, salary_min, salary_max, created_at, updated_at')
     .eq('id', id).is('deleted_at', null).single()
 
   if (!job) notFound()

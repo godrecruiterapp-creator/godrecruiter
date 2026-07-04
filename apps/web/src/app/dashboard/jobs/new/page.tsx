@@ -191,9 +191,9 @@ function SectionCard({ n, icon: Icon, title, children, className }: {
 
 // ─── Skill tag input ──────────────────────────────────────────────────────────
 
-function SkillInput({ label, skills, onChange, suggestions, placeholder }: {
+function SkillInput({ label, skills, onChange, suggestions }: {
   label: string; skills: string[]; onChange: (s: string[]) => void
-  suggestions: string[]; placeholder: string
+  suggestions: string[]
 }) {
   const [input, setInput] = useState('')
 
@@ -230,9 +230,9 @@ function SkillInput({ label, skills, onChange, suggestions, placeholder }: {
             if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add(input) }
             if (e.key === 'Backspace' && !input && skills.length) onChange(skills.slice(0, -1))
           }}
-          placeholder={placeholder}
         />
       </div>
+      <p className="text-[10px] text-muted-foreground mt-1">Press Enter or comma to add</p>
       {avail.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
           <span className="text-[10px] text-muted-foreground self-center mr-1">Suggest:</span>
@@ -250,9 +250,9 @@ function SkillInput({ label, skills, onChange, suggestions, placeholder }: {
 
 // ─── Dropdown with recent / search ───────────────────────────────────────────
 
-function SmartCombobox({ value, onChange, options, placeholder, onSelect }: {
+function SmartCombobox({ value, onChange, options, onSelect }: {
   value: string; onChange: (v: string) => void; options: string[]
-  placeholder: string; onSelect?: (v: string) => void
+  onSelect?: (v: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -266,7 +266,6 @@ function SmartCombobox({ value, onChange, options, placeholder, onSelect }: {
           onChange={e => { onChange(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder={placeholder}
         />
         <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
       </div>
@@ -287,12 +286,21 @@ function SmartCombobox({ value, onChange, options, placeholder, onSelect }: {
 
 // ─── Smart panel ─────────────────────────────────────────────────────────────
 
-function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
+function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workMode, city, description, recruiter }: {
   title: string; client: string; mustHave: string[]
   jobType: JobType; payRate: string; billRate: string
+  workMode: WorkMode; city: string; description: string; recruiter: string
 }) {
-  const filled = [title, client, jobType, mustHave.length > 0].filter(Boolean).length
-  const pct    = Math.round((filled / 6) * 100)
+  const sections = [
+    !!title,
+    !!client,
+    workMode === 'remote' || !!city,
+    mustHave.length > 0,
+    !!description,
+    !!recruiter,
+  ]
+  const filled = sections.filter(Boolean).length
+  const pct    = Math.round((filled / sections.length) * 100)
 
   const showSimilar    = title.toLowerCase().includes('rn') || title.toLowerCase().includes('nurse') || title.toLowerCase().includes('icu')
   const showCandidates = mustHave.length >= 2
@@ -310,7 +318,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate }: {
         <div className="h-2 rounded-full bg-muted overflow-hidden mb-2">
           <div className="h-full bg-[#dd7456] rounded-full transition-all duration-500" style={{ width:`${pct}%` }} />
         </div>
-        <p className="text-sm text-muted-foreground">{filled} of 6 sections started</p>
+        <p className="text-sm text-muted-foreground">{filled} of {sections.length} sections started</p>
       </div>
 
       {/* Bill rate margin */}
@@ -441,6 +449,7 @@ export default function NewJobPage() {
   // ── Core fields
   const [title,         setTitle]        = useState('')
   const [client,        setClient]       = useState('')
+  const [clientJobId,   setClientJobId]  = useState('')
   const [hiringManager, setHiringManager]= useState('')
   const [city,          setCity]         = useState('')
   const [stateVal,      setStateVal]     = useState('')
@@ -640,6 +649,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
     const fd = new FormData()
     fd.set('title',           title)
     fd.set('client',          client)
+    fd.set('client_job_id',   clientJobId)
     fd.set('city',            city)
     fd.set('state',           stateVal)
     fd.set('department',      department)
@@ -674,7 +684,10 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
       fd.set('salary_max', salaryMax || '')
     }
 
-    startTransition(async () => { await createJobAction(fd) })
+    startTransition(async () => {
+      const res = await createJobAction(fd)
+      if (res?.error) setErrors([res.error])
+    })
   }
 
   const toggleAuth = (v: string) =>
@@ -726,11 +739,11 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                 </button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-80 p-2">
+                <p className="text-[10px] text-muted-foreground px-1 mb-1">Search by title or client</p>
                 <FieldInput
                   autoFocus
                   value={copyQuery}
                   onChange={e => setCopyQuery(e.target.value)}
-                  placeholder="Search jobs by title or client…"
                   className="mb-2"
                 />
                 <div className="max-h-72 overflow-y-auto space-y-0.5">
@@ -778,7 +791,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       value={title}
                       onChange={setTitle}
                       options={RECENT_TITLES}
-                      placeholder="e.g. Travel RN (ICU), Senior Java Developer…"
                     />
                     {RECENT_TITLES.filter(t => !title).length > 0 && !title && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
@@ -794,12 +806,11 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                   </div>
 
                   <div className="col-span-2 sm:col-span-1">
-                    <FieldLabel required>Client</FieldLabel>
+                    <FieldLabel>Client</FieldLabel>
                     <SmartCombobox
                       value={client}
                       onChange={setClient}
                       options={recentClients}
-                      placeholder="Search or type client name…"
                       onSelect={handleClientSelect}
                     />
                     {!client && (
@@ -816,11 +827,19 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                   </div>
 
                   <div className="col-span-2 sm:col-span-1">
+                    <FieldLabel>Client Job ID</FieldLabel>
+                    <FieldInput
+                      value={clientJobId}
+                      onChange={e => setClientJobId(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">The client&apos;s own requisition/job number — separate from your internal Job ID.</p>
+                  </div>
+
+                  <div className="col-span-2 sm:col-span-1">
                     <FieldLabel>Hiring Manager</FieldLabel>
                     <FieldInput
                       value={hiringManager}
                       onChange={e => setHiringManager(e.target.value)}
-                      placeholder={client ? 'Auto-filled from client' : 'e.g. Dr. Sarah Kim'}
                     />
                     {client && !hiringManager && clientAutofill(client)?.hiringManager && (
                       <p className="text-[10px] text-muted-foreground mt-1">
@@ -842,7 +861,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     <FieldInput
                       value={department}
                       onChange={e => setDepartment(e.target.value)}
-                      placeholder="e.g. ICU, Engineering, Finance"
                     />
                     {client && clientAutofill(client)?.industry && (
                       <p className="text-[10px] text-muted-foreground mt-1">
@@ -870,7 +888,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       <FieldInput
                         value={city}
                         onChange={e => setCity(e.target.value)}
-                        placeholder="e.g. Houston"
                       />
                     </div>
                     <div>
@@ -947,7 +964,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                             type="number" min="0" step="0.50"
                             value={payRate}
                             onChange={e => setPayRate(e.target.value)}
-                            placeholder="50.00"
                             className="pl-7"
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">/hr</span>
@@ -962,7 +978,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                             type="number" min="0" step="0.50"
                             value={billRate}
                             onChange={e => setBillRate(e.target.value)}
-                            placeholder="65.00"
                             className="pl-7"
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">/hr</span>
@@ -986,14 +1001,14 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       <FieldLabel>Min Salary ($/year)</FieldLabel>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">$</span>
-                        <FieldInput type="number" min="0" step="1000" value={salaryMin} onChange={e => setSalaryMin(e.target.value)} placeholder="80,000" className="pl-7" />
+                        <FieldInput type="number" min="0" step="1000" value={salaryMin} onChange={e => setSalaryMin(e.target.value)} className="pl-7" />
                       </div>
                     </div>
                     <div>
                       <FieldLabel>Max Salary ($/year)</FieldLabel>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">$</span>
-                        <FieldInput type="number" min="0" step="1000" value={salaryMax} onChange={e => setSalaryMax(e.target.value)} placeholder="120,000" className="pl-7" />
+                        <FieldInput type="number" min="0" step="1000" value={salaryMax} onChange={e => setSalaryMax(e.target.value)} className="pl-7" />
                       </div>
                     </div>
                   </div>
@@ -1029,7 +1044,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                   skills={mustHave}
                   onChange={setMustHave}
                   suggestions={skillSuggestions}
-                  placeholder="Type a skill and press Enter (e.g. React, RN License, AWS…)"
                 />
 
                 <SkillInput
@@ -1037,7 +1051,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                   skills={niceToHave}
                   onChange={setNiceToHave}
                   suggestions={skillSuggestions.filter(s => !mustHave.includes(s))}
-                  placeholder="Optional skills that would be a bonus…"
                 />
 
                 <div>
@@ -1082,8 +1095,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     <p className="text-sm font-medium text-violet-800 dark:text-violet-200">Paste the client&apos;s job description below — AI will extract skills and fill in the form.</p>
                     <textarea
                       rows={6} value={pastedJD} onChange={e => setPastedJD(e.target.value)}
-                      placeholder="Paste the full job description here…"
-                      className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground"
+                      className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none"
                     />
                     <button type="button" onClick={extractFromPaste} disabled={!pastedJD.trim()}
                       className="h-8 px-4 text-sm font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
@@ -1099,15 +1111,17 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     <textarea
                       rows={10} value={description}
                       onChange={e => setDescription(e.target.value)}
-                      placeholder={aiGenerating ? 'AI is writing your description…' : 'Describe the role, what the candidate will be working on, and who they will work with. Or click "Generate with AI" above.'}
                       className={cn(
                         'w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5',
                         'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
-                        'resize-y placeholder:text-muted-foreground transition-colors',
+                        'resize-y transition-colors',
                         aiGenerating && 'opacity-50'
                       )}
                     />
-                    {description && (
+                    {aiGenerating && (
+                      <p className="text-[10px] text-violet-600 dark:text-violet-400 mt-1">AI is writing your description…</p>
+                    )}
+                    {description && !aiGenerating && (
                       <p className="text-[10px] text-muted-foreground mt-1">{description.split(/\s+/).length} words</p>
                     )}
                   </div>
@@ -1176,6 +1190,10 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                 jobType={jobType}
                 payRate={payRate}
                 billRate={billRate}
+                workMode={workMode}
+                city={city}
+                description={description}
+                recruiter={recruiter}
               />
             </div>
           </div>

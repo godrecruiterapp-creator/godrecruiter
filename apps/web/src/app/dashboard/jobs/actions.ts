@@ -24,6 +24,7 @@ export async function createJobAction(formData: FormData) {
 
   const title           = formData.get('title') as string
   const client          = formData.get('client') as string
+  const client_job_id   = formData.get('client_job_id') as string
   const city            = formData.get('city') as string
   const state_val       = formData.get('state') as string
   const department      = formData.get('department') as string
@@ -49,6 +50,7 @@ export async function createJobAction(formData: FormData) {
     tenant_id: membership.tenant_id,
     title,
     client: client || null,
+    client_job_id: client_job_id || null,
     city: city || null,
     state: state_val || null,
     department: department || null,
@@ -97,6 +99,7 @@ export async function updateJobAction(jobId: string, formData: FormData) {
 
   const title           = formData.get('title') as string
   const client          = formData.get('client') as string
+  const client_job_id   = formData.get('client_job_id') as string
   const city            = formData.get('city') as string
   const state_val       = formData.get('state') as string
   const department      = formData.get('department') as string
@@ -121,6 +124,7 @@ export async function updateJobAction(jobId: string, formData: FormData) {
   const { error } = await admin.from('jobs').update({
     title,
     client: client || null,
+    client_job_id: client_job_id || null,
     city: city || null,
     state: state_val || null,
     department: department || null,

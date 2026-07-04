@@ -93,6 +93,12 @@ export default async function EditJobPage({ params }: { params: Promise<{ id: st
                 <Input id="client" name="client" defaultValue={job.client ?? ''} placeholder="e.g. Acme Corp" />
               </div>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="client_job_id">Client Job ID</Label>
+                <Input id="client_job_id" name="client_job_id" defaultValue={job.client_job_id ?? ''} placeholder="The client's own requisition/job number" />
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="city">City</Label>
