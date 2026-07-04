@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -14,7 +16,7 @@ import { cn } from '@/lib/utils'
 import { relTime, formatSize, toInitials } from '@/lib/format'
 import {
   ArrowLeft, Phone, Mail, Briefcase, UserPlus, CalendarPlus, CheckSquare,
-  Building2, Plus, FileText, Upload, Hospital, Pencil, MoreHorizontal,
+  Plus, FileText, Upload, Hospital, Pencil, MoreHorizontal, Eye, ChevronDown,
   Settings, BarChart3, Trash2,
 } from 'lucide-react'
 import type { Client, ClientContact, ClientFacility } from '../_data'
@@ -124,6 +126,37 @@ function ManageMenu({ count, children }: { count: number; children: React.ReactN
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">{children}</DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+// Jobs-style bulk action bar: "N selected" + divider + a left-aligned "Manage" dropdown
+function BulkBar({ count, children }: { count: number; children: React.ReactNode }) {
+  if (count === 0) return null
+  return (
+    <div className="flex items-center gap-2 px-3 py-2 mb-2.5 bg-brand-muted border border-brand/20 rounded-lg">
+      <span className="text-sm font-semibold text-brand">{count} selected</span>
+      <div className="w-px h-4 bg-brand/20 mx-1" />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="sm" variant="outline" className="h-7 text-sm">
+            Manage <ChevronDown className="size-3.5 ml-1.5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-44">{children}</DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  )
+}
+
+// Hover-reveal row actions, right-aligned in the last cell of a table row
+function RowActions({ children }: { children: React.ReactNode }) {
+  return <div className="hidden group-hover:flex items-center justify-end gap-1">{children}</div>
+}
+function RowActionButton({ title, onClick, children }: { title: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button type="button" title={title} onClick={onClick} className="size-7 rounded-md hover:bg-muted flex items-center justify-center">
+      {children}
+    </button>
   )
 }
 
@@ -253,7 +286,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   // ── Add / edit contact form ───────────────────────────────────────────────
   const [ncName, setNcName] = useState('')
   const [ncTitle, setNcTitle] = useState('')
-  const [ncDept, setNcDept] = useState('')
   const [ncEmail, setNcEmail] = useState('')
   const [ncPhone, setNcPhone] = useState('')
   const [ncDecisionMaker, setNcDecisionMaker] = useState(false)
@@ -261,7 +293,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([])
 
   function resetContactForm() {
-    setNcName(''); setNcTitle(''); setNcDept(''); setNcEmail(''); setNcPhone(''); setNcDecisionMaker(false)
+    setNcName(''); setNcTitle(''); setNcEmail(''); setNcPhone(''); setNcDecisionMaker(false)
   }
   function openAddContact() {
     setEditingContactId(null)
@@ -270,20 +302,15 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   }
   function openEditContact(contact: ClientContact) {
     setEditingContactId(contact.id)
-    setNcName(contact.name); setNcTitle(contact.title); setNcDept(contact.department)
+    setNcName(contact.name); setNcTitle(contact.title)
     setNcEmail(contact.email); setNcPhone(contact.phone); setNcDecisionMaker(contact.decisionMaker)
     setContactDrawerOpen(true)
-  }
-  function openEditPrimaryContact() {
-    const primary = contactList.find(c => c.primary) ?? contactList[0]
-    if (primary) openEditContact(primary)
-    else openAddContact()
   }
   function submitContact(e: React.FormEvent) {
     e.preventDefault()
     if (!ncName.trim()) return
     const fd = new FormData()
-    fd.set('name', ncName); fd.set('title', ncTitle); fd.set('department', ncDept)
+    fd.set('name', ncName); fd.set('title', ncTitle)
     fd.set('email', ncEmail); fd.set('phone', ncPhone)
     if (ncDecisionMaker) fd.set('decision_maker', 'on')
     const name = ncName
@@ -310,20 +337,23 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   function toggleContactSelect(id: string) {
     setSelectedContactIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
-  function deleteSelectedContacts() {
-    if (!confirm(`Delete ${selectedContactIds.length} contact(s)?`)) return
-    const ids = selectedContactIds
+  const allContactsSelected  = contactList.length > 0 && contactList.every(c => selectedContactIds.includes(c.id))
+  const someContactsSelected = contactList.some(c => selectedContactIds.includes(c.id)) && !allContactsSelected
+  function toggleAllContacts(v: boolean) { setSelectedContactIds(v ? contactList.map(c => c.id) : []) }
+
+  function deleteContacts(ids: string[]) {
+    if (!confirm(`Delete ${ids.length} contact(s)?`)) return
     setContactList(prev => prev.filter(c => !ids.includes(c.id)))
-    setSelectedContactIds([])
+    setSelectedContactIds(prev => prev.filter(id => !ids.includes(id)))
     startTransition(async () => { await Promise.all(ids.map(id => deleteClientContactAction(id))) })
   }
-  function emailSelectedContacts() {
-    const chosen = contactList.filter(c => selectedContactIds.includes(c.id))
+  function emailContacts(ids: string[]) {
+    const chosen = contactList.filter(c => ids.includes(c.id))
     const emails = chosen.map(c => c.email).filter(Boolean)
     if (!emails.length) { toast.error('No email on file for the selected contact(s).'); return }
     window.open(`mailto:${emails.join(',')}`)
     logActivity(emails.length > 1 ? `emailed ${emails.length} contacts` : `emailed ${chosen[0]?.name}`)
-    setSelectedContactIds([])
+    setSelectedContactIds(prev => prev.filter(id => !ids.includes(id)))
   }
 
   // ── Add / edit facility form ──────────────────────────────────────────────
@@ -377,11 +407,14 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   function toggleFacilitySelect(id: string) {
     setSelectedFacilityIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
-  function deleteSelectedFacilities() {
-    if (!confirm(`Delete ${selectedFacilityIds.length} facilit${selectedFacilityIds.length > 1 ? 'ies' : 'y'}?`)) return
-    const ids = selectedFacilityIds
+  const allFacilitiesSelected  = facilityList.length > 0 && facilityList.every(f => selectedFacilityIds.includes(f.id))
+  const someFacilitiesSelected = facilityList.some(f => selectedFacilityIds.includes(f.id)) && !allFacilitiesSelected
+  function toggleAllFacilities(v: boolean) { setSelectedFacilityIds(v ? facilityList.map(f => f.id) : []) }
+
+  function deleteFacilities(ids: string[]) {
+    if (!confirm(`Delete ${ids.length} facilit${ids.length > 1 ? 'ies' : 'y'}?`)) return
     setFacilityList(prev => prev.filter(f => !ids.includes(f.id)))
-    setSelectedFacilityIds([])
+    setSelectedFacilityIds(prev => prev.filter(id => !ids.includes(id)))
     startTransition(async () => { await Promise.all(ids.map(id => deleteClientFacilityAction(id))) })
   }
 
@@ -439,13 +472,13 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
       if (mode === 'add') {
         const res = await uploadClientDocumentAction(clientInfo.id, fd)
         if (!res.success) { toast.error(res.error); return }
-        setDocList(prev => [{ id: res.id, name: res.name, category: res.category, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name }, ...prev])
+        setDocList(prev => [{ id: res.id, name: res.name, category: res.category, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name, url: res.url }, ...prev])
         setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `uploaded document: ${res.name}`, time: new Date().toISOString() }, ...prev])
         toast('Document uploaded.')
       } else if (replaceId) {
         const res = await replaceClientDocumentAction(replaceId, fd)
         if (!res.success) { toast.error(res.error); return }
-        setDocList(prev => prev.map(d => d.id === replaceId ? { ...d, name: res.name, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name } : d))
+        setDocList(prev => prev.map(d => d.id === replaceId ? { ...d, name: res.name, size: res.size, uploadedAt: res.created_at, uploaderName: res.uploader_name, url: res.url } : d))
         setActivityList(prev => [{ id: `local-${Date.now()}`, actor: 'You', action: `replaced document: ${res.name}`, time: new Date().toISOString() }, ...prev])
         toast('Document updated.')
       }
@@ -454,12 +487,19 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   function toggleDocSelect(id: string) {
     setSelectedDocIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
-  function deleteSelectedDocuments() {
-    if (!confirm(`Delete ${selectedDocIds.length} document(s)?`)) return
-    const ids = selectedDocIds
+  const allDocsSelected  = docList.length > 0 && docList.every(d => selectedDocIds.includes(d.id))
+  const someDocsSelected = docList.some(d => selectedDocIds.includes(d.id)) && !allDocsSelected
+  function toggleAllDocs(v: boolean) { setSelectedDocIds(v ? docList.map(d => d.id) : []) }
+
+  function deleteDocuments(ids: string[]) {
+    if (!confirm(`Delete ${ids.length} document(s)?`)) return
     setDocList(prev => prev.filter(d => !ids.includes(d.id)))
-    setSelectedDocIds([])
+    setSelectedDocIds(prev => prev.filter(id => !ids.includes(id)))
     startTransition(async () => { await Promise.all(ids.map(id => deleteClientDocumentAction(id))) })
+  }
+  function viewDocument(d: WorkspaceDoc) {
+    if (!d.url) { toast.error('No file URL available.'); return }
+    window.open(d.url, '_blank')
   }
 
   function deleteClient() {
@@ -555,19 +595,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
           {/* Quick actions */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button type="button" className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Pencil className="size-3.5" />Edit</button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-44">
-                <DropdownMenuItem asChild className="text-sm gap-2">
-                  <Link href={`/dashboard/clients/${clientInfo.id}/edit`}><Building2 className="size-3.5" />Edit client</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-sm gap-2" onClick={openEditPrimaryContact}>
-                  <UserPlus className="size-3.5" />Edit contact
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Link href={`/dashboard/clients/${clientInfo.id}/edit`} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Pencil className="size-3.5" />Edit</Link>
             <button type="button" onClick={openAddContact} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><UserPlus className="size-3.5" />Add contact</button>
             {isHealthcare && (
               <button type="button" onClick={openAddFacility} className="h-8 px-3 text-sm font-medium rounded-lg border border-border bg-background hover:bg-muted/60 flex items-center gap-1.5"><Hospital className="size-3.5" />Add facility</button>
@@ -764,44 +792,68 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <EmptyTab icon={UserPlus} title="No contacts yet" description="Add the people you work with at this client so recruiters always know who to reach." />
             ) : (
               <>
-                <div className="flex justify-end mb-3">
-                  <ManageMenu count={selectedContactIds.length}>
-                    {selectedContactIds.length === 1 && (
-                      <DropdownMenuItem className="text-sm gap-2" onClick={() => {
-                        const c = contactList.find(c => c.id === selectedContactIds[0])
-                        setSelectedContactIds([])
-                        if (c) openEditContact(c)
-                      }}>
-                        <Pencil className="size-3.5" />Edit
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem className="text-sm gap-2" onClick={emailSelectedContacts}>
-                      <Mail className="size-3.5" />Send email
+                <BulkBar count={selectedContactIds.length}>
+                  {selectedContactIds.length === 1 && (
+                    <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                      const c = contactList.find(c => c.id === selectedContactIds[0])
+                      setSelectedContactIds([])
+                      if (c) openEditContact(c)
+                    }}>
+                      <Pencil className="size-3.5" />Edit
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedContacts}>
-                      <Trash2 className="size-3.5" />Delete
-                    </DropdownMenuItem>
-                  </ManageMenu>
+                  )}
+                  <DropdownMenuItem className="text-sm gap-2" onClick={() => emailContacts(selectedContactIds)}>
+                    <Mail className="size-3.5" />Send email
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={() => deleteContacts(selectedContactIds)}>
+                    <Trash2 className="size-3.5" />Delete
+                  </DropdownMenuItem>
+                </BulkBar>
+                <div className="overflow-auto rounded-xl border border-border">
+                  <table className="w-full text-sm border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr className="border-b border-border">
+                        <th className="w-10 px-3 py-3"><Checkbox checked={allContactsSelected} data-state={someContactsSelected ? 'indeterminate' : undefined} onCheckedChange={v => toggleAllContacts(!!v)} aria-label="Select all contacts" /></th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Contact</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Title</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Email</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Phone</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Status</th>
+                        <th className="w-28" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contactList.map(c => (
+                        <tr key={c.id} className="group border-b border-border/60 last:border-0 hover:bg-muted/20" style={{ height: 52 }}>
+                          <td className="px-3 py-2"><Checkbox checked={selectedContactIds.includes(c.id)} onCheckedChange={() => toggleContactSelect(c.id)} aria-label={`Select ${c.name}`} /></td>
+                          <td className="px-3 py-2">
+                            <button type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 font-medium hover:text-brand">
+                              <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
+                              {c.name}
+                            </button>
+                          </td>
+                          <td className="px-3 py-2 text-secondary-foreground">{c.title || '—'}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{c.email || '—'}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{c.phone || '—'}</td>
+                          <td className="px-3 py-2">
+                            <div className="flex gap-1.5">
+                              {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25" />}
+                              {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border" />}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2">
+                            <RowActions>
+                              <RowActionButton title="Edit" onClick={() => openEditContact(c)}><Pencil className="size-3.5 text-muted-foreground" /></RowActionButton>
+                              <RowActionButton title="Delete" onClick={() => deleteContacts([c.id])}><Trash2 className="size-3.5 text-muted-foreground" /></RowActionButton>
+                              <RowActionButton title="Email" onClick={() => emailContacts([c.id])}><Mail className="size-3.5 text-muted-foreground" /></RowActionButton>
+                            </RowActions>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <SimpleTable
-                  headers={['', 'Contact', 'Title', 'Department', 'Email', 'Phone', 'Status']}
-                  rows={contactList.map(c => [
-                    <input key="cb" type="checkbox" checked={selectedContactIds.includes(c.id)} onChange={() => toggleContactSelect(c.id)} className="size-4" />,
-                    <button key="n" type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 font-medium hover:text-brand">
-                      <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
-                      {c.name}
-                    </button>,
-                    c.title || '—',
-                    c.department || '—',
-                    c.email || '—',
-                    c.phone || '—',
-                    <div key="s" className="flex gap-1.5">
-                      {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25" />}
-                      {c.decisionMaker && <Chip label="Decision maker" className="bg-muted text-muted-foreground border-border" />}
-                    </div>,
-                  ])}
-                />
               </>
             )}
           </div>
@@ -813,35 +865,56 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <EmptyTab icon={Hospital} title="No facilities yet" description="Add the hospitals, clinics, or labs this client operates so jobs can reference the right location." actionLabel="Add facility" onAction={openAddFacility} />
             ) : (
               <>
-                <div className="flex justify-end mb-3">
-                  <ManageMenu count={selectedFacilityIds.length}>
-                    {selectedFacilityIds.length === 1 && (
-                      <DropdownMenuItem className="text-sm gap-2" onClick={() => {
-                        const f = facilityList.find(f => f.id === selectedFacilityIds[0])
-                        setSelectedFacilityIds([])
-                        if (f) openEditFacility(f)
-                      }}>
-                        <Pencil className="size-3.5" />Edit
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedFacilities}>
-                      <Trash2 className="size-3.5" />Delete
+                <BulkBar count={selectedFacilityIds.length}>
+                  {selectedFacilityIds.length === 1 && (
+                    <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                      const f = facilityList.find(f => f.id === selectedFacilityIds[0])
+                      setSelectedFacilityIds([])
+                      if (f) openEditFacility(f)
+                    }}>
+                      <Pencil className="size-3.5" />Edit
                     </DropdownMenuItem>
-                  </ManageMenu>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={() => deleteFacilities(selectedFacilityIds)}>
+                    <Trash2 className="size-3.5" />Delete
+                  </DropdownMenuItem>
+                </BulkBar>
+                <div className="overflow-auto rounded-xl border border-border">
+                  <table className="w-full text-sm border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr className="border-b border-border">
+                        <th className="w-10 px-3 py-3"><Checkbox checked={allFacilitiesSelected} data-state={someFacilitiesSelected ? 'indeterminate' : undefined} onCheckedChange={v => toggleAllFacilities(!!v)} aria-label="Select all facilities" /></th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Facility</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Type</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Location</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Departments</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Specialties</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Manager</th>
+                        <th className="w-20" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {facilityList.map(f => (
+                        <tr key={f.id} className="group border-b border-border/60 last:border-0 hover:bg-muted/20" style={{ height: 52 }}>
+                          <td className="px-3 py-2"><Checkbox checked={selectedFacilityIds.includes(f.id)} onCheckedChange={() => toggleFacilitySelect(f.id)} aria-label={`Select ${f.name}`} /></td>
+                          <td className="px-3 py-2 font-medium">{f.name}</td>
+                          <td className="px-3 py-2"><Chip label={f.type} className="bg-muted text-muted-foreground border-border" /></td>
+                          <td className="px-3 py-2 text-secondary-foreground">{[f.city, f.state].filter(Boolean).join(', ') || '—'}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{f.departments.length ? f.departments.join(', ') : '—'}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{f.specialties.length ? f.specialties.join(', ') : '—'}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{f.facilityManager || '—'}</td>
+                          <td className="px-3 py-2">
+                            <RowActions>
+                              <RowActionButton title="Edit" onClick={() => openEditFacility(f)}><Pencil className="size-3.5 text-muted-foreground" /></RowActionButton>
+                              <RowActionButton title="Delete" onClick={() => deleteFacilities([f.id])}><Trash2 className="size-3.5 text-muted-foreground" /></RowActionButton>
+                            </RowActions>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <SimpleTable
-                  headers={['', 'Facility', 'Type', 'Location', 'Departments', 'Specialties', 'Manager']}
-                  rows={facilityList.map(f => [
-                    <input key="cb" type="checkbox" checked={selectedFacilityIds.includes(f.id)} onChange={() => toggleFacilitySelect(f.id)} className="size-4" />,
-                    <span key="n" className="font-medium">{f.name}</span>,
-                    <Chip key="t" label={f.type} className="bg-muted text-muted-foreground border-border" />,
-                    [f.city, f.state].filter(Boolean).join(', ') || '—',
-                    f.departments.length ? f.departments.join(', ') : '—',
-                    f.specialties.length ? f.specialties.join(', ') : '—',
-                    f.facilityManager || '—',
-                  ])}
-                />
               </>
             )}
           </div>
@@ -849,42 +922,67 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
 
         {activeTab === 'documents' && (
           <div className="px-6 py-6">
-            <div className="flex justify-end mb-3 gap-2">
-              <ManageMenu count={selectedDocIds.length}>
-                {selectedDocIds.length === 1 && (
-                  <DropdownMenuItem className="text-sm gap-2" onClick={() => {
-                    const d = docList.find(d => d.id === selectedDocIds[0])
-                    setSelectedDocIds([])
-                    if (d) openReplaceDocument(d)
-                  }}>
-                    <Upload className="size-3.5" />Change document
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={deleteSelectedDocuments}>
-                  <Trash2 className="size-3.5" />Delete
-                </DropdownMenuItem>
-              </ManageMenu>
-              {docList.length > 0 && (
-                <button type="button" onClick={openUploadDocument} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5">
-                  <Upload className="size-3.5" />Upload document
-                </button>
-              )}
-            </div>
             {docList.length === 0 ? (
               <EmptyTab icon={Upload} title="No documents yet" description="Contracts, agreements, and other files for this client will show up here." actionLabel="Upload document" onAction={openUploadDocument} />
             ) : (
-              <SimpleTable
-                headers={['', 'Name', 'Category', 'Size', 'Uploaded', 'Uploaded by']}
-                rows={docList.map(d => [
-                  <input key="cb" type="checkbox" checked={selectedDocIds.includes(d.id)} onChange={() => toggleDocSelect(d.id)} className="size-4" />,
-                  <span key="n" className="flex items-center gap-2 font-medium"><FileText className="size-4 text-muted-foreground shrink-0" />{d.name}</span>,
-                  <Chip key="c" label={d.category} className="bg-muted text-muted-foreground border-border" />,
-                  formatSize(d.size),
-                  relTime(d.uploadedAt),
-                  d.uploaderName || '—',
-                ])}
-              />
+              <>
+                <div className="flex items-center justify-between mb-2.5 gap-2">
+                  <BulkBar count={selectedDocIds.length}>
+                    {selectedDocIds.length === 1 && (
+                      <DropdownMenuItem className="text-sm gap-2" onClick={() => {
+                        const d = docList.find(d => d.id === selectedDocIds[0])
+                        setSelectedDocIds([])
+                        if (d) openReplaceDocument(d)
+                      }}>
+                        <Upload className="size-3.5" />Change document
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-sm gap-2 text-destructive focus:text-destructive" onClick={() => deleteDocuments(selectedDocIds)}>
+                      <Trash2 className="size-3.5" />Delete
+                    </DropdownMenuItem>
+                  </BulkBar>
+                  <button type="button" onClick={openUploadDocument} className="h-8 px-3 text-sm font-medium rounded-lg bg-brand hover:bg-brand/90 text-white flex items-center gap-1.5 shrink-0">
+                    <Upload className="size-3.5" />Upload document
+                  </button>
+                </div>
+                <div className="overflow-auto rounded-xl border border-border">
+                  <table className="w-full text-sm border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr className="border-b border-border">
+                        <th className="w-10 px-3 py-3"><Checkbox checked={allDocsSelected} data-state={someDocsSelected ? 'indeterminate' : undefined} onCheckedChange={v => toggleAllDocs(!!v)} aria-label="Select all documents" /></th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Name</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Category</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Size</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Uploaded</th>
+                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Uploaded by</th>
+                        <th className="w-28" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {docList.map(d => (
+                        <tr key={d.id} className="group border-b border-border/60 last:border-0 hover:bg-muted/20" style={{ height: 52 }}>
+                          <td className="px-3 py-2"><Checkbox checked={selectedDocIds.includes(d.id)} onCheckedChange={() => toggleDocSelect(d.id)} aria-label={`Select ${d.name}`} /></td>
+                          <td className="px-3 py-2">
+                            <span className="flex items-center gap-2 font-medium"><FileText className="size-4 text-muted-foreground shrink-0" />{d.name}</span>
+                          </td>
+                          <td className="px-3 py-2"><Chip label={d.category} className="bg-muted text-muted-foreground border-border" /></td>
+                          <td className="px-3 py-2 text-secondary-foreground">{formatSize(d.size)}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{relTime(d.uploadedAt)}</td>
+                          <td className="px-3 py-2 text-secondary-foreground">{d.uploaderName || '—'}</td>
+                          <td className="px-3 py-2">
+                            <RowActions>
+                              <RowActionButton title="View" onClick={() => viewDocument(d)}><Eye className="size-3.5 text-muted-foreground" /></RowActionButton>
+                              <RowActionButton title="Change document" onClick={() => openReplaceDocument(d)}><Upload className="size-3.5 text-muted-foreground" /></RowActionButton>
+                              <RowActionButton title="Delete" onClick={() => deleteDocuments([d.id])}><Trash2 className="size-3.5 text-muted-foreground" /></RowActionButton>
+                            </RowActions>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         )}
@@ -1050,10 +1148,6 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
               <FieldInput value={ncTitle} onChange={e => setNcTitle(e.target.value)} placeholder="e.g. Director of Nursing" />
             </div>
             <div>
-              <FieldLabel>Department</FieldLabel>
-              <FieldInput value={ncDept} onChange={e => setNcDept(e.target.value)} placeholder="e.g. ICU" />
-            </div>
-            <div>
               <FieldLabel>Email</FieldLabel>
               <FieldInput type="email" value={ncEmail} onChange={e => setNcEmail(e.target.value)} placeholder="name@company.com" />
             </div>
@@ -1197,10 +1291,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
             <div className="px-4 py-4 space-y-5">
               <div className="flex items-center gap-3">
                 <Avatar className="size-10"><AvatarFallback className="text-sm font-bold bg-brand-muted text-brand">{toInitials(selectedContact.name)}</AvatarFallback></Avatar>
-                <div>
-                  <p className="text-sm font-medium">{selectedContact.title || '—'}</p>
-                  <p className="text-sm text-muted-foreground">{selectedContact.department || '—'}</p>
-                </div>
+                <p className="text-sm font-medium">{selectedContact.title || '—'}</p>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span className="font-medium">{selectedContact.email || '—'}</span></div>

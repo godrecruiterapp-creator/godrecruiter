@@ -374,7 +374,8 @@ export async function uploadClientDocumentAction(clientId: string, formData: For
   if (dbErr) return { success: false as const, error: dbErr.message }
 
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, `uploaded document: ${file.name}`)
-  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, category, uploader_name: ctx.name, created_at }
+  const url = admin.storage.from('client-documents').getPublicUrl(path).data.publicUrl
+  return { success: true as const, id: fileId, name: file.name, size: file.size, file_type: file.type, category, uploader_name: ctx.name, created_at, url }
 }
 
 export async function replaceClientDocumentAction(docId: string, formData: FormData) {
@@ -403,7 +404,8 @@ export async function replaceClientDocumentAction(docId: string, formData: FormD
   if (dbErr) return { success: false as const, error: dbErr.message }
 
   await logActivity(admin, existing.client_id, ctx.tenant_id, ctx.user.id, ctx.name, `replaced document: ${file.name}`)
-  return { success: true as const, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at }
+  const url = admin.storage.from('client-documents').getPublicUrl(path).data.publicUrl
+  return { success: true as const, name: file.name, size: file.size, file_type: file.type, uploader_name: ctx.name, created_at, url }
 }
 
 export async function deleteClientDocumentAction(docId: string) {
