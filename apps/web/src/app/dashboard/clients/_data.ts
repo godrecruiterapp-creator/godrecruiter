@@ -22,9 +22,9 @@ export type Client = {
   country: string
   zip: string
   timezone: string
-  accountOwner: string
-  recruitmentManager: string
-  primaryRecruiter: string
+  accountOwner: string[]
+  recruitmentManager: string[]
+  primaryRecruiter: string[]
   teamLead: string
   assignedRecruiters: string[]
   clientSince: string
@@ -88,9 +88,9 @@ export function mapClientRow(r: any): Client {
     country: r.country ?? 'USA',
     zip: r.zip ?? '',
     timezone: r.timezone ?? '',
-    accountOwner: r.account_owner ?? '',
-    recruitmentManager: r.recruitment_manager ?? '',
-    primaryRecruiter: r.primary_recruiter ?? '',
+    accountOwner: r.account_owner ?? [],
+    recruitmentManager: r.recruitment_manager ?? [],
+    primaryRecruiter: r.primary_recruiter ?? [],
     teamLead: r.team_lead ?? '',
     assignedRecruiters: r.assigned_recruiters ?? [],
     clientSince: r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', MONTH_YEAR) : '',

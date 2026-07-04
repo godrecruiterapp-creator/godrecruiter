@@ -1,13 +1,16 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { Country, State } from 'country-state-city'
 import {
-  ArrowLeft, Building2, MapPin, Users, Settings2, Tag, AlertCircle,
+  ArrowLeft, Building2, MapPin, Users, Settings2, Tag, AlertCircle, ChevronDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { Client, Industry } from './_data'
-import { createClientAction, updateClientAction } from './actions'
+import { createClientAction, updateClientAction, getTenantUsersAction, type TenantUserRow } from './actions'
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -15,6 +18,14 @@ const INDUSTRIES: Industry[] = [
   'Healthcare', 'IT', 'Engineering', 'Finance', 'Manufacturing', 'Government', 'Professional Services', 'Other',
 ]
 const COMPANY_SIZES = ['1-100', '100-500', '500-1,000', '1,000-5,000', '5,000-10,000', '10,000+']
+const COUNTRIES = Country.getAllCountries()
+const TIMEZONES = Intl.supportedValuesOf('timeZone')
+
+function resolveCountryCode(name?: string) {
+  if (!name) return 'US'
+  const found = COUNTRIES.find(c => c.name === name || c.isoCode === name)
+  return found?.isoCode ?? 'US'
+}
 
 // ─── Small components ─────────────────────────────────────────────────────────
 
@@ -59,6 +70,42 @@ function FieldSelect({ className, children, ...props }: React.SelectHTMLAttribut
     )}>
       {children}
     </select>
+  )
+}
+
+// Multi-select dropdown of tenant team members (checkbox list in a popover)
+function TeamMultiSelect({ options, selected, onChange }: {
+  options: TenantUserRow[]; selected: string[]; onChange: (v: string[]) => void
+}) {
+  const [open, setOpen] = useState(false)
+  function toggle(name: string) {
+    onChange(selected.includes(name) ? selected.filter(n => n !== name) : [...selected, name])
+  }
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button" className={cn(
+          'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
+          'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+          'flex items-center justify-between gap-2 text-left transition-colors',
+        )}>
+          <span className={cn('truncate', selected.length === 0 && 'text-muted-foreground')}>
+            {selected.length ? selected.join(', ') : 'Select team members'}
+          </span>
+          <ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[--radix-popover-trigger-width] p-1 max-h-64 overflow-auto">
+        {options.length === 0 ? (
+          <p className="text-sm text-muted-foreground px-2 py-2">No team members found.</p>
+        ) : options.map(u => (
+          <label key={u.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
+            <Checkbox checked={selected.includes(u.name)} onCheckedChange={() => toggle(u.name)} />
+            {u.name}
+          </label>
+        ))}
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -111,14 +158,26 @@ export function ClientForm({ mode, clientId, initial }: {
   const [companyType, setCompanyType] = useState<'direct' | 'vms'>(initial?.companyType ?? 'direct')
 
   const [city, setCity]     = useState(initial?.city ?? '')
+  const [countryCode, setCountryCode] = useState(() => resolveCountryCode(initial?.country))
+  const [country, setCountry] = useState(initial?.country || COUNTRIES.find(c => c.isoCode === 'US')!.name)
   const [state, setState]   = useState(initial?.state ?? '')
-  const [country, setCountry] = useState(initial?.country ?? 'USA')
   const [zip, setZip]       = useState(initial?.zip ?? '')
-  const [timezone, setTimezone] = useState(initial?.timezone ?? 'America/Chicago')
+  const [timezone, setTimezone] = useState(initial?.timezone || 'America/Chicago')
 
-  const [accountOwner, setAccountOwner]             = useState(initial?.accountOwner ?? '')
-  const [recruitmentManager, setRecruitmentManager] = useState(initial?.recruitmentManager ?? '')
-  const [primaryRecruiter, setPrimaryRecruiter]     = useState(initial?.primaryRecruiter ?? '')
+  const states = useMemo(() => State.getStatesOfCountry(countryCode), [countryCode])
+
+  function handleCountryChange(isoCode: string) {
+    setCountryCode(isoCode)
+    setCountry(COUNTRIES.find(c => c.isoCode === isoCode)?.name ?? '')
+    setState('')
+  }
+
+  const [accountOwner, setAccountOwner]             = useState<string[]>(initial?.accountOwner ?? [])
+  const [recruitmentManager, setRecruitmentManager] = useState<string[]>(initial?.recruitmentManager ?? [])
+  const [primaryRecruiter, setPrimaryRecruiter]     = useState<string[]>(initial?.primaryRecruiter ?? [])
+  const [assignedRecruiter, setAssignedRecruiter]   = useState<string[]>(initial?.assignedRecruiters ?? [])
+  const [tenantUsers, setTenantUsers] = useState<TenantUserRow[]>([])
+  useEffect(() => { getTenantUsersAction().then(setTenantUsers) }, [])
 
   const [preferredCommunication, setPreferredCommunication]   = useState(initial?.preferredCommunication ?? 'Email')
   const [preferredSubmissionMethod, setPreferredSubmissionMethod] = useState(initial?.preferredSubmissionMethod ?? 'Email')
@@ -155,9 +214,10 @@ export function ClientForm({ mode, clientId, initial }: {
     fd.set('country', country)
     fd.set('zip', zip)
     fd.set('timezone', timezone)
-    fd.set('account_owner', accountOwner)
-    fd.set('recruitment_manager', recruitmentManager)
-    fd.set('primary_recruiter', primaryRecruiter)
+    fd.set('account_owner', JSON.stringify(accountOwner))
+    fd.set('recruitment_manager', JSON.stringify(recruitmentManager))
+    fd.set('primary_recruiter', JSON.stringify(primaryRecruiter))
+    fd.set('assigned_recruiters', JSON.stringify(assignedRecruiter))
     fd.set('preferred_communication', preferredCommunication)
     fd.set('preferred_submission_method', preferredSubmissionMethod)
     fd.set('preferred_resume_format', preferredResumeFormat)
@@ -176,7 +236,7 @@ export function ClientForm({ mode, clientId, initial }: {
 
   return (
     <div className="h-full overflow-y-auto bg-muted/10">
-      <div className="max-w-[900px] mx-auto px-6 py-6 pb-24">
+      <div className="w-full px-6 py-6 pb-24">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -208,23 +268,23 @@ export function ClientForm({ mode, clientId, initial }: {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel required>Company name</FieldLabel>
-                <FieldInput value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Houston Methodist" />
+                <FieldInput value={name} onChange={e => setName(e.target.value)} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Display name</FieldLabel>
-                <FieldInput value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Shown across the app" />
+                <FieldInput value={displayName} onChange={e => setDisplayName(e.target.value)} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Legal name</FieldLabel>
-                <FieldInput value={legalName} onChange={e => setLegalName(e.target.value)} placeholder="For contracts and invoices" />
+                <FieldInput value={legalName} onChange={e => setLegalName(e.target.value)} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Website</FieldLabel>
-                <FieldInput value={website} onChange={e => setWebsite(e.target.value)} placeholder="e.g. example.com" />
+                <FieldInput value={website} onChange={e => setWebsite(e.target.value)} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Tax ID</FieldLabel>
-                <FieldInput value={taxId} onChange={e => setTaxId(e.target.value)} placeholder="EIN" />
+                <FieldInput value={taxId} onChange={e => setTaxId(e.target.value)} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Company size</FieldLabel>
@@ -255,23 +315,30 @@ export function ClientForm({ mode, clientId, initial }: {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>City</FieldLabel>
-                <FieldInput value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Houston" />
-              </div>
-              <div>
-                <FieldLabel>State</FieldLabel>
-                <FieldInput value={state} onChange={e => setState(e.target.value)} placeholder="e.g. TX" />
-              </div>
-              <div>
-                <FieldLabel>Zip code</FieldLabel>
-                <FieldInput value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g. 77030" />
+                <FieldInput value={city} onChange={e => setCity(e.target.value)} />
               </div>
               <div>
                 <FieldLabel>Country</FieldLabel>
-                <FieldInput value={country} onChange={e => setCountry(e.target.value)} />
+                <FieldSelect value={countryCode} onChange={e => handleCountryChange(e.target.value)}>
+                  {COUNTRIES.map(c => <option key={c.isoCode} value={c.isoCode}>{c.name}</option>)}
+                </FieldSelect>
+              </div>
+              <div>
+                <FieldLabel>State</FieldLabel>
+                <FieldSelect value={state} onChange={e => setState(e.target.value)} disabled={states.length === 0}>
+                  <option value="">{states.length ? 'Select a state' : 'No states available'}</option>
+                  {states.map(s => <option key={s.isoCode} value={s.isoCode}>{s.name}</option>)}
+                </FieldSelect>
+              </div>
+              <div>
+                <FieldLabel>Zip code</FieldLabel>
+                <FieldInput value={zip} onChange={e => setZip(e.target.value)} />
               </div>
               <div>
                 <FieldLabel>Time zone</FieldLabel>
-                <FieldInput value={timezone} onChange={e => setTimezone(e.target.value)} placeholder="e.g. America/Chicago" />
+                <FieldSelect value={timezone} onChange={e => setTimezone(e.target.value)}>
+                  {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                </FieldSelect>
               </div>
             </div>
           </SectionCard>
@@ -280,15 +347,19 @@ export function ClientForm({ mode, clientId, initial }: {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Account owner</FieldLabel>
-                <FieldInput value={accountOwner} onChange={e => setAccountOwner(e.target.value)} placeholder="e.g. Arun Kumar" />
+                <TeamMultiSelect options={tenantUsers} selected={accountOwner} onChange={setAccountOwner} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Recruitment manager</FieldLabel>
-                <FieldInput value={recruitmentManager} onChange={e => setRecruitmentManager(e.target.value)} />
+                <TeamMultiSelect options={tenantUsers} selected={recruitmentManager} onChange={setRecruitmentManager} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Primary recruiter</FieldLabel>
-                <FieldInput value={primaryRecruiter} onChange={e => setPrimaryRecruiter(e.target.value)} />
+                <TeamMultiSelect options={tenantUsers} selected={primaryRecruiter} onChange={setPrimaryRecruiter} />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <FieldLabel>Assigned recruiter</FieldLabel>
+                <TeamMultiSelect options={tenantUsers} selected={assignedRecruiter} onChange={setAssignedRecruiter} />
               </div>
             </div>
           </SectionCard>
@@ -315,12 +386,11 @@ export function ClientForm({ mode, clientId, initial }: {
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <FieldLabel>Preferred interview process</FieldLabel>
-                <FieldInput value={preferredInterviewProcess} onChange={e => setPreferredInterviewProcess(e.target.value)} placeholder="e.g. 2 rounds — phone then panel" />
+                <FieldInput value={preferredInterviewProcess} onChange={e => setPreferredInterviewProcess(e.target.value)} />
               </div>
               <div className="col-span-2">
                 <FieldLabel>Special instructions</FieldLabel>
-                <FieldTextarea value={specialInstructions} onChange={e => setSpecialInstructions(e.target.value)}
-                  rows={3} placeholder="Anything a recruiter should know before submitting a candidate" />
+                <FieldTextarea value={specialInstructions} onChange={e => setSpecialInstructions(e.target.value)} rows={3} />
               </div>
             </div>
           </SectionCard>
@@ -337,7 +407,7 @@ export function ClientForm({ mode, clientId, initial }: {
               </div>
               <div>
                 <FieldLabel>Tags</FieldLabel>
-                <FieldInput value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="Comma-separated, e.g. Hot, VMS" />
+                <FieldInput value={tagsInput} onChange={e => setTagsInput(e.target.value)} />
               </div>
             </div>
           </SectionCard>

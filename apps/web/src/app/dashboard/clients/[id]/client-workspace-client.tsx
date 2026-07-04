@@ -206,8 +206,8 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   const [tAssignedRecruiters, setTAssignedRecruiters] = useState('')
 
   function openTeamDrawer() {
-    setTAccountManager(clientInfo.accountOwner)
-    setTRecruitmentManager(clientInfo.recruitmentManager)
+    setTAccountManager(clientInfo.accountOwner.join(', '))
+    setTRecruitmentManager(clientInfo.recruitmentManager.join(', '))
     setTTeamLead(clientInfo.teamLead)
     setTAssignedRecruiters(clientInfo.assignedRecruiters.join(', '))
     setTeamDrawerOpen(true)
@@ -221,8 +221,8 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
     fd.set('assigned_recruiters', tAssignedRecruiters)
     setClientInfo(c => ({
       ...c,
-      accountOwner: tAccountManager,
-      recruitmentManager: tRecruitmentManager,
+      accountOwner: tAccountManager.split(',').map(s => s.trim()).filter(Boolean),
+      recruitmentManager: tRecruitmentManager.split(',').map(s => s.trim()).filter(Boolean),
       teamLead: tTeamLead,
       assignedRecruiters: tAssignedRecruiters.split(',').map(s => s.trim()).filter(Boolean),
     }))
@@ -587,7 +587,7 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                 <Chip label={clientInfo.industry} className="bg-muted text-muted-foreground border-border" />
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Account owner {clientInfo.accountOwner || '—'}
+                Account owner {clientInfo.accountOwner.join(', ') || '—'}
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">Client since {clientInfo.clientSince} · Last activity {clientInfo.lastActivity}</p>
             </div>
@@ -1112,11 +1112,11 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
           <form onSubmit={submitTeam} className="px-4 py-4 space-y-4 overflow-y-auto">
             <div>
               <FieldLabel>Account manager</FieldLabel>
-              <FieldInput value={tAccountManager} onChange={e => setTAccountManager(e.target.value)} placeholder="e.g. Arun Kumar" />
+              <FieldInput value={tAccountManager} onChange={e => setTAccountManager(e.target.value)} placeholder="Comma-separated, e.g. Arun Kumar, Sarah M." />
             </div>
             <div>
               <FieldLabel>Recruitment manager</FieldLabel>
-              <FieldInput value={tRecruitmentManager} onChange={e => setTRecruitmentManager(e.target.value)} placeholder="e.g. Sarah M." />
+              <FieldInput value={tRecruitmentManager} onChange={e => setTRecruitmentManager(e.target.value)} placeholder="Comma-separated, e.g. Sarah M., Emily T." />
             </div>
             <div>
               <FieldLabel>Team lead</FieldLabel>

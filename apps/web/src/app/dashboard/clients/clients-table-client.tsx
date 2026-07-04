@@ -42,7 +42,7 @@ export function ClientsTableClient({ rows }: { rows: ClientRow[] }) {
   const industries = useMemo(() => Array.from(new Set(rows.map(r => r.client.industry))).sort(), [rows])
 
   const filtered = rows.filter(({ client: c }) => {
-    if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.accountOwner.toLowerCase().includes(search.toLowerCase())) return false
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.accountOwner.some(o => o.toLowerCase().includes(search.toLowerCase()))) return false
     if (industry !== '__all__' && c.industry !== industry) return false
     if (status !== '__all__' && c.status !== status) return false
     return true
@@ -120,7 +120,7 @@ export function ClientsTableClient({ rows }: { rows: ClientRow[] }) {
                 </td>
                 <td className="px-3 py-2 text-secondary-foreground">{c.industry}</td>
                 <td className="px-3 py-2"><Chip label={STATUS_LABEL[c.status]} className={STATUS_BADGE[c.status]} /></td>
-                <td className="px-3 py-2 text-secondary-foreground">{c.accountOwner}</td>
+                <td className="px-3 py-2 text-secondary-foreground">{c.accountOwner.join(', ') || '—'}</td>
                 <td className="px-3 py-2 text-secondary-foreground">{openJobs}</td>
                 <td className="px-3 py-2 text-secondary-foreground">{placements}</td>
                 <td className="px-3 py-2 text-secondary-foreground">{c.lastActivity}</td>

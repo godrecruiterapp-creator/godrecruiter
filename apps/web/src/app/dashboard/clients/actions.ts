@@ -25,6 +25,16 @@ async function logActivity(admin: ReturnType<typeof createAdminClient>, clientId
   })
 }
 
+function parseJsonArray(v: FormDataEntryValue | null): string[] {
+  if (!v) return []
+  try {
+    const arr = JSON.parse(v as string)
+    return Array.isArray(arr) ? arr.filter(Boolean) : []
+  } catch {
+    return []
+  }
+}
+
 // ── Client CRUD ───────────────────────────────────────────────────────────────
 
 export async function createClientAction(formData: FormData) {
@@ -55,9 +65,10 @@ export async function createClientAction(formData: FormData) {
     country: (formData.get('country') as string) || 'USA',
     zip: (formData.get('zip') as string) || null,
     timezone: (formData.get('timezone') as string) || null,
-    account_owner: (formData.get('account_owner') as string) || null,
-    recruitment_manager: (formData.get('recruitment_manager') as string) || null,
-    primary_recruiter: (formData.get('primary_recruiter') as string) || null,
+    account_owner: parseJsonArray(formData.get('account_owner')),
+    recruitment_manager: parseJsonArray(formData.get('recruitment_manager')),
+    primary_recruiter: parseJsonArray(formData.get('primary_recruiter')),
+    assigned_recruiters: parseJsonArray(formData.get('assigned_recruiters')),
     preferred_communication: (formData.get('preferred_communication') as string) || 'Email',
     preferred_submission_method: (formData.get('preferred_submission_method') as string) || 'Email',
     preferred_resume_format: (formData.get('preferred_resume_format') as string) || 'PDF',
@@ -99,9 +110,10 @@ export async function updateClientAction(clientId: string, formData: FormData) {
     country: (formData.get('country') as string) || 'USA',
     zip: (formData.get('zip') as string) || null,
     timezone: (formData.get('timezone') as string) || null,
-    account_owner: (formData.get('account_owner') as string) || null,
-    recruitment_manager: (formData.get('recruitment_manager') as string) || null,
-    primary_recruiter: (formData.get('primary_recruiter') as string) || null,
+    account_owner: parseJsonArray(formData.get('account_owner')),
+    recruitment_manager: parseJsonArray(formData.get('recruitment_manager')),
+    primary_recruiter: parseJsonArray(formData.get('primary_recruiter')),
+    assigned_recruiters: parseJsonArray(formData.get('assigned_recruiters')),
     preferred_communication: (formData.get('preferred_communication') as string) || 'Email',
     preferred_submission_method: (formData.get('preferred_submission_method') as string) || 'Email',
     preferred_resume_format: (formData.get('preferred_resume_format') as string) || 'PDF',
@@ -152,15 +164,14 @@ export async function updateClientTeamAction(clientId: string, formData: FormDat
   const ctx = await getUserContext()
   if (!ctx) return { success: false as const, error: 'Not authenticated.' }
 
-  const assignedRecruiters = (formData.get('assigned_recruiters') as string || '')
-    .split(',').map(s => s.trim()).filter(Boolean)
+  const splitCsv = (v: FormDataEntryValue | null) => (v as string || '').split(',').map(s => s.trim()).filter(Boolean)
 
   const admin = createAdminClient()
   const { error } = await admin.from('clients').update({
-    account_owner: (formData.get('account_owner') as string) || null,
-    recruitment_manager: (formData.get('recruitment_manager') as string) || null,
+    account_owner: splitCsv(formData.get('account_owner')),
+    recruitment_manager: splitCsv(formData.get('recruitment_manager')),
     team_lead: (formData.get('team_lead') as string) || null,
-    assigned_recruiters: assignedRecruiters,
+    assigned_recruiters: splitCsv(formData.get('assigned_recruiters')),
   }).eq('id', clientId).eq('tenant_id', ctx.tenant_id)
 
   if (error) return { success: false as const, error: error.message }
@@ -416,6 +427,28 @@ export async function deleteClientDocumentAction(docId: string) {
   if (doc?.storage_path) await admin.storage.from('client-documents').remove([doc.storage_path])
   await admin.from('client_documents').delete().eq('id', docId)
   return { success: true as const }
+}
+
+// ── Tenant team members (for Account owner / Recruitment manager / etc pickers) ─
+
+export type TenantUserRow = { id: string; name: string }
+
+export async function getTenantUsersAction(): Promise<TenantUserRow[]> {
+  const ctx = await getUserContext()
+  if (!ctx) return []
+  const admin = createAdminClient()
+
+  const { data } = await admin
+    .from('platform_user_tenants')
+    .select('platform_users!platform_user_tenants_platform_user_id_fkey(id, full_name)')
+    .eq('tenant_id', ctx.tenant_id)
+    .eq('is_active', true)
+
+  return (data ?? [])
+    .map((r: any) => Array.isArray(r.platform_users) ? r.platform_users[0] : r.platform_users)
+    .filter(Boolean)
+    .map((u: any) => ({ id: u.id, name: u.full_name }))
+    .sort((a, b) => a.name.localeCompare(b.name))
 }
 
 // ── Client picker for the "New job" autofill (client name → city/state/contact) ─
