@@ -60,7 +60,7 @@ export default function SettingsDashboard() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search settings…"
-          className="w-full h-10 pl-10 pr-4 text-sm rounded-xl border border-input bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus:bg-background transition-all"
+          className="w-full h-10 pl-10 pr-4 text-sm rounded-xl border border-input bg-muted/40 focus-visible:outline-none focus-visible:border-[#D1D5DB] focus:bg-background transition-all"
         />
       </div>
 

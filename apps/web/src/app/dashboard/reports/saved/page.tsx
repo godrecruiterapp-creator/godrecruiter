@@ -49,7 +49,7 @@ export default function SavedReports() {
       <div className="relative max-w-sm">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
         <input
-          className="h-8 w-full pl-8 pr-3 text-sm border rounded-md bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-8 w-full pl-8 pr-3 text-sm border rounded-md bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]"
           placeholder="Search saved reports..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}

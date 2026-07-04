@@ -186,7 +186,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
               <input
                 value={name} onChange={e => setName(e.target.value)}
                 placeholder="e.g. Morning Dashboard"
-                className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]"
               />
             </div>
 
@@ -197,7 +197,7 @@ function CreateView({ onClose, onBack }: { onClose: () => void; onBack: () => vo
                 value={desc} onChange={e => setDesc(e.target.value)}
                 placeholder="What is this dashboard for?"
                 rows={2}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB] resize-none"
               />
             </div>
 
@@ -462,7 +462,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
                   value={w.size}
                   onChange={e => resizeWidget(w.id, e.target.value as DashboardWidget['size'])}
                   onClick={e => e.stopPropagation()}
-                  className="h-6 px-1.5 text-[10px] rounded border border-border bg-background text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  className="h-6 px-1.5 text-[10px] rounded border border-border bg-background text-muted-foreground focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                   {(['small','medium','large','full'] as const).map(s => (
                     <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
                   ))}
@@ -501,7 +501,7 @@ function CustomizeView({ onClose, onBack }: { onClose: () => void; onBack: () =>
               <input
                 value={libSearch} onChange={e => setLibSearch(e.target.value)}
                 placeholder="Search sections…"
-                className="w-full h-9 pl-8 pr-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-full h-9 pl-8 pr-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]"
               />
             </div>
 
@@ -608,7 +608,7 @@ function AIBuilderView({ onClose, onBack }: { onClose: () => void; onBack: () =>
           <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">Dashboard Name <span className="font-normal normal-case">(optional)</span></label>
           <input value={name} onChange={e => setName(e.target.value)}
             placeholder={role ? `${role} Dashboard` : 'e.g. Morning Dashboard'}
-            className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
         </div>
 
         {role && (
@@ -664,7 +664,7 @@ function DuplicateView({ onClose, onBack }: { onClose: () => void; onBack: () =>
         <div>
           <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">New Dashboard Name</label>
           <input value={name} onChange={e => setName(e.target.value)}
-            className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            className="w-full h-10 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
         </div>
         <p className="text-sm text-muted-foreground">All sections and settings will be copied. The original dashboard will not be changed.</p>
       </div>

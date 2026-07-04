@@ -477,7 +477,7 @@ export default function PlacementsPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Search placements…"
-                    className="h-9 pl-8 pr-3 text-sm w-56 rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="h-9 pl-8 pr-3 text-sm w-56 rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]"
                   />
                 </div>
                 <button className="h-9 px-4 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors flex items-center gap-1.5 font-medium">

@@ -689,12 +689,12 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">From</span>
                   <input type="date" value={draft.dateFrom} onChange={e => setDraftField('dateFrom', e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">To</span>
                   <input type="date" value={draft.dateTo} onChange={e => setDraftField('dateTo', e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                 </div>
               </div>
             </div>

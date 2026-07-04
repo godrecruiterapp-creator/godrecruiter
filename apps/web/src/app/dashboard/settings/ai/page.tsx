@@ -52,7 +52,7 @@ export default function AISettingsPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Provider</label>
               <select value={provider} onChange={e => setProvider(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>Anthropic</option>
                 <option>OpenAI</option>
                 <option>Azure OpenAI</option>
@@ -61,7 +61,7 @@ export default function AISettingsPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Model</label>
               <select value={model} onChange={e => setModel(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
                 <option value="claude-opus-4-8">Claude Opus 4.8</option>
                 <option value="claude-haiku-4-5">Claude Haiku 4.5</option>
@@ -74,7 +74,7 @@ export default function AISettingsPage() {
                   type={showKey ? 'text' : 'password'}
                   value={apiKey}
                   onChange={e => setApiKey(e.target.value)}
-                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono"
+                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB] font-mono"
                 />
                 <button onClick={() => setShowKey(s => !s)}
                   className="h-9 px-3 text-sm rounded-lg border border-border hover:bg-muted/60 transition-colors">
@@ -190,7 +190,7 @@ export default function AISettingsPage() {
         >
           <div className="space-y-3">
             <CardRow label="Monthly token limit" description="Hard cap per billing period">
-              <select defaultValue="1m" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="1m" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option value="500k">500K tokens</option>
                 <option value="1m">1M tokens</option>
                 <option value="5m">5M tokens</option>

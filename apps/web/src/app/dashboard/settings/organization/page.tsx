@@ -56,12 +56,12 @@ export default function OrganizationPage() {
             <div className="col-span-2 space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Company name</label>
               <input value={name} onChange={e => setName(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Industry</label>
               <select value={industry} onChange={e => setIndustry(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>Staffing & Recruiting</option>
                 <option>Healthcare Staffing</option>
                 <option>IT Staffing</option>
@@ -71,7 +71,7 @@ export default function OrganizationPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Company size</label>
               <select value={size} onChange={e => setSize(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>1–10 employees</option>
                 <option>11–50 employees</option>
                 <option>51–200 employees</option>
@@ -81,12 +81,12 @@ export default function OrganizationPage() {
             <div className="col-span-2 space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Website</label>
               <input value={website} onChange={e => setWebsite(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Timezone</label>
               <select value={timezone} onChange={e => setTimezone(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>America/Chicago (CST)</option>
                 <option>America/New_York (EST)</option>
                 <option>America/Denver (MST)</option>
@@ -96,7 +96,7 @@ export default function OrganizationPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Language</label>
               <select value={language} onChange={e => setLanguage(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>English (US)</option>
                 <option>English (UK)</option>
                 <option>Spanish</option>
@@ -121,33 +121,33 @@ export default function OrganizationPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Phone</label>
               <input value={phone} onChange={e => setPhone(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Email</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
             <div className="col-span-2 space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Street address</label>
               <input value={address} onChange={e => setAddress(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">City</label>
               <input value={city} onChange={e => setCity(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">State</label>
                 <input value={state} onChange={e => setState(e.target.value)}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">ZIP</label>
                 <input value={zip} onChange={e => setZip(e.target.value)}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
               </div>
             </div>
           </div>
@@ -182,10 +182,10 @@ export default function OrganizationPage() {
               <div key={l.id} className="flex items-center gap-2">
                 <input value={l.name} onChange={e => setLocations(p => p.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
                   placeholder="Office name"
-                  className="w-36 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                  className="w-36 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                 <input value={l.address} onChange={e => setLocations(p => p.map((x, j) => j === i ? { ...x, address: e.target.value } : x))}
                   placeholder="Address"
-                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                 <button onClick={() => setLocations(p => p.filter((_, j) => j !== i))}
                   className="p-2 text-muted-foreground hover:text-red-600 transition-colors">
                   <Trash2 className="size-3.5" />
@@ -224,11 +224,11 @@ export default function OrganizationPage() {
                   <div className="flex items-center gap-2 text-sm">
                     <input type="time" value={h.start}
                       onChange={e => setHours(p => p.map((x, j) => j === i ? { ...x, start: e.target.value } : x))}
-                      className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                      className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                     <span className="text-muted-foreground text-sm">to</span>
                     <input type="time" value={h.end}
                       onChange={e => setHours(p => p.map((x, j) => j === i ? { ...x, end: e.target.value } : x))}
-                      className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                      className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                   </div>
                 ) : (
                   <span className="text-sm text-muted-foreground">Closed</span>
@@ -254,7 +254,7 @@ export default function OrganizationPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Currency</label>
-              <select defaultValue="USD" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="USD" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
                 <option value="GBP">GBP (£)</option>
@@ -262,7 +262,7 @@ export default function OrganizationPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Date format</label>
-              <select defaultValue="mdy" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="mdy" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option value="mdy">MM/DD/YYYY</option>
                 <option value="dmy">DD/MM/YYYY</option>
                 <option value="ymd">YYYY-MM-DD</option>
@@ -270,7 +270,7 @@ export default function OrganizationPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Fiscal year starts</label>
-              <select defaultValue="jan" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="jan" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m => (
                   <option key={m} value={m.toLowerCase()}>{m}</option>
                 ))}
@@ -278,7 +278,7 @@ export default function OrganizationPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Work week starts</label>
-              <select defaultValue="mon" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="mon" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option value="mon">Monday</option>
                 <option value="sun">Sunday</option>
               </select>

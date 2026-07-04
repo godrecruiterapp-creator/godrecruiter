@@ -42,7 +42,7 @@ function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInput
   return (
     <input {...props} className={cn(
       'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
       'placeholder:text-muted-foreground transition-colors',
       className
     )} />
@@ -53,7 +53,7 @@ function FieldTextarea({ className, ...props }: React.TextareaHTMLAttributes<HTM
   return (
     <textarea {...props} className={cn(
       'w-full px-3 py-2 text-sm rounded-lg border border-border bg-background ring-offset-background resize-none',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
       'placeholder:text-muted-foreground transition-colors',
       className
     )} />
@@ -64,7 +64,7 @@ function FieldSelect({ className, children, ...props }: React.SelectHTMLAttribut
   return (
     <select {...props} className={cn(
       'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
       'transition-colors appearance-none cursor-pointer',
       className
     )}>
@@ -86,7 +86,7 @@ function TeamMultiSelect({ options, selected, onChange }: {
       <PopoverTrigger asChild>
         <button type="button" className={cn(
           'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
           'flex items-center justify-between gap-2 text-left transition-colors',
         )}>
           <span className={cn('truncate', selected.length === 0 && 'text-muted-foreground')}>
@@ -113,10 +113,10 @@ function TypeBtn({ label, active, onClick }: { label: string; active: boolean; o
   return (
     <button type="button" onClick={onClick}
       className={cn(
-        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border-2 transition-all text-center ring-offset-background',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border transition-all text-center',
+        'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
         active
-          ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
+          ? 'border-foreground bg-background text-foreground font-semibold'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground'
       )}>
       {label}

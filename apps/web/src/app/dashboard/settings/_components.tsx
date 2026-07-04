@@ -101,7 +101,7 @@ export function FieldInput({ label, value, onChange, placeholder, type = 'text' 
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
       <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-shadow" />
+        className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background ring-offset-background focus-visible:outline-none focus-visible:border-[#D1D5DB] transition-shadow" />
     </div>
   )
 }
@@ -113,7 +113,7 @@ export function FieldSelect({ label, value, onChange, options }: {
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-shadow">
+        className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background ring-offset-background focus-visible:outline-none focus-visible:border-[#D1D5DB] transition-shadow">
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

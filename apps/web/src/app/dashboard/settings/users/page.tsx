@@ -39,11 +39,11 @@ function InviteModal({ onClose }: { onClose: () => void }) {
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-muted-foreground">Email address</label>
             <input placeholder="colleague@company.com"
-              className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+              className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-muted-foreground">Role</label>
-            <select className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <select className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
               <option>Recruiter</option>
               <option>Team Lead</option>
               <option>Manager</option>
@@ -52,7 +52,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-muted-foreground">Department</label>
-            <select className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <select className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
               <option>Healthcare Recruitment</option>
               <option>IT Staffing</option>
               <option>Finance & Accounting</option>
@@ -103,7 +103,7 @@ export default function UsersPage() {
             <div className="relative max-w-xs">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search users…"
-                className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -211,12 +211,12 @@ export default function UsersPage() {
                     <td className="px-5 py-3 text-center">
                       <input type="number" value={r.warn} min={1} max={r.max}
                         onChange={e => setCapacity(c => c.map((x, j) => j === i ? { ...x, warn: +e.target.value } : x))}
-                        className="w-16 h-7 text-center text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                        className="w-16 h-7 text-center text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                     </td>
                     <td className="px-5 py-3 text-center">
                       <input type="number" value={r.max} min={1}
                         onChange={e => setCapacity(c => c.map((x, j) => j === i ? { ...x, max: +e.target.value } : x))}
-                        className="w-16 h-7 text-center text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                        className="w-16 h-7 text-center text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]" />
                     </td>
                   </tr>
                 ))}
@@ -239,21 +239,21 @@ export default function UsersPage() {
         >
           <div className="space-y-3">
             <CardRow label="Default role" description="Role assigned when a new user accepts their invite">
-              <select defaultValue="Recruiter" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="Recruiter" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>Recruiter</option>
                 <option>Team Lead</option>
                 <option>Manager</option>
               </select>
             </CardRow>
             <CardRow label="Default dashboard">
-              <select defaultValue="Dashboard" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="Dashboard" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option>Dashboard</option>
                 <option>Jobs</option>
                 <option>Candidates</option>
               </select>
             </CardRow>
             <CardRow label="Online status visibility">
-              <select defaultValue="auto" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select defaultValue="auto" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]">
                 <option value="auto">Auto (based on login)</option>
                 <option value="always">Always show online</option>
                 <option value="off">Do not show</option>

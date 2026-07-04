@@ -75,7 +75,7 @@ function FInput({ className, highlighted, ...props }: React.InputHTMLAttributes<
   return (
     <input {...props} className={cn(
       'w-full h-9 px-3 text-sm rounded-lg border bg-background ring-offset-background',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
       'placeholder:text-muted-foreground transition-colors',
       highlighted ? 'border-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20' : 'border-border',
       className
@@ -87,7 +87,7 @@ function FSelect({ className, children, ...props }: React.SelectHTMLAttributes<H
   return (
     <select {...props} className={cn(
       'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background appearance-none cursor-pointer',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors',
+      'focus-visible:outline-none focus-visible:border-[#D1D5DB] transition-colors',
       className
     )}>{children}</select>
   )
@@ -117,8 +117,9 @@ function PillToggle({ label, active, onClick }: { label: string; active: boolean
     <button type="button" onClick={onClick}
       className={cn(
         'h-8 px-3 text-sm font-medium rounded-lg border transition-all',
+        'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
         active
-          ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
+          ? 'border-foreground bg-background text-foreground font-semibold'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
       )}>
       {active && <Check className="size-3 inline mr-1" />}{label}
@@ -323,7 +324,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
               value={quickInput}
               onChange={e => setQuickInput(e.target.value)}
               placeholder="Enter email or phone number…"
-              className="w-full h-9 pl-9 pr-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-full h-9 pl-9 pr-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]"
               autoFocus
             />
           </div>
@@ -357,7 +358,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             onChange={e => setQuickInput(e.target.value)}
             placeholder="Paste the full resume text here…"
             rows={8}
-            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground"
+            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:border-[#D1D5DB] resize-none placeholder:text-muted-foreground"
             autoFocus
           />
           <button
@@ -384,7 +385,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             value={linkedinUrl}
             onChange={e => setLinkedinUrl(e.target.value)}
             placeholder="https://www.linkedin.com/in/…"
-            className="w-full h-9 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="w-full h-9 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:border-[#D1D5DB]"
             autoFocus
           />
           <textarea
@@ -392,7 +393,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             onChange={e => setQuickInput(e.target.value)}
             placeholder="Paste the profile's About / Experience / Skills text here…"
             rows={7}
-            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground"
+            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:border-[#D1D5DB] resize-none placeholder:text-muted-foreground"
           />
           <button
             type="button"
@@ -830,7 +831,7 @@ export default function NewCandidatePage() {
                   <textarea
                     rows={3} value={summary} onChange={e => setSummary(e.target.value)}
                     placeholder="Brief summary of the candidate's background, key strengths, and career goals…"
-                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground transition-colors"
+                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:border-[#D1D5DB] resize-none placeholder:text-muted-foreground transition-colors"
                   />
                 </div>
               </SectionCard>
@@ -892,8 +893,9 @@ export default function NewCandidatePage() {
                     {(['hourly', 'salary'] as const).map(t => (
                       <button key={t} type="button" onClick={() => setPayType(t)}
                         className={cn(
-                          'flex-1 h-9 text-sm font-semibold rounded-xl border-2 capitalize transition-all',
-                          payType === t ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
+                          'flex-1 h-9 text-sm font-semibold rounded-xl border capitalize transition-all',
+                          'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
+                          payType === t ? 'border-foreground bg-background text-foreground'
                                         : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
                         )}>
                         {t === 'hourly' ? '$/hr — Contract' : '$/year — Direct Hire'}
@@ -932,9 +934,10 @@ export default function NewCandidatePage() {
                     {WORK_AUTH_OPTIONS.map(a => (
                       <button key={a} type="button" onClick={() => setWorkAuth(a === workAuth ? '' : a)}
                         className={cn(
-                          'h-8 px-3 text-sm font-medium rounded-lg border-2 transition-all',
+                          'h-8 px-3 text-sm font-medium rounded-lg border transition-all',
+                          'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
                           workAuth === a
-                            ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
+                            ? 'border-foreground bg-background text-foreground'
                             : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
                         )}>
                         {workAuth === a && <Check className="size-3 inline mr-1" />}{a}
@@ -1000,14 +1003,15 @@ export default function NewCandidatePage() {
                     {CANDIDATE_STATUS_OPTIONS.map(s => (
                       <button key={s.value} type="button" onClick={() => setStatus(s.value)}
                         className={cn(
-                          'flex items-start gap-2 p-3 rounded-xl border-2 text-left transition-all',
+                          'flex items-start gap-2 p-3 rounded-xl border text-left transition-all',
+                          'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
                           status === s.value
-                            ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15]'
+                            ? 'border-foreground bg-background'
                             : 'border-border bg-background hover:border-muted-foreground/40'
                         )}>
-                        <div className={cn('mt-0.5 size-3.5 rounded-full shrink-0 border-2', status === s.value ? 'bg-[#dd7456] border-[#dd7456]' : 'border-muted-foreground/40')} />
+                        <div className={cn('mt-0.5 size-3.5 rounded-full shrink-0 border-2', status === s.value ? 'bg-foreground border-foreground' : 'border-muted-foreground/40')} />
                         <div>
-                          <p className={cn('text-sm font-semibold', status === s.value ? 'text-[#dd7456]' : 'text-foreground')}>{s.label}</p>
+                          <p className="text-sm font-semibold text-foreground">{s.label}</p>
                           <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
                         </div>
                       </button>
@@ -1039,7 +1043,7 @@ export default function NewCandidatePage() {
                   <textarea
                     rows={3} value={notes} onChange={e => setNotes(e.target.value)}
                     placeholder="Call notes, interview feedback, referral context, anything your team should know…"
-                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground transition-colors"
+                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:border-[#D1D5DB] resize-none placeholder:text-muted-foreground transition-colors"
                   />
                 </div>
               </SectionCard>
