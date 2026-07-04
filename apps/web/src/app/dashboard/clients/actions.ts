@@ -451,6 +451,7 @@ export async function getTenantUsersAction(): Promise<TenantUserRow[]> {
 export type ClientAutofillRow = {
   id: string; name: string; city: string; state: string
   companyType: 'direct' | 'vms'; hiringManager: string
+  industry: string; assignedRecruiters: string[]
 }
 
 export async function getClientsAutofillAction(): Promise<ClientAutofillRow[]> {
@@ -460,7 +461,7 @@ export async function getClientsAutofillAction(): Promise<ClientAutofillRow[]> {
 
   const { data: clients } = await admin
     .from('clients')
-    .select('id, name, city, state, company_type')
+    .select('id, name, city, state, company_type, industry, assigned_recruiters')
     .eq('tenant_id', ctx.tenant_id)
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
@@ -477,5 +478,6 @@ export async function getClientsAutofillAction(): Promise<ClientAutofillRow[]> {
   return clients.map(c => ({
     id: c.id, name: c.name, city: c.city ?? '', state: c.state ?? '',
     companyType: c.company_type, hiringManager: primaryByClient.get(c.id) ?? '',
+    industry: c.industry ?? '', assignedRecruiters: c.assigned_recruiters ?? [],
   }))
 }

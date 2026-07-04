@@ -181,6 +181,30 @@ export async function bulkDeleteJobsAction(jobIds: string[]) {
   return { success: true }
 }
 
+// ── Job picker for "Copy Existing Job" on the New Job page ──────────────────────
+
+export type JobCopyRow = {
+  id: string; title: string; client: string | null; city: string | null; state: string | null
+  department: string | null; employment_type: string | null; work_mode: string | null
+  client_type: string | null; openings: number | null; recruiter_name: string | null
+  priority: string | null; description: string | null; requirements: string | null
+  salary_min: number | null; salary_max: number | null
+}
+
+export async function getJobsForCopyAction(): Promise<JobCopyRow[]> {
+  const ctx = await getUserContext()
+  if (!ctx) return []
+  const admin = createAdminClient()
+  const { data } = await admin
+    .from('jobs')
+    .select('id, title, client, city, state, department, employment_type, work_mode, client_type, openings, recruiter_name, priority, description, requirements, salary_min, salary_max')
+    .eq('tenant_id', ctx.tenant_id)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  return data ?? []
+}
+
 // ── Notes ──────────────────────────────────────────────────────────────────────
 
 async function getUserContext() {

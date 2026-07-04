@@ -3,13 +3,14 @@
 import { useState, useTransition, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { createJobAction } from '../actions'
+import { createJobAction, getJobsForCopyAction, type JobCopyRow } from '../actions'
 import { getClientsAutofillAction, type ClientAutofillRow } from '../../clients/actions'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   ArrowLeft, Sparkles, Users, Building2, MapPin,
   DollarSign, FileText, User, Plus, X, CheckCircle2,
   Briefcase, Clock, GraduationCap, Shield, AlertCircle,
-  Copy, ChevronDown, Zap, Star, RefreshCw, Search,
+  Copy, ChevronDown, Zap, Star, RefreshCw, Search, LayoutTemplate,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -43,6 +44,66 @@ type JobType  = 'contract' | 'direct_hire' | 'cth'
 type WorkMode = 'onsite'   | 'hybrid'      | 'remote'
 type TaxTerm  = 'w2'       | 'c2c'         | '1099'   | ''
 type Priority = 'high'     | 'medium'      | 'low'
+
+// ─── Job templates (static presets — no template table needed for a fixed list) ─
+
+type JobTemplate = {
+  name: string; title: string; jobType: JobType; workMode: WorkMode; taxTerm: TaxTerm
+  duration?: string; department?: string; education?: string
+  mustHave: string[]; niceToHave?: string[]; description: string
+}
+
+const JOB_TEMPLATES: JobTemplate[] = [
+  {
+    name: 'Travel RN (ICU)', title: 'Travel RN (ICU)', jobType: 'contract', workMode: 'onsite', taxTerm: 'w2',
+    duration: '3 months', department: 'ICU', education: 'RN / BSN',
+    mustHave: ['RN License', 'BLS', 'ACLS', 'ICU Experience'],
+    description: 'Travel RN needed for a busy ICU. 13-week contract, day/night rotation, weekly pay.',
+  },
+  {
+    name: 'Senior Java Developer', title: 'Senior Java Developer', jobType: 'contract', workMode: 'hybrid', taxTerm: 'c2c',
+    duration: '6 months', department: 'Engineering', education: "Bachelor's Degree",
+    mustHave: ['Java', 'Spring Boot', 'Microservices', 'AWS'],
+    description: 'Senior Java engineer to build and maintain backend microservices on AWS.',
+  },
+  {
+    name: 'DevOps Engineer', title: 'DevOps Engineer', jobType: 'direct_hire', workMode: 'remote', taxTerm: '',
+    department: 'Engineering', education: "Bachelor's Degree",
+    mustHave: ['CI/CD', 'Docker', 'Kubernetes', 'AWS'],
+    description: 'DevOps engineer to own CI/CD pipelines and cloud infrastructure end to end.',
+  },
+  {
+    name: 'Data Engineer', title: 'Data Engineer', jobType: 'contract', workMode: 'remote', taxTerm: 'w2',
+    duration: '12 months', department: 'Engineering', education: "Bachelor's Degree",
+    mustHave: ['Python', 'SQL', 'Spark', 'ETL'],
+    description: 'Data engineer to build and maintain ETL pipelines feeding the analytics warehouse.',
+  },
+]
+
+// Reverses the `${jobType}_${taxTerm}` encoding createJobAction writes to `employment_type`.
+function parseEmploymentType(v: string): { jobType: JobType; taxTerm: TaxTerm } {
+  if (v === 'direct_hire') return { jobType: 'direct_hire', taxTerm: '' }
+  const m = v.match(/^(contract|cth)_(w2|c2c|1099)$/)
+  if (m) return { jobType: m[1] as JobType, taxTerm: m[2] as TaxTerm }
+  if (v === 'contract' || v === 'cth') return { jobType: v as JobType, taxTerm: '' }
+  return { jobType: 'contract', taxTerm: 'w2' }
+}
+
+// Reverses the "Label: value" lines handleSubmit joins into `requirements`.
+function parseRequirements(text: string) {
+  const lines = (text || '').split('\n')
+  const get = (label: string) => lines.find(l => l.startsWith(`${label}:`))?.slice(label.length + 1).trim() ?? ''
+  const list = (label: string) => { const v = get(label); return v ? v.split(',').map(s => s.trim()).filter(Boolean) : [] }
+  return {
+    hiringManager: get('Hiring Manager'),
+    duration: get('Duration'),
+    experience: get('Experience Required').replace(/\+ years$/, ''),
+    mustHave: list('Must-Have Skills'),
+    niceToHave: list('Nice to Have'),
+    workAuth: list('Work Authorization'),
+    education: get('Education'),
+  }
+}
 
 // ─── Small components ─────────────────────────────────────────────────────────
 
@@ -210,7 +271,7 @@ function SmartCombobox({ value, onChange, options, placeholder, onSelect }: {
         <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
       </div>
       {open && filtered.length > 0 && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-xl shadow-lg overflow-hidden">
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-background border border-border rounded-xl shadow-lg">
           {filtered.slice(0, 8).map(o => (
             <button key={o} type="button"
               onMouseDown={() => { onChange(o); onSelect?.(o); setOpen(false) }}
@@ -367,8 +428,15 @@ export default function NewJobPage() {
   function clientAutofill(name: string) {
     const c = clients.find(c => c.name === name)
     if (!c) return null
-    return { city: c.city, state: c.state, hiringManager: c.hiringManager, clientType: c.companyType }
+    return {
+      city: c.city, state: c.state, hiringManager: c.hiringManager, clientType: c.companyType,
+      industry: c.industry, assignedRecruiters: c.assignedRecruiters,
+    }
   }
+
+  // Existing jobs, for the "Copy Existing Job" picker
+  const [existingJobs, setExistingJobs] = useState<JobCopyRow[]>([])
+  useEffect(() => { getJobsForCopyAction().then(setExistingJobs) }, [])
 
   // ── Core fields
   const [title,         setTitle]        = useState('')
@@ -414,7 +482,20 @@ export default function NewJobPage() {
   const [isPending,     startTransition] = useTransition()
   const [errors,        setErrors]       = useState<string[]>([])
 
+  // ── Template / Copy pickers
+  const [templateOpen,  setTemplateOpen] = useState(false)
+  const [copyOpen,      setCopyOpen]     = useState(false)
+  const [copyQuery,     setCopyQuery]    = useState('')
+
   const isContract = jobType === 'contract' || jobType === 'cth'
+
+  // Recruiter options: the client's assigned recruiter(s) plus the static recent list,
+  // so an auto-filled name always has a matching <option>.
+  const recruiterOptions = useMemo(() => {
+    const clientRecruiters = clientAutofill(client)?.assignedRecruiters ?? []
+    return Array.from(new Set([...clientRecruiters, ...RECENT_RECRUITERS]))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, clients])
 
   // Skill suggestions based on title
   const skillSuggestions = useMemo(() => {
@@ -436,7 +517,65 @@ export default function NewJobPage() {
       setStateVal(fill.state)
       if (fill.hiringManager) setHiringManager(fill.hiringManager)
       setClientType(fill.clientType)
+      if (fill.industry) setDepartment(fill.industry)
+      if (fill.assignedRecruiters.length) setRecruiter(fill.assignedRecruiters[0]!)
     }
+  }
+
+  // Apply a static job template
+  const applyTemplate = (t: JobTemplate) => {
+    setTitle(t.title)
+    setJobType(t.jobType)
+    setWorkMode(t.workMode)
+    setTaxTerm(t.taxTerm)
+    if (t.duration) setDuration(t.duration)
+    if (t.department) setDepartment(t.department)
+    if (t.education) setEducation(t.education)
+    setMustHave(t.mustHave)
+    setNiceToHave(t.niceToHave ?? [])
+    setDescription(t.description)
+    setTemplateOpen(false)
+  }
+
+  // Copy an existing job's fields onto this form
+  const applyExistingJob = (job: JobCopyRow) => {
+    setTitle(`${job.title} (Copy)`)
+    setClient(job.client ?? '')
+    setCity(job.city ?? '')
+    setStateVal(job.state ?? '')
+    setDepartment(job.department ?? '')
+    setClientType(job.client_type === 'vms' ? 'vms' : 'direct')
+    setWorkMode((['onsite', 'hybrid', 'remote'] as const).includes(job.work_mode as WorkMode) ? (job.work_mode as WorkMode) : 'onsite')
+    const { jobType: jt, taxTerm: tt } = parseEmploymentType(job.employment_type ?? '')
+    setJobType(jt)
+    setTaxTerm(tt)
+    setOpenings(String(job.openings ?? 1))
+    setRecruiter(job.recruiter_name ?? '')
+    setPriority((['high', 'medium', 'low'] as const).includes(job.priority as Priority) ? (job.priority as Priority) : 'medium')
+    setDescription(job.description ?? '')
+
+    const req = parseRequirements(job.requirements ?? '')
+    setHiringManager(req.hiringManager)
+    setDuration(req.duration)
+    setExperience(req.experience)
+    setMustHave(req.mustHave)
+    setNiceToHave(req.niceToHave)
+    setWorkAuth(req.workAuth)
+    setEducation(req.education)
+    // Dates are job-instance specific (likely stale on an old job) — leave blank for the copy.
+    setStartDate('')
+    setDeadline('')
+
+    if (jt === 'contract' || jt === 'cth') {
+      setPayRate(job.salary_min != null ? String(job.salary_min / 100) : '')
+      setBillRate(job.salary_max != null ? String(job.salary_max / 100) : '')
+    } else {
+      setSalaryMin(job.salary_min != null ? String(job.salary_min / 100) : '')
+      setSalaryMax(job.salary_max != null ? String(job.salary_max / 100) : '')
+    }
+
+    setCopyOpen(false)
+    setCopyQuery('')
   }
 
   // Pre-fill client from the Client Workspace's "Post job" quick action.
@@ -558,14 +697,58 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button type="button"
-              className="h-8 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground">
-              Use Template
-            </button>
-            <button type="button"
-              className="h-8 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground flex items-center gap-1.5">
-              <Copy className="size-3.5" />Copy Existing Job
-            </button>
+            <Popover open={templateOpen} onOpenChange={setTemplateOpen}>
+              <PopoverTrigger asChild>
+                <button type="button"
+                  className="h-8 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground flex items-center gap-1.5">
+                  <LayoutTemplate className="size-3.5" />Use Template
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 p-1 max-h-80 overflow-y-auto">
+                {JOB_TEMPLATES.map(t => (
+                  <button key={t.name} type="button" onClick={() => applyTemplate(t)}
+                    className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/60 transition-colors">
+                    <span className="block text-sm font-medium">{t.name}</span>
+                    <span className="block text-[11px] text-muted-foreground">
+                      {t.jobType === 'contract' ? 'Contract' : t.jobType === 'direct_hire' ? 'Direct Hire' : 'Contract to Hire'}
+                      {t.department ? ` · ${t.department}` : ''}
+                    </span>
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+
+            <Popover open={copyOpen} onOpenChange={o => { setCopyOpen(o); if (!o) setCopyQuery('') }}>
+              <PopoverTrigger asChild>
+                <button type="button"
+                  className="h-8 px-4 text-sm rounded-lg border border-border bg-background hover:bg-muted/60 transition-colors font-medium text-muted-foreground flex items-center gap-1.5">
+                  <Copy className="size-3.5" />Copy Existing Job
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-2">
+                <FieldInput
+                  autoFocus
+                  value={copyQuery}
+                  onChange={e => setCopyQuery(e.target.value)}
+                  placeholder="Search jobs by title or client…"
+                  className="mb-2"
+                />
+                <div className="max-h-72 overflow-y-auto space-y-0.5">
+                  {existingJobs.length === 0 ? (
+                    <p className="text-sm text-muted-foreground px-2 py-2">No existing jobs to copy from.</p>
+                  ) : existingJobs
+                      .filter(j => `${j.title} ${j.client ?? ''}`.toLowerCase().includes(copyQuery.toLowerCase()))
+                      .slice(0, 30)
+                      .map(j => (
+                        <button key={j.id} type="button" onClick={() => applyExistingJob(j)}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/60 transition-colors">
+                          <span className="block text-sm font-medium truncate">{j.title}</span>
+                          <span className="block text-[11px] text-muted-foreground truncate">{j.client || '—'}</span>
+                        </button>
+                      ))}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
@@ -661,6 +844,11 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       onChange={e => setDepartment(e.target.value)}
                       placeholder="e.g. ICU, Engineering, Finance"
                     />
+                    {client && clientAutofill(client)?.industry && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Auto-filled from {client}&apos;s industry: {clientAutofill(client)!.industry}
+                      </p>
+                    )}
                   </div>
                 </div>
               </SectionCard>
@@ -933,8 +1121,13 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     <FieldLabel>Assigned Recruiter</FieldLabel>
                     <FieldSelect value={recruiter} onChange={e => setRecruiter(e.target.value)}>
                       <option value="">— Assign recruiter —</option>
-                      {RECENT_RECRUITERS.map(r => <option key={r} value={r}>{r}</option>)}
+                      {recruiterOptions.map(r => <option key={r} value={r}>{r}</option>)}
                     </FieldSelect>
+                    {client && !!clientAutofill(client)?.assignedRecruiters.length && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Auto-filled from {client}&apos;s assigned recruiter
+                      </p>
+                    )}
                   </div>
                   <div>
                     <FieldLabel># of Openings</FieldLabel>
