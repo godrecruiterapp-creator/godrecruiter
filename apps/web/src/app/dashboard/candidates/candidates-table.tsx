@@ -464,7 +464,7 @@ function AddInterviewDialog({ candidateId, jobs, onClose, onCreated }: {
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Notes</Label>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-              className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground" />
+              className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring placeholder:text-muted-foreground" />
           </div>
         </div>
         <DialogFooter>
@@ -797,7 +797,7 @@ function CandidatePreviewSheet({
                     onChange={e => setNoteText(e.target.value)}
                     placeholder="Add a note…"
                     rows={3}
-                    className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground"
+                    className="w-full text-sm border border-border rounded-md px-3 py-2 resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring placeholder:text-muted-foreground"
                   />
                   <div className="flex justify-end gap-2 mt-2">
                     <Button variant="outline" size="sm" onClick={() => { setAddNoteOpen(false); setNoteText('') }} className="h-7 text-sm">
@@ -1185,7 +1185,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
                 <input autoFocus value={viewName} onChange={e => setViewName(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') saveView(); if (e.key === 'Escape') setSavingView(false) }}
                   placeholder="View name…"
-                  className="h-8 w-28 px-2.5 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-brand" />
+                  className="h-8 w-28 px-2.5 text-sm border border-border rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 <button onClick={saveView} disabled={!viewName.trim()} className="h-8 px-2.5 text-sm bg-brand text-white rounded-md hover:bg-brand/90 disabled:opacity-40">Save</button>
                 <button onClick={() => setSavingView(false)} className="h-8 px-2 text-sm text-muted-foreground hover:text-foreground">✕</button>
               </div>
@@ -1380,12 +1380,12 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">Min</span>
                   <input type="number" placeholder="0" value={draft.pay_min} onChange={e => setDraftField('pay_min', e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">Max</span>
                   <input type="number" placeholder="∞" value={draft.pay_max} onChange={e => setDraftField('pay_max', e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 </div>
               </div>
             </div>
@@ -1395,12 +1395,12 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">From</span>
                   <input type="date" value={draft.date_from} onChange={e => setDraftField('date_from', e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <span className="text-[11px] text-muted-foreground">To</span>
                   <input type="date" value={draft.date_to} onChange={e => setDraftField('date_to', e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 </div>
               </div>
             </div>

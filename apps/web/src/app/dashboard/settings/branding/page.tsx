@@ -53,12 +53,12 @@ export default function BrandingPage() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">Display name</label>
                 <input value={companyName} onChange={e => setCompanyName(e.target.value)}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">Tagline</label>
                 <input value={tagline} onChange={e => setTagline(e.target.value)}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
               </div>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function BrandingPage() {
                 <input type="color" value={primaryColor} onChange={e => setPrimaryColor(e.target.value)}
                   className="size-10 rounded-lg border border-input cursor-pointer p-0.5 bg-background" />
                 <input value={primaryColor} onChange={e => setPrimaryColor(e.target.value)}
-                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
+                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono" />
               </div>
             </div>
             <div className="space-y-2">
@@ -99,7 +99,7 @@ export default function BrandingPage() {
                 <input type="color" value={accentColor} onChange={e => setAccentColor(e.target.value)}
                   className="size-10 rounded-lg border border-input cursor-pointer p-0.5 bg-background" />
                 <input value={accentColor} onChange={e => setAccentColor(e.target.value)}
-                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
+                  className="flex-1 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono" />
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function BrandingPage() {
               <label className="text-sm font-medium text-muted-foreground">Custom domain</label>
               <input value={customDomain} onChange={e => setCustomDomain(e.target.value)}
                 placeholder="careers.yourcompany.com"
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
               <p className="text-sm text-muted-foreground">Point a CNAME record to portal.godrecruiter.com</p>
             </div>
           </div>

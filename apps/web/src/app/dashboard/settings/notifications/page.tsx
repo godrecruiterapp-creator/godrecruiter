@@ -123,13 +123,13 @@ export default function NotificationsPage() {
                 <div className="space-y-1.5">
                   <label className="text-sm text-muted-foreground">From</label>
                   <input type="time" value={quietFrom} onChange={e => setQuietFrom(e.target.value)}
-                    className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                    className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 </div>
                 <span className="text-muted-foreground mt-5">to</span>
                 <div className="space-y-1.5">
                   <label className="text-sm text-muted-foreground">To</label>
                   <input type="time" value={quietTo} onChange={e => setQuietTo(e.target.value)}
-                    className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                    className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 </div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Notifications are held and delivered after quiet hours end.</p>

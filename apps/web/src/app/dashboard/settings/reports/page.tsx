@@ -95,14 +95,14 @@ export default function ReportsPage() {
         >
           <div className="space-y-3">
             <CardRow label="Default export format">
-              <select defaultValue="csv" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="csv" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="csv">CSV</option>
                 <option value="xlsx">Excel (XLSX)</option>
                 <option value="pdf">PDF</option>
               </select>
             </CardRow>
             <CardRow label="Default date range">
-              <select defaultValue="30d" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="30d" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
                 <option value="90d">Last 90 days</option>

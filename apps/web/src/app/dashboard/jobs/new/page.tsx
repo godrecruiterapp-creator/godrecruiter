@@ -119,8 +119,8 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'placeholder:text-muted-foreground transition-colors',
       className
     )} />
@@ -130,8 +130,8 @@ function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInput
 function FieldSelect({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'transition-colors appearance-none cursor-pointer',
       className
     )}>
@@ -146,7 +146,8 @@ function TypeBtn({ label, sub, active, onClick }: {
   return (
     <button type="button" onClick={onClick}
       className={cn(
-        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border-2 transition-all text-center',
+        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border-2 transition-all text-center ring-offset-background',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         active
           ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground'
@@ -161,7 +162,8 @@ function PillToggle({ label, active, onClick }: { label: string; active: boolean
   return (
     <button type="button" onClick={onClick}
       className={cn(
-        'h-8 px-3 text-sm font-medium rounded-lg border transition-all',
+        'h-8 px-3 text-sm font-medium rounded-lg border transition-all ring-offset-background',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         active
           ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
@@ -1096,7 +1098,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                     <p className="text-sm font-medium text-violet-800 dark:text-violet-200">Paste the client&apos;s job description below — AI will extract skills and fill in the form.</p>
                     <textarea
                       rows={6} value={pastedJD} onChange={e => setPastedJD(e.target.value)}
-                      className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none"
+                      className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
                     />
                     <button type="button" onClick={extractFromPaste} disabled={!pastedJD.trim()}
                       className="h-8 px-4 text-sm font-semibold rounded-lg bg-[#dd7456] text-white hover:bg-[#c45e3e] disabled:opacity-40 transition-colors">
@@ -1114,7 +1116,7 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                       onChange={e => setDescription(e.target.value)}
                       className={cn(
                         'w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5',
-                        'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                         'resize-y transition-colors',
                         aiGenerating && 'opacity-50'
                       )}

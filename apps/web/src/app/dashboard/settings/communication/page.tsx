@@ -46,7 +46,7 @@ export default function CommunicationPage() {
             <div className="col-span-2 space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Email provider</label>
               <select value={emailProvider} onChange={e => setEmailProvider(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option>Microsoft Outlook</option>
                 <option>Gmail / Google Workspace</option>
                 <option>SendGrid</option>
@@ -57,12 +57,12 @@ export default function CommunicationPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Sender name</label>
               <input value={senderName} onChange={e => setSenderName(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Sender email</label>
               <input type="email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
           </div>
           <div className="border-t border-border/40 pt-3 space-y-3">
@@ -96,7 +96,7 @@ export default function CommunicationPage() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">SMS provider</label>
                 <select value={smsProvider} onChange={e => setSmsProvider(e.target.value)}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <option>Twilio</option>
                   <option>Vonage</option>
                   <option>AWS SNS</option>
@@ -105,7 +105,7 @@ export default function CommunicationPage() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">API key</label>
                 <input type="password" defaultValue="twilio_key_••••••••"
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
               </div>
             </div>
           )}
@@ -125,7 +125,7 @@ export default function CommunicationPage() {
           }
         >
           <CardRow label="Calendar integration">
-            <select defaultValue="outlook" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+            <select defaultValue="outlook" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <option value="outlook">Microsoft Outlook</option>
               <option value="google">Google Calendar</option>
               <option value="none">None</option>

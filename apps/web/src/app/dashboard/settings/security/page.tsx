@@ -54,7 +54,7 @@ export default function SecurityPage() {
               <label className="text-sm font-medium text-muted-foreground">Minimum length</label>
               <div className="flex items-center gap-2">
                 <input type="number" value={minLen} min={8} max={32} onChange={e => setMinLen(+e.target.value)}
-                  className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center" />
+                  className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-center" />
                 <span className="text-sm text-muted-foreground">characters</span>
               </div>
             </div>
@@ -62,7 +62,7 @@ export default function SecurityPage() {
               <label className="text-sm font-medium text-muted-foreground">Lockout after</label>
               <div className="flex items-center gap-2">
                 <input type="number" value={lockout} min={3} max={20} onChange={e => setLockout(+e.target.value)}
-                  className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center" />
+                  className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-center" />
                 <span className="text-sm text-muted-foreground">failed attempts</span>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function SecurityPage() {
               <label className="text-sm font-medium text-muted-foreground">Password expires every</label>
               <div className="flex items-center gap-2">
                 <input type="number" value={expireDays} min={0} max={365} onChange={e => setExpireDays(+e.target.value)}
-                  className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center" />
+                  className="w-20 h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-center" />
                 <span className="text-sm text-muted-foreground">days (0 = never)</span>
               </div>
             </div>
@@ -142,12 +142,12 @@ export default function SecurityPage() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">Azure Tenant ID</label>
                 <input value={tenantId} onChange={e => setTenantId(e.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-muted-foreground">Client ID</label>
                 <input value={clientId} onChange={e => setClientId(e.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono" />
               </div>
             </div>
           )}

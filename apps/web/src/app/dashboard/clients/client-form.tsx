@@ -41,8 +41,8 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'placeholder:text-muted-foreground transition-colors',
       className
     )} />
@@ -52,8 +52,8 @@ function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInput
 function FieldTextarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea {...props} className={cn(
-      'w-full px-3 py-2 text-sm rounded-lg border border-border bg-background resize-none',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+      'w-full px-3 py-2 text-sm rounded-lg border border-border bg-background ring-offset-background resize-none',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'placeholder:text-muted-foreground transition-colors',
       className
     )} />
@@ -63,8 +63,8 @@ function FieldTextarea({ className, ...props }: React.TextareaHTMLAttributes<HTM
 function FieldSelect({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'transition-colors appearance-none cursor-pointer',
       className
     )}>
@@ -85,8 +85,8 @@ function TeamMultiSelect({ options, selected, onChange }: {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button type="button" className={cn(
-          'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
-          'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+          'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'flex items-center justify-between gap-2 text-left transition-colors',
         )}>
           <span className={cn('truncate', selected.length === 0 && 'text-muted-foreground')}>
@@ -113,7 +113,8 @@ function TypeBtn({ label, active, onClick }: { label: string; active: boolean; o
   return (
     <button type="button" onClick={onClick}
       className={cn(
-        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border-2 transition-all text-center',
+        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border-2 transition-all text-center ring-offset-background',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         active
           ? 'border-[#dd7456] bg-[#fdf0ec] dark:bg-[#2a1a15] text-[#dd7456]'
           : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground'

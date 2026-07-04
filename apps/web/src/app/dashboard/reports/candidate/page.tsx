@@ -44,7 +44,7 @@ export default function CandidateReports() {
           <p className="text-sm text-muted-foreground">Understand your candidate pool, sources, and pipeline health</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>Last 30 Days</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option>Last 30 Days</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>

@@ -74,8 +74,8 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 function FInput({ className, highlighted, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { highlighted?: boolean }) {
   return (
     <input {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border bg-background',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]',
+      'w-full h-9 px-3 text-sm rounded-lg border bg-background ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'placeholder:text-muted-foreground transition-colors',
       highlighted ? 'border-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20' : 'border-border',
       className
@@ -86,8 +86,8 @@ function FInput({ className, highlighted, ...props }: React.InputHTMLAttributes<
 function FSelect({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background appearance-none cursor-pointer',
-      'focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] transition-colors',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background appearance-none cursor-pointer',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors',
       className
     )}>{children}</select>
   )
@@ -323,7 +323,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
               value={quickInput}
               onChange={e => setQuickInput(e.target.value)}
               placeholder="Enter email or phone number…"
-              className="w-full h-9 pl-9 pr-3 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]"
+              className="w-full h-9 pl-9 pr-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               autoFocus
             />
           </div>
@@ -357,7 +357,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             onChange={e => setQuickInput(e.target.value)}
             placeholder="Paste the full resume text here…"
             rows={8}
-            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground"
+            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground"
             autoFocus
           />
           <button
@@ -384,7 +384,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             value={linkedinUrl}
             onChange={e => setLinkedinUrl(e.target.value)}
             placeholder="https://www.linkedin.com/in/…"
-            className="w-full h-9 px-3 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456]"
+            className="w-full h-9 px-3 text-sm rounded-lg border border-border bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             autoFocus
           />
           <textarea
@@ -392,7 +392,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
             onChange={e => setQuickInput(e.target.value)}
             placeholder="Paste the profile's About / Experience / Skills text here…"
             rows={7}
-            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground"
+            className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground"
           />
           <button
             type="button"
@@ -830,7 +830,7 @@ export default function NewCandidatePage() {
                   <textarea
                     rows={3} value={summary} onChange={e => setSummary(e.target.value)}
                     placeholder="Brief summary of the candidate's background, key strengths, and career goals…"
-                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground transition-colors"
+                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground transition-colors"
                   />
                 </div>
               </SectionCard>
@@ -1039,7 +1039,7 @@ export default function NewCandidatePage() {
                   <textarea
                     rows={3} value={notes} onChange={e => setNotes(e.target.value)}
                     placeholder="Call notes, interview feedback, referral context, anything your team should know…"
-                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#dd7456]/20 focus:border-[#dd7456] resize-none placeholder:text-muted-foreground transition-colors"
+                    className="w-full text-sm rounded-lg border border-border bg-background px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none placeholder:text-muted-foreground transition-colors"
                   />
                 </div>
               </SectionCard>

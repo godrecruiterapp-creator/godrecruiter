@@ -28,7 +28,7 @@ function StageList({ stages, setStages }: { stages: Stage[]; setStages: (s: Stag
         <div className="flex gap-2">
           <input autoFocus value={val} onChange={e => setVal(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && val.trim()) { setStages([...stages, { id: Date.now().toString(), name: val.trim() }]); setVal(''); setAdding(false) } if (e.key === 'Escape') setAdding(false) }}
-            className="flex-1 h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Stage name…" />
+            className="flex-1 h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" placeholder="Stage name…" />
           <button onClick={() => { if (val.trim()) { setStages([...stages, { id: Date.now().toString(), name: val.trim() }]); setVal('') } setAdding(false) }}
             className="h-8 px-3 text-sm rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">Add</button>
         </div>
@@ -56,7 +56,7 @@ function TagEditor({ tags, setTags }: { tags: Tag[]; setTags: (t: Tag[]) => void
       <input value={val} onChange={e => setVal(e.target.value)}
         onKeyDown={e => { if ((e.key === 'Enter' || e.key === ',') && val.trim()) { e.preventDefault(); setTags([...tags, { id: Date.now().toString(), label: val.trim() }]); setVal('') } }}
         placeholder="Add tag…"
-        className="h-7 w-28 px-2 text-xs rounded-full border border-dashed border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
+        className="h-7 w-28 px-2 text-xs rounded-full border border-dashed border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
     </div>
   )
 }
@@ -174,7 +174,7 @@ export default function RecruitmentPage() {
             <CardRow label="Auto-flag as Hot when SLA ≤" description="Jobs near their SLA deadline are automatically marked urgent">
               <div className="flex items-center gap-2">
                 <input type="number" value={hotThreshold} min={1} max={48} onChange={e => setHotThreshold(+e.target.value)}
-                  className="w-16 h-8 text-center text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  className="w-16 h-8 text-center text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 <span className="text-sm text-muted-foreground">hours</span>
               </div>
             </CardRow>

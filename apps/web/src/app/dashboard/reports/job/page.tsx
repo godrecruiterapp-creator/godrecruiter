@@ -51,8 +51,8 @@ export default function JobReports() {
           <p className="text-sm text-muted-foreground">Analyze job orders, aging, pipeline, and fill rates</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>Last 30 Days</option><option>Last 7 Days</option></select>
-          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>All Clients</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option>Last 30 Days</option><option>Last 7 Days</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option>All Clients</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>

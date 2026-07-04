@@ -76,7 +76,7 @@ export default function CompliancePage() {
             <CardRow label="Alert days before expiry">
               <div className="flex items-center gap-2">
                 <input type="number" defaultValue={30} min={7}
-                  className="w-16 h-8 text-center text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  className="w-16 h-8 text-center text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 <span className="text-sm text-muted-foreground">days</span>
               </div>
             </CardRow>
@@ -130,7 +130,7 @@ export default function CompliancePage() {
         >
           <div className="space-y-3">
             <CardRow label="Candidate data retention">
-              <select defaultValue="3years" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="3years" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="1year">1 year</option>
                 <option value="2years">2 years</option>
                 <option value="3years">3 years (recommended)</option>
@@ -138,7 +138,7 @@ export default function CompliancePage() {
               </select>
             </CardRow>
             <CardRow label="Audit log retention">
-              <select defaultValue="2years" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="2years" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="1year">1 year</option>
                 <option value="2years">2 years</option>
                 <option value="5years">5 years</option>

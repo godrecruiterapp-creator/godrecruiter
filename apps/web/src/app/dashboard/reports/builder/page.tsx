@@ -122,13 +122,13 @@ export default function ReportBuilder() {
             </div>
             {filters.map((f, i) => (
               <div key={i} className="flex items-center gap-2 mb-2">
-                <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={f.field} onChange={(e) => updateFilter(i, { field: e.target.value })}>
+                <select className="h-7 text-sm border rounded-md px-1.5 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" value={f.field} onChange={(e) => updateFilter(i, { field: e.target.value })}>
                   {cols.map((c) => <option key={c}>{c}</option>)}
                 </select>
-                <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={f.operator} onChange={(e) => updateFilter(i, { operator: e.target.value })}>
+                <select className="h-7 text-sm border rounded-md px-1.5 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" value={f.operator} onChange={(e) => updateFilter(i, { operator: e.target.value })}>
                   {OPERATORS.map((o) => <option key={o}>{o}</option>)}
                 </select>
-                <input className="flex-1 h-7 px-2 text-sm border rounded-md bg-background" value={f.value} onChange={(e) => updateFilter(i, { value: e.target.value })} placeholder="Value" />
+                <input className="flex-1 h-7 px-2 text-sm border rounded-md bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" value={f.value} onChange={(e) => updateFilter(i, { value: e.target.value })} placeholder="Value" />
                 <button onClick={() => setFilters((prev) => prev.filter((_, idx) => idx !== i))}><X className="size-3.5 text-muted-foreground" /></button>
               </div>
             ))}
@@ -138,18 +138,18 @@ export default function ReportBuilder() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium whitespace-nowrap">Group By</p>
-              <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
+              <select className="h-7 text-sm border rounded-md px-1.5 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
                 <option value="">None</option>
                 {cols.map((c) => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium whitespace-nowrap">Sort By</p>
-              <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <select className="h-7 text-sm border rounded-md px-1.5 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                 <option value="">None</option>
                 {cols.map((c) => <option key={c}>{c}</option>)}
               </select>
-              <select className="h-7 text-sm border rounded-md px-1.5 bg-background" value={sortDir} onChange={(e) => setSortDir(e.target.value)}>
+              <select className="h-7 text-sm border rounded-md px-1.5 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" value={sortDir} onChange={(e) => setSortDir(e.target.value)}>
                 <option>ASC</option>
                 <option>DESC</option>
               </select>

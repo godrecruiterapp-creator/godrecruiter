@@ -88,7 +88,7 @@ export default function ScheduledReports() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <Label className="text-sm">Report</Label>
-              <select className="h-8 text-sm border rounded-md px-2 bg-background">
+              <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option>Weekly Submission Dashboard</option>
                 <option>Recruiter Leaderboard</option>
                 <option>Monthly Revenue Summary</option>
@@ -99,7 +99,7 @@ export default function ScheduledReports() {
 
             <div className="flex flex-col gap-1.5">
               <Label className="text-sm">Schedule</Label>
-              <select className="h-8 text-sm border rounded-md px-2 bg-background">
+              <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option>Hourly</option>
                 <option>Daily</option>
                 <option>Weekly</option>
@@ -114,7 +114,7 @@ export default function ScheduledReports() {
               <Label className="text-sm">Recipients</Label>
               <div className="flex gap-2">
                 <input
-                  className="flex-1 h-8 px-2.5 text-sm border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="flex-1 h-8 px-2.5 text-sm border rounded-md bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   placeholder="Enter email and press Enter"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -149,7 +149,7 @@ export default function ScheduledReports() {
             <div className="flex flex-col gap-1.5">
               <Label className="text-sm">Message (optional)</Label>
               <textarea
-                className="min-h-[72px] px-2.5 py-2 text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                className="min-h-[72px] px-2.5 py-2 text-sm border rounded-md bg-background resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="Add a message to include in the report email..."
               />
             </div>

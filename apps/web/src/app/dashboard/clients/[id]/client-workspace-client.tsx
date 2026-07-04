@@ -96,8 +96,8 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background',
-      'focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'placeholder:text-muted-foreground transition-colors',
       className,
     )} />
@@ -106,8 +106,8 @@ function FieldInput({ className, ...props }: React.InputHTMLAttributes<HTMLInput
 function FieldSelect({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select {...props} className={cn(
-      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background cursor-pointer',
-      'focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors',
+      'w-full h-9 px-3 text-sm rounded-lg border border-border bg-background ring-offset-background cursor-pointer',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors',
       className,
     )}>
       {children}

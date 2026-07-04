@@ -109,17 +109,17 @@ export default function BillingPage() {
             <div className="col-span-2 space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Card number</label>
               <input defaultValue="•••• •••• •••• 4242"
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Expiry</label>
               <input defaultValue="08/27" placeholder="MM/YY"
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">CVC</label>
               <input defaultValue="•••" placeholder="CVC"
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
           </div>
         </SettingCard>

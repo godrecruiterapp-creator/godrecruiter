@@ -59,7 +59,7 @@ export default function CareerPortalPage() {
               <label className="text-sm font-medium text-muted-foreground">Subdomain</label>
               <div className="flex items-center gap-0">
                 <input value={subdomain} onChange={e => setSubdomain(e.target.value)}
-                  className="flex-1 h-9 px-3 text-sm rounded-l-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                  className="flex-1 h-9 px-3 text-sm rounded-l-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
                 <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-muted border border-l-0 border-input rounded-r-lg">
                   .godrecruiter.com/careers
                 </span>
@@ -68,12 +68,12 @@ export default function CareerPortalPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Page title</label>
               <input value={title} onChange={e => setTitle(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Description</label>
               <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+                className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none" />
             </div>
           </div>
         </SettingCard>
@@ -122,7 +122,7 @@ export default function CareerPortalPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">Meta title</label>
               <input value={seoTitle} onChange={e => setSeoTitle(e.target.value)}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
             </div>
             <CardRow label="Auto-generate sitemap">
               <Toggle checked={true} onChange={() => {}} />

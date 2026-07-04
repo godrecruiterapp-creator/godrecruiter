@@ -48,17 +48,17 @@ export default function RecruiterReports() {
           <p className="text-sm text-muted-foreground">Track recruiter activity, performance, and productivity</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-sm border rounded-md px-2 bg-background">
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <option>Last 30 Days</option>
             <option>Last 7 Days</option>
             <option>Last 90 Days</option>
           </select>
-          <select className="h-8 text-sm border rounded-md px-2 bg-background">
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <option>All Recruiters</option>
             <option>Sarah Mitchell</option>
             <option>James Patel</option>
           </select>
-          <select className="h-8 text-sm border rounded-md px-2 bg-background">
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <option>All Departments</option>
             <option>Healthcare</option>
             <option>IT</option>

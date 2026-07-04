@@ -1060,7 +1060,7 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
                       value={search}
                       onChange={e => setSearch(e.target.value)}
                       placeholder="Search candidates…"
-                      className="h-9 w-56 pl-9 pr-8 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-brand placeholder:text-muted-foreground"
+                      className="h-9 w-56 pl-9 pr-8 text-sm border border-input rounded-md bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring placeholder:text-muted-foreground"
                     />
                     {search && (
                       <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">

@@ -59,7 +59,7 @@ export default function FilesPage() {
         >
           <div className="space-y-3">
             <CardRow label="Maximum file size">
-              <select defaultValue="10" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="10" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="5">5 MB</option>
                 <option value="10">10 MB</option>
                 <option value="20">20 MB</option>
@@ -67,7 +67,7 @@ export default function FilesPage() {
               </select>
             </CardRow>
             <CardRow label="Maximum batch upload">
-              <select defaultValue="50" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+              <select defaultValue="50" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="10">10 files</option>
                 <option value="50">50 files</option>
                 <option value="100">100 files</option>
@@ -89,7 +89,7 @@ export default function FilesPage() {
           }
         >
           <CardRow label="Primary storage provider">
-            <select defaultValue="internal" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring">
+            <select defaultValue="internal" className="h-8 px-2 text-sm rounded-lg border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <option value="internal">God Recruiter Cloud (default)</option>
               <option value="gdrive">Google Drive</option>
               <option value="onedrive">OneDrive</option>

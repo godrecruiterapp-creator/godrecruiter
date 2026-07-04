@@ -48,7 +48,7 @@ export default function ExecutiveReports() {
           <p className="text-sm text-muted-foreground">Top-line performance, growth trends, and strategic metrics</p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="h-8 text-sm border rounded-md px-2 bg-background"><option>YTD 2026</option><option>Last Quarter</option></select>
+          <select className="h-8 text-sm border rounded-md px-2 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option>YTD 2026</option><option>Last Quarter</option></select>
           <Button size="sm" variant="outline" className="gap-1.5"><Download className="size-3.5" />Export</Button>
         </div>
       </div>
