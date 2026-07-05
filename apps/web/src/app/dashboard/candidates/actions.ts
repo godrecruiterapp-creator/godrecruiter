@@ -70,7 +70,7 @@ export async function createCandidateAction(formData: FormData): Promise<{ error
     return { error: `Failed to add candidate: ${error.message}` }
   }
 
-  redirect(`/dashboard/candidates/${candidate.id}`)
+  redirect(`/dashboard/candidates/${candidate.id}?created=1`)
 }
 
 export async function updateCandidateAction(candidateId: string, formData: FormData): Promise<{ error: string }> {
@@ -119,7 +119,7 @@ export async function updateCandidateAction(candidateId: string, formData: FormD
     return { error: `Failed to update candidate: ${error.message}` }
   }
 
-  redirect(`/dashboard/candidates/${candidateId}`)
+  redirect(`/dashboard/candidates/${candidateId}?updated=1`)
 }
 
 export async function deleteCandidateAction(candidateId: string) {

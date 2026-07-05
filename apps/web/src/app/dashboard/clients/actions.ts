@@ -84,7 +84,7 @@ export async function createClientAction(formData: FormData) {
 
   await logActivity(admin, id, ctx.tenant_id, ctx.user.id, ctx.name, 'created this client')
 
-  redirect(`/dashboard/clients/${id}`)
+  redirect(`/dashboard/clients/${id}?created=1`)
 }
 
 export async function updateClientAction(clientId: string, formData: FormData) {
@@ -129,7 +129,7 @@ export async function updateClientAction(clientId: string, formData: FormData) {
 
   await logActivity(admin, clientId, ctx.tenant_id, ctx.user.id, ctx.name, 'updated client details')
 
-  redirect(`/dashboard/clients/${clientId}`)
+  redirect(`/dashboard/clients/${clientId}?updated=1`)
 }
 
 export async function deleteClientAction(clientId: string) {

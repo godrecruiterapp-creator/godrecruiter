@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
@@ -177,8 +178,19 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
   jobs: WorkspaceJob[]; candidates: WorkspaceCandidate[]
   documents: WorkspaceDoc[]; activity: WorkspaceActivity[]; notes: WorkspaceNote[]
 }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+
+  useEffect(() => {
+    const flag = searchParams.get('created') ? 'created' : searchParams.get('updated') ? 'updated' : null
+    if (flag) {
+      toast(flag === 'created' ? 'Client created successfully.' : 'Client updated successfully.')
+      router.replace(`/dashboard/clients/${client.id}`, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Editable client info (name/id stay fixed — they key filtering/routing elsewhere)
   const [clientInfo, setClientInfo] = useState<Client>(client)

@@ -2,7 +2,8 @@
 
 import { useState, useTransition, useRef, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -830,7 +831,17 @@ export function JobDetailClient({ job, initialNotes, initialDocs, initialActivit
   aiEnabled: boolean
 }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
+
+  useEffect(() => {
+    const flag = searchParams.get('created') ? 'created' : searchParams.get('updated') ? 'updated' : null
+    if (flag) {
+      toast(flag === 'created' ? 'Job posted successfully.' : 'Job updated successfully.')
+      router.replace(`/dashboard/jobs/${job.id}`, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { readiness, health, fillProbability, recruiterMatches, candidateCategories, nextBestActions } = intelligence
 

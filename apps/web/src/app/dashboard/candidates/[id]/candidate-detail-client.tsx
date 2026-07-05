@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -562,11 +563,21 @@ export function CandidateDetailClient({ candidate, initialNotes, initialDocs, in
   initialJobs: JobRow[]
 }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'notes' | 'documents' | 'activity'>('overview')
   const [notes, setNotes]   = useState<NoteRow[]>(initialNotes)
   const [docs, setDocs]     = useState<DocRow[]>(initialDocs)
   const [submitOpen, setSubmitOpen] = useState(false)
+
+  useEffect(() => {
+    const flag = searchParams.get('created') ? 'created' : searchParams.get('updated') ? 'updated' : null
+    if (flag) {
+      toast(flag === 'created' ? 'Candidate added successfully.' : 'Candidate updated successfully.')
+      router.replace(`/dashboard/candidates/${candidate.id}`, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const name     = [candidate.first_name, candidate.last_name].filter(Boolean).join(' ') || 'Unnamed'
   const initials = [candidate.first_name?.[0], candidate.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'

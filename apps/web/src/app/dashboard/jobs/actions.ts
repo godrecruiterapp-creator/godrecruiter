@@ -72,7 +72,7 @@ export async function createJobAction(formData: FormData) {
 
   if (error) return { error: `Failed to create job: ${error.message}` }
 
-  redirect(`/dashboard/jobs/${job.id}`)
+  redirect(`/dashboard/jobs/${job.id}?created=1`)
 }
 
 export async function updateJobStatusAction(jobId: string, status: string) {
@@ -144,7 +144,7 @@ export async function updateJobAction(jobId: string, formData: FormData) {
 
   if (error) return { error: `Failed to update job: ${error.message}` }
 
-  redirect(`/dashboard/jobs/${jobId}`)
+  redirect(`/dashboard/jobs/${jobId}?updated=1`)
 }
 
 export async function bulkUpdateJobsAction(jobIds: string[], updates: { status?: string; priority?: string; recruiter_name?: string }) {
