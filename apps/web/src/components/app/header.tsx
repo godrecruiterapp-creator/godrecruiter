@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ChevronRight, Search, User, Briefcase, X, LogOut, Sun, Moon, Bell, Home, Settings, CheckCheck } from 'lucide-react'
 import { useBreadcrumbTitle } from '@/components/app/breadcrumb-provider'
@@ -25,6 +25,7 @@ interface Props {
   userName: string
   userEmail: string
   userId: string
+  avatarUrl: string | null
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
@@ -128,7 +129,7 @@ const STATUS_DOT: Record<string, string> = {
   open: 'bg-emerald-500', on_hold: 'bg-amber-500', filled: 'bg-blue-500', closed: 'bg-zinc-400',
 }
 
-export function Header({ userName, userEmail, userId }: Props) {
+export function Header({ userName, userEmail, userId, avatarUrl }: Props) {
   const initials = userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   const crumbs = useBreadcrumbs()
   const router = useRouter()
@@ -471,6 +472,7 @@ export function Header({ userName, userEmail, userId }: Props) {
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2.5 rounded-md hover:bg-muted px-1.5 py-1 transition-colors outline-none">
               <Avatar className="size-7 rounded-md shrink-0">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={userName} className="rounded-md" />}
                 <AvatarFallback className="rounded-md bg-foreground text-background text-xs font-semibold">
                   {initials}
                 </AvatarFallback>

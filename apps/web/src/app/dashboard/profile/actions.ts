@@ -31,7 +31,7 @@ export async function updateAvatarAction(formData: FormData) {
   if (authRes.error) return { error: authRes.error.message }
   if (dbRes.error)   return { error: dbRes.error.message }
 
-  revalidatePath('/dashboard/profile')
+  revalidatePath('/dashboard', 'layout')
   return { success: true as const, avatarUrl: avatar_url }
 }
 
