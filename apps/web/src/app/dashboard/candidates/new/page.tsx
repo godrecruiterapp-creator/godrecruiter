@@ -98,7 +98,7 @@ function SectionCard({ n, icon: Icon, title, badge, children }: {
   badge?: string | undefined; children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-background shadow-sm overflow-hidden">
+    <div className="rounded-xl border border-border/60 bg-background shadow-sm overflow-hidden">
       <div className="flex items-center gap-3 px-6 py-4 border-b border-border/40 bg-muted/10">
         <div className="size-6 rounded-full bg-[#dd7456]/10 flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-[#dd7456]">{n}</span>
@@ -262,7 +262,7 @@ function IntakeScreen({ onExtracted, onSkip }: {
         onDragLeave={() => setDragging(false)}
         onClick={() => fileRef.current?.click()}
         className={cn(
-          'relative rounded-2xl border-2 border-dashed cursor-pointer transition-all p-12 text-center mb-6',
+          'relative rounded-xl border-2 border-dashed cursor-pointer transition-all p-12 text-center mb-6',
           dragging
             ? 'border-[#dd7456] bg-[#fdf0ec]/60 dark:bg-[#2a1a15]/60 scale-[1.01]'
             : 'border-border bg-muted/10 hover:border-[#dd7456]/50 hover:bg-[#fdf0ec]/20 dark:hover:bg-[#2a1a15]/20'
@@ -431,7 +431,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
 
       {/* Extraction success */}
       {extracted && (
-        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
             <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Resume parsed successfully</p>
@@ -441,7 +441,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
       )}
 
       {/* Progress */}
-      <div className="rounded-2xl border border-border/60 bg-background shadow-sm p-4">
+      <div className="rounded-xl border border-border/60 bg-background shadow-sm p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Profile strength</p>
           <span className="text-sm font-bold text-[#dd7456]">{pct}%</span>
@@ -469,7 +469,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
 
       {/* Matching jobs */}
       {showJobs && (
-        <div className="rounded-2xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 p-4">
+        <div className="rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Briefcase className="size-4 text-violet-500" />
             <p className="text-sm font-semibold text-violet-800 dark:text-violet-200">3 matching jobs</p>
@@ -489,7 +489,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
       )}
 
       {/* AI panel */}
-      <div className="rounded-2xl border border-border/60 bg-background shadow-sm p-4">
+      <div className="rounded-xl border border-border/60 bg-background shadow-sm p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="size-4 text-[#dd7456]" />
           <p className="text-sm font-semibold">AI Insights</p>
@@ -507,7 +507,7 @@ function SmartPanel({ extracted, firstName, lastName, skills, workAuth, experien
       </div>
 
       {/* Tips */}
-      <div className="rounded-2xl border border-border/50 bg-muted/20 p-4">
+      <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
         <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Quick tips</p>
         <ul className="space-y-1.5 text-[11px] text-muted-foreground leading-relaxed">
           <li>Work Authorization is the most important field for US Staffing</li>

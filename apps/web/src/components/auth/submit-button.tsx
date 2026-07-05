@@ -19,7 +19,7 @@ export function SubmitButton({ label, loadingLabel, pending: pendingProp }: Subm
       style={{
         width: '100%', height: '40px',
         background: pending ? '#eb9678' : '#dd7456',
-        color: '#FFFFFF', border: 'none', borderRadius: '6px',
+        color: '#FFFFFF', border: 'none', borderRadius: '8px',
         fontSize: '14px', fontWeight: '500',
         cursor: pending ? 'not-allowed' : 'pointer',
         transition: 'background 0.12s',

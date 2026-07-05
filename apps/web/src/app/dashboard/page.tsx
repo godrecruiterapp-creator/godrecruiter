@@ -190,7 +190,7 @@ function Widget({ title, icon: Icon, action, children, className, id }: {
 }) {
   return (
     <section id={id} className={cn(
-      'rounded-2xl bg-background border border-border/60 shadow-sm flex flex-col overflow-hidden',
+      'rounded-xl bg-background border border-border/60 shadow-sm flex flex-col overflow-hidden',
       'transition-all duration-200 hover:shadow-md',
       className
     )}>
@@ -267,7 +267,7 @@ function Ring({ value, max, size = 72, label, sub, color = 'stroke-[#dd7456]' }:
 function TodayFocus({ greetStr, firstName, date, onStart }: { greetStr:string; firstName:string; date:string; onStart:()=>void }) {
   return (
     <div className={cn(
-      'rounded-2xl border border-[#dd7456]/20 overflow-hidden',
+      'rounded-xl border border-[#dd7456]/20 overflow-hidden',
       'bg-gradient-to-br from-[#fdf0ec] to-background dark:from-[#2a1a15] dark:to-background',
     )}>
       <div className="px-7 py-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -324,7 +324,7 @@ function PipelineFunnel() {
   const router = useRouter()
   const max = PIPELINE[0]!.count
   return (
-    <div className="rounded-2xl bg-background border border-border/60 shadow-sm overflow-hidden">
+    <div className="rounded-xl bg-background border border-border/60 shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/40">
         <div className="flex items-center gap-2">
           <Activity className="size-3.5 text-muted-foreground" />
@@ -474,7 +474,7 @@ function ThingsToDo({ refEl }: { refEl: React.RefObject<HTMLElement | null> }) {
       id="things-to-do"
       ref={refEl as React.RefObject<HTMLElement>}
       className={cn(
-        'rounded-2xl bg-background border shadow-sm flex flex-col overflow-hidden',
+        'rounded-xl bg-background border shadow-sm flex flex-col overflow-hidden',
         'transition-all duration-500',
         flash ? 'border-[#dd7456] shadow-[0_0_0_3px_#dd745620]' : 'border-border/60 hover:shadow-md'
       )}
@@ -862,7 +862,7 @@ function NeedsAttention() {
 
 function TodayProgress() {
   return (
-    <div className="rounded-2xl bg-background border border-border/60 shadow-sm overflow-hidden">
+    <div className="rounded-xl bg-background border border-border/60 shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/40">
         <div className="flex items-center gap-2">
           <Target className="size-3.5 text-muted-foreground" />

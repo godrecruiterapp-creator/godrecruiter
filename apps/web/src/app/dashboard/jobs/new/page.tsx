@@ -145,7 +145,7 @@ function SectionCard({ n, icon: Icon, title, children, className }: {
   children: React.ReactNode; className?: string
 }) {
   return (
-    <div className={cn('rounded-2xl border border-border/60 bg-background shadow-sm overflow-hidden', className)}>
+    <div className={cn('rounded-xl border border-border/60 bg-background shadow-sm overflow-hidden', className)}>
       <div className="flex items-center gap-3 px-6 py-4 border-b border-border/40 bg-muted/10">
         <div className="size-6 rounded-full bg-[#dd7456]/10 flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-[#dd7456]">{n}</span>
@@ -279,7 +279,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workM
     <div className="space-y-4 sticky top-6">
 
       {/* Progress */}
-      <div className="rounded-2xl border border-border/60 bg-background shadow-sm p-4">
+      <div className="rounded-xl border border-border/60 bg-background shadow-sm p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Progress</p>
           <span className="text-sm font-bold text-[#dd7456]">{pct}%</span>
@@ -292,7 +292,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workM
 
       {/* Bill rate margin */}
       {margin && parseFloat(margin) > 0 && (
-        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
           <div className="flex items-center gap-2 mb-1">
             <DollarSign className="size-4 text-emerald-600 dark:text-emerald-400" />
             <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Margin preview</p>
@@ -306,7 +306,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workM
 
       {/* Similar jobs */}
       {showSimilar && (
-        <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/60 p-4">
+        <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/60 p-4">
           <div className="flex items-start gap-2 mb-3">
             <AlertCircle className="size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
@@ -332,7 +332,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workM
 
       {/* Candidate match */}
       {showCandidates && (
-        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-4">
           <div className="flex items-start gap-2 mb-3">
             <Users className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
@@ -354,7 +354,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workM
       )}
 
       {/* AI suggestions */}
-      <div className="rounded-2xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 p-4">
+      <div className="rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="size-4 text-violet-500" />
           <p className="text-sm font-semibold text-violet-800 dark:text-violet-200">AI Insights</p>
@@ -383,7 +383,7 @@ function SmartPanel({ title, client, mustHave, jobType, payRate, billRate, workM
       </div>
 
       {/* Tips */}
-      <div className="rounded-2xl border border-border/50 bg-muted/20 p-4">
+      <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
         <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2.5">Quick tips</p>
         <ul className="space-y-2 text-[11px] text-muted-foreground leading-relaxed">
           <li>Select a client to auto-fill location and hiring manager</li>

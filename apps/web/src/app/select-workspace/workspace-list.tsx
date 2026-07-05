@@ -64,7 +64,7 @@ export function WorkspaceList({ workspaces, userName }: Props) {
                 padding: '14px 16px',
                 background: 'var(--bg-surface)',
                 border: '1px solid var(--border-subtle)',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 textDecoration: 'none',
                 transition: 'border-color 0.15s, box-shadow 0.15s',
                 cursor: 'pointer',

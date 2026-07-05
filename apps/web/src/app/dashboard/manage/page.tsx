@@ -79,7 +79,7 @@ function DashCard({ dash, isActive, onActivate }: { dash: DashboardConfig; isAct
   return (
     <div
       className={cn(
-        'group relative flex flex-col gap-3 p-4 rounded-2xl border transition-all cursor-pointer',
+        'group relative flex flex-col gap-3 p-4 rounded-xl border transition-all cursor-pointer',
         isActive
           ? 'border-[#dd7456]/40 bg-gradient-to-br from-[#fdf0ec] to-background dark:from-[#2a1a15] shadow-sm'
           : 'border-border hover:border-muted-foreground/30 hover:shadow-sm bg-background',
@@ -197,7 +197,7 @@ export default function ManageDashboardsPage() {
             { label:'Active Right Now',  value: 1,                                            icon:'🎯' },
             { label:'Shared with Team',  value: live.filter(d => d.visibility !== 'private').length, icon:'👥' },
           ].map(({ label, value, icon }) => (
-            <div key={label} className="px-4 py-3 rounded-2xl border border-border bg-background">
+            <div key={label} className="px-4 py-3 rounded-xl border border-border bg-background">
               <p className="text-2xl font-bold">{value}</p>
               <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
             </div>
@@ -232,7 +232,7 @@ export default function ManageDashboardsPage() {
         )}
 
         {/* AI prompt */}
-        <div className="flex items-center justify-between px-5 py-4 rounded-2xl border border-[#dd7456]/20 bg-gradient-to-r from-[#fdf0ec] to-background dark:from-[#2a1a15]">
+        <div className="flex items-center justify-between px-5 py-4 rounded-xl border border-[#dd7456]/20 bg-gradient-to-r from-[#fdf0ec] to-background dark:from-[#2a1a15]">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-[#dd7456]/10 flex items-center justify-center">
               <Sparkles className="size-5 text-[#dd7456]" />

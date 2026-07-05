@@ -16,7 +16,7 @@ export default function UnauthorizedPage() {
             padding: '8px 16px',
             background: 'var(--accent-primary)',
             color: '#fff',
-            borderRadius: '6px',
+            borderRadius: '8px',
             fontSize: '13px',
             fontWeight: '600',
             textDecoration: 'none',
