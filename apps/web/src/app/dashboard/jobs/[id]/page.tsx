@@ -49,7 +49,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       .select('id, stage, created_at, candidate_id, candidates(id, first_name, last_name, current_title, current_company, location, candidate_type, resume_url, created_at, updated_at)')
       .eq('job_id', id),
     admin.from('platform_user_tenants')
-      .select('platform_user_id, platform_users(id, full_name)')
+      .select('platform_user_id, platform_users!platform_user_id(id, full_name)')
       .eq('tenant_id', job.tenant_id).eq('is_active', true),
     admin.from('jobs')
       .select('id, client, employment_type, department, status, recruiter_id, created_at')

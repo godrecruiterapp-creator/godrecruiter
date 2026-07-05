@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { logoutAction } from '@/app/(auth)/actions'
 
 interface Workspace {
@@ -108,31 +107,6 @@ export function WorkspaceList({ workspaces, userName }: Props) {
             </a>
           ))}
         </div>
-
-        {/* Create new workspace */}
-        <Link
-          href="/onboarding"
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-            padding: '10px 16px',
-            border: '1px dashed var(--border-default)',
-            borderRadius: '8px',
-            fontSize: '13px', fontWeight: '500',
-            color: 'var(--text-secondary)',
-            textDecoration: 'none',
-            transition: 'border-color 0.15s, color 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent-primary)'
-            e.currentTarget.style.color = 'var(--accent-primary)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-default)'
-            e.currentTarget.style.color = 'var(--text-secondary)'
-          }}
-        >
-          + Create a new workspace
-        </Link>
 
         {/* Sign out */}
         <div style={{ textAlign: 'center', marginTop: '24px' }}>

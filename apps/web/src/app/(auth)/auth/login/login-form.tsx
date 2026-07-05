@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 
@@ -137,15 +137,6 @@ export function LoginForm({ redirectTo, reset }: Props) {
               </button>
             </form>
           </CardContent>
-
-          <CardFooter className="justify-center">
-            <p className="text-sm text-muted-foreground">
-              No account?{' '}
-              <Link href="/auth/signup" className="text-foreground font-medium hover:underline underline-offset-4">
-                Create one free
-              </Link>
-            </p>
-          </CardFooter>
         </Card>
       </div>
     </div>

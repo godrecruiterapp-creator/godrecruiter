@@ -43,9 +43,9 @@ export default async function SelectWorkspacePage() {
     redirect('/dashboard')
   }
 
-  // No workspaces → send to onboarding
+  // No workspaces — companies are onboarded by God Recruiter, not self-serve
   if (workspaces.length === 0) {
-    redirect('/onboarding')
+    redirect('/auth/unauthorized')
   }
 
   const fullName =

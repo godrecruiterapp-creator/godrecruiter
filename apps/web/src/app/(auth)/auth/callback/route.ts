@@ -52,8 +52,9 @@ export async function GET(request: NextRequest) {
         .eq('is_active', true)
 
       if (!count || count === 0) {
-        // New user — send to onboarding to create their first workspace
-        return NextResponse.redirect(`${origin}/onboarding`)
+        // No tenant membership — companies are onboarded by God Recruiter,
+        // not self-serve, so there's nowhere else for this account to go.
+        return NextResponse.redirect(`${origin}/auth/unauthorized`)
       }
 
       return NextResponse.redirect(`${origin}${next}`)

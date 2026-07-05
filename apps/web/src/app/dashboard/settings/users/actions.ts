@@ -44,7 +44,7 @@ export async function getUsersPageDataAction(): Promise<{ error: string } | { me
   const admin = createAdminClient()
   const [{ data: members, error: membersErr }, { data: roles, error: rolesErr }] = await Promise.all([
     admin.from('platform_user_tenants')
-      .select('id, platform_user_id, role_id, is_active, invited_at, joined_at, platform_users(full_name, email, avatar_url), tenant_roles(name, is_system)')
+      .select('id, platform_user_id, role_id, is_active, invited_at, joined_at, platform_users!platform_user_id(full_name, email, avatar_url), tenant_roles(name, is_system)')
       .eq('tenant_id', gate.ctx.tenant_id)
       .order('joined_at', { ascending: false }),
     admin.from('tenant_roles')

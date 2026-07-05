@@ -5,7 +5,6 @@ const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'godrecruiter.com'
 
 const PUBLIC_PATHS = [
   '/auth/login',
-  '/auth/signup',
   '/auth/forgot-password',
   '/auth/reset-password',
   '/auth/accept-invite',
@@ -60,7 +59,7 @@ export async function middleware(request: NextRequest) {
 
   // ── 3. Public paths — no auth required ───────────────────────────────────
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
-    if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {
+    if (user && pathname === '/auth/login') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     return supabaseResponse

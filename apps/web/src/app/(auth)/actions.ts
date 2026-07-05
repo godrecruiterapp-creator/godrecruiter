@@ -3,7 +3,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { ulid } from 'ulid'
 
 // ── LOGIN ────────────────────────────────────────────────────────────────────
 export async function loginAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
@@ -27,51 +26,6 @@ export async function loginAction(prevState: ActionState, formData: FormData): P
   }
 
   return { redirectTo: redirectTo ?? '/dashboard' }
-}
-
-// ── SIGNUP ──────────────���────────────────────────────────��───────────────────
-export async function signupAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
-  const fullName = formData.get('full_name') as string
-  const email    = formData.get('email')     as string
-  const password = formData.get('password')  as string
-
-  if (!fullName || !email || !password) return { error: 'All fields are required.' }
-  if (password.length < 8) return { error: 'Password must be at least 8 characters.' }
-
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
-  })
-
-  if (error) {
-    if (error.message.includes('already registered') || error.message.includes('already been registered')) {
-      return { error: 'An account with this email already exists. Try signing in.' }
-    }
-    return { error: `Could not create account: ${error.message}` }
-  }
-
-  if (data.user && !data.session) {
-    // Email confirmation required
-    return { success: 'Check your email — we sent you a confirmation link.' }
-  }
-
-  // Auto-confirmed (local dev or email confirmations disabled)
-  // Create platform_users record
-  if (data.user) {
-    const admin = createAdminClient()
-    await admin.from('platform_users').upsert({
-      id: data.user.id,
-      email,
-      full_name: fullName,
-    }, { onConflict: 'id' })
-  }
-
-  redirect('/onboarding')
 }
 
 // ── FORGOT PASSWORD ───────────────────────────────────────────���──────────────
