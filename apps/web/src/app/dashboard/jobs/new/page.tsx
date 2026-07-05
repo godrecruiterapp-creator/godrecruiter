@@ -140,39 +140,6 @@ function FieldSelect({ className, children, ...props }: React.SelectHTMLAttribut
   )
 }
 
-function TypeBtn({ label, sub, active, onClick }: {
-  label: string; sub?: string; active: boolean; onClick: () => void
-}) {
-  return (
-    <button type="button" onClick={onClick}
-      className={cn(
-        'flex-1 py-3 px-4 rounded-xl text-sm font-medium border transition-all text-center',
-        'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
-        active
-          ? 'border-foreground bg-background text-foreground font-semibold'
-          : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground'
-      )}>
-      <span className="block font-semibold">{label}</span>
-      {sub && <span className="block text-[10px] mt-0.5 opacity-70">{sub}</span>}
-    </button>
-  )
-}
-
-function PillToggle({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick}
-      className={cn(
-        'h-8 px-3 text-sm font-medium rounded-lg border transition-all',
-        'focus-visible:outline-none focus-visible:border-[#D1D5DB]',
-        active
-          ? 'border-foreground bg-background text-foreground font-semibold'
-          : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
-      )}>
-      {label}
-    </button>
-  )
-}
-
 function SectionCard({ n, icon: Icon, title, children, className }: {
   n: number; icon: React.ComponentType<{ className?: string }>; title: string
   children: React.ReactNode; className?: string
@@ -693,9 +660,6 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
     })
   }
 
-  const toggleAuth = (v: string) =>
-    setWorkAuth(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])
-
   return (
     <div className="h-full overflow-y-auto bg-muted/10">
       <div className="max-w-[1400px] mx-auto px-6 py-6 pb-24">
@@ -853,10 +817,10 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
 
                   <div>
                     <FieldLabel>Account Type</FieldLabel>
-                    <div className="flex gap-2">
-                      <TypeBtn label="Direct Client" active={clientType === 'direct'} onClick={() => setClientType('direct')} />
-                      <TypeBtn label="VMS"           active={clientType === 'vms'}    onClick={() => setClientType('vms')}    />
-                    </div>
+                    <FieldSelect value={clientType} onChange={e => setClientType(e.target.value)}>
+                      <option value="direct">Direct Client</option>
+                      <option value="vms">VMS</option>
+                    </FieldSelect>
                   </div>
 
                   <div>
@@ -878,11 +842,11 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
               <SectionCard n={2} icon={MapPin} title="Location">
                 <div>
                   <FieldLabel>Work Location</FieldLabel>
-                  <div className="flex gap-2">
-                    <TypeBtn label="On-site"  active={workMode === 'onsite'}  onClick={() => setWorkMode('onsite')}  />
-                    <TypeBtn label="Hybrid"   active={workMode === 'hybrid'}  onClick={() => setWorkMode('hybrid')}  />
-                    <TypeBtn label="Remote"   active={workMode === 'remote'}  onClick={() => setWorkMode('remote')}  />
-                  </div>
+                  <FieldSelect value={workMode} onChange={e => setWorkMode(e.target.value as WorkMode)}>
+                    <option value="onsite">On-site</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="remote">Remote</option>
+                  </FieldSelect>
                 </div>
                 {workMode !== 'remote' && (
                   <div className="grid grid-cols-2 gap-4">
@@ -915,21 +879,21 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
               <SectionCard n={3} icon={Clock} title="Job Type">
                 <div>
                   <FieldLabel required>Employment Type</FieldLabel>
-                  <div className="flex gap-2">
-                    <TypeBtn label="Contract"       sub="W2 / C2C / 1099"    active={jobType === 'contract'}    onClick={() => setJobType('contract')}    />
-                    <TypeBtn label="Direct Hire"    sub="Full-time permanent" active={jobType === 'direct_hire'} onClick={() => setJobType('direct_hire')} />
-                    <TypeBtn label="Contract to Hire" sub="CTH"              active={jobType === 'cth'}          onClick={() => setJobType('cth')}         />
-                  </div>
+                  <FieldSelect value={jobType} onChange={e => setJobType(e.target.value as JobType)}>
+                    <option value="contract">Contract (W2 / C2C / 1099)</option>
+                    <option value="direct_hire">Direct Hire (Full-time permanent)</option>
+                    <option value="cth">Contract to Hire</option>
+                  </FieldSelect>
                 </div>
 
                 {isContract && (
                   <div>
                     <FieldLabel>Tax Terms</FieldLabel>
-                    <div className="flex gap-2">
-                      <TypeBtn label="W2"  sub="Through agency"   active={taxTerm === 'w2'}   onClick={() => setTaxTerm('w2')}   />
-                      <TypeBtn label="C2C" sub="Corp-to-Corp"      active={taxTerm === 'c2c'}  onClick={() => setTaxTerm('c2c')}  />
-                      <TypeBtn label="1099" sub="Independent"      active={taxTerm === '1099'} onClick={() => setTaxTerm('1099')} />
-                    </div>
+                    <FieldSelect value={taxTerm} onChange={e => setTaxTerm(e.target.value as TaxTerm)}>
+                      <option value="w2">W2 (Through agency)</option>
+                      <option value="c2c">C2C (Corp-to-Corp)</option>
+                      <option value="1099">1099 (Independent)</option>
+                    </FieldSelect>
                   </div>
                 )}
 
@@ -1058,14 +1022,20 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
 
                 <div>
                   <FieldLabel>Work Authorization</FieldLabel>
-                  <div className="flex flex-wrap gap-2">
-                    {VISA_OPTIONS.map(v => (
-                      <PillToggle key={v} label={v} active={workAuth.includes(v)} onClick={() => toggleAuth(v)} />
-                    ))}
-                  </div>
-                  {workAuth.length === 0 && (
-                    <p className="text-[10px] text-muted-foreground mt-1">No restriction selected — all visa types will be considered</p>
-                  )}
+                  <FieldSelect
+                    multiple
+                    size={VISA_OPTIONS.length}
+                    value={workAuth}
+                    onChange={e => setWorkAuth(Array.from(e.target.selectedOptions, o => o.value))}
+                    className="h-auto py-1"
+                  >
+                    {VISA_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
+                  </FieldSelect>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {workAuth.length === 0
+                      ? 'No restriction selected — all visa types will be considered. Ctrl/Cmd-click to select multiple.'
+                      : 'Ctrl/Cmd-click to select multiple.'}
+                  </p>
                 </div>
               </SectionCard>
 
@@ -1156,20 +1126,11 @@ ${workMode === 'remote' ? 'This is a fully remote position.' : workMode === 'hyb
                   </div>
                   <div>
                     <FieldLabel>Priority</FieldLabel>
-                    <div className="flex gap-2">
-                      {(['high', 'medium', 'low'] as Priority[]).map(p => (
-                        <button key={p} type="button" onClick={() => setPriority(p)}
-                          className={cn(
-                            'flex-1 h-9 text-sm font-semibold rounded-lg border-2 transition-all capitalize',
-                            priority === p && p === 'high'   && 'border-red-400 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300',
-                            priority === p && p === 'medium' && 'border-amber-400 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300',
-                            priority === p && p === 'low'    && 'border-slate-300 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
-                            priority !== p && 'border-border bg-background text-muted-foreground hover:border-muted-foreground/50'
-                          )}>
-                          {p === 'high' ? '🔴' : p === 'medium' ? '🟡' : '⚪'} {p.charAt(0).toUpperCase() + p.slice(1)}
-                        </button>
-                      ))}
-                    </div>
+                    <FieldSelect value={priority} onChange={e => setPriority(e.target.value as Priority)}>
+                      <option value="high">🔴 High</option>
+                      <option value="medium">🟡 Medium</option>
+                      <option value="low">⚪ Low</option>
+                    </FieldSelect>
                   </div>
                   <div>
                     <FieldLabel>Submission Deadline</FieldLabel>
