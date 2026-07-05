@@ -105,7 +105,7 @@ export function WorkspaceList({ workspaces, userName }: Props) {
               {/* Plan badge */}
               <div style={{
                 fontSize: '9px', fontWeight: '700', padding: '2px 7px',
-                borderRadius: '3px', letterSpacing: '0.04em',
+                borderRadius: '9999px', letterSpacing: '0.04em',
                 background: ws.plan_id === 'enterprise' ? 'rgba(245,158,11,0.12)' : 'rgba(139,92,246,0.1)',
                 color: ws.plan_id === 'enterprise' ? '#b45309' : 'var(--accent-primary)',
                 textTransform: 'uppercase',
@@ -126,7 +126,7 @@ export function WorkspaceList({ workspaces, userName }: Props) {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
             padding: '10px 16px',
             border: '1px dashed var(--border-default)',
-            borderRadius: '10px',
+            borderRadius: '8px',
             fontSize: '13px', fontWeight: '500',
             color: 'var(--text-secondary)',
             textDecoration: 'none',
