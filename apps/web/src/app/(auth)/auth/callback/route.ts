@@ -19,6 +19,11 @@ export async function GET(request: NextRequest) {
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!exchangeError && data.user) {
+      // Password reset just needs a session — skip the onboarding/tenant checks below
+      if (next === '/auth/reset-password') {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+
       // Ensure platform_users record exists (first OAuth login creates it)
       const admin = createAdminClient()
       const fullName =
