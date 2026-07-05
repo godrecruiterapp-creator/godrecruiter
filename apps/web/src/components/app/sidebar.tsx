@@ -96,11 +96,11 @@ export function AppSidebar({ serverBehavior }: { serverBehavior?: 'expanded' | '
                 key={href}
                 href={href}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-md text-base transition-colors',
+                  'flex items-center gap-2.5 rounded-md text-sm leading-5 font-normal transition-colors',
                   collapsed ? 'justify-center px-0 py-2' : 'px-2.5 py-2',
                   active
-                    ? 'bg-[#ededed] text-[#181818] font-semibold'
-                    : 'text-[#636f7a] font-medium hover:bg-accent hover:text-accent-foreground'
+                    ? 'bg-[#ededed] text-[#181818]'
+                    : 'text-[#636f7a] hover:bg-accent hover:text-accent-foreground'
                 )}
               >
                 <Icon className="size-4 flex-shrink-0" />
