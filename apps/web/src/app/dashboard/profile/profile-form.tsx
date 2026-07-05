@@ -10,7 +10,6 @@ import { Loader2, CheckCircle2, AlertCircle, User, Lock, Building2, PanelLeft, C
 import { updateProfileAction, updatePasswordAction, updateAvatarAction } from './actions'
 import { useSidebarBehavior, type SidebarBehavior } from '@/hooks/use-sidebar-behavior'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { roleLabel } from '@/lib/roles'
 
 interface Props {
   fullName: string
@@ -114,7 +113,7 @@ export function ProfileForm({ fullName, email, avatarUrl, tenantName, role, memb
               )}
               {role && (
                 <span className="inline-flex items-center rounded-full border border-brand/30 bg-brand-muted text-brand px-2 py-0.5 text-xs font-medium">
-                  {roleLabel(role)}
+                  {role}
                 </span>
               )}
               <span className="text-sm text-muted-foreground">Member since {memberSince}</span>

@@ -19,8 +19,10 @@ export async function GET(request: NextRequest) {
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!exchangeError && data.user) {
-      // Password reset just needs a session — skip the onboarding/tenant checks below
-      if (next === '/auth/reset-password') {
+      // Password reset / accept-invite just need a session — skip the
+      // onboarding/tenant checks below (an invited user has no *active*
+      // membership yet, so that check would wrongly send them to onboarding).
+      if (next === '/auth/reset-password' || next === '/auth/accept-invite') {
         return NextResponse.redirect(`${origin}${next}`)
       }
 

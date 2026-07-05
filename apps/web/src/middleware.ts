@@ -8,6 +8,7 @@ const PUBLIC_PATHS = [
   '/auth/signup',
   '/auth/forgot-password',
   '/auth/reset-password',
+  '/auth/accept-invite',
   '/auth/verify-email',
   '/auth/callback',
   '/auth/sso',
@@ -93,7 +94,7 @@ export async function middleware(request: NextRequest) {
   const { data: membership } = await supabase
     .schema('public')
     .from('platform_user_tenants')
-    .select('role, is_active')
+    .select('is_active, tenant_roles(name)')
     .eq('platform_user_id', user.id)
     .eq('tenant_id', tenantContext.tenant_id)
     .single()
@@ -102,11 +103,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/unauthorized', request.url))
   }
 
+  const roleName = (membership.tenant_roles as unknown as { name: string } | null)?.name ?? ''
+
   supabaseResponse.headers.set('x-tenant-id', tenantContext.tenant_id)
   supabaseResponse.headers.set('x-tenant-schema', tenantContext.schema_name)
   supabaseResponse.headers.set('x-tenant-slug', tenantContext.slug)
   supabaseResponse.headers.set('x-tenant-region', tenantContext.region)
-  supabaseResponse.headers.set('x-user-role', membership.role)
+  supabaseResponse.headers.set('x-user-role', roleName)
 
   return supabaseResponse
 }

@@ -11,7 +11,7 @@ export default async function ProfilePage() {
   const admin = createAdminClient()
   const [membershipRes, profileRes] = await Promise.all([
     admin.from('platform_user_tenants')
-      .select('role, tenants(name)')
+      .select('tenant_roles(name), tenants(name)')
       .eq('platform_user_id', user.id)
       .eq('is_active', true)
       .single(),
@@ -29,7 +29,7 @@ export default async function ProfilePage() {
   const avatarUrl = profileRes.data?.avatar_url ?? user.user_metadata?.avatar_url ?? null
 
   const tenantName = (membershipRes.data?.tenants as any)?.name ?? null
-  const role       = (membershipRes.data as any)?.role ?? null
+  const role       = (membershipRes.data?.tenant_roles as any)?.name ?? null
   const memberSince = new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
   const sidebarBehavior = (user.user_metadata?.sidebar_behavior ?? 'expanded') as 'expanded' | 'collapsed' | 'hover'

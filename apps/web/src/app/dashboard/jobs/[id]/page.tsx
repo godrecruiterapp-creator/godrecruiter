@@ -50,8 +50,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       .eq('job_id', id),
     admin.from('platform_user_tenants')
       .select('platform_user_id, platform_users(id, full_name)')
-      .eq('tenant_id', job.tenant_id).eq('is_active', true)
-      .in('role', ['senior_recruiter', 'recruiter', 'sourcer']),
+      .eq('tenant_id', job.tenant_id).eq('is_active', true),
     admin.from('jobs')
       .select('id, client, employment_type, department, status, recruiter_id, created_at')
       .eq('tenant_id', job.tenant_id).is('deleted_at', null),

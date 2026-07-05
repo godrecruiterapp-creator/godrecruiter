@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { logoutAction } from '@/app/(auth)/actions'
-import { ROLE_LABELS } from '@/lib/roles'
 
 interface Workspace {
   id: string
@@ -89,7 +88,7 @@ export function WorkspaceList({ workspaces, userName }: Props) {
                   {ws.name}
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                  {ROLE_LABELS[ws.role] ?? ws.role} · {ws.slug}.godrecruiter.com
+                  {ws.role} · {ws.slug}.godrecruiter.com
                 </div>
               </div>
 

@@ -1,6 +1,5 @@
 import { headers } from 'next/headers'
 import type { TenantContext } from '@god-recruiter/types'
-import type { UserRole } from '@god-recruiter/types'
 
 // Read tenant context that was stamped by middleware.
 // Call this in Server Components or Route Handlers only.
@@ -26,9 +25,10 @@ export async function getTenantContext(): Promise<TenantContext> {
   }
 }
 
-export async function getUserRole(): Promise<UserRole> {
+// Role names are now per-tenant custom text (see tenant_roles), not a fixed enum.
+export async function getUserRole(): Promise<string> {
   const headersList = await headers()
   const role = headersList.get('x-user-role')
   if (!role) throw new Error('User role missing from request headers')
-  return role as UserRole
+  return role
 }

@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import type { CreateTenantInput } from '@god-recruiter/validators'
 import type { Tenant } from '@god-recruiter/types'
 import { ulid } from 'ulid'
+import { MODULES } from '@/lib/modules'
 
 export async function provisionTenant(
   input: CreateTenantInput,
@@ -40,21 +41,39 @@ export async function provisionTenant(
 
   if (puError) throw new Error(`Failed to upsert platform user: ${puError.message}`)
 
-  // ── Step 3: Link user to tenant as owner ─────────────────────────────────
+  // ── Step 3: Create this tenant's Super Admin role (system, full access) ───
+  const superAdminRoleId = ulid()
+
+  const { error: roleError } = await supabase
+    .from('tenant_roles')
+    .insert({ id: superAdminRoleId, tenant_id: tenantId, name: 'Super Admin', is_system: true })
+
+  if (roleError) throw new Error(`Failed to create Super Admin role: ${roleError.message}`)
+
+  const { error: permError } = await supabase
+    .from('role_permissions')
+    .insert(MODULES.map(m => ({
+      role_id: superAdminRoleId, module: m.key,
+      can_view: true, can_create: true, can_edit: true, can_delete: true,
+    })))
+
+  if (permError) throw new Error(`Failed to grant Super Admin permissions: ${permError.message}`)
+
+  // ── Step 4: Link user to tenant as Super Admin ───────────────────────────
   const { error: memberError } = await supabase
     .from('platform_user_tenants')
     .insert({
       id: ulid(),
       platform_user_id: ownerUserId,
       tenant_id: tenantId,
-      role: 'tenant_owner',
+      role_id: superAdminRoleId,
       is_active: true,
       joined_at: new Date().toISOString(),
     })
 
   if (memberError) throw new Error(`Failed to create membership: ${memberError.message}`)
 
-  // ── Step 4: Track usage event ─────────────────────────────────────────────
+  // ── Step 5: Track usage event ─────────────────────────────────────────────
   await supabase.from('usage_events').insert({
     id: ulid(),
     tenant_id: tenantId,

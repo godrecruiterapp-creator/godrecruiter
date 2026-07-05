@@ -14,8 +14,8 @@ export default async function SelectWorkspacePage() {
   const { data: memberships } = await admin
     .from('platform_user_tenants')
     .select(`
-      role,
       joined_at,
+      tenant_roles ( name ),
       tenants (
         id,
         name,
@@ -34,7 +34,8 @@ export default async function SelectWorkspacePage() {
     .filter((m) => m.tenants)
     .map((m) => {
       const t = (m.tenants as unknown) as TenantRow
-      return { ...t, role: m.role }
+      const role = (m.tenant_roles as unknown as { name: string } | null)?.name ?? ''
+      return { ...t, role }
     })
 
   // If user has exactly one workspace, skip the picker and go straight in
