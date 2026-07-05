@@ -16,7 +16,7 @@ export default async function ProfilePage() {
       .eq('is_active', true)
       .single(),
     admin.from('platform_users')
-      .select('full_name')
+      .select('full_name, avatar_url')
       .eq('id', user.id)
       .single(),
   ])
@@ -25,6 +25,8 @@ export default async function ProfilePage() {
     ?? user.user_metadata?.full_name
     ?? user.email?.split('@')[0]
     ?? 'User'
+
+  const avatarUrl = profileRes.data?.avatar_url ?? user.user_metadata?.avatar_url ?? null
 
   const tenantName = (membershipRes.data?.tenants as any)?.name ?? null
   const role       = (membershipRes.data as any)?.role ?? null
@@ -43,6 +45,7 @@ export default async function ProfilePage() {
       <ProfileForm
         fullName={fullName}
         email={user.email ?? ''}
+        avatarUrl={avatarUrl}
         tenantName={tenantName}
         role={role}
         memberSince={memberSince}

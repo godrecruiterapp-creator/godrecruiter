@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { logoutAction } from '@/app/(auth)/actions'
+import { ROLE_LABELS } from '@/lib/roles'
 
 interface Workspace {
   id: string
@@ -16,16 +17,6 @@ interface Workspace {
 interface Props {
   workspaces: Workspace[]
   userName: string
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  tenant_owner:    'Owner',
-  admin:           'Admin',
-  senior_recruiter:'Senior Recruiter',
-  recruiter:       'Recruiter',
-  sourcer:         'Sourcer',
-  interviewer:     'Interviewer',
-  client_portal:   'Client',
 }
 
 export function WorkspaceList({ workspaces, userName }: Props) {

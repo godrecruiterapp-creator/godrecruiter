@@ -4,6 +4,37 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
+export async function updateAvatarAction(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+
+  const file = formData.get('file') as File | null
+  if (!file || file.size === 0) return { error: 'No file selected.' }
+  if (!file.type.startsWith('image/')) return { error: 'Please upload an image file.' }
+  if (file.size > 5 * 1024 * 1024) return { error: 'Image must be under 5MB.' }
+
+  const admin = createAdminClient()
+  const ext = file.name.split('.').pop() || 'jpg'
+  const path = `${user.id}/avatar.${ext}`
+  const { error: upErr } = await admin.storage.from('avatars')
+    .upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type, upsert: true })
+  if (upErr) return { error: upErr.message }
+
+  const { data: { publicUrl } } = admin.storage.from('avatars').getPublicUrl(path)
+  const avatar_url = `${publicUrl}?v=${Date.now()}`
+
+  const [authRes, dbRes] = await Promise.all([
+    supabase.auth.updateUser({ data: { avatar_url } }),
+    admin.from('platform_users').update({ avatar_url }).eq('id', user.id),
+  ])
+  if (authRes.error) return { error: authRes.error.message }
+  if (dbRes.error)   return { error: dbRes.error.message }
+
+  revalidatePath('/dashboard/profile')
+  return { success: true as const, avatarUrl: avatar_url }
+}
+
 export async function updateProfileAction(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
