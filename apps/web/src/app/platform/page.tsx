@@ -1,17 +1,17 @@
-import { getPlatformOwnersAction } from './actions'
-import { OwnersManager } from './owners-manager'
+import { getTenantsAction } from './actions'
+import { TenantsManager } from './tenants-manager'
 import { PageHeader } from '@/app/dashboard/settings/_components'
 
-export default async function PlatformOwnersPage() {
-  const result = await getPlatformOwnersAction()
+export default async function PlatformTenantsPage() {
+  const result = await getTenantsAction()
 
   return (
     <>
-      <PageHeader title="Platform Owners" description="Global admins who manage every tenant on God Recruiter." />
+      <PageHeader title="Tenants" description="Every company running on God Recruiter." />
       {'error' in result ? (
         <p className="text-sm text-destructive">{result.error}</p>
       ) : (
-        <OwnersManager initialOwners={result.owners} />
+        <TenantsManager initialTenants={result.tenants} />
       )}
     </>
   )

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getPlatformOwnerContext } from '@/lib/platform/owner'
 import { logoutAction } from '@/app/(auth)/actions'
 import { Toaster } from '@/components/ui/sonner'
+import { PlatformNav } from './nav'
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   const ctx = await getPlatformOwnerContext()
@@ -20,6 +21,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           </button>
         </form>
       </header>
+      <PlatformNav />
       <main className="p-6 max-w-4xl mx-auto">{children}</main>
       <Toaster position="bottom-right" />
     </div>
