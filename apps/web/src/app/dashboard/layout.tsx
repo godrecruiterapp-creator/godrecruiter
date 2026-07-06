@@ -15,9 +15,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const admin = createAdminClient()
   const { data: membership } = await admin.from('platform_user_tenants')
-    .select('tenants(status)').eq('platform_user_id', user.id).eq('is_active', true).single()
+    .select('tenants(status), tenant_roles(is_system)').eq('platform_user_id', user.id).eq('is_active', true).single()
   const tenantStatus = (membership?.tenants as unknown as { status: string } | null)?.status
   if (tenantStatus === 'suspended' || tenantStatus === 'cancelled') redirect('/auth/suspended')
+  const isSuperAdmin = (membership?.tenant_roles as unknown as { is_system: boolean } | null)?.is_system ?? false
 
   const fullName =
     user.user_metadata?.full_name ??
@@ -36,7 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex h-screen overflow-hidden bg-background">
         <AppSidebar serverBehavior={sidebarBehavior} />
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-          <Header userName={fullName} userEmail={user.email ?? ''} userId={user.id} avatarUrl={avatarUrl} />
+          <Header userName={fullName} userEmail={user.email ?? ''} userId={user.id} avatarUrl={avatarUrl} isSuperAdmin={isSuperAdmin} />
           <main className="flex-1 overflow-hidden bg-muted/30 flex flex-col">
             <Suspense fallback={<div className="p-6"><PageSkeleton /></div>}>
               {children}

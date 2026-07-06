@@ -1,7 +1,7 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getTenantMemberContext, hasPermission, type TenantMemberContext } from '@/lib/tenant/permissions'
+import { getTenantMemberContext, type TenantMemberContext } from '@/lib/tenant/permissions'
 import { MODULES, type ModuleKey } from '@/lib/modules'
 import { revalidatePath } from 'next/cache'
 import { ulid } from 'ulid'
@@ -24,10 +24,10 @@ export type RoleRow = {
 
 type Gate = { ok: true; ctx: TenantMemberContext } | { ok: false; error: string }
 
-async function requireSettingsAccess(action: 'view' | 'create' | 'edit' | 'delete'): Promise<Gate> {
+async function requireSettingsAccess(_action: 'view' | 'create' | 'edit' | 'delete'): Promise<Gate> {
   const ctx = await getTenantMemberContext()
   if (!ctx) return { ok: false, error: 'Not authenticated.' }
-  if (!(await hasPermission(ctx, 'settings', action))) return { ok: false, error: 'You do not have permission to manage roles.' }
+  if (!ctx.is_system_role) return { ok: false, error: 'Only the Super Admin can manage roles.' }
   return { ok: true, ctx }
 }
 

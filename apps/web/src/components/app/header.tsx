@@ -26,6 +26,7 @@ interface Props {
   userEmail: string
   userId: string
   avatarUrl: string | null
+  isSuperAdmin: boolean
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
@@ -129,7 +130,7 @@ const STATUS_DOT: Record<string, string> = {
   open: 'bg-emerald-500', on_hold: 'bg-amber-500', filled: 'bg-blue-500', closed: 'bg-zinc-400',
 }
 
-export function Header({ userName, userEmail, userId, avatarUrl }: Props) {
+export function Header({ userName, userEmail, userId, avatarUrl, isSuperAdmin }: Props) {
   const initials = userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   const crumbs = useBreadcrumbs()
   const router = useRouter()
@@ -490,11 +491,13 @@ export function Header({ userName, userEmail, userId, avatarUrl }: Props) {
                 <User className="size-3.5 mr-2" />My Profile
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings" className="cursor-pointer">
-                <Settings className="size-3.5 mr-2" />Settings
-              </Link>
-            </DropdownMenuItem>
+            {isSuperAdmin && (
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings" className="cursor-pointer">
+                  <Settings className="size-3.5 mr-2" />Settings
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
               className="cursor-pointer"
