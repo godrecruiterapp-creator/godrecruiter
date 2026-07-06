@@ -11,13 +11,14 @@ export async function forgotPasswordAction(prevState: ActionState, formData: For
   if (!email) return { error: 'Email is required.' }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/auth/reset-password`,
-  })
+  // No redirectTo / link: a clickable link and the code share the same underlying
+  // token, so an email scanner auto-visiting the link burns the code too. Code-only
+  // avoids that — nothing for a bot to click.
+  const { error } = await supabase.auth.resetPasswordForEmail(email)
 
   if (error) return { error: 'Could not send reset email. Please try again.' }
 
-  return { success: 'Check your inbox for a reset link and a 6-digit code.' }
+  return { success: 'Check your inbox for a 6-digit code.' }
 }
 
 // Email links get silently pre-fetched and burned by some inboxes (Gmail link-scanning,
