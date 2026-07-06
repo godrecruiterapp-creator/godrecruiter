@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { AuthBackground } from '@/components/auth/auth-background'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react'
@@ -72,7 +73,7 @@ export function LoginForm({ redirectTo, reset }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+    <AuthBackground>
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
@@ -181,6 +182,6 @@ export function LoginForm({ redirectTo, reset }: Props) {
           100% { transform: scaleY(1); }
         }
       `}</style>
-    </div>
+    </AuthBackground>
   )
 }

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle, ArrowLeft, Mail } from 'lucide-react'
 import { forgotPasswordAction } from '../../actions'
+import { AuthBackground } from '@/components/auth/auth-background'
 import { useFormStatus } from 'react-dom'
 
 function SubmitBtn() {
@@ -26,7 +27,7 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+    <AuthBackground>
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-2.5">
@@ -82,6 +83,6 @@ export default function ForgotPasswordPage() {
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </AuthBackground>
   )
 }

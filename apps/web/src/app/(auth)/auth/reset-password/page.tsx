@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AuthBackground } from '@/components/auth/auth-background'
 import { SessionResetForm } from './session-form'
 import { CodeResetForm } from './code-form'
 
@@ -9,7 +10,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+    <AuthBackground>
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-2.5">
@@ -30,6 +31,6 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AuthBackground>
   )
 }
