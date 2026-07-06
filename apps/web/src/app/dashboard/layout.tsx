@@ -13,13 +13,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
+  const admin = createAdminClient()
+  const { data: membership } = await admin.from('platform_user_tenants')
+    .select('tenants(status)').eq('platform_user_id', user.id).eq('is_active', true).single()
+  const tenantStatus = (membership?.tenants as unknown as { status: string } | null)?.status
+  if (tenantStatus === 'suspended' || tenantStatus === 'cancelled') redirect('/auth/unauthorized')
+
   const fullName =
     user.user_metadata?.full_name ??
     user.user_metadata?.name ??
     user.email?.split('@')[0] ??
     'User'
 
-  const { data: profile } = await createAdminClient()
+  const { data: profile } = await admin
     .from('platform_users').select('avatar_url').eq('id', user.id).single()
   const avatarUrl = profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null
 

@@ -21,11 +21,14 @@ export async function getTenantMemberContext(): Promise<TenantMemberContext | nu
   const admin = createAdminClient()
   const [{ data: membership }, { data: profile }] = await Promise.all([
     admin.from('platform_user_tenants')
-      .select('tenant_id, role_id, tenant_roles(name, is_system)')
+      .select('tenant_id, role_id, tenant_roles(name, is_system), tenants(status)')
       .eq('platform_user_id', user.id).eq('is_active', true).single(),
     admin.from('platform_users').select('full_name').eq('id', user.id).single(),
   ])
   if (!membership) return null
+
+  const tenantStatus = (membership.tenants as unknown as { status: string } | null)?.status
+  if (tenantStatus === 'suspended' || tenantStatus === 'cancelled') return null
 
   const role = membership.tenant_roles as unknown as { name: string; is_system: boolean } | null
 
