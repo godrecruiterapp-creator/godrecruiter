@@ -17,7 +17,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: membership } = await admin.from('platform_user_tenants')
     .select('tenants(status)').eq('platform_user_id', user.id).eq('is_active', true).single()
   const tenantStatus = (membership?.tenants as unknown as { status: string } | null)?.status
-  if (tenantStatus === 'suspended' || tenantStatus === 'cancelled') redirect('/auth/unauthorized')
+  if (tenantStatus === 'suspended' || tenantStatus === 'cancelled') redirect('/auth/suspended')
 
   const fullName =
     user.user_metadata?.full_name ??

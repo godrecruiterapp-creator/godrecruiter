@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   '/auth/callback',
   '/auth/sso',
   '/auth/logout',
+  '/auth/suspended',
   '/api/auth/',
 ]
 
