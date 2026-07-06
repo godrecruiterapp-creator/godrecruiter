@@ -18,11 +18,11 @@ export async function forgotPasswordAction(prevState: ActionState, formData: For
 
   if (error) return { error: 'Could not send reset email. Please try again.' }
 
-  return { success: 'Check your inbox for a 6-digit code.' }
+  return { success: 'Check your inbox for a code.' }
 }
 
 // Email links get silently pre-fetched and burned by some inboxes (Gmail link-scanning,
-// Outlook Safe Links) before the user ever clicks them. The 6-digit code sent in the same
+// Outlook Safe Links) before the user ever clicks them. The code sent in the same
 // email sidesteps that entirely — nothing can "click" a code the user types in by hand.
 export async function verifyResetCodeAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const email    = formData.get('email')    as string

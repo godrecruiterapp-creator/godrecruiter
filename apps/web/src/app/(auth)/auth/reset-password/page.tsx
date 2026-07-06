@@ -22,7 +22,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Choose a new password</CardTitle>
             <CardDescription>
-              {user ? 'Must be at least 8 characters.' : 'Enter the 6-digit code from your email, then choose a new password.'}
+              {user ? 'Must be at least 8 characters.' : 'Enter the code from your email, then choose a new password.'}
             </CardDescription>
           </CardHeader>
           <CardContent>

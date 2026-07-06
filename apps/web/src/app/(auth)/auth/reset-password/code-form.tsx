@@ -37,8 +37,8 @@ export function CodeResetForm({ initialEmail }: { initialEmail: string }) {
             defaultValue={initialEmail} required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="code">6-digit code</Label>
-          <Input id="code" name="code" type="text" inputMode="numeric" maxLength={6} placeholder="123456" autoComplete="one-time-code" required />
+          <Label htmlFor="code">Code from your email</Label>
+          <Input id="code" name="code" type="text" inputMode="numeric" placeholder="123456789" autoComplete="one-time-code" required />
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">New password</Label>
