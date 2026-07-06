@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,6 +17,17 @@ interface Props {
 export function LoginForm({ redirectTo, reset }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const [linkExpired, setLinkExpired] = useState(false)
+
+  // Supabase redirects failed email-link verifications (expired/already-used
+  // recovery or invite links) here with the error in the URL hash — the server
+  // never sees a hash, so this has to be read client-side.
+  useEffect(() => {
+    if (!window.location.hash) return
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    if (params.get('error')) setLinkExpired(true)
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+  }, [])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -79,6 +90,19 @@ export function LoginForm({ redirectTo, reset }: Props) {
                 <Alert className="border-success/30 bg-success/5 text-success">
                   <CheckCircle2 className="size-4" />
                   <AlertDescription>Password updated. Sign in with your new password.</AlertDescription>
+                </Alert>
+              )}
+
+              {linkExpired && (
+                <Alert variant="destructive">
+                  <AlertCircle className="size-4" />
+                  <AlertDescription>
+                    That link expired or was already used.{' '}
+                    <Link href="/auth/forgot-password" className="font-medium underline underline-offset-2">
+                      Request a new code
+                    </Link>{' '}
+                    instead.
+                  </AlertDescription>
                 </Alert>
               )}
 
