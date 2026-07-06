@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { bootstrapFirstOwner, isPlatformOwner } from '@/lib/platform/owner'
 
 export async function POST(request: NextRequest) {
-  const { email, password } = await request.json()
+  const { email, password, rememberMe } = await request.json()
 
   const cookiesToApply: Array<{ name: string; value: string; options: CookieOptions }> = []
 
@@ -41,6 +41,11 @@ export async function POST(request: NextRequest) {
   const redirectTo = (await isPlatformOwner(data.user.id)) ? '/platform' : null
 
   const response = NextResponse.json({ ok: true, redirectTo })
-  cookiesToApply.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+  cookiesToApply.forEach(({ name, value, options }) => {
+    // Unchecked "remember me" = session cookie, gone when the browser closes.
+    // Checked = keep whatever persistent lifetime Supabase set on the cookie.
+    const finalOptions = rememberMe ? options : { ...options, maxAge: undefined, expires: undefined }
+    response.cookies.set(name, value, finalOptions)
+  })
   return response
 }
