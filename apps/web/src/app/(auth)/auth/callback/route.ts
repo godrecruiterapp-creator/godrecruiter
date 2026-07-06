@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient }     from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { bootstrapFirstOwner, isPlatformOwner } from '@/lib/platform/owner'
 import { ulid } from 'ulid'
 
 // Handles OAuth and email magic-link callbacks from Supabase Auth
@@ -43,6 +44,9 @@ export async function GET(request: NextRequest) {
         },
         { onConflict: 'id', ignoreDuplicates: false }
       )
+
+      await bootstrapFirstOwner(data.user.id)
+      if (await isPlatformOwner(data.user.id)) return NextResponse.redirect(`${origin}/platform`)
 
       // Check if this user has any tenant memberships
       const { count } = await admin

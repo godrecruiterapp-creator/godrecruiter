@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient }      from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { isPlatformOwner } from '@/lib/platform/owner'
 import { WorkspaceList } from './workspace-list'
 
 export default async function SelectWorkspacePage() {
@@ -43,9 +44,11 @@ export default async function SelectWorkspacePage() {
     redirect('/dashboard')
   }
 
-  // No workspaces — companies are onboarded by God Recruiter, not self-serve
+  // No workspaces — either a Platform Owner (who isn't part of any tenant) or
+  // an account with nothing to do here, since companies are onboarded by
+  // God Recruiter, not self-serve.
   if (workspaces.length === 0) {
-    redirect('/auth/unauthorized')
+    redirect((await isPlatformOwner(user.id)) ? '/platform' : '/auth/unauthorized')
   }
 
   const fullName =

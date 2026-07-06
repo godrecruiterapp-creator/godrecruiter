@@ -35,8 +35,9 @@ export function LoginForm({ redirectTo, reset }: Props) {
         credentials: 'same-origin',
       })
 
+      const data = await res.json()
+
       if (!res.ok) {
-        const data = await res.json()
         const msg = data.error ?? 'Something went wrong.'
         if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) {
           setError('Incorrect email or password.')
@@ -49,7 +50,7 @@ export function LoginForm({ redirectTo, reset }: Props) {
         return
       }
 
-      window.location.replace(redirectTo ?? '/dashboard')
+      window.location.replace(data.redirectTo ?? redirectTo ?? '/dashboard')
     } catch {
       setError('Something went wrong. Please try again.')
       setPending(false)

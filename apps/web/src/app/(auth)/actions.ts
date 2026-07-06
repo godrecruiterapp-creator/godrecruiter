@@ -3,30 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-
-// ── LOGIN ────────────────────────────────────────────────────────────────────
-export async function loginAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
-  const email    = formData.get('email')    as string
-  const password = formData.get('password') as string
-  const redirectTo = formData.get('redirectTo') as string | null
-
-  if (!email || !password) return { error: 'Email and password are required.' }
-
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-
-  if (error) {
-    if (error.message.includes('Invalid login')) {
-      return { error: 'Incorrect email or password.' }
-    }
-    if (error.message.includes('Email not confirmed')) {
-      return { error: 'Please verify your email before signing in.' }
-    }
-    return { error: 'Something went wrong. Please try again.' }
-  }
-
-  return { redirectTo: redirectTo ?? '/dashboard' }
-}
+import { isPlatformOwner } from '@/lib/platform/owner'
 
 // ── FORGOT PASSWORD ───────────────────────────────────────────���──────────────
 export async function forgotPasswordAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
@@ -84,7 +61,7 @@ export async function acceptInviteAction(prevState: ActionState, formData: FormD
     .eq('is_active', false)
     .is('joined_at', null)
 
-  redirect('/select-workspace')
+  redirect((await isPlatformOwner(user.id)) ? '/platform' : '/select-workspace')
 }
 
 // ── LOGOUT ───────��────────────────────────────────��───────────────────────────
