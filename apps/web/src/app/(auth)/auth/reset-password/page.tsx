@@ -1,27 +1,12 @@
-'use client'
-
-import { useActionState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle } from 'lucide-react'
-import { resetPasswordAction } from '../../actions'
-import { useFormStatus } from 'react-dom'
+import { SessionResetForm } from './session-form'
+import { CodeResetForm } from './code-form'
 
-function SubmitBtn() {
-  const { pending } = useFormStatus()
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
-      {pending ? 'Updating…' : 'Update password'}
-    </Button>
-  )
-}
-
-export default function ResetPasswordPage() {
-  const [state, action] = useActionState(resetPasswordAction, null)
+export default async function ResetPasswordPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
+  const { email } = await searchParams
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
@@ -36,26 +21,12 @@ export default function ResetPasswordPage() {
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Choose a new password</CardTitle>
-            <CardDescription>Must be at least 8 characters.</CardDescription>
+            <CardDescription>
+              {user ? 'Must be at least 8 characters.' : 'Enter the 6-digit code from your email, then choose a new password.'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {state?.error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="size-4" />
-                <AlertDescription>{state.error}</AlertDescription>
-              </Alert>
-            )}
-            <form action={action} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">New password</Label>
-                <Input id="password" name="password" type="password" placeholder="Min. 8 characters" autoComplete="new-password" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm">Confirm new password</Label>
-                <Input id="confirm" name="confirm" type="password" placeholder="••••••••" autoComplete="new-password" required />
-              </div>
-              <SubmitBtn />
-            </form>
+            {user ? <SessionResetForm /> : <CodeResetForm initialEmail={email ?? ''} />}
           </CardContent>
         </Card>
       </div>

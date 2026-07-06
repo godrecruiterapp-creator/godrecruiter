@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,13 +16,14 @@ function SubmitBtn() {
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
-      {pending ? 'Sending…' : 'Send reset link'}
+      {pending ? 'Sending…' : 'Send reset code'}
     </Button>
   )
 }
 
 export default function ForgotPasswordPage() {
   const [state, action] = useActionState(forgotPasswordAction, null)
+  const [email, setEmail] = useState('')
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
@@ -37,7 +38,7 @@ export default function ForgotPasswordPage() {
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Reset your password</CardTitle>
-            <CardDescription>Enter your email and we&apos;ll send you a reset link.</CardDescription>
+            <CardDescription>Enter your email and we&apos;ll send you a reset code.</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -57,12 +58,16 @@ export default function ForgotPasswordPage() {
                   <p className="font-medium text-sm">Check your inbox</p>
                   <p className="text-sm text-muted-foreground mt-1">{state.success}</p>
                 </div>
+                <Button asChild className="w-full mt-2">
+                  <Link href={`/auth/reset-password?email=${encodeURIComponent(email)}`}>Enter the code</Link>
+                </Button>
               </div>
             ) : (
               <form action={action} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Work email</Label>
-                  <Input id="email" name="email" type="email" placeholder="you@company.com" autoComplete="email" required />
+                  <Input id="email" name="email" type="email" placeholder="you@company.com" autoComplete="email" required
+                    value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
                 <SubmitBtn />
               </form>

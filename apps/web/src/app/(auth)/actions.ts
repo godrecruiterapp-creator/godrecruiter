@@ -17,7 +17,31 @@ export async function forgotPasswordAction(prevState: ActionState, formData: For
 
   if (error) return { error: 'Could not send reset email. Please try again.' }
 
-  return { success: 'Password reset link sent — check your inbox.' }
+  return { success: 'Check your inbox for a reset link and a 6-digit code.' }
+}
+
+// Email links get silently pre-fetched and burned by some inboxes (Gmail link-scanning,
+// Outlook Safe Links) before the user ever clicks them. The 6-digit code sent in the same
+// email sidesteps that entirely — nothing can "click" a code the user types in by hand.
+export async function verifyResetCodeAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const email    = formData.get('email')    as string
+  const code     = formData.get('code')     as string
+  const password = formData.get('password') as string
+  const confirm  = formData.get('confirm')  as string
+
+  if (!email || !code) return { error: 'Email and code are required.' }
+  if (!password || !confirm) return { error: 'Both password fields are required.' }
+  if (password !== confirm) return { error: 'Passwords do not match.' }
+  if (password.length < 8) return { error: 'Password must be at least 8 characters.' }
+
+  const supabase = await createClient()
+  const { error: otpError } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'recovery' })
+  if (otpError) return { error: 'That code is incorrect or has expired. Request a new one.' }
+
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) return { error: 'Could not update your password. Please try again.' }
+
+  redirect('/auth/login?reset=success')
 }
 
 // ── RESET PASSWORD ─��───────────────────────────���───────────────────────��──────
