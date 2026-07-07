@@ -167,7 +167,7 @@ export default function ReportBuilder() {
                   <thead>
                     <tr className="text-muted-foreground border-b bg-muted/30">
                       {selected.map((col) => (
-                        <th key={col} className="py-2 px-3 text-left font-medium whitespace-nowrap">{col}</th>
+                        <th key={col} className="py-2 px-3 text-left table-header-cell whitespace-nowrap">{col}</th>
                       ))}
                     </tr>
                   </thead>
@@ -175,7 +175,7 @@ export default function ReportBuilder() {
                     {MOCK_ROWS.slice(0, 5).map((row, i) => (
                       <tr key={i} className="border-b last:border-0 hover:bg-muted/20">
                         {selected.map((col) => (
-                          <td key={col} className="py-2 px-3 text-muted-foreground whitespace-nowrap">
+                          <td key={col} className="py-2 px-3 table-cell-secondary whitespace-nowrap">
                             {(row as Record<string, string>)[col] ?? '—'}
                           </td>
                         ))}

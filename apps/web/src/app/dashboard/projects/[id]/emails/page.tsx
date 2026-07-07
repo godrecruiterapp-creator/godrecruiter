@@ -55,7 +55,7 @@ export default function ProjectEmailsPage() {
             <tr className="border-b border-border">
               {['Subject', 'Recipients', 'Sent', 'Opens', 'Replies', 'Status', ''].map(h => (
                 <th key={h} className="h-9 px-4 text-left align-middle">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</span>
+                  <span className="table-header-cell whitespace-nowrap">{h}</span>
                 </th>
               ))}
             </tr>
@@ -66,20 +66,20 @@ export default function ProjectEmailsPage() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                    <span className="text-sm font-medium">{e.subject}</span>
+                    <span className="table-cell-primary">{e.subject}</span>
                   </div>
                 </td>
-                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{e.to} recipients</span></td>
-                <td className="px-4 py-3"><span className="text-xs text-muted-foreground whitespace-nowrap">{e.sent}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary">{e.to} recipients</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary whitespace-nowrap">{e.sent}</span></td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5">
                     <Eye className="size-3 text-muted-foreground" />
-                    <span className="text-sm tabular-nums">{e.opens}</span>
+                    <span className="table-cell-secondary tabular-nums">{e.opens}</span>
                     {e.to > 0 && <span className="text-[10px] text-muted-foreground">({Math.round(e.opens / e.to * 100)}%)</span>}
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={cn('text-sm font-semibold tabular-nums', e.replies > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>{e.replies}</span>
+                  <span className={cn('table-cell-secondary tabular-nums', e.replies > 0 ? 'text-emerald-600' : '')}>{e.replies}</span>
                 </td>
                 <td className="px-4 py-3">
                   <span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', STA_CFG[e.status])}>{e.status}</span>

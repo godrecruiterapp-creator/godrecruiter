@@ -103,23 +103,23 @@ export default function AgentsDashboard() {
               <table className="w-full">
                 <thead className="bg-muted/60">
                   <tr className="border-b">
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Agent</th>
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Time</th>
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Records</th>
+                    <th className="px-4 py-2.5 text-left table-header-cell">Agent</th>
+                    <th className="px-4 py-2.5 text-left table-header-cell">Status</th>
+                    <th className="px-4 py-2.5 text-left table-header-cell">Time</th>
+                    <th className="px-4 py-2.5 text-left table-header-cell">Records</th>
                   </tr>
                 </thead>
                 <tbody>
                   {RECENT_EXEC.map((r, i) => (
                     <tr key={i} className="border-b last:border-0 hover:bg-muted/40">
-                      <td className="px-4 py-2.5 text-sm font-medium">{r.agent}</td>
+                      <td className="px-4 py-2.5 table-cell-primary">{r.agent}</td>
                       <td className="px-4 py-2.5">
                         <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[r.status]}`}>
                           {r.status}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{r.time}</td>
-                      <td className="px-4 py-2.5 text-sm text-muted-foreground tabular-nums">{r.records}</td>
+                      <td className="px-4 py-2.5 table-cell-secondary">{r.time}</td>
+                      <td className="px-4 py-2.5 table-cell-secondary tabular-nums">{r.records}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -216,7 +216,7 @@ function CandidateTable({ candidates, onSelect }: { candidates: Candidate[]; onS
       <thead className="sticky top-0 bg-muted/60 backdrop-blur-sm">
         <tr className="border-b border-border">
           {['Name', 'Stage', 'Score', 'Experience', 'Location', 'Visa', ''].map(h => (
-            <th key={h} className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground px-5 py-3 whitespace-nowrap">
+            <th key={h} className="text-left table-header-cell px-5 py-3 whitespace-nowrap">
               {h}
             </th>
           ))}
@@ -230,7 +230,7 @@ function CandidateTable({ candidates, onSelect }: { candidates: Candidate[]; onS
                 <Avatar className="size-8 shrink-0">
                   <AvatarFallback className="text-xs font-bold bg-muted text-muted-foreground">{c.initials}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium text-foreground whitespace-nowrap">{c.name}</span>
+                <span className="table-cell-primary whitespace-nowrap">{c.name}</span>
               </div>
             </td>
             <td className="px-5 py-3.5">
@@ -239,8 +239,8 @@ function CandidateTable({ candidates, onSelect }: { candidates: Candidate[]; onS
               </span>
             </td>
             <td className="px-5 py-3.5"><ScoreBadge score={c.score} /></td>
-            <td className="px-5 py-3.5"><span className="text-sm text-foreground">{c.exp}</span></td>
-            <td className="px-5 py-3.5"><span className="text-sm text-muted-foreground whitespace-nowrap">{c.location}</span></td>
+            <td className="px-5 py-3.5"><span className="table-cell-secondary">{c.exp}</span></td>
+            <td className="px-5 py-3.5"><span className="table-cell-secondary whitespace-nowrap">{c.location}</span></td>
             <td className="px-5 py-3.5">
               <span className="text-xs font-medium bg-muted text-muted-foreground px-2 py-1 rounded-md">{c.visa}</span>
             </td>

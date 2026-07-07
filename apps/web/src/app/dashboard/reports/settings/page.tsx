@@ -112,14 +112,14 @@ export default function ReportSettings() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="pb-2 text-left font-medium">Role</th>
-              <th className="pb-2 text-left font-medium">Report Access</th>
+              <th className="pb-2 text-left table-header-cell">Role</th>
+              <th className="pb-2 text-left table-header-cell">Report Access</th>
             </tr>
           </thead>
           <tbody>
             {ROLES.map((r) => (
               <tr key={r.role} className="border-b last:border-0">
-                <td className="py-2.5 font-medium">{r.role}</td>
+                <td className="py-2.5 table-cell-primary">{r.role}</td>
                 <td className="py-2.5">
                   <div className="flex flex-wrap gap-1">
                     {r.access.map((a) => (

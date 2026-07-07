@@ -141,7 +141,7 @@ function TableView({ candidates, selected, allSel, someSel, toggleAll, toggleRow
             <th className="h-9 w-10 px-3"><Checkbox checked={allSel} data-state={someSel ? 'indeterminate' : undefined} onCheckedChange={toggleAll} /></th>
             {['Candidate', 'Stage', 'Title / Company', 'Skills', 'Location', 'Auth', 'Recruiter', 'Last Contact', 'AI Score', ''].map(h => (
               <th key={h} className="h-9 px-3 text-left align-middle whitespace-nowrap">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</span>
+                <span className="table-header-cell">{h}</span>
               </th>
             ))}
           </tr>
@@ -158,7 +158,7 @@ function TableView({ candidates, selected, allSel, someSel, toggleAll, toggleRow
                       {c.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold whitespace-nowrap">{c.name}</p>
+                      <p className="table-cell-primary whitespace-nowrap">{c.name}</p>
                       <div className="flex gap-1 mt-0.5">
                         {c.tags.map(t => (
                           <span key={t} className={cn('text-[9px] px-1.5 py-px rounded-full font-medium border', t === 'Hot' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-muted text-muted-foreground border-border')}>{t}</span>
@@ -171,7 +171,7 @@ function TableView({ candidates, selected, allSel, someSel, toggleAll, toggleRow
                   <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap', STAGE_COLORS[c.stage] ?? '')}>{c.stage}</span>
                 </td>
                 <td className="px-3 py-2">
-                  <p className="text-sm font-medium whitespace-nowrap">{c.title}</p>
+                  <p className="table-cell-secondary whitespace-nowrap">{c.title}</p>
                   <p className="text-[10px] text-muted-foreground">{c.company}</p>
                 </td>
                 <td className="px-3 py-2">
@@ -182,14 +182,14 @@ function TableView({ candidates, selected, allSel, someSel, toggleAll, toggleRow
                     {c.skills.length > 2 && <span className="text-[10px] text-muted-foreground">+{c.skills.length - 2}</span>}
                   </div>
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap"><span className="text-sm text-muted-foreground">{c.location}</span></td>
+                <td className="px-3 py-2 whitespace-nowrap"><span className="table-cell-secondary">{c.location}</span></td>
                 <td className="px-3 py-2">
                   <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', c.auth === 'USC' || c.auth === 'GC' ? 'bg-emerald-50 text-emerald-700' : c.auth === 'H1B' ? 'bg-amber-50 text-amber-700' : 'bg-muted text-muted-foreground')}>
                     {c.auth}
                   </span>
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap"><span className="text-sm text-muted-foreground">{c.recruiter}</span></td>
-                <td className="px-3 py-2 whitespace-nowrap"><span className="text-xs text-muted-foreground">{c.lastContact}</span></td>
+                <td className="px-3 py-2 whitespace-nowrap"><span className="table-cell-secondary">{c.recruiter}</span></td>
+                <td className="px-3 py-2 whitespace-nowrap"><span className="table-cell-secondary">{c.lastContact}</span></td>
                 <td className="px-3 py-2">
                   <span className={cn('text-sm font-bold tabular-nums', scoreColor(c.aiScore))}>{c.aiScore}</span>
                 </td>

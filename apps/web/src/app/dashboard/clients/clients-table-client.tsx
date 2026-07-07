@@ -102,7 +102,7 @@ export function ClientsTableClient({ rows }: { rows: ClientRow[] }) {
           <thead className="sticky top-0 bg-muted/40 z-10">
             <tr className="border-b border-border">
               {['Name', 'Industry', 'Status', 'Account Owner', 'Open Jobs', 'Placements', 'Last Activity'].map(h => (
-                <th key={h} className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">{h}</th>
+                <th key={h} className="text-left px-3 py-3 table-header-cell whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -115,15 +115,15 @@ export function ClientsTableClient({ rows }: { rows: ClientRow[] }) {
                     <div className="size-8 rounded-lg bg-brand-muted text-brand flex items-center justify-center text-xs font-bold shrink-0">
                       {toInitials(c.name)}
                     </div>
-                    <span className="font-medium truncate">{c.name}</span>
+                    <span className="table-cell-primary truncate">{c.name}</span>
                   </div>
                 </td>
-                <td className="px-3 py-2 text-secondary-foreground">{c.industry}</td>
+                <td className="px-3 py-2 table-cell-secondary">{c.industry}</td>
                 <td className="px-3 py-2"><Chip label={STATUS_LABEL[c.status]} className={STATUS_BADGE[c.status]} /></td>
-                <td className="px-3 py-2 text-secondary-foreground">{c.accountOwner.join(', ') || '—'}</td>
-                <td className="px-3 py-2 text-secondary-foreground">{openJobs}</td>
-                <td className="px-3 py-2 text-secondary-foreground">{placements}</td>
-                <td className="px-3 py-2 text-secondary-foreground">{c.lastActivity}</td>
+                <td className="px-3 py-2 table-cell-secondary">{c.accountOwner.join(', ') || '—'}</td>
+                <td className="px-3 py-2 table-cell-secondary">{openJobs}</td>
+                <td className="px-3 py-2 table-cell-secondary">{placements}</td>
+                <td className="px-3 py-2 table-cell-secondary">{c.lastActivity}</td>
               </tr>
             ))}
           </tbody>

@@ -41,7 +41,7 @@ export default function ProjectJobsPage() {
             <tr className="border-b border-border">
               {['Job', 'Client', 'Priority', 'Status', 'Openings', 'Submissions', 'Placements', 'AI Match', ''].map(h => (
                 <th key={h} className="h-9 px-4 text-left align-middle">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</span>
+                  <span className="table-header-cell whitespace-nowrap">{h}</span>
                 </th>
               ))}
             </tr>
@@ -53,18 +53,18 @@ export default function ProjectJobsPage() {
                   <div className="flex items-center gap-2">
                     <Briefcase className="size-3.5 text-muted-foreground shrink-0" />
                     <div>
-                      <p className="text-sm font-semibold">{j.title}</p>
+                      <p className="table-cell-primary">{j.title}</p>
                       <p className="text-[10px] text-muted-foreground">{j.id}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{j.client}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary">{j.client}</span></td>
                 <td className="px-4 py-3"><span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', PRI_CFG[j.priority])}>{j.priority}</span></td>
                 <td className="px-4 py-3"><span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', STA_CFG[j.status])}>{j.status}</span></td>
-                <td className="px-4 py-3"><span className="text-sm font-medium tabular-nums">{j.openings}</span></td>
-                <td className="px-4 py-3"><span className="text-sm tabular-nums text-muted-foreground">{j.submissions}</span></td>
-                <td className="px-4 py-3"><span className={cn('text-sm font-semibold tabular-nums', j.placements > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>{j.placements}</span></td>
-                <td className="px-4 py-3"><span className={cn('text-sm font-bold tabular-nums', j.aiMatch >= 90 ? 'text-emerald-600' : j.aiMatch >= 75 ? 'text-amber-500' : 'text-red-500')}>{j.aiMatch}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary tabular-nums">{j.openings}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary tabular-nums">{j.submissions}</span></td>
+                <td className="px-4 py-3"><span className={cn('table-cell-secondary tabular-nums', j.placements > 0 ? 'text-emerald-600' : '')}>{j.placements}</span></td>
+                <td className="px-4 py-3"><span className={cn('table-cell-secondary tabular-nums', j.aiMatch >= 90 ? 'text-emerald-600' : j.aiMatch >= 75 ? 'text-amber-500' : 'text-red-500')}>{j.aiMatch}</span></td>
                 <td className="px-4 py-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

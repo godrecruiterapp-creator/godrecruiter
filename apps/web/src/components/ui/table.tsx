@@ -73,7 +73,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-9 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      "h-9 px-4 text-left align-middle [&:has([role=checkbox])]:pr-0 table-header-cell",
       className
     )}
     {...props}
@@ -81,13 +81,19 @@ const TableHead = React.forwardRef<
 ))
 TableHead.displayName = "TableHead"
 
+// First `<td>` in a row is the primary column (500 weight); every other
+// `<td>` is secondary (400 weight) — matches the app-wide table typography
+// standard without needing per-cell props.
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn("px-4 py-2 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    className={cn(
+      "px-4 py-2 align-middle [&:has([role=checkbox])]:pr-0 table-cell-secondary",
+      className
+    )}
     {...props}
   />
 ))

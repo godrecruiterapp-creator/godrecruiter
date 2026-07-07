@@ -146,6 +146,35 @@
   }
 }
 
+/* Table typography — single source of truth for every table in the app.
+   Header: 600, first/primary column: 500, remaining columns: 400 — all 14px/20px. */
+@layer components {
+  .table-header-cell {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .table-cell-primary {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  .table-cell-secondary {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    color: var(--secondary-foreground);
+  }
+  /* First cell in a row is the primary column — promotes automatically when
+     `.table-cell-secondary` is applied directly to the `<td>` itself. */
+  tr > .table-cell-secondary:first-child {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);

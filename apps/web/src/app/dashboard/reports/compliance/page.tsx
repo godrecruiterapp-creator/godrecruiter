@@ -80,19 +80,19 @@ export default function ComplianceReports() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="pb-2 text-left font-medium">Candidate</th>
-              <th className="pb-2 text-left font-medium">License Type</th>
-              <th className="pb-2 text-left font-medium">Expiry Date</th>
-              <th className="pb-2 text-right font-medium">Days Remaining</th>
-              <th className="pb-2 text-left font-medium">Status</th>
+              <th className="pb-2 text-left table-header-cell">Candidate</th>
+              <th className="pb-2 text-left table-header-cell">License Type</th>
+              <th className="pb-2 text-left table-header-cell">Expiry Date</th>
+              <th className="pb-2 text-right table-header-cell">Days Remaining</th>
+              <th className="pb-2 text-left table-header-cell">Status</th>
             </tr>
           </thead>
           <tbody>
             {LICENSES.map((r) => (
               <tr key={r.candidate + r.type} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-2 font-medium">{r.candidate}</td>
-                <td className="py-2 text-muted-foreground">{r.type}</td>
-                <td className="py-2 text-muted-foreground">{r.expiry}</td>
+                <td className="py-2 table-cell-primary">{r.candidate}</td>
+                <td className="py-2 table-cell-secondary">{r.type}</td>
+                <td className="py-2 table-cell-secondary">{r.expiry}</td>
                 <td className={`py-2 text-right ${daysColor(r.days)}`}>{r.days < 0 ? `${Math.abs(r.days)}d overdue` : `${r.days}d`}</td>
                 <td className="py-2"><span className={`px-1.5 py-0.5 rounded text-[10px] ${statusBadge(r.status)}`}>{r.status}</span></td>
               </tr>

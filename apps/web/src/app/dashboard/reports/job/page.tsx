@@ -79,27 +79,27 @@ export default function JobReports() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="pb-2 text-left font-medium">Job ID</th>
-              <th className="pb-2 text-left font-medium">Job Title</th>
-              <th className="pb-2 text-left font-medium">Client</th>
-              <th className="pb-2 text-right font-medium">Days Open</th>
-              <th className="pb-2 text-left font-medium">Status</th>
-              <th className="pb-2 text-left font-medium">Priority</th>
-              <th className="pb-2 text-left font-medium">Recruiter</th>
+              <th className="pb-2 text-left table-header-cell">Job ID</th>
+              <th className="pb-2 text-left table-header-cell">Job Title</th>
+              <th className="pb-2 text-left table-header-cell">Client</th>
+              <th className="pb-2 text-right table-header-cell">Days Open</th>
+              <th className="pb-2 text-left table-header-cell">Status</th>
+              <th className="pb-2 text-left table-header-cell">Priority</th>
+              <th className="pb-2 text-left table-header-cell">Recruiter</th>
             </tr>
           </thead>
           <tbody>
             {AGING.map((r) => (
               <tr key={r.id} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-2 text-muted-foreground font-mono">{r.id}</td>
-                <td className="py-2 font-medium">{r.title}</td>
-                <td className="py-2 text-muted-foreground">{r.client}</td>
+                <td className="py-2 table-cell-secondary font-mono">{r.id}</td>
+                <td className="py-2 table-cell-primary">{r.title}</td>
+                <td className="py-2 table-cell-secondary">{r.client}</td>
                 <td className={`py-2 text-right ${agingColor(r.days)}`}>{r.days}d</td>
                 <td className="py-2"><span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700">{r.status}</span></td>
                 <td className="py-2">
                   <span className={`px-1.5 py-0.5 rounded text-[10px] ${r.priority === 'High' ? 'bg-red-100 text-red-700' : r.priority === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground'}`}>{r.priority}</span>
                 </td>
-                <td className="py-2 text-muted-foreground">{r.recruiter}</td>
+                <td className="py-2 table-cell-secondary">{r.recruiter}</td>
               </tr>
             ))}
           </tbody>

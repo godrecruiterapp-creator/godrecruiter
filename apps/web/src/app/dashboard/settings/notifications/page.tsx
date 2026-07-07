@@ -78,16 +78,16 @@ export default function NotificationsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
-                  <th className="text-left py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Event</th>
-                  <th className="text-center px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">In-app</th>
-                  <th className="text-center px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Email</th>
-                  <th className="text-center px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">SMS</th>
+                  <th className="text-left py-2 table-header-cell">Event</th>
+                  <th className="text-center px-3 py-2 table-header-cell">In-app</th>
+                  <th className="text-center px-3 py-2 table-header-cell">Email</th>
+                  <th className="text-center px-3 py-2 table-header-cell">SMS</th>
                 </tr>
               </thead>
               <tbody>
                 {events.map(e => (
                   <tr key={e.id} className="border-b border-border/40 last:border-0">
-                    <td className="py-3 text-sm">{e.label}</td>
+                    <td className="py-3 table-cell-primary">{e.label}</td>
                     {(['inApp', 'email', 'sms'] as Channel[]).map(ch => (
                       <td key={ch} className="px-3 py-3 text-center">
                         <div className="flex justify-center">

@@ -67,22 +67,22 @@ export default function ClientReports() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="pb-2 text-left font-medium">Client</th>
-              <th className="pb-2 text-right font-medium">Active Jobs</th>
-              <th className="pb-2 text-right font-medium">Submissions</th>
-              <th className="pb-2 text-right font-medium">Placements</th>
-              <th className="pb-2 text-right font-medium">Revenue</th>
-              <th className="pb-2 text-left font-medium">Status</th>
+              <th className="pb-2 text-left table-header-cell">Client</th>
+              <th className="pb-2 text-right table-header-cell">Active Jobs</th>
+              <th className="pb-2 text-right table-header-cell">Submissions</th>
+              <th className="pb-2 text-right table-header-cell">Placements</th>
+              <th className="pb-2 text-right table-header-cell">Revenue</th>
+              <th className="pb-2 text-left table-header-cell">Status</th>
             </tr>
           </thead>
           <tbody>
             {TOP_CLIENTS.map((r) => (
               <tr key={r.client} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-2 font-medium">{r.client}</td>
-                <td className="py-2 text-right">{r.jobs}</td>
-                <td className="py-2 text-right">{r.submissions}</td>
-                <td className="py-2 text-right">{r.placements}</td>
-                <td className="py-2 text-right font-medium text-emerald-600">{r.revenue}</td>
+                <td className="py-2 table-cell-primary">{r.client}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.jobs}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.submissions}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.placements}</td>
+                <td className="py-2 text-right table-cell-secondary text-emerald-600">{r.revenue}</td>
                 <td className="py-2">
                   <span className={`px-1.5 py-0.5 rounded text-[10px] ${r.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'}`}>{r.status}</span>
                 </td>

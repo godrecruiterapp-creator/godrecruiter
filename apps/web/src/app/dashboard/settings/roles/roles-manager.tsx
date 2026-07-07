@@ -148,9 +148,9 @@ export function RolesManager({ initialRoles }: { initialRoles: RoleRow[] }) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left px-6 py-3.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Module</th>
+                  <th className="text-left px-6 py-3.5 table-header-cell">Module</th>
                   {ACTIONS.map(a => (
-                    <th key={a.field} className="px-4 py-3.5 text-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wide w-24">
+                    <th key={a.field} className="px-4 py-3.5 text-center table-header-cell w-24">
                       {a.label}
                     </th>
                   ))}
@@ -161,7 +161,7 @@ export function RolesManager({ initialRoles }: { initialRoles: RoleRow[] }) {
                   const perm = selected.permissions.find(p => p.module === m.key)
                   return (
                     <tr key={m.key} className="border-t border-border/30 hover:bg-muted/10 transition-colors">
-                      <td className="px-6 py-3 font-medium">{m.label}</td>
+                      <td className="px-6 py-3 table-cell-primary">{m.label}</td>
                       {ACTIONS.map(a => (
                         <td key={a.field} className="px-4 py-3 text-center">
                           {selected.is_system ? (

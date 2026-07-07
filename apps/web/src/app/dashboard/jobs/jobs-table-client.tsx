@@ -337,7 +337,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
     if (key === 'select') return <Checkbox checked={allSel} data-state={someSel ? 'indeterminate' : undefined} onCheckedChange={toggleAll} aria-label="Select all" />
     return (
       <button onClick={() => handleSort(key)} className={`flex items-center gap-0 w-full text-left ${COL_META[key].sortable ? 'cursor-pointer' : 'cursor-default'}`}>
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{COL_META[key].label}</span>
+        <span className="table-header-cell whitespace-nowrap">{COL_META[key].label}</span>
         <SortChevron k={key} />
       </button>
     )
@@ -353,33 +353,33 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
       case 'job_id':
         return (
           <Link href={`/dashboard/jobs/${job.id}`} onClick={e => e.stopPropagation()}
-            className="text-xs text-muted-foreground font-medium tabular-nums hover:text-brand transition-colors">
+            className="table-cell-secondary tabular-nums hover:text-brand transition-colors">
             {job.display_id ?? `…${job.id.slice(-6).toUpperCase()}`}
           </Link>
         )
       case 'title':
         return (
           <Link href={`/dashboard/jobs/${job.id}`} onClick={e => e.stopPropagation()}
-            className="text-base font-medium truncate hover:text-brand transition-colors block">
+            className="table-cell-primary truncate hover:text-brand transition-colors block">
             {job.title}
           </Link>
         )
-      case 'client':     return <span className="text-sm text-muted-foreground truncate">{job.client ?? '—'}</span>
-      case 'city':       return <span className="text-sm text-muted-foreground truncate">{job.city ?? '—'}</span>
-      case 'state':      return <span className="text-sm text-muted-foreground">{job.state ?? '—'}</span>
-      case 'emp_type':   return <span className="text-sm text-muted-foreground whitespace-nowrap">{EMP_LABELS[job.employment_type ?? ''] ?? '—'}</span>
+      case 'client':     return <span className="table-cell-secondary truncate">{job.client ?? '—'}</span>
+      case 'city':       return <span className="table-cell-secondary truncate">{job.city ?? '—'}</span>
+      case 'state':      return <span className="table-cell-secondary">{job.state ?? '—'}</span>
+      case 'emp_type':   return <span className="table-cell-secondary whitespace-nowrap">{EMP_LABELS[job.employment_type ?? ''] ?? '—'}</span>
       case 'status':     return <Chip label={st.label} className={st.className} />
       case 'priority':   return <Chip label={pri.label} className={pri.className} />
-      case 'recruiter':  return <span className="text-sm text-muted-foreground">{job.recruiter_name ?? '—'}</span>
-      case 'openings':   return <span className="text-sm text-muted-foreground tabular-nums">{job.openings}</span>
-      case 'submitted':  return <span className="text-sm text-muted-foreground tabular-nums">0</span>
-      case 'interviews': return <span className="text-sm text-muted-foreground tabular-nums">0</span>
-      case 'offers':     return <span className="text-sm text-muted-foreground tabular-nums">0</span>
-      case 'created':    return <span className="text-xs text-muted-foreground whitespace-nowrap">{fmt(job.created_at)}</span>
-      case 'modified':   return <span className="text-xs text-muted-foreground whitespace-nowrap">{fmt(job.updated_at)}</span>
+      case 'recruiter':  return <span className="table-cell-secondary">{job.recruiter_name ?? '—'}</span>
+      case 'openings':   return <span className="table-cell-secondary tabular-nums">{job.openings}</span>
+      case 'submitted':  return <span className="table-cell-secondary tabular-nums">0</span>
+      case 'interviews': return <span className="table-cell-secondary tabular-nums">0</span>
+      case 'offers':     return <span className="table-cell-secondary tabular-nums">0</span>
+      case 'created':    return <span className="table-cell-secondary whitespace-nowrap">{fmt(job.created_at)}</span>
+      case 'modified':   return <span className="table-cell-secondary whitespace-nowrap">{fmt(job.updated_at)}</span>
       case 'aging':
         return (
-          <span className={`text-sm tabular-nums font-medium ${days > 30 ? 'text-red-600 dark:text-red-400' : days > 14 ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+          <span className={`table-cell-secondary tabular-nums ${days > 30 ? 'text-red-600 dark:text-red-400' : days > 14 ? 'text-amber-600 dark:text-amber-400' : ''}`}>
             {days}d
           </span>
         )

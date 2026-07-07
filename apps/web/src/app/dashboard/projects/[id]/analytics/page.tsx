@@ -102,7 +102,7 @@ export default function ProjectAnalyticsPage() {
                 <tr>
                   {['Recruiter','Submissions','Interviews','Placements','Response %'].map(h => (
                     <th key={h} className="pb-2 text-left">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</span>
+                      <span className="table-header-cell whitespace-nowrap">{h}</span>
                     </th>
                   ))}
                 </tr>
@@ -110,11 +110,11 @@ export default function ProjectAnalyticsPage() {
               <tbody>
                 {RECRUITER_PERF.map(r => (
                   <tr key={r.name} className="border-t border-border">
-                    <td className="py-2 text-sm font-medium">{r.name}</td>
-                    <td className="py-2 text-sm tabular-nums">{r.submissions}</td>
-                    <td className="py-2 text-sm tabular-nums">{r.interviews}</td>
-                    <td className="py-2 text-sm font-semibold tabular-nums text-emerald-600">{r.placements}</td>
-                    <td className="py-2 text-sm tabular-nums">{r.responseRate}%</td>
+                    <td className="py-2 table-cell-primary">{r.name}</td>
+                    <td className="py-2 table-cell-secondary tabular-nums">{r.submissions}</td>
+                    <td className="py-2 table-cell-secondary tabular-nums">{r.interviews}</td>
+                    <td className="py-2 table-cell-secondary tabular-nums text-emerald-600">{r.placements}</td>
+                    <td className="py-2 table-cell-secondary tabular-nums">{r.responseRate}%</td>
                   </tr>
                 ))}
               </tbody>

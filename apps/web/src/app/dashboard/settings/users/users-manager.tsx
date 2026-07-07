@@ -127,7 +127,7 @@ export function UsersManager({ initialMembers, initialRoles }: { initialMembers:
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 {['User', 'Role', 'Status', ''].map(h => (
-                  <th key={h} className={cn('px-5 py-2.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide', h ? 'text-left' : '')}>{h}</th>
+                  <th key={h} className={cn('px-5 py-2.5 table-header-cell', h ? 'text-left' : '')}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -140,7 +140,7 @@ export function UsersManager({ initialMembers, initialRoles }: { initialMembers:
                         {m.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium">{m.full_name}</p>
+                        <p className="table-cell-primary">{m.full_name}</p>
                         <p className="text-[10px] text-muted-foreground">{m.email}</p>
                       </div>
                     </div>

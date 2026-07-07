@@ -338,7 +338,7 @@ function JobsTab({ jobs }: { jobs: JobRow[] }) {
             <thead className="sticky top-0 bg-muted/60 backdrop-blur-sm border-b border-border">
               <tr>
                 {['Job Title', 'Client', 'Location', 'Stage', 'Status', 'Submitted', ''].map(h => (
-                  <th key={h} className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground px-5 h-9 whitespace-nowrap">
+                  <th key={h} className="text-left table-header-cell px-5 h-9 whitespace-nowrap">
                     {h}
                   </th>
                 ))}
@@ -348,24 +348,24 @@ function JobsTab({ jobs }: { jobs: JobRow[] }) {
               {visible.map(j => (
                 <tr key={j.submissionId} className="hover:bg-muted/30 transition-colors group">
                   <td className="px-5 py-2.5">
-                    <Link href={`/dashboard/jobs/${j.jobId}`} className="text-sm font-medium hover:text-brand transition-colors">
+                    <Link href={`/dashboard/jobs/${j.jobId}`} className="table-cell-primary hover:text-brand transition-colors">
                       {j.title}
                     </Link>
                   </td>
-                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.client ?? '—'}</span></td>
-                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.location ?? '—'}</span></td>
+                  <td className="px-5 py-2.5"><span className="table-cell-secondary">{j.client ?? '—'}</span></td>
+                  <td className="px-5 py-2.5"><span className="table-cell-secondary">{j.location ?? '—'}</span></td>
                   <td className="px-5 py-2.5">
                     <span className="text-xs bg-muted text-foreground px-2.5 py-1 rounded-md">
                       {STAGE_LABEL[j.stage] ?? j.stage}
                     </span>
                   </td>
                   <td className="px-5 py-2.5">
-                    <span className="flex items-center gap-1.5 text-sm text-foreground">
+                    <span className="flex items-center gap-1.5 table-cell-secondary">
                       <span className={`size-1.5 rounded-full ${STATUS_DOT[j.status] ?? 'bg-zinc-400'}`} />
                       {j.status.replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedAt}</span></td>
+                  <td className="px-5 py-2.5"><span className="table-cell-secondary">{j.submittedAt}</span></td>
                   <td className="px-5 py-2.5">
                     <Link href={`/dashboard/jobs/${j.jobId}`}
                       className="text-sm border border-border px-2.5 py-1 rounded-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100">

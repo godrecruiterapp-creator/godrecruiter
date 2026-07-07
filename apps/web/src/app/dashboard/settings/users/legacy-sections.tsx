@@ -63,14 +63,14 @@ export function LegacySettingsSections() {
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 {['Recruiter', 'Current', 'Warn at', 'Maximum'].map(h => (
-                  <th key={h} className={cn('px-5 py-2.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide', h === 'Recruiter' ? 'text-left' : 'text-center')}>{h}</th>
+                  <th key={h} className={cn('px-5 py-2.5 table-header-cell', h === 'Recruiter' ? 'text-left' : 'text-center')}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {capacity.map((r, i) => (
                 <tr key={r.name} className="border-b border-border/40 last:border-0">
-                  <td className="px-5 py-3 text-sm font-medium">{r.name}</td>
+                  <td className="px-5 py-3 table-cell-primary">{r.name}</td>
                   <td className="px-5 py-3 text-center">
                     <span className={cn('font-bold tabular-nums text-sm', r.current >= r.max ? 'text-red-600' : r.current >= r.warn ? 'text-amber-600' : 'text-emerald-600')}>
                       {r.current}

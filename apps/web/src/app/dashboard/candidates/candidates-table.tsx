@@ -542,7 +542,7 @@ function SubmissionsTab({ jobs }: { jobs: PreviewJob[] }) {
             <thead className="sticky top-0 bg-muted/60 backdrop-blur-sm border-b border-border">
               <tr>
                 {['Job ID', 'Job Title', 'Client Name', 'Submitted On', 'Submitted By', 'Job Status', 'Stage'].map(h => (
-                  <th key={h} className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground px-5 h-9 whitespace-nowrap">
+                  <th key={h} className="text-left table-header-cell px-5 h-9 whitespace-nowrap">
                     {h}
                   </th>
                 ))}
@@ -553,21 +553,21 @@ function SubmissionsTab({ jobs }: { jobs: PreviewJob[] }) {
                 <tr key={j.submissionId} className="hover:bg-muted/30 transition-colors group">
                   <td className="px-5 py-2.5">
                     <Link href={`/dashboard/jobs/${j.jobId}`} onClick={e => e.stopPropagation()}
-                      className="text-sm text-muted-foreground font-medium tabular-nums hover:text-brand transition-colors">
+                      className="table-cell-primary tabular-nums hover:text-brand transition-colors">
                       {j.jobDisplayId ?? '—'}
                     </Link>
                   </td>
                   <td className="px-5 py-2.5">
                     <Link href={`/dashboard/jobs/${j.jobId}`}
-                      className="text-sm font-medium hover:text-brand transition-colors">
+                      className="table-cell-secondary hover:text-brand transition-colors">
                       {j.title}
                     </Link>
                   </td>
-                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.client ?? '—'}</span></td>
-                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedAtLabel}</span></td>
-                  <td className="px-5 py-2.5"><span className="text-sm text-muted-foreground">{j.submittedBy ?? '—'}</span></td>
+                  <td className="px-5 py-2.5"><span className="table-cell-secondary">{j.client ?? '—'}</span></td>
+                  <td className="px-5 py-2.5"><span className="table-cell-secondary">{j.submittedAtLabel}</span></td>
+                  <td className="px-5 py-2.5"><span className="table-cell-secondary">{j.submittedBy ?? '—'}</span></td>
                   <td className="px-5 py-2.5">
-                    <span className={`text-sm font-medium ${STATUS_BADGE[j.status] ?? 'text-muted-foreground'}`}>
+                    <span className={`table-cell-secondary ${STATUS_BADGE[j.status] ?? ''}`}>
                       {j.status.replace('_', ' ')}
                     </span>
                   </td>
@@ -1043,7 +1043,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
     if (key === 'actions') return null
     return (
       <button onClick={() => handleSort(key)} className={`flex items-center gap-0 w-full text-left ${COL_META[key].sortable ? 'cursor-pointer' : 'cursor-default'}`}>
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{COL_META[key].label}</span>
+        <span className="text-xs font-semibold text-muted-foreground tracking-wide whitespace-nowrap">{COL_META[key].label}</span>
         <SortChevron k={key} />
       </button>
     )
@@ -1058,7 +1058,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
       case 'candidate_id':
         return (
           <Link href={`/dashboard/candidates/${c.id}`} onClick={e => e.stopPropagation()}
-            className="text-xs text-muted-foreground font-medium tabular-nums hover:text-brand transition-colors">
+            className="table-cell-secondary tabular-nums hover:text-brand transition-colors">
             {canId(c.candidate_number)}
           </Link>
         )
@@ -1069,7 +1069,7 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
               <AvatarFallback className="text-[10px] font-semibold bg-brand-muted text-brand">{ini}</AvatarFallback>
             </Avatar>
             <Link href={`/dashboard/candidates/${c.id}`} onClick={e => e.stopPropagation()}
-              className="text-base font-medium truncate hover:text-brand transition-colors">
+              className="table-cell-primary truncate hover:text-brand transition-colors">
               {name}
             </Link>
             {/* Eye icon — opens preview sheet */}
@@ -1082,20 +1082,20 @@ export function CandidatesTable({ candidates: all }: { candidates: CandidateRow[
             </button>
           </div>
         )
-      case 'job_title':     return <span className="text-sm text-muted-foreground truncate">{c.current_title ?? '—'}</span>
-      case 'stage':         return <span className="text-sm text-muted-foreground">—</span>
-      case 'experience':    return <span className="text-sm text-muted-foreground">—</span>
-      case 'skills':        return <span className="text-sm text-muted-foreground">—</span>
-      case 'email':         return <span className="text-sm text-muted-foreground truncate">{c.email}</span>
-      case 'phone':         return <span className="text-sm text-muted-foreground">{c.phone ?? '—'}</span>
-      case 'city':          return <span className="text-sm text-muted-foreground truncate">{c.location ?? '—'}</span>
-      case 'state':         return <span className="text-sm text-muted-foreground">—</span>
-      case 'work_auth':     return <span className="text-sm text-muted-foreground">{WORK_AUTH[c.candidate_type ?? ''] ?? '—'}</span>
-      case 'availability':  return <span className="text-sm text-muted-foreground">{c.notice_period ?? '—'}</span>
-      case 'pay':           return <span className="text-sm text-muted-foreground tabular-nums">{c.expected_ctc ? formatCtc(c.expected_ctc) : '—'}</span>
-      case 'recruiter':     return <span className="text-sm text-muted-foreground">—</span>
-      case 'last_activity': return <span className="text-xs text-muted-foreground">{relTime(c.updated_at)}</span>
-      case 'created':       return <span className="text-xs text-muted-foreground">{relTime(c.created_at)}</span>
+      case 'job_title':     return <span className="table-cell-secondary truncate">{c.current_title ?? '—'}</span>
+      case 'stage':         return <span className="table-cell-secondary">—</span>
+      case 'experience':    return <span className="table-cell-secondary">—</span>
+      case 'skills':        return <span className="table-cell-secondary">—</span>
+      case 'email':         return <span className="table-cell-secondary truncate">{c.email}</span>
+      case 'phone':         return <span className="table-cell-secondary">{c.phone ?? '—'}</span>
+      case 'city':          return <span className="table-cell-secondary truncate">{c.location ?? '—'}</span>
+      case 'state':         return <span className="table-cell-secondary">—</span>
+      case 'work_auth':     return <span className="table-cell-secondary">{WORK_AUTH[c.candidate_type ?? ''] ?? '—'}</span>
+      case 'availability':  return <span className="table-cell-secondary">{c.notice_period ?? '—'}</span>
+      case 'pay':           return <span className="table-cell-secondary tabular-nums">{c.expected_ctc ? formatCtc(c.expected_ctc) : '—'}</span>
+      case 'recruiter':     return <span className="table-cell-secondary">—</span>
+      case 'last_activity': return <span className="table-cell-secondary">{relTime(c.updated_at)}</span>
+      case 'created':       return <span className="table-cell-secondary">{relTime(c.created_at)}</span>
       case 'actions':       return null
     }
   }

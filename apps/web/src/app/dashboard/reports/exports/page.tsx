@@ -33,23 +33,23 @@ export default function ExportHistory() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="py-3 px-4 text-left font-medium">Date</th>
-              <th className="py-3 px-4 text-left font-medium">Report</th>
-              <th className="py-3 px-4 text-left font-medium">Format</th>
-              <th className="py-3 px-4 text-left font-medium">Size</th>
-              <th className="py-3 px-4 text-left font-medium">Status</th>
-              <th className="py-3 px-4 text-left font-medium">Download</th>
+              <th className="py-3 px-4 text-left table-header-cell">Date</th>
+              <th className="py-3 px-4 text-left table-header-cell">Report</th>
+              <th className="py-3 px-4 text-left table-header-cell">Format</th>
+              <th className="py-3 px-4 text-left table-header-cell">Size</th>
+              <th className="py-3 px-4 text-left table-header-cell">Status</th>
+              <th className="py-3 px-4 text-left table-header-cell">Download</th>
             </tr>
           </thead>
           <tbody>
             {EXPORTS.map((r, i) => (
               <tr key={i} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">{r.date}</td>
-                <td className="py-3 px-4 font-medium">{r.report}</td>
+                <td className="py-3 px-4 table-cell-secondary whitespace-nowrap">{r.date}</td>
+                <td className="py-3 px-4 table-cell-primary">{r.report}</td>
                 <td className="py-3 px-4">
                   <span className="px-1.5 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">{r.format}</span>
                 </td>
-                <td className="py-3 px-4 text-muted-foreground">{r.size}</td>
+                <td className="py-3 px-4 table-cell-secondary">{r.size}</td>
                 <td className="py-3 px-4">
                   <span className={`px-1.5 py-0.5 rounded text-[10px] ${statusBadge(r.status)}`}>{r.status}</span>
                 </td>

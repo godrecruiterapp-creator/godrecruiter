@@ -108,7 +108,7 @@ export default function HistoryPage() {
     if (key === 'actions') return null
     return (
       <button onClick={() => handleSort(key)} className={cn('flex items-center w-full text-left', COL_META[key].sortable ? 'cursor-pointer' : 'cursor-default')}>
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{COL_META[key].label}</span>
+        <span className="table-header-cell whitespace-nowrap">{COL_META[key].label}</span>
         <SortChevron k={key} />
       </button>
     )
@@ -117,16 +117,16 @@ export default function HistoryPage() {
   function renderCell(key: ColKey, r: Run) {
     switch (key) {
       case 'select': return <Checkbox checked={selected.has(r.id)} onCheckedChange={v => toggleRow(r.id, !!v)} onClick={e => e.stopPropagation()} />
-      case 'date': return <span className="text-xs text-muted-foreground whitespace-nowrap">{r.date}</span>
-      case 'agent': return <span className="text-sm font-medium">{r.agent}</span>
+      case 'date': return <span className="table-cell-secondary whitespace-nowrap">{r.date}</span>
+      case 'agent': return <span className="table-cell-primary">{r.agent}</span>
       case 'status': return (
         <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize', STATUS_BADGE[r.status] ?? '')}>{r.status}</span>
       )
-      case 'duration': return <span className="text-sm text-muted-foreground tabular-nums">{r.duration}</span>
-      case 'records': return <span className="text-sm text-muted-foreground tabular-nums">{r.records}</span>
-      case 'actions_performed': return <span className="text-sm text-muted-foreground tabular-nums">{r.actions_performed}</span>
+      case 'duration': return <span className="table-cell-secondary tabular-nums">{r.duration}</span>
+      case 'records': return <span className="table-cell-secondary tabular-nums">{r.records}</span>
+      case 'actions_performed': return <span className="table-cell-secondary tabular-nums">{r.actions_performed}</span>
       case 'errors': return (
-        <span className={cn('text-sm tabular-nums font-medium', r.errors > 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground')}>{r.errors}</span>
+        <span className={cn('table-cell-secondary tabular-nums', r.errors > 0 ? 'text-red-600 dark:text-red-400' : '')}>{r.errors}</span>
       )
       case 'actions': return (
         <DropdownMenu>

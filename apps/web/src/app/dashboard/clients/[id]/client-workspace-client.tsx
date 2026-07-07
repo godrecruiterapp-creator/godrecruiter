@@ -771,11 +771,11 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     <thead className="bg-muted/40">
                       <tr className="border-b border-border">
                         <th className="w-10 px-3 py-3"><Checkbox checked={allContactsSelected} data-state={someContactsSelected ? 'indeterminate' : undefined} onCheckedChange={v => toggleAllContacts(!!v)} aria-label="Select all contacts" /></th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Contact</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Title</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Email</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Phone</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Status</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Contact</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Title</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Email</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Phone</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Status</th>
                         <th className="w-28" />
                       </tr>
                     </thead>
@@ -784,14 +784,14 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                         <tr key={c.id} className="group border-b border-border/60 last:border-0 hover:bg-muted/20" style={{ height: 52 }}>
                           <td className="px-3 py-2"><Checkbox checked={selectedContactIds.includes(c.id)} onCheckedChange={() => toggleContactSelect(c.id)} aria-label={`Select ${c.name}`} /></td>
                           <td className="px-3 py-2">
-                            <button type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 font-medium hover:text-brand">
+                            <button type="button" onClick={() => setSelectedContact(c)} className="flex items-center gap-2.5 table-cell-primary hover:text-brand">
                               <Avatar className="size-7 shrink-0"><AvatarFallback className="text-xs font-bold bg-brand-muted text-brand">{toInitials(c.name)}</AvatarFallback></Avatar>
                               {c.name}
                             </button>
                           </td>
-                          <td className="px-3 py-2 text-secondary-foreground">{c.title || '—'}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{c.email || '—'}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{c.phone || '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{c.title || '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{c.email || '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{c.phone || '—'}</td>
                           <td className="px-3 py-2">
                             <div className="flex gap-1.5">
                               {c.primary && <Chip label="Primary" className="bg-brand-muted text-brand border-brand/25" />}
@@ -841,12 +841,12 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     <thead className="bg-muted/40">
                       <tr className="border-b border-border">
                         <th className="w-10 px-3 py-3"><Checkbox checked={allFacilitiesSelected} data-state={someFacilitiesSelected ? 'indeterminate' : undefined} onCheckedChange={v => toggleAllFacilities(!!v)} aria-label="Select all facilities" /></th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Facility</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Type</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Location</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Departments</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Specialties</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Manager</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Facility</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Type</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Location</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Departments</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Specialties</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Manager</th>
                         <th className="w-20" />
                       </tr>
                     </thead>
@@ -854,12 +854,12 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                       {facilityList.map(f => (
                         <tr key={f.id} className="group border-b border-border/60 last:border-0 hover:bg-muted/20" style={{ height: 52 }}>
                           <td className="px-3 py-2"><Checkbox checked={selectedFacilityIds.includes(f.id)} onCheckedChange={() => toggleFacilitySelect(f.id)} aria-label={`Select ${f.name}`} /></td>
-                          <td className="px-3 py-2 font-medium">{f.name}</td>
+                          <td className="px-3 py-2 table-cell-primary">{f.name}</td>
                           <td className="px-3 py-2"><Chip label={f.type} className="bg-muted text-muted-foreground border-border" /></td>
-                          <td className="px-3 py-2 text-secondary-foreground">{[f.city, f.state].filter(Boolean).join(', ') || '—'}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{f.departments.length ? f.departments.join(', ') : '—'}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{f.specialties.length ? f.specialties.join(', ') : '—'}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{f.facilityManager || '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{[f.city, f.state].filter(Boolean).join(', ') || '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{f.departments.length ? f.departments.join(', ') : '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{f.specialties.length ? f.specialties.join(', ') : '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{f.facilityManager || '—'}</td>
                           <td className="px-3 py-2">
                             <RowActions>
                               <RowActionButton title="Edit" onClick={() => openEditFacility(f)}><Pencil className="size-3.5 text-muted-foreground" /></RowActionButton>
@@ -907,11 +907,11 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                     <thead className="bg-muted/40">
                       <tr className="border-b border-border">
                         <th className="w-10 px-3 py-3"><Checkbox checked={allDocsSelected} data-state={someDocsSelected ? 'indeterminate' : undefined} onCheckedChange={v => toggleAllDocs(!!v)} aria-label="Select all documents" /></th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Name</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Category</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Size</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Uploaded</th>
-                        <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">Uploaded by</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Name</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Category</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Size</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Uploaded</th>
+                        <th className="text-left px-3 py-3 table-header-cell whitespace-nowrap">Uploaded by</th>
                         <th className="w-28" />
                       </tr>
                     </thead>
@@ -920,12 +920,12 @@ export function ClientWorkspaceClient({ client, contacts, facilities, jobs, cand
                         <tr key={d.id} className="group border-b border-border/60 last:border-0 hover:bg-muted/20" style={{ height: 52 }}>
                           <td className="px-3 py-2"><Checkbox checked={selectedDocIds.includes(d.id)} onCheckedChange={() => toggleDocSelect(d.id)} aria-label={`Select ${d.name}`} /></td>
                           <td className="px-3 py-2">
-                            <span className="flex items-center gap-2 font-medium"><FileText className="size-4 text-muted-foreground shrink-0" />{d.name}</span>
+                            <span className="flex items-center gap-2 table-cell-primary"><FileText className="size-4 text-muted-foreground shrink-0" />{d.name}</span>
                           </td>
                           <td className="px-3 py-2"><Chip label={d.category} className="bg-muted text-muted-foreground border-border" /></td>
-                          <td className="px-3 py-2 text-secondary-foreground">{formatSize(d.size)}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{relTime(d.uploadedAt)}</td>
-                          <td className="px-3 py-2 text-secondary-foreground">{d.uploaderName || '—'}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{formatSize(d.size)}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{relTime(d.uploadedAt)}</td>
+                          <td className="px-3 py-2 table-cell-secondary">{d.uploaderName || '—'}</td>
                           <td className="px-3 py-2">
                             <RowActions>
                               <RowActionButton title="View" onClick={() => viewDocument(d)}><Eye className="size-3.5 text-muted-foreground" /></RowActionButton>
@@ -1306,13 +1306,13 @@ function SimpleTable({ headers, rows }: { headers: string[]; rows: React.ReactNo
       <table className="w-full text-sm border-collapse">
         <thead className="bg-muted/40">
           <tr className="border-b border-border">
-            {headers.map((h, i) => <th key={h || `h${i}`} className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">{h}</th>)}
+            {headers.map((h, i) => <th key={h || `h${i}`} className="text-left px-3 py-3 table-header-cell whitespace-nowrap">{h}</th>)}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} className="border-b border-border/60 last:border-0" style={{ height: 52 }}>
-              {row.map((cell, j) => <td key={j} className="px-3 py-2">{cell}</td>)}
+              {row.map((cell, j) => <td key={j} className="px-3 py-2 table-cell-secondary">{cell}</td>)}
             </tr>
           ))}
         </tbody>

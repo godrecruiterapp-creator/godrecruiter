@@ -76,7 +76,7 @@ export function OwnersManager({ initialOwners }: { initialOwners: OwnerRow[] }) 
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 {['Owner', 'Granted', ''].map(h => (
-                  <th key={h} className="px-5 py-2.5 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
+                  <th key={h} className="px-5 py-2.5 text-left table-header-cell">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -89,12 +89,12 @@ export function OwnersManager({ initialOwners }: { initialOwners: OwnerRow[] }) 
                         {o.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium">{o.full_name}{o.is_self && <span className="text-muted-foreground font-normal"> (you)</span>}</p>
+                        <p className="table-cell-primary">{o.full_name}{o.is_self && <span className="text-muted-foreground font-normal"> (you)</span>}</p>
                         <p className="text-[10px] text-muted-foreground">{o.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-muted-foreground">{new Date(o.granted_at).toLocaleDateString('en-US')}</td>
+                  <td className="px-5 py-3 table-cell-secondary">{new Date(o.granted_at).toLocaleDateString('en-US')}</td>
                   <td className="px-5 py-3 text-right">
                     {!o.is_self && (
                       <button onClick={() => handleRemove(o)}

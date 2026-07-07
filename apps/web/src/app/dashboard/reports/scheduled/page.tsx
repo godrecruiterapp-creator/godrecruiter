@@ -43,22 +43,22 @@ export default function ScheduledReports() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="py-3 px-4 text-left font-medium">Report</th>
-              <th className="py-3 px-4 text-left font-medium">Schedule</th>
-              <th className="py-3 px-4 text-left font-medium">Next Run</th>
-              <th className="py-3 px-4 text-left font-medium">Recipients</th>
-              <th className="py-3 px-4 text-left font-medium">Format</th>
-              <th className="py-3 px-4 text-left font-medium">Status</th>
-              <th className="py-3 px-4 text-left font-medium">Actions</th>
+              <th className="py-3 px-4 text-left table-header-cell">Report</th>
+              <th className="py-3 px-4 text-left table-header-cell">Schedule</th>
+              <th className="py-3 px-4 text-left table-header-cell">Next Run</th>
+              <th className="py-3 px-4 text-left table-header-cell">Recipients</th>
+              <th className="py-3 px-4 text-left table-header-cell">Format</th>
+              <th className="py-3 px-4 text-left table-header-cell">Status</th>
+              <th className="py-3 px-4 text-left table-header-cell">Actions</th>
             </tr>
           </thead>
           <tbody>
             {SCHEDULED.map((r) => (
               <tr key={r.report} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-3 px-4 font-medium">{r.report}</td>
-                <td className="py-3 px-4 text-muted-foreground">{r.schedule}</td>
-                <td className="py-3 px-4 text-muted-foreground">{r.next}</td>
-                <td className="py-3 px-4 text-muted-foreground">{r.recipients}</td>
+                <td className="py-3 px-4 table-cell-primary">{r.report}</td>
+                <td className="py-3 px-4 table-cell-secondary">{r.schedule}</td>
+                <td className="py-3 px-4 table-cell-secondary">{r.next}</td>
+                <td className="py-3 px-4 table-cell-secondary">{r.recipients}</td>
                 <td className="py-3 px-4">
                   <span className="px-1.5 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">{r.format}</span>
                 </td>

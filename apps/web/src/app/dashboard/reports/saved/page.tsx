@@ -63,24 +63,24 @@ export default function SavedReports() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-muted-foreground border-b">
-                <th className="py-3 px-4 text-left font-medium">Report Name</th>
-                <th className="py-3 px-4 text-left font-medium">Category</th>
-                <th className="py-3 px-4 text-left font-medium">Created</th>
-                <th className="py-3 px-4 text-left font-medium">Last Run</th>
-                <th className="py-3 px-4 text-left font-medium">Owner</th>
-                <th className="py-3 px-4 text-left font-medium">Actions</th>
+                <th className="py-3 px-4 text-left table-header-cell">Report Name</th>
+                <th className="py-3 px-4 text-left table-header-cell">Category</th>
+                <th className="py-3 px-4 text-left table-header-cell">Created</th>
+                <th className="py-3 px-4 text-left table-header-cell">Last Run</th>
+                <th className="py-3 px-4 text-left table-header-cell">Owner</th>
+                <th className="py-3 px-4 text-left table-header-cell">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((r) => (
                 <tr key={r.name} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="py-3 px-4 font-medium">{r.name}</td>
+                  <td className="py-3 px-4 table-cell-primary">{r.name}</td>
                   <td className="py-3 px-4">
                     <span className={`px-1.5 py-0.5 rounded text-[10px] ${categoryColor(r.category)}`}>{r.category}</span>
                   </td>
-                  <td className="py-3 px-4 text-muted-foreground">{r.created}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{r.lastRun}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{r.owner}</td>
+                  <td className="py-3 px-4 table-cell-secondary">{r.created}</td>
+                  <td className="py-3 px-4 table-cell-secondary">{r.lastRun}</td>
+                  <td className="py-3 px-4 table-cell-secondary">{r.owner}</td>
                   <td className="py-3 px-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

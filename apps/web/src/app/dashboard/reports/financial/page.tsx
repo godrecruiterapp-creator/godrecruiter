@@ -85,21 +85,21 @@ export default function FinancialReports() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="pb-2 text-left font-medium">Period</th>
-              <th className="pb-2 text-right font-medium">Revenue</th>
-              <th className="pb-2 text-right font-medium">Gross Margin</th>
-              <th className="pb-2 text-right font-medium">Placements</th>
-              <th className="pb-2 text-right font-medium">Avg Spread</th>
+              <th className="pb-2 text-left table-header-cell">Period</th>
+              <th className="pb-2 text-right table-header-cell">Revenue</th>
+              <th className="pb-2 text-right table-header-cell">Gross Margin</th>
+              <th className="pb-2 text-right table-header-cell">Placements</th>
+              <th className="pb-2 text-right table-header-cell">Avg Spread</th>
             </tr>
           </thead>
           <tbody>
             {REVENUE.map((r) => (
               <tr key={r.period} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-2 font-medium">{r.period}</td>
-                <td className="py-2 text-right font-medium text-emerald-600">{r.revenue}</td>
-                <td className="py-2 text-right">{r.margin}</td>
-                <td className="py-2 text-right">{r.placements}</td>
-                <td className="py-2 text-right">{r.avgSpread}</td>
+                <td className="py-2 table-cell-primary">{r.period}</td>
+                <td className="py-2 text-right table-cell-secondary text-emerald-600">{r.revenue}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.margin}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.placements}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.avgSpread}</td>
               </tr>
             ))}
           </tbody>

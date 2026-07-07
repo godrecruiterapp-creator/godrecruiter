@@ -184,7 +184,7 @@ export default function MyAgentsPage() {
     if (key === 'actions') return null
     return (
       <button onClick={() => handleSort(key)} className={cn('flex items-center w-full text-left', COL_META[key].sortable ? 'cursor-pointer' : 'cursor-default')}>
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{COL_META[key].label}</span>
+        <span className="table-header-cell whitespace-nowrap">{COL_META[key].label}</span>
         <SortChevron k={key} />
       </button>
     )
@@ -193,18 +193,18 @@ export default function MyAgentsPage() {
   function renderCell(key: ColKey, a: Agent) {
     switch (key) {
       case 'select': return <Checkbox checked={selected.has(a.id)} onCheckedChange={v => toggleRow(a.id, !!v)} onClick={e => e.stopPropagation()} />
-      case 'name': return <span className="text-sm font-medium">{a.name}</span>
+      case 'name': return <span className="table-cell-primary">{a.name}</span>
       case 'category': return (
         <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-muted/60 text-foreground border-border">{a.category}</span>
       )
       case 'status': return (
         <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize', STATUS_BADGE[a.status] ?? '')}>{a.status}</span>
       )
-      case 'trigger': return <span className="text-sm text-muted-foreground">{a.trigger}</span>
-      case 'last_run': return <span className="text-xs text-muted-foreground">{a.last_run}</span>
-      case 'next_run': return <span className="text-sm text-muted-foreground">{a.next_run}</span>
-      case 'success_rate': return <span className={cn('text-sm font-semibold tabular-nums', rateColor(a.success_rate))}>{a.success_rate}%</span>
-      case 'owner': return <span className="text-sm text-muted-foreground">{a.owner}</span>
+      case 'trigger': return <span className="table-cell-secondary">{a.trigger}</span>
+      case 'last_run': return <span className="table-cell-secondary">{a.last_run}</span>
+      case 'next_run': return <span className="table-cell-secondary">{a.next_run}</span>
+      case 'success_rate': return <span className={cn('table-cell-secondary tabular-nums', rateColor(a.success_rate))}>{a.success_rate}%</span>
+      case 'owner': return <span className="table-cell-secondary">{a.owner}</span>
       case 'actions': return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

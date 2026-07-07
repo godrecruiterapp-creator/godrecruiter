@@ -94,27 +94,27 @@ export default function RecruiterReports() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground border-b">
-              <th className="pb-2 text-left font-medium">Rank</th>
-              <th className="pb-2 text-left font-medium">Recruiter</th>
-              <th className="pb-2 text-right font-medium">Calls</th>
-              <th className="pb-2 text-right font-medium">Emails</th>
-              <th className="pb-2 text-right font-medium">Submissions</th>
-              <th className="pb-2 text-right font-medium">Interviews</th>
-              <th className="pb-2 text-right font-medium">Placements</th>
-              <th className="pb-2 text-right font-medium">Score</th>
+              <th className="pb-2 text-left table-header-cell">Rank</th>
+              <th className="pb-2 text-left table-header-cell">Recruiter</th>
+              <th className="pb-2 text-right table-header-cell">Calls</th>
+              <th className="pb-2 text-right table-header-cell">Emails</th>
+              <th className="pb-2 text-right table-header-cell">Submissions</th>
+              <th className="pb-2 text-right table-header-cell">Interviews</th>
+              <th className="pb-2 text-right table-header-cell">Placements</th>
+              <th className="pb-2 text-right table-header-cell">Score</th>
             </tr>
           </thead>
           <tbody>
             {LEADERBOARD.map((r) => (
               <tr key={r.rank} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="py-2 text-muted-foreground">#{r.rank}</td>
-                <td className="py-2 font-medium">{r.name}</td>
-                <td className="py-2 text-right">{r.calls}</td>
-                <td className="py-2 text-right">{r.emails}</td>
-                <td className="py-2 text-right">{r.submissions}</td>
-                <td className="py-2 text-right">{r.interviews}</td>
-                <td className="py-2 text-right">{r.placements}</td>
-                <td className="py-2 text-right font-medium text-emerald-600">{r.score}</td>
+                <td className="py-2 table-cell-secondary">#{r.rank}</td>
+                <td className="py-2 table-cell-primary">{r.name}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.calls}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.emails}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.submissions}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.interviews}</td>
+                <td className="py-2 text-right table-cell-secondary">{r.placements}</td>
+                <td className="py-2 text-right table-cell-secondary text-emerald-600">{r.score}</td>
               </tr>
             ))}
           </tbody>

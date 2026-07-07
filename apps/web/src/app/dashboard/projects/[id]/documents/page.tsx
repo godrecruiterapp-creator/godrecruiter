@@ -36,7 +36,7 @@ export default function ProjectDocumentsPage() {
             <tr className="border-b border-border">
               {['Name', 'Type', 'Size', 'Uploaded', 'By', ''].map(h => (
                 <th key={h} className="h-9 px-4 text-left align-middle">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</span>
+                  <span className="table-header-cell whitespace-nowrap">{h}</span>
                 </th>
               ))}
             </tr>
@@ -47,15 +47,15 @@ export default function ProjectDocumentsPage() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <FileText className="size-4 text-muted-foreground shrink-0" />
-                    <span className="text-sm font-medium">{d.name}</span>
+                    <span className="table-cell-primary">{d.name}</span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${TYPE_CFG[d.type] ?? ''}`}>{d.type}</span>
                 </td>
-                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{d.size}</span></td>
-                <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{d.uploaded}</span></td>
-                <td className="px-4 py-3"><span className="text-sm text-muted-foreground">{d.by}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary">{d.size}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary">{d.uploaded}</span></td>
+                <td className="px-4 py-3"><span className="table-cell-secondary">{d.by}</span></td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button className="size-7 flex items-center justify-center rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors">

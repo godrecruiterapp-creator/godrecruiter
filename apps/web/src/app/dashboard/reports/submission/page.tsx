@@ -103,20 +103,20 @@ export default function SubmissionReports() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-muted-foreground border-b">
-                <th className="pb-2 text-left font-medium">Date</th>
-                <th className="pb-2 text-left font-medium">Recruiter</th>
-                <th className="pb-2 text-left font-medium">Job</th>
-                <th className="pb-2 text-left font-medium">Candidate</th>
-                <th className="pb-2 text-left font-medium">Stage</th>
+                <th className="pb-2 text-left table-header-cell">Date</th>
+                <th className="pb-2 text-left table-header-cell">Recruiter</th>
+                <th className="pb-2 text-left table-header-cell">Job</th>
+                <th className="pb-2 text-left table-header-cell">Candidate</th>
+                <th className="pb-2 text-left table-header-cell">Stage</th>
               </tr>
             </thead>
             <tbody>
               {TABLE.map((r, i) => (
                 <tr key={i} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="py-2 text-muted-foreground">{r.date}</td>
-                  <td className="py-2">{r.agent}</td>
-                  <td className="py-2 font-medium">{r.job}</td>
-                  <td className="py-2">{r.candidate}</td>
+                  <td className="py-2 table-cell-secondary">{r.date}</td>
+                  <td className="py-2 table-cell-secondary">{r.agent}</td>
+                  <td className="py-2 table-cell-primary">{r.job}</td>
+                  <td className="py-2 table-cell-secondary">{r.candidate}</td>
                   <td className="py-2"><span className={`px-1.5 py-0.5 rounded text-[10px] ${stageColor(r.stage)}`}>{r.stage}</span></td>
                 </tr>
               ))}

@@ -86,7 +86,7 @@ export default function ActivityPage() {
               <tr className="border-b border-border">
                 {['Automation', 'Started By', 'Date & Time', 'Steps Completed', 'Time Taken', 'Result'].map(h => (
                   <th key={h} className="h-9 px-4 text-left align-middle">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</span>
+                    <span className="table-header-cell whitespace-nowrap">{h}</span>
                   </th>
                 ))}
               </tr>
@@ -98,13 +98,13 @@ export default function ActivityPage() {
                 return (
                   <tr key={r.id} className="border-b border-border hover:bg-muted/40 transition-colors">
                     <td className="px-4 py-3 align-middle">
-                      <span className="text-sm font-medium">{r.automation}</span>
+                      <span className="table-cell-primary">{r.automation}</span>
                     </td>
                     <td className="px-4 py-3 align-middle">
-                      <span className="text-sm text-muted-foreground">{r.startedBy}</span>
+                      <span className="table-cell-secondary">{r.startedBy}</span>
                     </td>
                     <td className="px-4 py-3 align-middle">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">{r.date}</span>
+                      <span className="table-cell-secondary whitespace-nowrap">{r.date}</span>
                     </td>
                     <td className="px-4 py-3 align-middle">
                       <div className="flex items-center gap-1.5">
@@ -112,7 +112,7 @@ export default function ActivityPage() {
                           <div className={cn('h-full rounded-full', r.result === 'success' ? 'bg-emerald-500' : r.result === 'partial' ? 'bg-amber-400' : 'bg-red-400')}
                             style={{ width: `${(r.steps / r.total) * 100}%` }} />
                         </div>
-                        <span className="text-sm text-muted-foreground tabular-nums">{r.steps}/{r.total}</span>
+                        <span className="table-cell-secondary tabular-nums">{r.steps}/{r.total}</span>
                       </div>
                       {r.errors && <p className="text-[10px] text-red-600 mt-0.5 max-w-xs">{r.errors}</p>}
                     </td>

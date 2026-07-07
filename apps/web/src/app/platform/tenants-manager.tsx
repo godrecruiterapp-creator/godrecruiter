@@ -120,7 +120,7 @@ export function TenantsManager({ initialTenants }: { initialTenants: TenantRow[]
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 {['Company', 'Region', 'Plan', 'Status', ''].map(h => (
-                  <th key={h} className="px-5 py-2.5 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
+                  <th key={h} className="px-5 py-2.5 text-left table-header-cell">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -131,11 +131,11 @@ export function TenantsManager({ initialTenants }: { initialTenants: TenantRow[]
               {tenants.map(t => (
                 <tr key={t.id} className="border-b border-border/40 last:border-0 hover:bg-muted/20 transition-colors">
                   <td className="px-5 py-3">
-                    <p className="font-medium">{t.name}</p>
+                    <p className="table-cell-primary">{t.name}</p>
                     <p className="text-[10px] text-muted-foreground">{t.slug}</p>
                   </td>
-                  <td className="px-5 py-3 text-muted-foreground">{t.region}</td>
-                  <td className="px-5 py-3 text-muted-foreground capitalize">{t.plan_id}</td>
+                  <td className="px-5 py-3 table-cell-secondary">{t.region}</td>
+                  <td className="px-5 py-3 table-cell-secondary capitalize">{t.plan_id}</td>
                   <td className="px-5 py-3"><Badge variant={STATUS_VARIANT[t.status] ?? 'default'}>{t.status}</Badge></td>
                   <td className="px-5 py-3 text-right">
                     <button onClick={() => handleToggleStatus(t)} disabled={busyId === t.id}
