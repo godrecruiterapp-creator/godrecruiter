@@ -7,22 +7,7 @@ import { notifyUser } from '@/lib/notifications'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
-export async function createJobAction(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated.' }
-
-  const admin = createAdminClient()
-
-  const { data: membership } = await admin
-    .from('platform_user_tenants')
-    .select('tenant_id')
-    .eq('platform_user_id', user.id)
-    .eq('is_active', true)
-    .single()
-
-  if (!membership) return { error: 'No workspace found.' }
-
+function parseJobFormData(formData: FormData) {
   const title           = formData.get('title') as string
   const client          = formData.get('client') as string
   const client_job_id   = formData.get('client_job_id') as string
@@ -41,33 +26,57 @@ export async function createJobAction(formData: FormData) {
   const recruiter_name  = formData.get('recruiter_name') as string
   const client_type     = formData.get('client_type') as string
 
-  if (!title) return { error: 'Job title is required.' }
-
   const validStatuses = ['open', 'on_hold', 'closed', 'filled']
   const safeStatus = validStatuses.includes(status) ? status : 'open'
+
+  return {
+    title, client, client_job_id, city, state_val, department, employment_type,
+    work_mode, description, requirements, salary_min, salary_max, openings,
+    safeStatus, priority, recruiter_name, client_type,
+  }
+}
+
+export async function createJobAction(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+
+  const admin = createAdminClient()
+
+  const { data: membership } = await admin
+    .from('platform_user_tenants')
+    .select('tenant_id')
+    .eq('platform_user_id', user.id)
+    .eq('is_active', true)
+    .single()
+
+  if (!membership) return { error: 'No workspace found.' }
+
+  const f = parseJobFormData(formData)
+  if (!f.title) return { error: 'Job title is required.' }
 
   const { data: job, error } = await admin.from('jobs').insert({
     id: ulid(),
     tenant_id: membership.tenant_id,
-    title,
-    client: client || null,
-    client_job_id: client_job_id || null,
-    city: city || null,
-    state: state_val || null,
-    department: department || null,
-    employment_type: employment_type || null,
-    work_mode: work_mode || 'onsite',
-    description: description || null,
-    requirements: requirements || null,
-    salary_min,
-    salary_max,
-    openings,
-    status: safeStatus,
-    priority: priority || 'medium',
-    recruiter_name: recruiter_name || null,
-    client_type: client_type || null,
+    title: f.title,
+    client: f.client || null,
+    client_job_id: f.client_job_id || null,
+    city: f.city || null,
+    state: f.state_val || null,
+    department: f.department || null,
+    employment_type: f.employment_type || null,
+    work_mode: f.work_mode || 'onsite',
+    description: f.description || null,
+    requirements: f.requirements || null,
+    salary_min: f.salary_min,
+    salary_max: f.salary_max,
+    openings: f.openings,
+    status: f.safeStatus,
+    priority: f.priority || 'medium',
+    recruiter_name: f.recruiter_name || null,
+    client_type: f.client_type || null,
     created_by: user.id,
-    published_at: safeStatus === 'open' ? new Date().toISOString() : null,
+    published_at: f.safeStatus === 'open' ? new Date().toISOString() : null,
   }).select().single()
 
   if (error) return { error: `Failed to create job: ${error.message}` }
@@ -98,48 +107,28 @@ export async function updateJobAction(jobId: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated.' }
 
-  const title           = formData.get('title') as string
-  const client          = formData.get('client') as string
-  const client_job_id   = formData.get('client_job_id') as string
-  const city            = formData.get('city') as string
-  const state_val       = formData.get('state') as string
-  const department      = formData.get('department') as string
-  const employment_type = formData.get('employment_type') as string
-  const work_mode       = formData.get('work_mode') as string
-  const description     = formData.get('description') as string
-  const requirements    = formData.get('requirements') as string
-  const salary_min      = formData.get('salary_min') ? parseInt(formData.get('salary_min') as string) * 100 : null
-  const salary_max      = formData.get('salary_max') ? parseInt(formData.get('salary_max') as string) * 100 : null
-  const openings        = parseInt(formData.get('openings') as string) || 1
-  const status          = formData.get('status') as string
-  const priority        = formData.get('priority') as string
-  const recruiter_name  = formData.get('recruiter_name') as string
-  const client_type     = formData.get('client_type') as string
-
-  if (!title) return { error: 'Job title is required.' }
-
-  const validStatuses = ['open', 'on_hold', 'closed', 'filled']
-  const safeStatus = validStatuses.includes(status) ? status : 'open'
+  const f = parseJobFormData(formData)
+  if (!f.title) return { error: 'Job title is required.' }
 
   const admin = createAdminClient()
   const { error } = await admin.from('jobs').update({
-    title,
-    client: client || null,
-    client_job_id: client_job_id || null,
-    city: city || null,
-    state: state_val || null,
-    department: department || null,
-    employment_type: employment_type || null,
-    work_mode: work_mode || 'onsite',
-    description: description || null,
-    requirements: requirements || null,
-    salary_min,
-    salary_max,
-    openings,
-    status: safeStatus,
-    priority: priority || 'medium',
-    recruiter_name: recruiter_name || null,
-    client_type: client_type || null,
+    title: f.title,
+    client: f.client || null,
+    client_job_id: f.client_job_id || null,
+    city: f.city || null,
+    state: f.state_val || null,
+    department: f.department || null,
+    employment_type: f.employment_type || null,
+    work_mode: f.work_mode || 'onsite',
+    description: f.description || null,
+    requirements: f.requirements || null,
+    salary_min: f.salary_min,
+    salary_max: f.salary_max,
+    openings: f.openings,
+    status: f.safeStatus,
+    priority: f.priority || 'medium',
+    recruiter_name: f.recruiter_name || null,
+    client_type: f.client_type || null,
   }).eq('id', jobId)
 
   if (error) return { error: `Failed to update job: ${error.message}` }
