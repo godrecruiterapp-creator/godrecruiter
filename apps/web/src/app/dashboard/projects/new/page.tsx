@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { ChevronLeft, ChevronRight, Check, FolderKanban, Users, Lock, Globe, Building2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, FolderKanban, Users, Lock, Globe, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createProjectAction } from '../actions'
 
 const STEPS = ['Name', 'Description', 'Type', 'Visibility', 'Team', 'Review']
 
@@ -43,8 +44,22 @@ export default function NewProjectPage() {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [s, setS] = useState<State>(INIT)
+  const [error, setError] = useState<string | null>(null)
+  const [pending, startTransition] = useTransition()
 
   const set = (p: Partial<State>) => setS(prev => ({ ...prev, ...p }))
+
+  const create = () => {
+    setError(null)
+    startTransition(async () => {
+      const res = await createProjectAction({
+        name: s.name, description: s.description, type: s.type,
+        visibility: s.visibility, team: s.team,
+      })
+      // Success redirects server-side; only an error object comes back here.
+      if (res?.error) setError(res.error)
+    })
+  }
 
   const canNext = [
     s.name.trim().length > 0,
@@ -224,9 +239,12 @@ export default function NewProjectPage() {
             )}
           </div>
 
+          {/* Error */}
+          {error && <p className="mt-6 text-sm text-destructive text-center">{error}</p>}
+
           {/* Footer nav */}
           <div className="flex items-center justify-between mt-8">
-            <Button variant="ghost" size="sm" className="text-sm h-8"
+            <Button variant="ghost" size="sm" className="text-sm h-8" disabled={pending}
               onClick={() => step === 0 ? router.push('/dashboard/projects/my-projects') : setStep(s => s - 1)}>
               <ChevronLeft className="size-3.5 mr-1" />{step === 0 ? 'Cancel' : 'Back'}
             </Button>
@@ -237,8 +255,10 @@ export default function NewProjectPage() {
                   Next <ChevronRight className="size-3.5 ml-1" />
                 </Button>
               ) : (
-                <Button size="sm" className="h-8 text-sm" onClick={() => router.push('/dashboard/projects/1')}>
-                  <FolderKanban className="size-3.5 mr-1.5" />Create Project
+                <Button size="sm" className="h-8 text-sm" disabled={pending || !s.name.trim() || !s.type} onClick={create}>
+                  {pending
+                    ? <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Creating…</>
+                    : <><FolderKanban className="size-3.5 mr-1.5" />Create Project</>}
                 </Button>
               )}
             </div>
