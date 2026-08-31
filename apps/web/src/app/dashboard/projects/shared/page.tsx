@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { FolderKanban, Users } from 'lucide-react'
-import { PROJECTS } from '../_data'
+import { type Project } from '../_data'
 import { cn } from '@/lib/utils'
 
-const SHARED = PROJECTS.filter(p => p.visibility !== 'private' && p.owner !== 'Arun Kumar')
+// TODO: load real projects shared with the current user once sharing is wired.
+const SHARED: Project[] = []
 
 const STATUS_CFG = {
   active:    'bg-emerald-50 text-emerald-700 border-emerald-200',

@@ -4,15 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Upload, FileText, Download, MoreHorizontal, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { EmptyState } from '@/components/ui/empty-state'
 
-const DOCS = [
-  { id: '1', name: 'Client Requirements — Houston Methodist.pdf', type: 'PDF',  size: '245 KB', uploaded: 'Jun 24', by: 'Arun Kumar' },
-  { id: '2', name: 'Rate Card Q3 2026.xlsx',                      type: 'XLSX', size: '88 KB',  uploaded: 'Jun 24', by: 'Arun Kumar' },
-  { id: '3', name: 'Submission Template — ICU RN.docx',           type: 'DOCX', size: '112 KB', uploaded: 'Jun 20', by: 'Sarah M.' },
-  { id: '4', name: 'Interview Guide — Clinical.pdf',              type: 'PDF',  size: '320 KB', uploaded: 'Jun 18', by: 'Emily T.' },
-  { id: '5', name: 'Offer Letter Template.docx',                  type: 'DOCX', size: '67 KB',  uploaded: 'Jun 15', by: 'Arun Kumar' },
-  { id: '6', name: 'Compliance Checklist Q3.pdf',                 type: 'PDF',  size: '156 KB', uploaded: 'Jun 10', by: 'James R.' },
-]
+type Doc = { id: string; name: string; type: string; size: string; uploaded: string; by: string }
+const DOCS: Doc[] = []
 
 const TYPE_CFG: Record<string, string> = {
   PDF:  'bg-red-50 text-red-700',
@@ -30,6 +25,10 @@ export default function ProjectDocumentsPage() {
         </div>
         <Button size="sm" className="h-8 text-sm gap-1.5 shrink-0"><Upload className="size-3.5" />Upload</Button>
       </div>
+      {DOCS.length === 0 ? (
+        <EmptyState icon={FileText} title="No documents yet"
+          description="Upload requirement docs, rate cards, or templates to keep them with this project." />
+      ) : (
       <div className="flex-1 overflow-auto border border-border rounded-lg">
         <table className="w-full border-collapse">
           <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm">
@@ -81,6 +80,7 @@ export default function ProjectDocumentsPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   )
 }

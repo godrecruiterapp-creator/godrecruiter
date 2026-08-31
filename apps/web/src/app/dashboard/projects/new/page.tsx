@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { ChevronLeft, ChevronRight, Check, FolderKanban, Users, Lock, Globe, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createProjectAction } from '../actions'
+import { getTenantUsersAction } from '../../clients/actions'
 
 const STEPS = ['Name', 'Description', 'Type', 'Visibility', 'Team', 'Review']
 
@@ -29,8 +30,6 @@ const VISIBILITY = [
   { id: 'organization', label: 'Organization',  desc: 'Visible to everyone in your company', icon: Building2 },
 ]
 
-const TEAM_OPTIONS = ['Sarah M.', 'James R.', 'Emily T.', 'David K.', 'Lisa P.', 'Tom H.']
-
 const EXAMPLE_NAMES = [
   'Texas ICU Nurses', 'Senior Java Developers', 'Redeployment Candidates',
   'Healthcare Pipeline', 'Travel Nurses — Summer', 'Bench Candidates',
@@ -46,6 +45,11 @@ export default function NewProjectPage() {
   const [s, setS] = useState<State>(INIT)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
+  const [teamOptions, setTeamOptions] = useState<string[]>([])
+
+  useEffect(() => {
+    getTenantUsersAction().then(rows => setTeamOptions(rows.map(r => r.name)))
+  }, [])
 
   const set = (p: Partial<State>) => setS(prev => ({ ...prev, ...p }))
 
@@ -195,8 +199,11 @@ export default function NewProjectPage() {
               <div>
                 <h2 className="text-xl font-semibold mb-1">Assign team members</h2>
                 <p className="text-sm text-muted-foreground mb-5">Choose who will work on this project. You can add more later.</p>
+                {teamOptions.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No teammates yet — it&apos;s just you. Invite people from Settings to assign them here.</p>
+                )}
                 <div className="flex flex-col gap-2">
-                  {TEAM_OPTIONS.map(m => {
+                  {teamOptions.map(m => {
                     const sel = s.team.includes(m)
                     return (
                       <button key={m} onClick={() => set({ team: sel ? s.team.filter(t => t !== m) : [...s.team, m] })}

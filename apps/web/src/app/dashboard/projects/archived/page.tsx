@@ -3,11 +3,9 @@
 import { FolderKanban, ArchiveRestore } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const ARCHIVED = [
-  { id: 'a1', name: 'Q1 Healthcare Pipeline',  type: 'Talent Pool',     candidates: 156, archivedOn: 'Mar 31, 2026' },
-  { id: 'a2', name: 'Winter Nurse Campaign',   type: 'Hiring Campaign', candidates: 78,  archivedOn: 'Jan 15, 2026' },
-  { id: 'a3', name: 'Legacy Java Projects',    type: 'Pipeline',        candidates: 44,  archivedOn: 'Feb 28, 2026' },
-]
+type ArchivedProject = { id: string; name: string; type: string; candidates: number; archivedOn: string }
+// TODO: load archived projects from the DB (status = 'archived').
+const ARCHIVED: ArchivedProject[] = []
 
 export default function ArchivedProjectsPage() {
   return (

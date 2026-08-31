@@ -10,6 +10,8 @@ import {
   UserCheck, Trash2, Send, Star, Bot, Sparkles, ChevronDown, SlidersHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Users } from 'lucide-react'
 import { PROJECT_CANDIDATES, KANBAN_STAGES } from '../../_data'
 
 const STAGE_COLORS: Record<string, string> = {
@@ -116,7 +118,10 @@ export default function ProjectCandidatesPage() {
         </div>
       )}
 
-      {view === 'table' ? (
+      {candidates.length === 0 ? (
+        <EmptyState icon={Users} title="No candidates yet"
+          description="Add candidates to this project to start tracking them through the pipeline." />
+      ) : view === 'table' ? (
         <TableView candidates={candidates} selected={selected} allSel={allSel} someSel={someSel} toggleAll={toggleAll} toggleRow={toggleRow} />
       ) : (
         <KanbanView candidates={candidates} />

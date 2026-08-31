@@ -3,20 +3,13 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Plus, MoreHorizontal } from 'lucide-react'
+import { Plus, MoreHorizontal, CheckSquare } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { EmptyState } from '@/components/ui/empty-state'
 import { cn } from '@/lib/utils'
 
-const TASKS = [
-  { id: '1', title: 'Call top 10 candidates',          due: 'Today',    priority: 'High',   assignee: 'Arun Kumar', status: 'open',     category: 'Outreach' },
-  { id: '2', title: 'Review 15 resumes',               due: 'Tomorrow', priority: 'High',   assignee: 'Sarah M.',   status: 'open',     category: 'Review' },
-  { id: '3', title: 'Schedule 5 interviews',           due: 'Jun 30',   priority: 'Medium', assignee: 'Arun Kumar', status: 'open',     category: 'Interviews' },
-  { id: '4', title: 'Collect compliance docs — Maria', due: 'Jun 29',   priority: 'High',   assignee: 'Emily T.',   status: 'overdue',  category: 'Documents' },
-  { id: '5', title: 'Client submission — Houston Methodist', due: 'Jun 30', priority: 'High', assignee: 'Arun Kumar', status: 'open', category: 'Submission' },
-  { id: '6', title: 'Follow up with James Wilson',     due: 'Jul 1',    priority: 'Medium', assignee: 'Sarah M.',   status: 'open',     category: 'Follow-up' },
-  { id: '7', title: 'Boolean search — ER Nurses TX',   due: 'Completed',priority: 'Medium', assignee: 'Emily T.',   status: 'done',     category: 'Sourcing' },
-  { id: '8', title: 'Manager review — 3 candidates',  due: 'Completed',priority: 'Low',    assignee: 'Arun Kumar', status: 'done',     category: 'Review' },
-]
+type Task = { id: string; title: string; due: string; priority: string; assignee: string; status: string; category: string }
+const TASKS: Task[] = []
 
 const PRI_CFG: Record<string, string> = {
   High:   'bg-red-50 text-red-700 border-red-200',
@@ -42,6 +35,10 @@ export default function ProjectTasksPage() {
         <Button size="sm" className="h-8 text-sm gap-1.5"><Plus className="size-3.5" />Add Task</Button>
       </div>
       <div className="flex-1 overflow-y-auto space-y-1">
+        {tasks.length === 0 && (
+          <EmptyState icon={CheckSquare} title="No tasks yet"
+            description="Add a task to track outreach, reviews, submissions, and follow-ups for this project." />
+        )}
         {open.map(t => <TaskRow key={t.id} task={t} onToggle={() => toggle(t.id)} />)}
         {done.length > 0 && (
           <>

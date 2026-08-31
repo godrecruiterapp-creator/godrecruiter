@@ -1,11 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, Share2, Settings, MoreHorizontal, Users, Briefcase } from 'lucide-react'
-import { PROJECTS, PROJECT_FALLBACK } from '../_data'
+import { PROJECT_FALLBACK } from '../_data'
+import { getProjectAction } from '../actions'
 
 const TABS = [
   { label: 'Overview',   href: '' },
@@ -31,7 +32,10 @@ const STATUS_CFG = {
 export default function ProjectDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams<{ id: string }>()
   const pathname = usePathname()
-  const project = PROJECTS.find(p => p.id === params.id) ?? PROJECT_FALLBACK
+  const [project, setProject] = useState(PROJECT_FALLBACK)
+  useEffect(() => {
+    if (params.id) getProjectAction(params.id).then(p => { if (p) setProject(p) })
+  }, [params.id])
   const base = `/dashboard/projects/${params.id}`
 
   return (

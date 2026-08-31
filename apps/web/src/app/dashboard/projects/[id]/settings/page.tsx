@@ -1,17 +1,54 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Trash2, AlertCircle } from 'lucide-react'
+import { Trash2, AlertCircle, Loader2 } from 'lucide-react'
+import { getProjectAction, updateProjectAction, archiveProjectAction, deleteProjectAction } from '../../actions'
 
 export default function ProjectSettingsPage() {
-  const [name, setName] = useState('Texas ICU Nurses')
-  const [desc, setDesc] = useState('Healthcare pipeline for critical care nurses across Texas hospitals.')
+  const params = useParams<{ id: string }>()
+  const router = useRouter()
+  const [name, setName] = useState('')
+  const [desc, setDesc] = useState('')
   const [status, setStatus] = useState('active')
   const [visibility, setVisibility] = useState('team')
+  const [msg, setMsg] = useState<string | null>(null)
+  const [saving, startSave] = useTransition()
+
+  useEffect(() => {
+    if (!params.id) return
+    getProjectAction(params.id).then(p => {
+      if (!p) return
+      setName(p.name); setDesc(p.description); setStatus(p.status); setVisibility(p.visibility)
+    })
+  }, [params.id])
+
+  const save = () => {
+    setMsg(null)
+    startSave(async () => {
+      const res = await updateProjectAction(params.id, { name, description: desc, status, visibility })
+      setMsg(res?.error ?? 'Saved.')
+    })
+  }
+
+  const archive = () => startSave(async () => {
+    const res = await archiveProjectAction(params.id)
+    if (res?.error) setMsg(res.error)
+    else router.push('/dashboard/projects/my-projects')
+  })
+
+  const remove = () => {
+    if (!confirm('Delete this project? Candidates remain in the ATS.')) return
+    startSave(async () => {
+      const res = await deleteProjectAction(params.id)
+      if (res?.error) setMsg(res.error)
+      else router.push('/dashboard/projects/my-projects')
+    })
+  }
 
   return (
     <div className="h-full overflow-y-auto p-5">
@@ -50,7 +87,12 @@ export default function ProjectSettingsPage() {
               </Select>
             </div>
           </div>
-          <Button size="sm" className="mt-3 h-8 text-sm">Save Changes</Button>
+          <div className="flex items-center gap-3 mt-3">
+            <Button size="sm" className="h-8 text-sm" disabled={saving || !name.trim()} onClick={save}>
+              {saving ? <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Saving…</> : 'Save Changes'}
+            </Button>
+            {msg && <span className="text-sm text-muted-foreground">{msg}</span>}
+          </div>
         </div>
 
         <div>
@@ -61,14 +103,14 @@ export default function ProjectSettingsPage() {
                 <p className="text-sm font-semibold">Archive this project</p>
                 <p className="text-[10px] text-muted-foreground">Candidates and data are preserved but the project becomes read-only.</p>
               </div>
-              <Button size="sm" variant="outline" className="h-7 text-sm shrink-0">Archive</Button>
+              <Button size="sm" variant="outline" className="h-7 text-sm shrink-0" disabled={saving} onClick={archive}>Archive</Button>
             </div>
             <div className="flex items-center justify-between border-t border-destructive/20 pt-3">
               <div>
                 <p className="text-sm font-semibold text-destructive">Delete this project</p>
                 <p className="text-[10px] text-muted-foreground">Permanently deletes the project. Candidates remain in the ATS.</p>
               </div>
-              <Button size="sm" variant="outline" className="h-7 text-sm shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10">
+              <Button size="sm" variant="outline" className="h-7 text-sm shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10" disabled={saving} onClick={remove}>
                 <Trash2 className="size-3 mr-1" />Delete
               </Button>
             </div>

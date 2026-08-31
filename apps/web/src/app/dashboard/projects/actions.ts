@@ -141,6 +141,29 @@ export async function getProjectAction(id: string): Promise<Project | null> {
   return data ? toProject(data as ProjectRow) : null
 }
 
+export async function updateProjectAction(id: string, input: { name: string; description: string; status: string; visibility: string }) {
+  const ctx = await getUserContext()
+  if (!ctx) return { error: 'Not authenticated.' }
+
+  const name = input.name?.trim()
+  if (!name) return { error: 'Project name is required.' }
+
+  const validStatus = ['active', 'paused', 'completed', 'archived']
+  const validVis = ['private', 'team', 'organization']
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('projects').update({
+    name,
+    description: input.description?.trim() || null,
+    status: validStatus.includes(input.status) ? input.status : 'active',
+    visibility: validVis.includes(input.visibility) ? input.visibility : 'team',
+  }).eq('id', id).eq('tenant_id', ctx.tenant_id)
+
+  if (error) return { error: `Failed to save: ${error.message}` }
+  revalidatePath(`/dashboard/projects/${id}`)
+  return { success: true as const }
+}
+
 export async function archiveProjectAction(id: string) {
   const ctx = await getUserContext()
   if (!ctx) return { error: 'Not authenticated.' }

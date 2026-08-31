@@ -3,15 +3,13 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Pin, Bot, MoreHorizontal, Plus, Sparkles } from 'lucide-react'
+import { Pin, Bot, MoreHorizontal, Plus, Sparkles, StickyNote } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { EmptyState } from '@/components/ui/empty-state'
 import { cn } from '@/lib/utils'
 
-const NOTES = [
-  { id: '1', author: 'Arun Kumar', time: 'Today 10:30 AM', pinned: true, body: 'Client confirmed they want 3 ICU nurses by July 15. Priority is CCRN-certified candidates with 5+ years experience. Pay rate up to $85/hr for travel. They are flexible on start date.' },
-  { id: '2', author: 'Sarah M.',   time: 'Yesterday 3:00 PM', pinned: false, body: 'Called 8 candidates today. Maria Lopez confirmed interest and is available immediately. James is waiting on his current contract ending July 5.' },
-  { id: '3', author: 'Emily T.',   time: 'Jun 25, 2026', pinned: false, body: 'Resume screening done for new batch. 12 out of 18 meet minimum requirements. Flagged 4 as hot candidates. AI summaries generated for all 12.' },
-]
+type Note = { id: string; author: string; time: string; pinned: boolean; body: string }
+const NOTES: Note[] = []
 
 export default function ProjectNotesPage() {
   const [notes, setNotes] = useState(NOTES)
@@ -19,7 +17,7 @@ export default function ProjectNotesPage() {
 
   function addNote() {
     if (!draft.trim()) return
-    setNotes(prev => [{ id: String(Date.now()), author: 'Arun Kumar', time: 'Just now', pinned: false, body: draft.trim() }, ...prev])
+    setNotes(prev => [{ id: String(Date.now()), author: 'You', time: 'Just now', pinned: false, body: draft.trim() }, ...prev])
     setDraft('')
   }
 
@@ -49,6 +47,10 @@ export default function ProjectNotesPage() {
 
       {/* Notes list */}
       <div className="flex-1 overflow-y-auto space-y-3">
+        {notes.length === 0 && (
+          <EmptyState icon={StickyNote} title="No notes yet"
+            description="Add a note to capture client requirements, call summaries, or team updates." />
+        )}
         {notes.map(n => (
           <div key={n.id} className={cn('rounded-xl border bg-background p-4 group', n.pinned ? 'border-amber-200 bg-amber-50/30' : 'border-border')}>
             <div className="flex items-start justify-between gap-2 mb-2">

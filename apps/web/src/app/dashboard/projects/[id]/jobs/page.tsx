@@ -3,15 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Plus, Briefcase, MoreHorizontal, ExternalLink } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { EmptyState } from '@/components/ui/empty-state'
 import { cn } from '@/lib/utils'
 
-const JOBS = [
-  { id: 'J1023', title: 'ICU RN',              client: 'Houston Methodist',  priority: 'High',   status: 'Open',   openings: 3, submissions: 8,  placements: 1, aiMatch: 94 },
-  { id: 'J1024', title: 'ER Nurse',             client: 'Memorial Medical',   priority: 'High',   status: 'Open',   openings: 2, submissions: 5,  placements: 0, aiMatch: 87 },
-  { id: 'J1031', title: 'OR Nurse',             client: 'St. Luke\'s',        priority: 'Medium', status: 'Open',   openings: 1, submissions: 3,  placements: 1, aiMatch: 91 },
-  { id: 'J1041', title: 'Sr. Java Developer',   client: 'FinCore Inc',        priority: 'High',   status: 'Open',   openings: 2, submissions: 12, placements: 0, aiMatch: 88 },
-  { id: 'J1045', title: 'Backend Engineer',     client: 'DataStream',         priority: 'Medium', status: 'Filled', openings: 1, submissions: 9,  placements: 1, aiMatch: 79 },
-]
+type JobRow = { id: string; title: string; client: string; priority: string; status: string; openings: number; submissions: number; placements: number; aiMatch: number }
+const JOBS: JobRow[] = []
 
 const PRI_CFG: Record<string, string> = {
   High:   'bg-red-50 text-red-700 border-red-200',
@@ -35,6 +31,10 @@ export default function ProjectJobsPage() {
         </div>
         <Button size="sm" className="h-8 text-sm gap-1.5"><Plus className="size-3.5" />Link Job</Button>
       </div>
+      {JOBS.length === 0 ? (
+        <EmptyState icon={Briefcase} title="No jobs linked yet"
+          description="Link a job to this project to move candidates directly into its pipeline." />
+      ) : (
       <div className="flex-1 overflow-auto border border-border rounded-lg">
         <table className="w-full border-collapse">
           <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm">
@@ -85,6 +85,7 @@ export default function ProjectJobsPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   )
 }

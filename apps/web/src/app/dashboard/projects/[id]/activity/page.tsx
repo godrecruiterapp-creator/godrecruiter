@@ -1,22 +1,11 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { UserPlus, UserMinus, Mail, Calendar, CheckSquare, StickyNote, Briefcase, RefreshCw, Upload, Bot } from 'lucide-react'
+import { UserPlus, UserMinus, Mail, Calendar, CheckSquare, StickyNote, Briefcase, RefreshCw, Upload, Bot, Activity } from 'lucide-react'
+import { EmptyState } from '@/components/ui/empty-state'
 
-const EVENTS = [
-  { time: 'Today 10:42 AM', text: 'Maria Lopez moved to Submitted',           type: 'stage',     actor: 'Arun Kumar' },
-  { time: 'Today 09:30 AM', text: 'Interview scheduled with James Wilson',     type: 'interview', actor: 'Sarah M.' },
-  { time: 'Today 08:15 AM', text: 'AI Summary generated for 5 candidates',     type: 'ai',        actor: 'System' },
-  { time: 'Yesterday 4:00 PM', text: 'Linda Torres moved to Offer',            type: 'stage',     actor: 'Arun Kumar' },
-  { time: 'Yesterday 2:30 PM', text: 'Note added by Sarah M.',                 type: 'note',      actor: 'Sarah M.' },
-  { time: 'Yesterday 11:00 AM', text: 'Bulk email sent to 14 candidates',      type: 'email',     actor: 'Arun Kumar' },
-  { time: 'Jun 25 3:00 PM',   text: 'Anna Kim added to project',              type: 'add',       actor: 'Emily T.' },
-  { time: 'Jun 25 2:15 PM',   text: 'Carlos Rivera added to project',         type: 'add',       actor: 'Emily T.' },
-  { time: 'Jun 24 10:00 AM',  text: 'Job #1023 ICU RN linked to project',     type: 'job',       actor: 'Arun Kumar' },
-  { time: 'Jun 24 09:00 AM',  text: 'Task "Call top 10 candidates" created',  type: 'task',      actor: 'Arun Kumar' },
-  { time: 'Jun 23 4:00 PM',   text: 'Document "Rate Card Q3" uploaded',       type: 'upload',    actor: 'Arun Kumar' },
-  { time: 'Jun 22 11:00 AM',  text: 'Raj Patel removed from project',         type: 'remove',    actor: 'Sarah M.' },
-]
+type Event = { time: string; text: string; type: string; actor: string }
+const EVENTS: Event[] = []
 
 const EVT_META: Record<string, { icon: React.ComponentType<{className?: string}>; dot: string }> = {
   stage:     { icon: RefreshCw,  dot: 'bg-blue-500' },
@@ -35,6 +24,10 @@ export default function ProjectActivityPage() {
   return (
     <div className="flex flex-col h-full overflow-y-auto p-5">
       <h2 className="text-sm font-semibold mb-4 shrink-0">Activity Timeline</h2>
+      {EVENTS.length === 0 && (
+        <EmptyState icon={Activity} title="No activity yet"
+          description="Actions on this project — candidates moved, notes added, emails sent — will show up here." />
+      )}
       <div className="flex flex-col gap-0">
         {EVENTS.map((e, i) => {
           const meta = EVT_META[e.type] ?? EVT_META.note!
