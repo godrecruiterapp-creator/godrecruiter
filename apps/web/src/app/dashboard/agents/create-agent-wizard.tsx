@@ -1,6 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { createAgentAction } from './actions'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -396,10 +399,24 @@ const STEP_COMPONENTS = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8,
 export function CreateAgentWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState(1)
   const [state, setState] = useState<WizardState>(INIT)
+  const [saving, startSaving] = useTransition()
+  const router = useRouter()
   const set = (p: Partial<WizardState>) => setState(s => ({ ...s, ...p }))
   const StepComp = STEP_COMPONENTS[step - 1]!
 
   function handleClose() { setStep(1); setState(INIT); onClose() }
+
+  function submit(activate: boolean) {
+    if (!state.name.trim()) { toast.error('Agent name is required.'); setStep(1); return }
+    const { name, description, category, trigger, ...config } = state
+    startSaving(async () => {
+      const res = await createAgentAction({ name, description, category, trigger, activate, config })
+      if (res?.error) { toast.error(res.error); return }
+      toast.success(activate ? 'Agent activated.' : 'Draft saved.')
+      handleClose()
+      router.refresh()
+    })
+  }
 
   return (
     <Sheet open={open} onOpenChange={v => { if (!v) handleClose() }}>
@@ -435,8 +452,8 @@ export function CreateAgentWizard({ open, onClose }: { open: boolean; onClose: (
             <Button size="sm" onClick={() => setStep(s => s + 1)}>Next</Button>
           ) : (
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleClose}>Save Draft</Button>
-              <Button size="sm" onClick={handleClose}>Activate Agent</Button>
+              <Button variant="outline" size="sm" disabled={saving} onClick={() => submit(false)}>Save Draft</Button>
+              <Button size="sm" disabled={saving} onClick={() => submit(true)}>{saving ? 'Saving…' : 'Activate Agent'}</Button>
             </div>
           )}
         </div>

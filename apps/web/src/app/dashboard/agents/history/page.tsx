@@ -13,18 +13,8 @@ type Run = {
   id: string; date: string; agent: string; status: string; duration: string; records: number; actions_performed: number; errors: number
 }
 
-const RUNS: Run[] = [
-  { id: '1',  date: 'Jun 26, 9:02 AM',  agent: 'Java Developer Sourcer',   status: 'completed', duration: '4m 12s', records: 14, actions_performed: 42, errors: 0 },
-  { id: '2',  date: 'Jun 26, 8:15 AM',  agent: 'Interview Reminder',        status: 'completed', duration: '0m 48s', records: 3,  actions_performed: 9,  errors: 0 },
-  { id: '3',  date: 'Jun 26, 7:30 AM',  agent: 'Missing Documents Alert',   status: 'failed',    duration: '1m 05s', records: 0,  actions_performed: 2,  errors: 1 },
-  { id: '4',  date: 'Jun 25, 6:00 PM',  agent: 'Pipeline Analytics',        status: 'completed', duration: '2m 33s', records: 28, actions_performed: 14, errors: 0 },
-  { id: '5',  date: 'Jun 25, 12:00 PM', agent: 'Candidate Follow-up',       status: 'completed', duration: '1m 52s', records: 7,  actions_performed: 21, errors: 0 },
-  { id: '6',  date: 'Jun 25, 9:00 AM',  agent: 'Resume Watcher',            status: 'completed', duration: '0m 22s', records: 2,  actions_performed: 4,  errors: 0 },
-  { id: '7',  date: 'Jun 24, 4:00 PM',  agent: 'License Expiry Monitor',    status: 'completed', duration: '3m 10s', records: 5,  actions_performed: 15, errors: 0 },
-  { id: '8',  date: 'Jun 24, 10:00 AM', agent: 'Java Developer Sourcer',    status: 'running',   duration: '—',      records: 0,  actions_performed: 0,  errors: 0 },
-  { id: '9',  date: 'Jun 24, 9:00 AM',  agent: 'Job Health Monitor',        status: 'failed',    duration: '0m 15s', records: 0,  actions_performed: 1,  errors: 2 },
-  { id: '10', date: 'Jun 23, 6:00 PM',  agent: 'Pipeline Analytics',        status: 'completed', duration: '2m 18s', records: 31, actions_performed: 12, errors: 0 },
-]
+// Execution history is populated once agents actually run. No dummy data.
+const RUNS: Run[] = []
 
 const STATUS_BADGE: Record<string, string> = {
   completed: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
@@ -179,6 +169,13 @@ export default function HistoryPage() {
       {/* Table */}
       <div className="flex flex-1 min-h-0 overflow-hidden border border-border rounded-lg">
         <div className="flex-1 overflow-auto">
+          {RUNS.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full gap-2 py-20">
+              <FileText className="size-6 text-muted-foreground/30" />
+              <p className="text-sm font-semibold">No execution history yet</p>
+              <p className="text-sm text-muted-foreground">Runs will appear here once your agents execute.</p>
+            </div>
+          ) : (
           <table className="w-full border-collapse">
             <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm">
               <tr className="border-b border-border">
@@ -208,10 +205,12 @@ export default function HistoryPage() {
               ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
 
       {/* Pagination */}
+      {RUNS.length > 0 && (
       <div className="flex items-center justify-end pt-3 shrink-0 gap-2">
         <span className="text-sm text-muted-foreground">
           {sorted.length === 0 ? '0' : `${page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, sorted.length)} of ${sorted.length}`}
@@ -234,6 +233,7 @@ export default function HistoryPage() {
           </button>
         </div>
       </div>
+      )}
     </div>
   )
 }

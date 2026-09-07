@@ -1,18 +1,6 @@
-'use client'
-
 import { Card } from '@/components/ui/card'
-import { Bot, TrendingUp, Clock, Users, Mail, FileText, Zap } from 'lucide-react'
-
-const KPIS = [
-  { label: 'Most Active Agent',      value: 'Java Sourcer',  icon: Bot },
-  { label: 'Total Runs',             value: '1,240',         icon: TrendingUp },
-  { label: 'Success Rate',           value: '94.2%',         icon: TrendingUp },
-  { label: 'Hours Saved',            value: '186',           icon: Clock },
-  { label: 'Candidates Found',       value: '2,840',         icon: Users },
-  { label: 'Emails Sent',            value: '1,120',         icon: Mail },
-  { label: 'Submissions Generated',  value: '340',           icon: FileText },
-  { label: 'AI Credits',             value: '18,400',        icon: Zap },
-]
+import { Bot, TrendingUp, Clock, Users, Mail, FileText, Zap, CheckCircle2 } from 'lucide-react'
+import { getAgentStatsAction } from '../actions'
 
 const CHARTS = [
   'Agent Success Rate',
@@ -21,12 +9,27 @@ const CHARTS = [
   'AI Credit Usage',
 ]
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  const stats = await getAgentStatsAction()
+
+  // Only agent counts are real today; run-derived metrics stay empty until an
+  // execution engine records runs.
+  const kpis = [
+    { label: 'Total Agents',          value: String(stats.total),  icon: Bot },
+    { label: 'Active Agents',         value: String(stats.active), icon: CheckCircle2 },
+    { label: 'Total Runs',            value: '0',  icon: TrendingUp },
+    { label: 'Success Rate',          value: '—',  icon: TrendingUp },
+    { label: 'Hours Saved',           value: '0',  icon: Clock },
+    { label: 'Candidates Found',      value: '0',  icon: Users },
+    { label: 'Emails Sent',           value: '0',  icon: Mail },
+    { label: 'AI Credits',            value: '0',  icon: Zap },
+  ]
+
   return (
     <div className="flex flex-col h-full p-6 overflow-auto gap-6">
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
-        {KPIS.map(({ label, value, icon: Icon }) => (
+        {kpis.map(({ label, value, icon: Icon }) => (
           <Card key={label} className="p-5 flex flex-col gap-1">
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Icon className="size-3.5 shrink-0" />
@@ -43,7 +46,7 @@ export default function AnalyticsPage() {
           <div key={label} className="rounded-lg border bg-muted/40 h-52 flex flex-col items-center justify-center gap-2">
             <TrendingUp className="size-6 text-muted-foreground/30" />
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="text-sm text-muted-foreground/60">Chart coming soon</p>
+            <p className="text-sm text-muted-foreground/60">No run data yet</p>
           </div>
         ))}
       </div>
