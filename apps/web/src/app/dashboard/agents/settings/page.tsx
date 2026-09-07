@@ -18,7 +18,7 @@ export default function AgentSettingsPage() {
     hoursEnd: '18:00',
     timezone: 'EST',
     notifEmail: 'godrecruiterapp@gmail.com',
-    apiKey: 'sk-ant-••••••••••••••••••••••••••••••••',
+    apiKey: '',
     auditRetention: '90',
   })
   const set = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }))
@@ -103,7 +103,7 @@ export default function AgentSettingsPage() {
         <div className="space-y-1.5">
           <Label>API Key</Label>
           <div className="relative">
-            <Input type={showKey ? 'text' : 'password'} value={form.apiKey} onChange={e => set('apiKey', e.target.value)} className="pr-9" />
+            <Input type={showKey ? 'text' : 'password'} value={form.apiKey} onChange={e => set('apiKey', e.target.value)} placeholder="sk-ant-…" className="pr-9" />
             <button onClick={() => setShowKey(x => !x)}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
               {showKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
