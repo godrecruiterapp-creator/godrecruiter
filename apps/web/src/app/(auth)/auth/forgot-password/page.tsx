@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
 
-        <Card>
+        <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Reset your password</CardTitle>
             <CardDescription>Enter your email and we&apos;ll send you a reset code.</CardDescription>

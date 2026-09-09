@@ -14,7 +14,7 @@ export default function SuspendedPage() {
           </div>
         </div>
 
-        <Card>
+        <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <CardContent className="pt-8 pb-8 flex flex-col items-center text-center gap-6">
             <div className="suspended-icon relative">
               <div className="size-20 rounded-full bg-[#dd7456]/10 flex items-center justify-center">
