@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useId } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { createAutomationAction } from '../actions'
 import {
   ChevronLeft, Plus, X, Sparkles, Check, Zap, Clock, Filter,
   UserPlus, RefreshCw, Send, XCircle, Trophy, Calendar, CalendarX,
@@ -428,6 +430,16 @@ export default function NewAutomationPage() {
 
   const hasTrigger = blocks.some(b => b.type === 'trigger')
   const summary = buildSummary(blocks)
+  const [saving, startSaving] = useTransition()
+
+  function save() {
+    startSaving(async () => {
+      const res = await createAutomationAction({ name, summary, blocks })
+      if (res?.error) { toast.error(res.error); return }
+      toast.success('Automation saved and turned on.')
+      router.push('/dashboard/automation/my-automations')
+    })
+  }
 
   function addBlock(type: BlockType, afterIndex?: number) {
     const b = makeBlock(type)
@@ -477,8 +489,8 @@ export default function NewAutomationPage() {
         <Button variant="ghost" size="sm" className="h-8 text-sm gap-1.5" onClick={() => setAiOpen(v => !v)}>
           <Sparkles className="size-3.5" />Build with AI
         </Button>
-        <Button size="sm" className="h-8 text-sm" disabled={!canSave} onClick={() => router.push('/dashboard/automation/my-automations')}>
-          <Check className="size-3.5 mr-1.5" strokeWidth={3} />Save Automation
+        <Button size="sm" className="h-8 text-sm" disabled={!canSave || saving} onClick={save}>
+          <Check className="size-3.5 mr-1.5" strokeWidth={3} />{saving ? 'Saving…' : 'Save Automation'}
         </Button>
       </div>
 

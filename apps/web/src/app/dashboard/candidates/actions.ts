@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOpenAIClient, OPENAI_MODEL, friendlyOpenAIError } from '@/lib/openai'
 import { notifyUser } from '@/lib/notifications'
+import { dispatchEvent } from '@/app/dashboard/automation/actions'
 import { ulid } from 'ulid'
 import { redirect } from 'next/navigation'
 
@@ -69,6 +70,13 @@ export async function createCandidateAction(formData: FormData): Promise<{ error
     if (error.code === '23505') return { error: 'A candidate with this email already exists.' }
     return { error: `Failed to add candidate: ${error.message}` }
   }
+
+  // Fire any "Candidate Added" automations in realtime. Awaited (serverless kills
+  // detached work) but self-contained: dispatchEvent never throws back here.
+  await dispatchEvent(tenantId, 'candidate_added', {
+    kind: 'candidate', id: candidate.id, label: `${first_name} ${last_name}`, recipientId: user.id,
+    data: { first_name, last_name, current_title, current_company, location, source, notes },
+  })
 
   redirect(`/dashboard/candidates/${candidate.id}?created=1`)
 }
