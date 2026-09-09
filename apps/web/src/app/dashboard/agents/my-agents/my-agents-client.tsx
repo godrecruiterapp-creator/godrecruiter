@@ -1,15 +1,19 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Search, Plus, SlidersHorizontal, Settings2, GripVertical, Check, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, X, MoreHorizontal, Play, Pause, Pencil, Copy, FileText, Trash2, Bot } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Search, Plus, SlidersHorizontal, Settings2, GripVertical, Check, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, X, MoreHorizontal, Play, Pause, Pencil, Copy, FileText, Trash2, Bot, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CreateAgentWizard } from '../create-agent-wizard'
+import { runAgentAction, type AgentRun } from '../actions'
 import type { Agent } from '../_data'
 
 const STATUS_BADGE: Record<string, string> = {
@@ -110,6 +114,24 @@ export function MyAgentsClient({ agents }: { agents: Agent[] }) {
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState<25 | 50 | 100>(25)
   const [wizardOpen, setWizardOpen] = useState(false)
+  const [runningId, setRunningId] = useState<string | null>(null)
+  const [runResult, setRunResult] = useState<AgentRun | null>(null)
+  const [, startRun] = useTransition()
+  const router = useRouter()
+
+  function handleRun(agent: Agent) {
+    if (runningId) return
+    setRunningId(agent.id)
+    const toastId = toast.loading(`Running ${agent.name}…`)
+    startRun(async () => {
+      const res = await runAgentAction(agent.id)
+      setRunningId(null)
+      if ('error' in res) { toast.error(res.error, { id: toastId }); return }
+      toast.dismiss(toastId)
+      setRunResult(res.run)
+      router.refresh() // updates last_run / success_rate
+    })
+  }
 
   const filtered = useMemo(() => {
     if (!search) return agents
@@ -198,7 +220,9 @@ export function MyAgentsClient({ agents }: { agents: Agent[] }) {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem><Play className="size-3.5 mr-2" />Run Now</DropdownMenuItem>
+            <DropdownMenuItem disabled={!!runningId} onSelect={() => handleRun(a)}>
+              {runningId === a.id ? <Loader2 className="size-3.5 mr-2 animate-spin" /> : <Play className="size-3.5 mr-2" />}Run Now
+            </DropdownMenuItem>
             {a.status === 'paused'
               ? <DropdownMenuItem><Play className="size-3.5 mr-2" />Resume</DropdownMenuItem>
               : <DropdownMenuItem><Pause className="size-3.5 mr-2" />Pause</DropdownMenuItem>
@@ -339,6 +363,33 @@ export function MyAgentsClient({ agents }: { agents: Agent[] }) {
         </div>
         )}
       </div>
+
+      <Dialog open={!!runResult} onOpenChange={v => { if (!v) setRunResult(null) }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {runResult?.status === 'failed'
+                ? <AlertCircle className="size-4 text-red-600" />
+                : <CheckCircle2 className="size-4 text-emerald-600" />}
+              {runResult?.agent_name ?? 'Agent'} — Run {runResult?.status === 'failed' ? 'failed' : 'complete'}
+            </DialogTitle>
+            <DialogDescription>{runResult?.output?.summary ?? runResult?.error ?? ''}</DialogDescription>
+          </DialogHeader>
+          {runResult?.output?.items && runResult.output.items.length > 0 && (
+            <div className="max-h-80 overflow-y-auto -mx-1 px-1 space-y-2">
+              {runResult.output.items.map((it, i) => (
+                <div key={i} className="rounded-lg border p-3">
+                  <p className="text-sm font-semibold">{it.title}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{it.detail}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {runResult?.status === 'success' && !runResult.output?.items?.length && (
+            <p className="text-sm text-muted-foreground">No matching items found in your current data.</p>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <CreateAgentWizard open={wizardOpen} onClose={() => setWizardOpen(false)} />
     </>

@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Search, Bot } from 'lucide-react'
+import { Search, Bot, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createAgentAction } from '../actions'
 
 type Template = {
   name: string; category: string; desc: string; timeSaved: string; difficulty: 'Beginner' | 'Intermediate' | 'Advanced'
@@ -41,6 +44,28 @@ const DIFFICULTY_BADGE: Record<string, string> = {
 export default function TemplatesPage() {
   const [search, setSearch] = useState('')
   const [cat, setCat] = useState('All')
+  const [installing, setInstalling] = useState<string | null>(null)
+  const [, startInstall] = useTransition()
+  const router = useRouter()
+
+  function install(t: Template) {
+    if (installing) return
+    setInstalling(t.name)
+    startInstall(async () => {
+      const res = await createAgentAction({
+        name: t.name,
+        description: t.desc,
+        category: t.category,
+        trigger: 'Manual',
+        activate: false, // land as a draft for review before it goes live
+        config: { template: t.name, objective: t.desc, difficulty: t.difficulty, timeSaved: t.timeSaved },
+      })
+      setInstalling(null)
+      if (res?.error) { toast.error(res.error); return }
+      toast.success(`${t.name} added to My Agents as a draft.`)
+      router.push('/dashboard/agents/my-agents')
+    })
+  }
 
   const filtered = TEMPLATES.filter(t => {
     if (cat !== 'All' && t.category !== cat) return false
@@ -88,7 +113,9 @@ export default function TemplatesPage() {
                 <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800">{t.category}</span>
                 <span className="text-sm text-muted-foreground">Est. {t.timeSaved}</span>
               </div>
-              <Button size="sm" variant="outline" className="h-7 text-sm">Install</Button>
+              <Button size="sm" variant="outline" className="h-7 text-sm" disabled={!!installing} onClick={() => install(t)}>
+                {installing === t.name ? <Loader2 className="size-3.5 animate-spin" /> : 'Install'}
+              </Button>
             </div>
           </Card>
         ))}
