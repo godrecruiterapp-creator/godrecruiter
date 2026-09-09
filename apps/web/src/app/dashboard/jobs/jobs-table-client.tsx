@@ -26,6 +26,7 @@ import {
   Users, Sparkles, Send, Mail, Phone, MessageSquare,
   Code2, ClipboardList, FileText, PenLine, Zap,
   Pencil, Globe, Share2, UserPlus, Copy, Link as LinkIcon,
+  Eye, MapPin, Building2, CalendarDays,
 } from 'lucide-react'
 import { bulkUpdateJobsAction, bulkDeleteJobsAction } from './actions'
 
@@ -231,6 +232,7 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
   const [colWidths, setColWidths] = useState<Partial<Record<ColKey, number>>>({})
   const [selected, setSelected]   = useState<Set<string>>(new Set())
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [sheetJob, setSheetJob]   = useState<Job | null>(null)
   const [draft, setDraft]         = useState<Filters>(EMPTY_FILTERS)
   const [applied, setApplied]     = useState<Filters>(EMPTY_FILTERS)
   const [sortKey, setSortKey]     = useState<ColKey | null>(null)
@@ -359,10 +361,20 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
         )
       case 'title':
         return (
-          <Link href={`/dashboard/jobs/${job.id}`} onClick={e => e.stopPropagation()}
-            className="table-cell-primary truncate hover:text-brand transition-colors block">
-            {job.title}
-          </Link>
+          <div className="flex items-center gap-1.5 min-w-0 group/name">
+            <Link href={`/dashboard/jobs/${job.id}`} onClick={e => e.stopPropagation()}
+              className="table-cell-primary truncate hover:text-brand transition-colors">
+              {job.title}
+            </Link>
+            {/* Eye icon — opens preview sheet */}
+            <button
+              onClick={e => { e.stopPropagation(); setSheetJob(job) }}
+              title="Quick preview"
+              className="ml-auto shrink-0 size-5 flex items-center justify-center rounded text-muted-foreground hover:text-brand hover:bg-brand-muted opacity-0 group-hover/name:opacity-100 transition-all"
+            >
+              <Eye className="size-3.5" />
+            </button>
+          </div>
         )
       case 'client':     return <span className="table-cell-secondary truncate">{job.client ?? '—'}</span>
       case 'city':       return <span className="table-cell-secondary truncate">{job.city ?? '—'}</span>
@@ -705,6 +717,60 @@ export function JobsTableClient({ jobs }: { jobs: Job[] }) {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      <JobPreviewSheet job={sheetJob} onClose={() => setSheetJob(null)} />
     </>
+  )
+}
+
+// ── Quick-preview drawer ────────────────────────────────────────────────────────
+
+function PreviewRow({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <Icon className="size-4 text-muted-foreground shrink-0 mt-0.5" />
+      <div className="min-w-0">
+        <p className="text-[11px] text-muted-foreground uppercase tracking-wide">{label}</p>
+        <p className="text-sm font-medium truncate">{value}</p>
+      </div>
+    </div>
+  )
+}
+
+function JobPreviewSheet({ job, onClose }: { job: Job | null; onClose: () => void }) {
+  const st  = job ? (STATUS_BADGE[job.status]    ?? STATUS_BADGE['open']!)     : null
+  const pri = job ? (PRIORITY_BADGE[job.priority] ?? PRIORITY_BADGE['medium']!) : null
+  const location = job ? [job.city, job.state].filter(Boolean).join(', ') || '—' : '—'
+  return (
+    <Sheet open={!!job} onOpenChange={open => { if (!open) onClose() }}>
+      <SheetContent side="right" className="w-96 sm:w-[28rem] flex flex-col p-0">
+        {job && (
+          <>
+            <SheetHeader className="px-5 py-4 border-b">
+              <SheetTitle className="text-base pr-6 truncate">{job.title}</SheetTitle>
+              <div className="flex items-center gap-2 pt-1">
+                {st  && <Chip label={st.label}  className={st.className} />}
+                {pri && <Chip label={pri.label} className={pri.className} />}
+                <span className="text-sm text-muted-foreground">{job.display_id ?? `…${job.id.slice(-6).toUpperCase()}`}</span>
+              </div>
+            </SheetHeader>
+
+            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+              <PreviewRow icon={Building2}    label="Client"      value={job.client ?? '—'} />
+              <PreviewRow icon={MapPin}       label="Location"    value={location} />
+              <PreviewRow icon={Briefcase}    label="Type"        value={EMP_LABELS[job.employment_type ?? ''] ?? '—'} />
+              <PreviewRow icon={Users}        label="Openings"    value={String(job.openings)} />
+              <PreviewRow icon={UserPlus}     label="Recruiter"   value={job.recruiter_name ?? 'Unassigned'} />
+              <PreviewRow icon={CalendarDays} label="Created"     value={`${fmt(job.created_at)} · ${aging(job.created_at)}d open`} />
+            </div>
+
+            <SheetFooter className="px-5 py-4 border-t gap-2 flex-row">
+              <Button asChild variant="outline" className="flex-1"><Link href={`/dashboard/jobs/${job.id}`}>Open full job</Link></Button>
+              <Button asChild className="flex-1"><Link href={`/dashboard/jobs/${job.id}/edit`}>Edit</Link></Button>
+            </SheetFooter>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
   )
 }
