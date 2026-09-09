@@ -19,7 +19,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
           </div>
         </div>
 
-        <Card>
+        <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Choose a new password</CardTitle>
             <CardDescription>

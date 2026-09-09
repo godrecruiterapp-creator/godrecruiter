@@ -82,7 +82,7 @@ export function LoginForm({ redirectTo, reset }: Props) {
           </div>
         </div>
 
-        <Card>
+        <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Welcome back</CardTitle>
             <CardDescription>Sign in to your workspace</CardDescription>
